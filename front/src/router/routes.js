@@ -1,5 +1,6 @@
 import IndexPage from "pages/IndexPage";
 import Peliculas from "pages/Peliculas";
+import Distribuidores from "pages/Distribuidores";
 
 const routes = [
   {
@@ -8,6 +9,7 @@ const routes = [
     children: [
       { path: '', component: IndexPage },
       { path: 'peliculas', component: Peliculas },
+      { path: 'distribuidores', component: Distribuidores },
     ]
   },
 

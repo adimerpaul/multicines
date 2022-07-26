@@ -37,6 +37,8 @@ class DistributorController extends Controller
     public function store(StoreDistributorRequest $request)
     {
         //
+        $distributor= Distributor::create($request->all());
+        return Distributor::where('id',$distributor->id)->first();
     }
 
     /**
@@ -71,6 +73,8 @@ class DistributorController extends Controller
     public function update(UpdateDistributorRequest $request, Distributor $distributor)
     {
         //
+        $distributor->update($request->all());
+        return $distributor;
     }
 
     /**
@@ -82,5 +86,6 @@ class DistributorController extends Controller
     public function destroy(Distributor $distributor)
     {
         //
+        $distributor->delete();
     }
 }
