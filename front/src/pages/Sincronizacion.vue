@@ -26,7 +26,7 @@
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section>
-          <q-form @submit.prevent="cuiCreate">
+          <q-form @submit.prevent="activityCreate">
             <div class="row">
               <div class="col-12">
                 <q-select :options="[0,1,2]" dense outlined label="codigoPuntoVenta" v-model="cui.codigoPuntoVenta" />
@@ -75,15 +75,16 @@ export default {
         this.cuis = res.data
       })
     },
-    cuiCreate() {
+    activityCreate() {
       this.loading=true
-      this.$api.post('cui', this.cui).then(res => {
+      this.$api.post('activity', this.cui).then(res => {
+        console.log(res.data)
         this.loading=false
         this.cuiDialog = false
         this.getCuis()
         this.$q.notify({
           color: 'positive',
-          message: 'Cui registrado correctamente',
+          message: 'Registro creado correctamente',
           icon: 'done'
         })
       }).catch(err=>{

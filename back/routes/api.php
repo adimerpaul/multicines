@@ -20,3 +20,4 @@ use Illuminate\Support\Facades\Route;
 Route::resource('movie', \App\Http\Controllers\MovieController::class);
 Route::resource('distributor', \App\Http\Controllers\DistributorController::class);
 Route::resource('cui', \App\Http\Controllers\CuiController::class);
+Route::resource('activity', \App\Http\Controllers\ActivityController::class);
