@@ -74,7 +74,7 @@
 
                   </th>
                   <tr v-for="f in parseInt(filas)" :key="f">{{letra[f-1]}}
-                    <td v-for="c in parseInt(columnas)" :key="c" >{{ingresar=parseInt(ingresar) + 1 }}--{{ingresar}}
+                    <td v-for="c in parseInt(columnas)" :key="c" >
 
                       <div v-on:click="activar(asientos[f + c -2])" v-if="asientos[f + c -2].activo=='ACTIVO'">
                         <img src="../assets/img/1.png" alt="" style="width: 30px;height:30px;" >
