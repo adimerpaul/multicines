@@ -8,6 +8,7 @@ export const globalStore = defineStore('global', {
     distributors: [],
     distributor: {},
     distributorSingleTon: false,
+
   }),
   getters: {
     doubleCount: (state) => state.counter * 2,

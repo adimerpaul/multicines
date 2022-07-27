@@ -13,14 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('cuis', function (Blueprint $table) {
+        Schema::create('activities', function (Blueprint $table) {
             $table->id();
-            $table->string("codigo")->nullable();
-            $table->dateTime("fechaVigencia")->nullable();
+            $table->string('codigoCaeb')->nullable();
+            $table->string('descripcion')->nullable();
+            $table->string('tipoActividad')->nullable();
             $table->integer("codigoPuntoVenta")->nullable();
             $table->integer("codigoSucursal")->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cuis');
+        Schema::dropIfExists('activities');
     }
 };

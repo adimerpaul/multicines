@@ -1,6 +1,8 @@
 import IndexPage from "pages/IndexPage";
 import Peliculas from "pages/Peliculas";
 import Distribuidores from "pages/Distribuidores";
+import Cuis from "pages/Cuis";
+import Sincronizacion from "pages/Sincronizacion";
 
 const routes = [
   {
@@ -10,6 +12,8 @@ const routes = [
       { path: '', component: IndexPage },
       { path: 'peliculas', component: Peliculas },
       { path: 'distribuidores', component: Distribuidores },
+      { path: 'cuis', component: Cuis },
+      { path: 'sincronizacion', component: Sincronizacion },
     ]
   },
 
