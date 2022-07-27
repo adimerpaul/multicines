@@ -74,8 +74,8 @@
 
                   </th>
                   <tr v-for="f in parseInt(filas)" :key="f">{{letra[f-1]}}
-                    <td v-for="c in parseInt(columnas)" :key="c" >{{ingresar}}
-                      
+                    <td v-for="c in parseInt(columnas)" :key="c" >{{ingresar=parseInt(ingresar) + 1 }}--{{ingresar}}
+
                       <div v-on:click="activar(asientos[f + c -2])" v-if="asientos[f + c -2].activo=='ACTIVO'">
                         <img src="../assets/img/1.png" alt="" style="width: 30px;height:30px;" >
 
@@ -173,13 +173,6 @@ export default {
         {label:'COLUMNAS',field:'columnas',name:'columnas',sortable:true},
         {label:'CAPACIDAD',field:'capacidad',name:'capacidad',sortable:true},
       ],
-      params: {
-        data: [
-          ['Cell-1', 'Cell-2', 'Cell-3'],
-          ['Cell-4', 'Cell-5', 'Cell-6'],
-          ['Cell-7', 'Cell-8', 'Cell-9']
-        ]
-      }
     }
   },
   created() {
