@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Sala;
+use App\Models\Seat;
+use App\Http\Requests\StoreSalaRequest;
+use App\Http\Requests\UpdateSalaRequest;
+
+class SalaController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //
+        return Sala::all();
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StoreSalaRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(StoreSalaRequest $request)
+    {
+        //
+        $sala=new Sala;
+        $sala->nro=$request->nro;
+        $sala->nombre=$request->nombre;
+        $sala->capacidad=$request->capacidad;
+        $sala->filas=$request->filas;
+        $sala->columnas=$request->columnas;
+        $sala->save();
+
+        foreach ($request->seats as $r){
+            $seat=new Seat;
+            $seat->fila=$r->fila;
+            $seat->columna=$r->columna;
+            $seat->letra=$r->letra;
+            $seat->activo=$r->activo;
+            $seat->sala_id=$sala->id;
+            $seat->save();
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Sala  $sala
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Sala $sala)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Sala  $sala
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Sala $sala)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateSalaRequest  $request
+     * @param  \App\Models\Sala  $sala
+     * @return \Illuminate\Http\Response
+     */
+    public function update(UpdateSalaRequest $request, Sala $sala)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Sala  $sala
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Sala $sala)
+    {
+        //
+    }
+}

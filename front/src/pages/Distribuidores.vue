@@ -2,13 +2,13 @@
   <q-page>
     <div class="row">
       <div class="col-12">
-        <q-table dense title="Gestionar Distribuidor" :rows-per-page-options="[0]" :rows="store.distributor" :columns="distributorColumns" :filter="disstributorFilter">
+        <q-table dense title="Gestionar Distribuidor" :rows-per-page-options="[0]" :rows="store.distributors" :columns="distributorColumns" :filter="distributorFilter">
           <template v-slot:top-right>
             <q-btn
               color="green"
               icon="add_circle"
               label="Agregar"
-              @click="dsitributorDialog=true"/>
+              @click="distributorDialog=true"/>
             <q-input outlined dense debounce="300" v-model="distributorFilter" placeholder="Buscar">
               <template v-slot:append>
                 <q-icon name="search" />
@@ -19,12 +19,12 @@
             <td auto-width :props="props">
               <q-btn-dropdown color="info" label="Opciones" dropdown-icon="change_history">
                 <q-list>
-                  <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=props.row;this.store.distributor=props.row.distributor">
+                  <q-item clickable v-close-popup @click="distributorUpdateDialog=true;distributor2=props.row;this.store.distributor=props.row.distributor">
                     <q-item-section>
                       <q-item-label>Actualizar</q-item-label>
                     </q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup @click="movieDelete(props.row.id,props.pageIndex)">
+                  <q-item clickable v-close-popup @click="distributorDelete(props.row.id,props.pageIndex)">
                     <q-item-section>
                       <q-item-label>Eliminar</q-item-label>
                     </q-item-section>
@@ -37,43 +37,39 @@
         <pre>{{store.movies}}</pre>
       </div>
     </div>
-    <q-dialog v-model="movieDialog" full-width>
+    <q-dialog v-model="distributorDialog" full-width>
       <q-card>
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Registrar Pelicula</div>
+          <div class="text-h6">Registrar Distribuidor</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section>
-          <q-form @submit.prevent="movieCreate">
+          <q-form @submit.prevent="distributorCreate">
             <div class="row">
               <div class="col-3">
-                <q-input dense outlined label="nombre" v-model="movie.nombre" />
+                <q-input dense outlined label="Nombre" v-model="distributor.nombre" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="duracion" v-model="movie.duracion" />
+                <q-input dense outlined label="Direccion" v-model="distributor.dir" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="paisOrigen" v-model="movie.paisOrigen" />
+                <q-input dense outlined label="Localidad" v-model="distributor.loc" />
+              </div>
+
+              <div class="col-3">
+                <q-input dense outlined label="NIT" v-model="distributor.nit" />
               </div>
               <div class="col-3">
-                <q-select dense outlined label="genero" v-model="movie.genero" :options="['Accion','Animacion','Animada','Aventura','Aventuras','Ciencia Ficcion','Comedia','Deporte','Documental','Drama','Historica','Infantil','Musical','Romantica','Suspenso','Terror','Thiller','Western','Otros']"/>
+                <q-input dense outlined label="Telefono" v-model="distributor.tel" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="sipnosis" v-model="movie.sipnosis" />
+                <q-input dense outlined label="Email" v-model="distributor.email" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="urlTrailer" v-model="movie.urlTrailer" />
+                <q-input dense outlined label="Responsable" v-model="distributor.responsable" />
               </div>
-              <div class="col-3">
-                <q-select dense outlined label="clasificacion" v-model="movie.clasificacion" :options="['+13','+13 C/R','+16','+18','ATP','ATP C/R','R',]"/>
-              </div>
-              <div class="col-3">
-                <q-input dense outlined type="date" label="fechaEstreno" v-model="movie.fechaEstreno" />
-              </div>
-              <div class="col-3">
-                <q-select dense outlined label="distributor_id" v-model="store.distributor" :options="store.distributors" option-label="nombre"/>
-              </div>
+
               <div class="col-12">
                 <q-btn :loading="loading" color="green" icon="add_circle" class="full-width" type="submit" label="Guardar" />
               </div>
@@ -82,42 +78,37 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <q-dialog v-model="movieUpdateDialog" full-width>
+    <q-dialog v-model="distributorUpdateDialog" full-width>
       <q-card>
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Modificar Pelicula</div>
+          <div class="text-h6">Modificar Distribuidor</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section>
-          <q-form @submit.prevent="movieUpdate">
+          <q-form @submit.prevent="distributorUpdate">
             <div class="row">
               <div class="col-3">
-                <q-input dense outlined label="nombre" v-model="movie2.nombre" />
+                <q-input dense outlined label="Nombre" v-model="distributor2.nombre" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="duracion" v-model="movie2.duracion" />
+                <q-input dense outlined label="Direccion" v-model="distributor2.dir" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="paisOrigen" v-model="movie2.paisOrigen" />
+                <q-input dense outlined label="Localidad" v-model="distributor2.loc" />
+              </div>
+
+              <div class="col-3">
+                <q-input dense outlined label="NIT" v-model="distributor2.nit" />
               </div>
               <div class="col-3">
-                <q-select dense outlined label="genero" v-model="movie2.genero" :options="['Accion','Animacion','Animada','Aventura','Aventuras','Ciencia Ficcion','Comedia','Deporte','Documental','Drama','Historica','Infantil','Musical','Romantica','Suspenso','Terror','Thiller','Western','Otros']"/>
+                <q-input dense outlined label="Telefono" v-model="distributor2.tel" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="sipnosis" v-model="movie2.sipnosis" />
+                <q-input dense outlined label="Email" v-model="distributor2.email" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="urlTrailer" v-model="movie2.urlTrailer" />
-              </div>
-              <div class="col-3">
-                <q-select dense outlined label="clasificacion" v-model="movie2.clasificacion" :options="['+13','+13 C/R','+16','+18','ATP','ATP C/R','R',]"/>
-              </div>
-              <div class="col-3">
-                <q-input dense outlined type="date" label="fechaEstreno" v-model="movie2.fechaEstreno" />
-              </div>
-              <div class="col-3">
-                <q-select dense outlined label="distributor_id" v-model="store.distributor" :options="store.distributors" option-label="nombre"/>
+                <q-input dense outlined label="Responsable" v-model="distributor2.responsable" />
               </div>
               <div class="col-12">
                 <q-btn color="yellow-8" icon="edit" class="full-width" type="submit" label="Modificar" />
@@ -135,76 +126,64 @@ import {globalStore} from "stores/globalStore";
 import {date} from "quasar";
 
 export default {
-  name: `Peliculas`,
+  name: `Distribuidores`,
   data() {
     return {
       loading: false,
       distributorFilter:'',
       distributor:{
-        clasificacion:'+13',
-        genero:'Accion',
-        fechaEstreno:date.formatDate(new Date(),'YYYY-MM-DD'),
       },
-      movie2:{},
-      movieDialog:false,
-      movieUpdateDialog:false,
+      distributor2:{},
+      distributorDialog:false,
+      distributorUpdateDialog:false,
       store: globalStore(),
-      movieColumns:[
-        {label:'opciones',field:'opciones',name:'opciones'},
-        {label:'nombre',field:'nombre',name:'nombre',sortable:true},
-        {label:'duracion',field:'duracion',name:'duracion',sortable:true},
-        {label:'paisOrigen',field:'paisOrigen',name:'paisOrigen',sortable:true},
-        {label:'genero',field:'genero',name:'genero',sortable:true},
-        {label:'clasificacion',field:'clasificacion',name:'clasificacion',sortable:true},
-        {label:'fechaEstreno',field:'fechaEstreno',name:'fechaEstreno',sortable:true},
-        {label:'distributor_id',field:row=>row.distributor.nombre,name:'distributor_id',sortable:true},
+      distributorColumns:[
+        {label:'OPCIONES',field:'opciones',name:'opciones'},
+        {label:'NOMBRE',field:'nombre',name:'nombre',sortable:true},
+        {label:'DIRECCION',field:'dir',name:'dir',sortable:true},
+        {label:'LOCALIZACION',field:'loc',name:'loc',sortable:true},
+        {label:'NIT',field:'nit',name:'nit',sortable:true},
+        {label:'TELEFONO',field:'tel',name:'tel',sortable:true},
+        {label:'EMAIL',field:'email',name:'email',sortable:true},
+        {label:'RESPONSABLE',field:'responsable',name:'responsable',sortable:true},
       ]
     }
   },
   created() {
-    if(!this.store.movieSingleTon) {
-      this.$q.loading.show()
-      this.store.movieSingleTon=true
-      this.$api.get('movie').then(res=>{
-        this.store.movies=res.data
-        this.$q.loading.hide()
-      })
-    }
-    if(!this.store.distributorSingleTon){
+    if(!this.store.distributorSingleTon) {
       this.$q.loading.show()
       this.store.distributorSingleTon=true
       this.$api.get('distributor').then(res=>{
         this.store.distributors=res.data
-        this.store.distributor=res.data[0]
         this.$q.loading.hide()
       })
+
     }
   },
   methods: {
-    movieCreate(){
+    distributorCreate(){
       this.loading=true
-      this.movie.distributor_id=this.store.distributor.id
-      this.$api.post('movie',this.movie).then(res=>{
+      this.$api.post('distributor',this.distributor).then(res=>{
         this.loading=false
-        this.store.movies.push(res.data)
-        this.movieDialog=false
+        this.store.distributors.push(res.data)
+        this.distributorDialog=false
       })
     },
-    movieUpdate(){
+    distributorUpdate(){
       this.$q.loading.show()
-      this.$api.put('movie/'+this.movie2.id,this.movie2).then(res=>{
+      this.$api.put('distributor/'+this.distributor2.id,this.distributor2).then(res=>{
         this.$q.loading.hide()
         console.log(res.data)
-        this.movie2={}
-        let index = this.store.movies.findIndex(m => m.id == res.data.id);
-        this.store.movies[index]=res.data
-        this.movieUpdateDialog=false
+        this.distributor2={}
+        let index = this.store.distributors.findIndex(m => m.id == res.data.id);
+        this.store.distributors[index]=res.data
+        this.distributorUpdateDialog=false
       })
     },
-    movieDelete(id,pageIndex){
+    distributorDelete(id,pageIndex){
       this.$q.dialog({
-        title: 'Eliminar Pelicula',
-        message: '¿Esta seguro de eliminar la pelicula?',
+        title: 'Eliminar Distribuidor',
+        message: '¿Esta seguro de eliminar la distribuidor?',
         ok: {
           push: true
         },
@@ -214,11 +193,11 @@ export default {
         },
       }).onOk(() => {
         this.$q.loading.show()
-        this.$api.delete('movie/'+id).then(res=>{
-          this.store.movies.splice(pageIndex,1)
+        this.$api.delete('distributor/'+id).then(res=>{
+          this.store.distributors.splice(pageIndex,1)
           this.$q.loading.hide()
           this.$q.notify({
-            message: 'Pelicula eliminada',
+            message: 'Distribuidor eliminada',
             color: 'positive',
             icon: 'done'
           })

@@ -34,9 +34,9 @@
         </q-expansion-item>
         <q-expansion-item expand-separator dense exact icon="o_movie_filter" label="Peliculas">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_movie" label="Peliculas" default-opened to="peliculas" expand-icon="null"/>
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Distribuidores" default-opened to="cufd" expand-icon="null"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Distribuidores" default-opened to="distribuidores" expand-icon="null"/>
         </q-expansion-item>
-        <q-expansion-item dense exact expand-separator icon="o_living" label="Salas" default-opened to="sala" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="o_living" label="Salas" default-opened to="salas" expand-icon="null"/>
       </q-list>
     </q-drawer>
 
