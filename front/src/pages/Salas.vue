@@ -58,11 +58,11 @@
                 <q-input dense outlined label="Nombre" v-model="sala.nombre" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="Filas" type="number" v-model="filas" @keyup="tablacine" />
+                <q-input dense outlined label="Filas" type="number" v-model="filas" @change="tablacine" />
               </div>
 
               <div class="col-3">
-                <q-input dense outlined label="Columnas" type="number" v-model="columnas" @keyup="tablacine"/>
+                <q-input dense outlined label="Columnas" type="number" v-model="columnas" @change="tablacine"/>
               </div>
               <div class="col-12">
                 <table>
@@ -75,8 +75,8 @@
                   <tbody>
                   <tr v-for="(f,i) in parseInt(filas)" :key="i">
                     <th>{{letra[i+1]}}</th>
-                    <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center">
-                      <q-btn round icon="o_chair" :color="asientos[columnas*(f-1)+(c-1)].activo=='ACTIVO'?'green-6':'grey-9'" >
+                    <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center">{{asientos[columnas*(f-1)+(c-1)]['activo']}}
+                      <q-btn round icon="o_chair" :color="asientos[columnas*(f-1)+(c-1)]['activo']=='ACTIVO'?'green-6':'grey-9'" >
                         <q-badge color="primary" floating>{{letra[i+1]+'-'+(columnas-c+1).toString()}}</q-badge>
                       </q-btn>
                     </td>
@@ -151,7 +151,7 @@
                     <tr v-for="(f,i) in parseInt(filas)" :key="i">
                       <th>{{letra[i+1]}}</th>
                       <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center">
-                        <q-btn round icon="o_chair" :color="asientos[columnas*(f-1)+(c-1)].activo=='ACTIVO'?'green-6':'grey-9'" >
+                        <q-btn round icon="o_chair" :color="valorindice(c,f)=='ACTIVO'?'green-6':'grey-9'" >{{valorindice(c,f)}}
                           <q-badge color="primary" floating>{{letra[i+1]+'-'+(columnas-c+1).toString()}}</q-badge>
                         </q-btn>
                       </td>
@@ -216,6 +216,9 @@ export default {
     this.tablacine()
   },
   methods: {
+    valorindice(c,f){
+      return this.asientos[(this.columnas*(f-1))+(c-1)].activo
+    },
     cambio(f,c){
       let index=this.columnas*(f-1)+(c-1)
       this.asientos[index].activo=this.asientos[index].activo=='ACTIVO'?'INACTIVO':'ACTIVO'
