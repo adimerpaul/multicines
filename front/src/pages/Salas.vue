@@ -16,8 +16,8 @@
             </q-input>
           </template>
           <template v-slot:body-cell-opciones="props">
-            <td auto-width :props="props">
-              <q-btn-dropdown color="info" label="Opciones" dropdown-icon="change_history">
+            <q-td auto-width :props="props">
+              <q-btn-dropdown color="info" label="Opciones" dropdown-icon="more_vert">
                 <q-list>
                   <q-item clickable v-close-popup @click="salaUpdateDialog=true;sala2=props.row;columnas=props.row.columnas;filas=props.row.filas;asientos=props.row.seats;">
                     <q-item-section>
@@ -31,7 +31,7 @@
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-            </td>
+            </q-td>
           </template>
         </q-table>
 
@@ -40,12 +40,13 @@
 
     <q-dialog v-model="salaDialog" full-width>
       <q-card>
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Registrar Sala
-          </div><br>
+        <q-card-section class="row q-pb-none">
+          <div class="text-h6">
+            Registrar Sala
+          </div>
 
-          <div >Capacidad: {{total}}</div>
           <q-space />
+          <div class="text-h6 text-grey" >Capacidad: {{total}}</div>
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section>
@@ -55,7 +56,7 @@
                 <q-input dense outlined label="Numero Sala (Opcional)" v-model="sala.nro" />
               </div>
               <div class="col-3">
-                <q-input dense outlined label="Nombre" v-model="sala.nombre" />
+                <q-input dense outlined label="Nombre" v-model="sala.nombre" required/>
               </div>
               <div class="col-3">
                 <q-input dense outlined label="Filas" type="number" v-model="filas" @change="tablacine" />
@@ -75,7 +76,7 @@
                   <tbody>
                   <tr v-for="(f,i) in parseInt(filas)" :key="i">
                     <th>{{letra[i+1]}}</th>
-                    <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center">{{asientos[columnas*(f-1)+(c-1)]['activo']}}
+                    <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center tdx">
                       <q-btn round icon="o_chair" :color="asientos[columnas*(f-1)+(c-1)]['activo']=='ACTIVO'?'green-6':'grey-9'" >
                         <q-badge color="primary" floating>{{letra[i+1]+'-'+(columnas-c+1).toString()}}</q-badge>
                       </q-btn>
@@ -133,11 +134,11 @@
                   <q-input dense outlined label="Nombre" v-model="sala2.nombre" />
                 </div>
                 <div class="col-3">
-                  <q-input dense outlined label="Filas" type="number" v-model="filas" @keyup="tablacine" />
+                  <q-input dense outlined label="Filas" type="number" v-model="filas" @change="tablacine" />
                 </div>
 
                 <div class="col-3">
-                  <q-input dense outlined label="Columnas" type="number" v-model="columnas" @keyup="tablacine"/>
+                  <q-input dense outlined label="Columnas" type="number" v-model="columnas" @change="tablacine"/>
                 </div>
                 <div class="col-12">
                   <table>
@@ -150,8 +151,8 @@
                     <tbody>
                     <tr v-for="(f,i) in parseInt(filas)" :key="i">
                       <th>{{letra[i+1]}}</th>
-                      <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center">
-                        <q-btn round icon="o_chair" :color="valorindice(c,f)=='ACTIVO'?'green-6':'grey-9'" >{{valorindice(c,f)}}
+                      <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center tdx">
+                        <q-btn round icon="o_chair" :color="valorindice(c,f)=='ACTIVO'?'green-6':'grey-9'" >
                           <q-badge color="primary" floating>{{letra[i+1]+'-'+(columnas-c+1).toString()}}</q-badge>
                         </q-btn>
                       </td>
@@ -181,8 +182,8 @@ export default {
       contador:0,
       loading: false,
       salaFilter:'',
-      filas:0,
-      columnas:0,
+      filas:5,
+      columnas:5,
       colnuminv:[],
       ingresar:0,
       sala:{
@@ -196,7 +197,7 @@ export default {
       letra:['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB'],
       salaColumns:[
         {label:'OPCIONES',field:'opciones',name:'opciones'},
-        {label:'NRO',field:'nro',name:'nro',sortable:true},
+        // {label:'NRO',field:'nro',name:'nro',sortable:true},
         {label:'NOMBRE',field:'nombre',name:'nombre',sortable:true},
         {label:'FILAS',field:'filas',name:'filas',sortable:true},
         {label:'COLUMNAS',field:'columnas',name:'columnas',sortable:true},
@@ -285,17 +286,24 @@ export default {
       this.sala.seats=this.asientos
       this.loading=true
       this.$api.post('sala',this.sala).then(res=>{
-        console.log(res.data)
         this.loading=false
-        //this.store.salas.push(res.data)
-        //this.salaDialog=false
+        this.store.salas.push(res.data)
+        this.salaDialog=false
+      }).catch(error=>{
+        this.$q.notify({
+          color:'negative',
+          message:error.response.data.message,
+          position:'top',
+          icon:'error',
+          timeout:5000
+        })
+        this.loading=false
       })
     },
     salaUpdate(){
       this.$q.loading.show()
       this.$api.put('sala/'+this.sala2.id,this.sala2).then(res=>{
         this.$q.loading.hide()
-        console.log(res.data)
         this.sala2={}
         let index = this.store.salas.findIndex(m => m.id == res.data.id);
         this.store.salas[index]=res.data
@@ -343,7 +351,7 @@ export default {
 table{
   width: 100%;
 }
-table, td, th {
+table, .tdx, th {
   border-collapse: collapse;
   border: 1px solid #ddd;
   padding: 5px;

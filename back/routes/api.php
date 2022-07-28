@@ -21,4 +21,5 @@ Route::resource('movie', \App\Http\Controllers\MovieController::class);
 Route::resource('distributor', \App\Http\Controllers\DistributorController::class);
 Route::resource('sala', \App\Http\Controllers\SalaController::class);
 Route::resource('cui', \App\Http\Controllers\CuiController::class);
+Route::resource('cufd', \App\Http\Controllers\CufdController::class);
 Route::resource('activity', \App\Http\Controllers\ActivityController::class);

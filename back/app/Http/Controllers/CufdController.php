@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cufd;
+use App\Http\Requests\StoreCufdRequest;
+use App\Http\Requests\UpdateCufdRequest;
 use App\Models\Cui;
-use App\Http\Requests\StoreCuiRequest;
-use App\Http\Requests\UpdateCuiRequest;
 
-class CuiController extends Controller
+class CufdController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +16,7 @@ class CuiController extends Controller
      */
     public function index()
     {
-        return Cui::all();
+        return Cufd::all();
     }
 
     /**
@@ -31,14 +32,18 @@ class CuiController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreCuiRequest  $request
+     * @param  \App\Http\Requests\StoreCufdRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreCuiRequest $request)
+    public function store(StoreCufdRequest $request)
     {
-        if (Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()>=1){
-            return response()->json(['error' => 'El CUI ya existe'], 400);
+        if (Cufd::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()>=1){
+            return response()->json(['message' => 'El CUFD ya existe'], 400);
         }else{
+            $cui=Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->whereDate('fechaVigencia','>=', now());
+            if ($cui->count()==0){
+                return response()->json(['message' => 'El CUI no existe'], 400);
+            }
             $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
@@ -51,33 +56,35 @@ class CuiController extends Controller
                 'use' => SOAP_LITERAL,
                 'style' => SOAP_DOCUMENT,
             ]);
-            $result= $client->cuis([
-                "SolicitudCuis"=>[
+            $result= $client->cufd([
+                "SolicitudCufd"=>[
                     "codigoAmbiente"=>env('AMBIENTE'),
                     "codigoModalidad"=>env('MODALIDAD'),
                     "codigoPuntoVenta"=>$request->codigoPuntoVenta,
                     "codigoSistema"=>env('CODIGO_SISTEMA'),
                     "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=> $cui->first()->codigo,
                     "nit"=>env('NIT'),
                 ]
             ]);
-            $cui = new Cui();
-            $cui->codigo = $result->RespuestaCuis->codigo;
-            $cui->fechaVigencia =  date('Y-m-d H:i:s', strtotime($result->RespuestaCuis->fechaVigencia));
-            $cui->codigoPuntoVenta = $request->codigoPuntoVenta;
-            $cui->codigoSucursal = $request->codigoSucursal;
-            $cui->save();
-            return response()->json(['success' => 'CUI creado correctamente'], 200);
+            $cufd = new Cufd();
+            $cufd->codigo = $result->RespuestaCufd->codigo;
+            $cufd->codigoControl = $result->RespuestaCufd->codigoControl;
+            $cufd->fechaVigencia =  date('Y-m-d H:i:s', strtotime($result->RespuestaCufd->fechaVigencia));
+            $cufd->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $cufd->codigoSucursal = $request->codigoSucursal;
+            $cufd->save();
+            return response()->json(['success' => 'CUFD creado correctamente'], 200);
         }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Cui  $cui
+     * @param  \App\Models\Cufd  $cufd
      * @return \Illuminate\Http\Response
      */
-    public function show(Cui $cui)
+    public function show(Cufd $cufd)
     {
         //
     }
@@ -85,10 +92,10 @@ class CuiController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Cui  $cui
+     * @param  \App\Models\Cufd  $cufd
      * @return \Illuminate\Http\Response
      */
-    public function edit(Cui $cui)
+    public function edit(Cufd $cufd)
     {
         //
     }
@@ -96,11 +103,11 @@ class CuiController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateCuiRequest  $request
-     * @param  \App\Models\Cui  $cui
+     * @param  \App\Http\Requests\UpdateCufdRequest  $request
+     * @param  \App\Models\Cufd  $cufd
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCuiRequest $request, Cui $cui)
+    public function update(UpdateCufdRequest $request, Cufd $cufd)
     {
         //
     }
@@ -108,10 +115,10 @@ class CuiController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Cui  $cui
+     * @param  \App\Models\Cufd  $cufd
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Cui $cui)
+    public function destroy(Cufd $cufd)
     {
         //
     }

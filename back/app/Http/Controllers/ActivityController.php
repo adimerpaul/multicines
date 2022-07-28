@@ -41,7 +41,7 @@ class ActivityController extends Controller
 
         $cui=Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->whereDate('fechaVigencia','>=', now());
         if ($cui->count()==0){
-            return response()->json(['error' => 'El CUI no existe'], 400);
+            return response()->json(['message' => 'El CUI no existe'], 400);
         }
         Activity::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
         $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion?WSDL",  [

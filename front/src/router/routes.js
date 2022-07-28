@@ -4,6 +4,7 @@ import Distribuidores from "pages/Distribuidores";
 import Cuis from "pages/Cuis";
 import Sincronizacion from "pages/Sincronizacion";
 import Salas from "pages/Salas";
+import Cufd from "pages/Cufd";
 
 const routes = [
   {
@@ -14,6 +15,7 @@ const routes = [
       { path: 'peliculas', component: Peliculas },
       { path: 'distribuidores', component: Distribuidores },
       { path: 'cuis', component: Cuis },
+      { path: 'cufd', component: Cufd },
       { path: 'sincronizacion', component: Sincronizacion },
       { path: 'salas', component: Salas },
     ]
