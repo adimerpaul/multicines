@@ -11,7 +11,8 @@ class Sala extends Model
     use SoftDeletes;
     use HasFactory;
     protected $fillable=['nro','nombre','filas','columnas','capacidad'];
-    public function Seats()
+
+    public function seats()
     {
         return $this->hasMany(Seat::class);
     }

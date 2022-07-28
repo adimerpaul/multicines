@@ -6,6 +6,9 @@ use App\Models\Sala;
 use App\Models\Seat;
 use App\Http\Requests\StoreSalaRequest;
 use App\Http\Requests\UpdateSalaRequest;
+use App\Http\Requests\StoreSeatRequest;
+use App\Http\Requests\UpdateSeatRequest;
+use Illuminate\Support\Facades\DB;
 
 class SalaController extends Controller
 {
@@ -17,7 +20,7 @@ class SalaController extends Controller
     public function index()
     {
         //
-        return Sala::all();
+        return Sala::with('seats')->get();
     }
 
     /**
@@ -39,6 +42,7 @@ class SalaController extends Controller
     public function store(StoreSalaRequest $request)
     {
         //
+        //return $request;
         $sala=new Sala;
         $sala->nro=$request->nro;
         $sala->nombre=$request->nombre;
@@ -48,14 +52,18 @@ class SalaController extends Controller
         $sala->save();
 
         foreach ($request->seats as $r){
+
             $seat=new Seat;
-            $seat->fila=$r->fila;
-            $seat->columna=$r->columna;
-            $seat->letra=$r->letra;
-            $seat->activo=$r->activo;
+
+            $seat->fila=$r['fila'];
+            $seat->columna=$r['columna'];
+            $seat->letra=$r['letra'];
+            $seat->activo=$r['activo'];
             $seat->sala_id=$sala->id;
             $seat->save();
+            //return $seat;
         }
+        return Sala::where('id',$sala->id)->with('seats')->first();
     }
 
     /**
@@ -101,5 +109,8 @@ class SalaController extends Controller
     public function destroy(Sala $sala)
     {
         //
+        DB::SELECT("DELETE from seats where sala_id=$sala->id");
+        $sala->delete();
+
     }
 }

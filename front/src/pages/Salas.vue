@@ -19,7 +19,7 @@
             <td auto-width :props="props">
               <q-btn-dropdown color="info" label="Opciones" dropdown-icon="change_history">
                 <q-list>
-                  <q-item clickable v-close-popup @click="salaUpdateDialog=true;sala2=props.row;this.store.sala=props.row.sala">
+                  <q-item clickable v-close-popup @click="salaUpdateDialog=true;sala2=props.row;columnas=props.row.columnas;filas=props.row.filas;asientos=props.row.seats;">
                     <q-item-section>
                       <q-item-label>Actualizar</q-item-label>
                     </q-item-section>
@@ -34,14 +34,17 @@
             </td>
           </template>
         </q-table>
-        <pre>{{store.movies}}</pre>
+
       </div>
     </div>
 
     <q-dialog v-model="salaDialog" full-width>
       <q-card>
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Registrar Sala</div>
+          <div class="text-h6">Registrar Sala
+          </div><br>
+
+          <div >Capacidad: {{total}}</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
@@ -116,35 +119,46 @@
     <q-dialog v-model="salaUpdateDialog" full-width>
       <q-card>
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Modificar Distribuidor</div>
+          <div class="text-h6">Modificar Sala</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section>
           <q-form @submit.prevent="salaUpdate">
-            <div class="row">
-              <div class="col-3">
-                <q-input dense outlined label="Nombre" v-model="sala2.nombre" />
-              </div>
-              <div class="col-3">
-                <q-input dense outlined label="Direccion" v-model="sala2.dir" />
-              </div>
-              <div class="col-3">
-                <q-input dense outlined label="Localidad" v-model="sala2.loc" />
-              </div>
+              <div class="row">
+                <div class="col-3">
+                  <q-input dense outlined label="Numero Sala (Opcional)" v-model="sala2.nro" />
+                </div>
+                <div class="col-3">
+                  <q-input dense outlined label="Nombre" v-model="sala2.nombre" />
+                </div>
+                <div class="col-3">
+                  <q-input dense outlined label="Filas" type="number" v-model="filas" @keyup="tablacine" />
+                </div>
 
-              <div class="col-3">
-                <q-input dense outlined label="NIT" v-model="sala2.nit" />
-              </div>
-              <div class="col-3">
-                <q-input dense outlined label="Telefono" v-model="sala2.tel" />
-              </div>
-              <div class="col-3">
-                <q-input dense outlined label="Email" v-model="sala2.email" />
-              </div>
-              <div class="col-3">
-                <q-input dense outlined label="Responsable" v-model="sala2.responsable" />
-              </div>
+                <div class="col-3">
+                  <q-input dense outlined label="Columnas" type="number" v-model="columnas" @keyup="tablacine"/>
+                </div>
+                <div class="col-12">
+                  <table>
+                    <thead>
+                    <tr>
+                      <th></th>
+                      <th v-for="(c,i) in parseInt(columnas) " :key="i">{{columnas-c+1}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(f,i) in parseInt(filas)" :key="i">
+                      <th>{{letra[i+1]}}</th>
+                      <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center">
+                        <q-btn round icon="o_chair" :color="asientos[columnas*(f-1)+(c-1)].activo=='ACTIVO'?'green-6':'grey-9'" >
+                          <q-badge color="primary" floating>{{letra[i+1]+'-'+(columnas-c+1).toString()}}</q-badge>
+                        </q-btn>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
               <div class="col-12">
                 <q-btn color="yellow-8" icon="edit" class="full-width" type="submit" label="Modificar" />
               </div>
@@ -167,14 +181,14 @@ export default {
       contador:0,
       loading: false,
       salaFilter:'',
-      filas:10,
-      columnas:22,
+      filas:0,
+      columnas:0,
       colnuminv:[],
       ingresar:0,
       sala:{
       },
       sala2:{},
-      salaDialog:true,
+      salaDialog:false,
       salaUpdateDialog:false,
       store: globalStore(),
       asientos:[],
@@ -191,14 +205,14 @@ export default {
     }
   },
   created() {
-    // if(!this.store.salaSingleTon) {
-    //   this.$q.loading.show()
-    //   this.store.salaSingleTon=true
-    //   this.$api.get('sala').then(res=>{
-    //     this.store.salas=res.data
-    //     this.$q.loading.hide()
-    //   })
-    // }
+     if(!this.store.salaSingleTon) {
+       this.$q.loading.show()
+       this.store.salaSingleTon=true
+       this.$api.get('sala').then(res=>{
+         this.store.salas=res.data
+         this.$q.loading.hide()
+       })
+     }
     this.tablacine()
   },
   methods: {
@@ -240,6 +254,9 @@ export default {
       if (this.filas=='' || this.filas==undefined) {
         this.filas=1
       }
+      if (this.columnas=='' || this.columnas==undefined) {
+        this.columnas=1
+      }
       this.asientos=[]
       if(this.filas>0 && this.columnas>0){
         for (let f=1;f<=this.filas;f++){
@@ -250,11 +267,25 @@ export default {
       }
     },
     salaCreate(){
+      if(this.sala.nombre=='' || this.sala.nombre==undefined){
+       return false;
+      }
+      if(this.filas=='' || this.filas==undefined || this.filas==0){
+        return false;
+      }
+      if(this.columnas=='' || this.columnas==undefined || this.columnas==0){
+        return false;
+      }
+      this.sala.filas=parseInt(this.filas)
+      this.sala.columnas=parseInt(this.columnas)
+      this.sala.capacidad=this.total
+      this.sala.seats=this.asientos
       this.loading=true
       this.$api.post('sala',this.sala).then(res=>{
+        console.log(res.data)
         this.loading=false
-        this.store.salas.push(res.data)
-        this.salaDialog=false
+        //this.store.salas.push(res.data)
+        //this.salaDialog=false
       })
     },
     salaUpdate(){
@@ -270,8 +301,8 @@ export default {
     },
     salaDelete(id,pageIndex){
       this.$q.dialog({
-        title: 'Eliminar Distribuidor',
-        message: '¿Esta seguro de eliminar la distribuidor?',
+        title: 'Eliminar Sala',
+        message: '¿Esta seguro de eliminar la sala?',
         ok: {
           push: true
         },
@@ -285,7 +316,7 @@ export default {
           this.store.salas.splice(pageIndex,1)
           this.$q.loading.hide()
           this.$q.notify({
-            message: 'Distribuidor eliminada',
+            message: 'Sala eliminada',
             color: 'positive',
             icon: 'done'
           })
@@ -293,6 +324,15 @@ export default {
       })
     }
   },
+  computed:{
+    total(){
+      let sum=0
+      this.asientos.forEach(function(r){
+        if(r.activo=='ACTIVO') sum++
+      })
+      return sum
+    }
+  }
 }
 </script>
 
