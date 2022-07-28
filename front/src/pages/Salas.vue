@@ -49,47 +49,62 @@
           <q-form @submit.prevent="salaCreate">
             <div class="row">
               <div class="col-3">
-                <q-input dense outlined label="NRO" v-model="sala.nro" />
+                <q-input dense outlined label="Numero Sala (Opcional)" v-model="sala.nro" />
               </div>
               <div class="col-3">
                 <q-input dense outlined label="Nombre" v-model="sala.nombre" />
               </div>
-              <div class="col-2">
-                <q-input dense outlined label="Filas" v-model="filas" />
+              <div class="col-3">
+                <q-input dense outlined label="Filas" type="number" v-model="filas" @keyup="tablacine" />
               </div>
 
-              <div class="col-2">
-                <q-input dense outlined label="Columnas" v-model="columnas" v-on:keyup="invertir"/>
+              <div class="col-3">
+                <q-input dense outlined label="Columnas" type="number" v-model="columnas" @keyup="tablacine"/>
               </div>
-              <div class="col-2">
-                <q-input dense outlined label="Capacidad" v-model="sala.capacidad" v-on:change="tablacine"/>
-              </div>
-              <div class="row " style="text-align:center;">
-                <table class="flex-center" >
-                  <th>
+              <div class="col-12">
+                <table>
+                  <thead>
                     <tr>
-                      <td v-for="c in colnuminv" :key="c">{{c}}</td>
-
+                      <th></th>
+                      <th v-for="(c,i) in parseInt(columnas) " :key="i">{{columnas-c+1}}</th>
                     </tr>
-
-                  </th>
-                  <tr v-for="f in parseInt(filas)" :key="f">{{letra[f-1]}}
-                    <td v-for="c in parseInt(columnas)" :key="c" >
-
-                      <div v-on:click="activar(asientos[f + c -2])" v-if="asientos[f + c -2].activo=='ACTIVO'">
-                        <img src="../assets/img/1.png" alt="" style="width: 30px;height:30px;" >
-
-                      </div>
-                      <div v-on:click="activar(asientos[f + c -2])" v-else>
-                        <img src="../assets/img/0.png" alt="" style="width: 30px;height:30px;" >
-                      </div>
+                  </thead>
+                  <tbody>
+                  <tr v-for="(f,i) in parseInt(filas)" :key="i">
+                    <th>{{letra[i+1]}}</th>
+                    <td v-for="(c,j) in parseInt(columnas)" @click="cambio(f,c)" :key="j" class="text-center">
+                      <q-btn round icon="o_chair" :color="asientos[columnas*(f-1)+(c-1)].activo=='ACTIVO'?'green-6':'grey-9'" >
+                        <q-badge color="primary" floating>{{letra[i+1]+'-'+(columnas-c+1).toString()}}</q-badge>
+                      </q-btn>
                     </td>
                   </tr>
+                  </tbody>
                 </table>
+<!--                <div class="row " style="text-align:center;">-->
+                  <!--                <table class="flex-center" >-->
+                  <!--                  <th>-->
+                  <!--                    <tr>-->
+                  <!--                      <td v-for="c in colnuminv" :key="c">{{c}}</td>-->
 
+                  <!--                    </tr>-->
+
+                  <!--                  </th>-->
+                  <!--                  <tr v-for="f in parseInt(filas)" :key="f">{{letra[f-1]}}-->
+                  <!--                    <td v-for="c in parseInt(columnas)" :key="c" >-->
+
+                  <!--                      <div v-on:click="activar(asientos[f + c -2])" v-if="asientos[f + c -2].activo=='ACTIVO'">-->
+                  <!--                        <img src="../assets/img/1.png" alt="" style="width: 30px;height:30px;" >-->
+
+                  <!--                      </div>-->
+                  <!--                      <div v-on:click="activar(asientos[f + c -2])" v-else>-->
+                  <!--                        <img src="../assets/img/0.png" alt="" style="width: 30px;height:30px;" >-->
+                  <!--                      </div>-->
+                  <!--                    </td>-->
+                  <!--                  </tr>-->
+                  <!--                </table>-->
+
+<!--                </div>-->
               </div>
-
-
               <div class="col-12">
                 <q-btn :loading="loading" color="green" icon="add_circle" class="full-width" type="submit" label="Guardar" />
               </div>
@@ -144,27 +159,27 @@
 <script>
 import {globalStore} from "stores/globalStore";
 import {date} from "quasar";
-import VueTableDynamic from 'vue-table-dynamic';
 
 export default {
   name: `Salas`,
   data() {
     return {
+      contador:0,
       loading: false,
       salaFilter:'',
-      filas:0,
-      columnas:0,
+      filas:10,
+      columnas:22,
       colnuminv:[],
       ingresar:0,
       sala:{
       },
       sala2:{},
-      salaDialog:false,
+      salaDialog:true,
       salaUpdateDialog:false,
       store: globalStore(),
       asientos:[],
       seat:{'fila':0,'columna':0,'letra':'','activo':''},
-      letra:['A','B','C','D','E','F','G','H','I','J'],
+      letra:['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB'],
       salaColumns:[
         {label:'OPCIONES',field:'opciones',name:'opciones'},
         {label:'NRO',field:'nro',name:'nro',sortable:true},
@@ -176,16 +191,21 @@ export default {
     }
   },
   created() {
-    if(!this.store.salaSingleTon) {
-      this.$q.loading.show()
-      this.store.salaSingleTon=true
-      this.$api.get('sala').then(res=>{
-        this.store.salas=res.data
-        this.$q.loading.hide()
-      })
-    }
+    // if(!this.store.salaSingleTon) {
+    //   this.$q.loading.show()
+    //   this.store.salaSingleTon=true
+    //   this.$api.get('sala').then(res=>{
+    //     this.store.salas=res.data
+    //     this.$q.loading.hide()
+    //   })
+    // }
+    this.tablacine()
   },
   methods: {
+    cambio(f,c){
+      let index=this.columnas*(f-1)+(c-1)
+      this.asientos[index].activo=this.asientos[index].activo=='ACTIVO'?'INACTIVO':'ACTIVO'
+    },
     cargarimagen(pp){
       if(pp.activo=='ACTIVO')
         return '../assets/img/1.png'
@@ -217,17 +237,17 @@ export default {
       this.tablacine()
     },
     tablacine(){
-        this.asientos=[]
-       this.ingresar=0
-        let head=[]
-        if(this.filas>0 && this.columnas>0){
-          for (let f=1;f<=this.filas;f++){
-            for(let i=this.columnas;i>=1;i--){
-              this.asientos.push({'fila':parseInt(f),'columna':parseInt(i),'letra':this.letra[f-1],'activo':'ACTIVO'})
-            }
+      if (this.filas=='' || this.filas==undefined) {
+        this.filas=1
+      }
+      this.asientos=[]
+      if(this.filas>0 && this.columnas>0){
+        for (let f=1;f<=this.filas;f++){
+          for(let i=this.columnas;i>=1;i--){
+            this.asientos.push({'fila':parseInt(f),'columna':parseInt(i),'letra':this.letra[f],'activo':'ACTIVO'})
           }
-          console.log(this.asientos)
         }
+      }
     },
     salaCreate(){
       this.loading=true
@@ -272,10 +292,20 @@ export default {
         })
       })
     }
-  }
+  },
 }
 </script>
 
 <style scoped>
-
+table{
+  width: 100%;
+}
+table, td, th {
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+input{
+  border: 1px solid #ddd;
+}
 </style>
