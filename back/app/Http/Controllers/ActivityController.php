@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Leyenda;
 use App\Models\Activity;
+use App\Models\Servicio;
 use App\Models\Message;
+use App\Models\Event;
 use App\Http\Requests\StoreActivityRequest;
 use App\Http\Requests\UpdateActivityRequest;
 use App\Models\Cui;
@@ -139,6 +141,49 @@ class ActivityController extends Controller
             $mensaje->codigoPuntoVenta = $request->codigoPuntoVenta;
             $mensaje->codigoSucursal = $request->codigoSucursal;
             $mensaje->save();
+        }
+
+        Servicio::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
+        $result= $client->sincronizarListaProductosServicios([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        foreach ($result->RespuestaListaProductos->listaCodigos as $l) {
+            $servicio = new Servicio();
+            $servicio->codigoActividad = $l->codigoActividad;
+            $servicio->codigoProducto = $l->codigoProducto;
+            $servicio->descripcionProducto = $l->descripcionProducto;
+            $servicio->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $servicio->codigoSucursal = $request->codigoSucursal;
+            $servicio->save();
+        }
+
+        Event::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
+        $result= $client->sincronizarParametricaEventosSignificativos([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
+            $servicio = new Servicio();
+            $servicio->codigoClasificador = $l->codigoClasificador;
+            $servicio->descripcion = $l->descripcion;
+            $servicio->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $servicio->codigoSucursal = $request->codigoSucursal;
+            $servicio->save();
         }
 
         return response()->json(['success' => 'Actividades sincronizadas'], 200);
