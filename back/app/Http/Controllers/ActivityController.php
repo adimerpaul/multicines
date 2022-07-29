@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Leyenda;
 use App\Models\Activity;
 use App\Http\Requests\StoreActivityRequest;
 use App\Http\Requests\UpdateActivityRequest;
@@ -95,6 +96,27 @@ class ActivityController extends Controller
             $sector->codigoPuntoVenta = $request->codigoPuntoVenta;
             $sector->codigoSucursal = $request->codigoSucursal;
             $sector->save();
+        }
+
+        Leyenda::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
+        $result= $client->sincronizarListaLeyendasFactura([
+                "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        foreach ($result->RespuestaListaParametricasLeyendas->listaLeyendas as $l) {
+            $leyenda = new Leyenda();
+            $leyenda->codigoActividad = $l->codigoActividad;
+            $leyenda->descripcionLeyenda = $l->descripcionLeyenda;
+            $leyenda->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $leyenda->codigoSucursal = $request->codigoSucursal;
+            $leyenda->save();
         }
         return response()->json(['success' => 'Actividades sincronizadas'], 200);
     }
