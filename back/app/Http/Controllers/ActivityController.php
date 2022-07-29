@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Leyenda;
 use App\Models\Activity;
+use App\Models\Message;
 use App\Http\Requests\StoreActivityRequest;
 use App\Http\Requests\UpdateActivityRequest;
 use App\Models\Cui;
@@ -118,6 +119,28 @@ class ActivityController extends Controller
             $leyenda->codigoSucursal = $request->codigoSucursal;
             $leyenda->save();
         }
+
+        Message::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
+        $result= $client->sincronizarListaMensajesServicios([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
+            $mensaje = new Message();
+            $mensaje->codigoClasificador = $l->codigoClasificador;
+            $mensaje->descripcion = $l->descripcion;
+            $mensaje->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $mensaje->codigoSucursal = $request->codigoSucursal;
+            $mensaje->save();
+        }
+
         return response()->json(['success' => 'Actividades sincronizadas'], 200);
     }
 
