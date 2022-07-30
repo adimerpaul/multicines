@@ -16,7 +16,7 @@
             </q-input>
           </template>
           <template v-slot:body-cell-opciones="props">
-            <td auto-width :props="props">
+            <q-td auto-width :props="props">
               <q-btn-dropdown color="info" label="Opciones" dropdown-icon="change_history">
                 <q-list>
                   <q-item clickable v-close-popup @click="distributorUpdateDialog=true;distributor2=props.row;this.store.distributor=props.row.distributor">
@@ -31,7 +31,7 @@
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-            </td>
+            </q-td>
           </template>
         </q-table>
         <pre>{{store.movies}}</pre>
@@ -56,7 +56,6 @@
               <div class="col-3">
                 <q-input dense outlined label="Localidad" v-model="distributor.loc" />
               </div>
-
               <div class="col-3">
                 <q-input dense outlined label="NIT" v-model="distributor.nit" />
               </div>
