@@ -36,7 +36,9 @@
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_movie" label="Peliculas" default-opened to="peliculas" expand-icon="null"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Distribuidores" default-opened to="distribuidores" expand-icon="null"/>
         </q-expansion-item>
-        <q-expansion-item dense exact expand-separator icon="o_living" label="Salas" default-opened to="salas" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="o_living" label="Salas" to="salas" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="calendar_month" label="Programación" to="programa" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Venta de boletos" to="sale" expand-icon="null"/>
       </q-list>
     </q-drawer>
 

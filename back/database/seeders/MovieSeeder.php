@@ -16,18 +16,35 @@ class MovieSeeder extends Seeder
     public function run()
     {
         DB::table('movies')->insert([
-            'nombre' => 'Movie 1',
-            'duracion' => 100,
-            'paisOrigen' => 'Pais 1',
-            'genero' => 'Genero 1',
-            'sipnosis' => 'Sipnosis 1',
-            'urlTrailer' => 'Url 1',
-            'imagen' => 'Imagen 1',
-            'clasificacion' => 'Clasificacion 1',
-            'fechaEstreno' => now(),
-            'distributor_id' => 2,
-            'created_at' => now(),
-            'updated_at' => now(),
+            [
+                'nombre' => 'minions 2: nace un villano',
+                'duracion' => 100,
+                'paisOrigen' => 'Pais 1',
+                'genero' => 'Genero 1',
+                'sipnosis' => 'Sipnosis 1',
+                'urlTrailer' => 'Url 1',
+                'imagen' => 'mini.jpg',
+                'clasificacion' => 'Clasificacion 1',
+                'fechaEstreno' => now(),
+                'distributor_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nombre' => 'thor love and thunder',
+                'duracion' => 100,
+                'paisOrigen' => 'Pais 2',
+                'genero' => 'Genero 2',
+                'sipnosis' => 'Sipnosis 2',
+                'urlTrailer' => 'Url 2',
+                'imagen' => 'thor.jpg',
+                'clasificacion' => 'Clasificacion 2',
+                'fechaEstreno' => now(),
+                'distributor_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
         ]);
     }
 }

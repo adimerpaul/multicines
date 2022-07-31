@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('prices', function (Blueprint $table) {
             $table->id();
             $table->string("serie")->nullable();
-            $table->string("precio")->nullable();
+            $table->double("precio",11,2)->nullable();
             $table->string("descripcion")->nullable();
             $table->string("activo")->nullable()->default("ACTIVO");
             $table->timestamps();

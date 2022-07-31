@@ -23,3 +23,6 @@ Route::resource('sala', \App\Http\Controllers\SalaController::class);
 Route::resource('cui', \App\Http\Controllers\CuiController::class);
 Route::resource('cufd', \App\Http\Controllers\CufdController::class);
 Route::resource('activity', \App\Http\Controllers\ActivityController::class);
+Route::resource('sale', \App\Http\Controllers\SaleController::class);
+Route::post('movies', [\App\Http\Controllers\SaleController::class, 'movies']);
+Route::post('hours', [\App\Http\Controllers\SaleController::class, 'hours']);

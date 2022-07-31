@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string("genero")->nullable();
             $table->string("sipnosis")->nullable();
             $table->string("urlTrailer")->nullable();
-            $table->string("imagen")->nullable();
+            $table->string("imagen")->nullable()->default('default.jpg');
             $table->string("clasificacion")->nullable();
             $table->date("fechaEstreno")->nullable();
             $table->unsignedBigInteger("distributor_id");

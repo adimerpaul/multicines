@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Programa;
 use App\Models\Sale;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
+use Illuminate\Http\Request;
 
 class SaleController extends Controller
 {
@@ -25,9 +27,15 @@ class SaleController extends Controller
      */
     public function create()
     {
-        //
     }
-
+    public function movies(Request $request)
+    {
+        return Programa::select('movie_id')->groupBy('movie_id')->with('movie')->whereDate('fecha',$request->fecha)->get();
+    }
+    public function hours(Request $request)
+    {
+        return Programa::with('sala')->with('price')->with('movie')->whereDate('fecha',$request->fecha)->where('movie_id',$request->id)->get();
+    }
     /**
      * Store a newly created resource in storage.
      *
