@@ -98,6 +98,20 @@ class SalaController extends Controller
     public function update(UpdateSalaRequest $request, Sala $sala)
     {
         //
+        $sala=Sala::find($request->id);
+        $sala->nro=$request->nro;
+        $sala->nombre=$request->nombre;
+        $sala->capacidad=$request->capacidad;
+        $sala->save();
+
+        foreach ($request->seats as $r){
+
+            $seat=Seat::find($r['id']);
+            $seat->activo=$r['activo'];
+            $seat->save();
+            //return $seat;
+        }
+        return Sala::where('id',$sala->id)->with('seats')->first();
     }
 
     /**

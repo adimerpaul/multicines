@@ -8,7 +8,7 @@
               color="green"
               icon="add_circle"
               label="Agregar"
-              @click="salaDialog=true"/>
+              @click="salaDialog=true; columnas=1; filas=1; tablacine()"/>
             <q-input outlined dense debounce="300" v-model="salaFilter" placeholder="Buscar">
               <template v-slot:append>
                 <q-icon name="search" />
@@ -117,6 +117,7 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
     <q-dialog v-model="salaUpdateDialog" full-width>
       <q-card>
         <q-card-section class="row items-center q-pb-none">
@@ -134,11 +135,11 @@
                   <q-input dense outlined label="Nombre" v-model="sala2.nombre" />
                 </div>
                 <div class="col-3">
-                  <q-input dense outlined label="Filas" type="number" v-model="filas" @change="tablacine" />
+                  <q-input dense outlined label="Filas" type="number" v-model="filas" readonly @change="tablacine" />
                 </div>
 
                 <div class="col-3">
-                  <q-input dense outlined label="Columnas" type="number" v-model="columnas" @change="tablacine"/>
+                  <q-input dense outlined label="Columnas" type="number" v-model="columnas" readonlysa @change="tablacine"/>
                 </div>
                 <div class="col-12">
                   <table>
@@ -301,6 +302,7 @@ export default {
       })
     },
     salaUpdate(){
+      this.sala2.seats=this.asientos
       this.$q.loading.show()
       this.$api.put('sala/'+this.sala2.id,this.sala2).then(res=>{
         this.$q.loading.hide()
