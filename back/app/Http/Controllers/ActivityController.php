@@ -186,6 +186,70 @@ class ActivityController extends Controller
             $servicio->save();
         }
 
+        Motivo::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
+        $result= $client->sincronizarParametricaMotivoAnulacion([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
+            $servicio = new Servicio();
+            $servicio->codigoClasificador = $l->codigoClasificador;
+            $servicio->descripcion = $l->descripcion;
+            $servicio->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $servicio->codigoSucursal = $request->codigoSucursal;
+            $servicio->save();
+        }
+        //paieses
+        $result= $client->sincronizarParametricaPaisOrigen([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        //fecha y hora
+        $result= $client->sincronizarFechaHora([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+
+        Document::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
+        $result= $client->sincronizarParametricaTipoDocumentoIdentidad([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
+            $servicio = new Servicio();
+            $servicio->codigoClasificador = $l->codigoClasificador;
+            $servicio->descripcion = $l->descripcion;
+            $servicio->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $servicio->codigoSucursal = $request->codigoSucursal;
+            $servicio->save();
+        }
+
         return response()->json(['success' => 'Actividades sincronizadas'], 200);
     }
 
