@@ -4,7 +4,7 @@
   <q-card-section class="q-py-xs bg-green-7 text-white text-bold" >
     <div class="row">
       <div class="col-2 flex flex-center">
-        PANEL DE VENTAS
+        <q-icon name="live_tv" left/> PANEL DE VENTAS
       </div>
       <div class="col-2">
         <q-input label="fecha" @update:model-value="myMovies" :min="now" type="date" label-color="white" outlined dense v-model="fecha"/>
