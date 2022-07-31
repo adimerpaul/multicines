@@ -178,12 +178,12 @@ class ActivityController extends Controller
             ]
         ]);
         foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
-            $servicio = new Servicio();
-            $servicio->codigoClasificador = $l->codigoClasificador;
-            $servicio->descripcion = $l->descripcion;
-            $servicio->codigoPuntoVenta = $request->codigoPuntoVenta;
-            $servicio->codigoSucursal = $request->codigoSucursal;
-            $servicio->save();
+            $evento = new Event();
+            $evento->codigoClasificador = $l->codigoClasificador;
+            $evento->descripcion = $l->descripcion;
+            $evento->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $evento->codigoSucursal = $request->codigoSucursal;
+            $evento->save();
         }
 
         Motivo::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
@@ -199,12 +199,12 @@ class ActivityController extends Controller
             ]
         ]);
         foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
-            $servicio = new Servicio();
-            $servicio->codigoClasificador = $l->codigoClasificador;
-            $servicio->descripcion = $l->descripcion;
-            $servicio->codigoPuntoVenta = $request->codigoPuntoVenta;
-            $servicio->codigoSucursal = $request->codigoSucursal;
-            $servicio->save();
+            $motivo = new Motivo();
+            $motivo->codigoClasificador = $l->codigoClasificador;
+            $motivo->descripcion = $l->descripcion;
+            $motivo->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $motivo->codigoSucursal = $request->codigoSucursal;
+            $motivo->save();
         }
         //paieses
         $result= $client->sincronizarParametricaPaisOrigen([
@@ -242,12 +242,33 @@ class ActivityController extends Controller
             ]
         ]);
         foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
-            $servicio = new Servicio();
-            $servicio->codigoClasificador = $l->codigoClasificador;
-            $servicio->descripcion = $l->descripcion;
-            $servicio->codigoPuntoVenta = $request->codigoPuntoVenta;
-            $servicio->codigoSucursal = $request->codigoSucursal;
-            $servicio->save();
+            $document = new Document();
+            $document->codigoClasificador = $l->codigoClasificador;
+            $document->descripcion = $l->descripcion;
+            $document->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $document->codigoSucursal = $request->codigoSucursal;
+            $document->save();
+        }
+
+        Documentsector::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
+        $result= $client->sincronizarParametricaTipoDocumentoSector([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
+            $documentsector = new Documentsector();
+            $documentsector->codigoClasificador = $l->codigoClasificador;
+            $documentsector->descripcion = $l->descripcion;
+            $documentsector->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $documentsector->codigoSucursal = $request->codigoSucursal;
+            $documentsector->save();
         }
 
         return response()->json(['success' => 'Actividades sincronizadas'], 200);
