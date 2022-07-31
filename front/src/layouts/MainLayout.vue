@@ -12,10 +12,10 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          MultiCines PLAZA
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>Usuario: </div>
       </q-toolbar>
     </q-header>
 
@@ -25,7 +25,9 @@
       bordered
     >
       <q-list bordered class="rounded-borders">
-        <q-item-label header class="text-center">Menu de Navegacion</q-item-label>
+        <q-item-label header class="text-center q-pa-none q-ma-none" style="background: #770050">
+          <q-img src="logo.png" width="150px" />
+        </q-item-label>
         <q-expansion-item dense exact expand-separator icon="o_home" label="Principal" default-opened to="/" expand-icon="null"/>
         <q-expansion-item expand-separator dense exact icon="o_engineering" label="Siat">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_psychology" label="Cuis" default-opened to="cuis" expand-icon="null"/>
