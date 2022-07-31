@@ -16,6 +16,7 @@ class ProgramaController extends Controller
     public function index()
     {
         //
+        return Programa::whereDate('fecha','>=',now())->with('movie')->with('sala')->with('price')->get();
     }
 
     /**

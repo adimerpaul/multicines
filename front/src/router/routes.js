@@ -6,6 +6,7 @@ import Sincronizacion from "pages/Sincronizacion";
 import Salas from "pages/Salas";
 import Tarifas from "pages/Tarifas";
 import Cufd from "pages/Cufd";
+import Programa from "pages/Programa";
 import Sale from "pages/Sale";
 
 const routes = [
@@ -22,6 +23,7 @@ const routes = [
       { path: 'salas', component: Salas },
       { path: 'tarifas', component: Tarifas },
       { path: 'sale', component: Sale },
+      { path: 'programa', component: Programa },
     ]
   },
 
