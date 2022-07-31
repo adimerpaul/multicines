@@ -16,6 +16,7 @@ class PriceController extends Controller
     public function index()
     {
         //
+        return Price::all();
     }
 
     /**
@@ -37,6 +38,13 @@ class PriceController extends Controller
     public function store(StorePriceRequest $request)
     {
         //
+        $price= new Price;
+        $price->serie=strtoupper($request->serie);
+        $price->precio=$request->precio;
+        $price->descripcion=strtoupper($request->descripcion);
+        $price->save();
+
+
     }
 
     /**
@@ -71,6 +79,12 @@ class PriceController extends Controller
     public function update(UpdatePriceRequest $request, Price $price)
     {
         //
+        $price= Price::find($request->id);
+        $price->serie=strtoupper($request->serie);
+        $price->precio=$request->precio;
+        $price->descripcion=strtoupper($request->descripcion);
+        $price->save();
+        return  $price;
     }
 
     /**
@@ -82,5 +96,6 @@ class PriceController extends Controller
     public function destroy(Price $price)
     {
         //
+        $price->delete();
     }
 }
