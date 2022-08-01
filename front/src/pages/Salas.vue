@@ -53,7 +53,7 @@
           <q-form @submit.prevent="salaCreate">
             <div class="row">
               <div class="col-3">
-                <q-input dense outlined label="Numero Sala (Opcional)" v-model="sala.nro" />
+                <q-input dense outlined label="Numero Sala (Opcional)" v-model="sala.nro" type="number"/>
               </div>
               <div class="col-3">
                 <q-input dense outlined label="Nombre" v-model="sala.nombre" required/>
@@ -129,7 +129,7 @@
           <q-form @submit.prevent="salaUpdate">
               <div class="row">
                 <div class="col-3">
-                  <q-input dense outlined label="Numero Sala (Opcional)" v-model="sala2.nro" />
+                  <q-input dense outlined label="Numero Sala (Opcional)" v-model="sala2.nro" type="number" />
                 </div>
                 <div class="col-3">
                   <q-input dense outlined label="Nombre" v-model="sala2.nombre" />

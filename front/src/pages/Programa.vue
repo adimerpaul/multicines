@@ -2,11 +2,77 @@
   <q-page>
     <div class="row">
       <div class="col-12">
-      <div class="text-h5">PROGRMACION DE FUNCIONES</div>
+      <div class="text-h5">PROGRAMACION DE FUNCIONES</div>
+        <q-btn label="Registrar" color="green" @click="programaDialog=true; "/>
 
+
+      <div class="col-12">
+        <div class="row">
+          <div class="col"><q-btn label="TODOS" :color="color[0]" @click="listado(0)"/></div>
+          <div class="col" v-for="s in store.salas" :key="s">
+            <q-btn  :label="s.nombre" :color="color[s.nro]" @click="listado(s.id)"/>
+          </div>
+
+
+
+        </div>
+
+      </div>
         <FullCalendar class="full-height" :options="calendarOptions" />
 
       </div>
+
+      <q-dialog v-model="programaDialog" full-width>
+        <q-card >
+          <q-card-section>
+            <div class="text-h6">REGISTRO DE FUNCION</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            <div class="row">
+
+            <div class="col-4"><q-select v-model="sala" label="SALAS" :options="listsalas"  use-input input-debounce="0" @filter="filterSala">
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+              </q-select></div>
+              <div class="col-4"><q-select v-model="pelicula" label="PELICULAS" :options="listpelis" use-input input-debounce="0" @filter="filterPelicula">
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select></div>
+              <div class="col-4"><q-select v-model="tarifa" label="TARIFAS"  :options="listtarifa" use-input input-debounce="0" @filter="filterTarifa">
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select></div>
+            <div class="col-4"><q-input v-model="programa.fechaini" label="Fecha Inicial" type="date"/></div>
+            <div class="col-4"><q-input v-model="programa.fechafin" label="Fecha Final" type="date"/></div>
+            <div class="col-4"><q-input v-model="programa.hora" label="Hora" type="time"/></div>
+              <div class="col-4"><q-checkbox v-model="programa.subtitulada" label="SUBTITULADA" size="xl" true-value="SI" false-value="NO"/></div>
+              <div class="col-4">    <q-toggle v-model="programa.formato" color="green" :label="programa.formato" size="xl"  false-value="2D" true-value="3D"/> </div>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right" class="text-primary">
+            <q-btn flat label="Cancel" v-close-popup />
+            <q-btn flat label="Add address" v-close-popup />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
     </div>
   </q-page>
 </template>
@@ -28,27 +94,25 @@ export default {
   data() {
     return {
       loading: false,
-      movieFilter:'',
-      movie:{
-        clasificacion:'+13',
-        genero:'Accion',
-        fechaEstreno:date.formatDate(new Date(),'YYYY-MM-DD'),
-      },
-      movie2:{},
-      movieDialog:false,
-      movieUpdateDialog:false,
+      events: [],
+      sala:{label:'',value:{}},
+      pelicula:{label:'',value:{}},
+      tarifa:{label:'',value:{}},
+      funcion:[],
+      programa:{'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO','formato':'2D'},
+      listpelis:[],
+      listsalas:[],
+      filsala:[],
+      filpelis:[],
+      filtarifa:[],
+      listtarifa:[],
+      color: ["indigo", "blue", "green", "cyan-4","orange","light-green","lime","amber", "light-blue", "purple", "pink","teal","lime", "deep-orange", "#1b5e20", "#ff5722","#795548","#e65100","#827717","#01579b", "#006064", "#1b5e20", "#ff5722","#795548"],
+      programaDialog:false,
       store: globalStore(),
-      movieColumns:[
-        {label:'opciones',field:'opciones',name:'opciones'},
-        {label:'nombre',field:'nombre',name:'nombre',sortable:true},
-        {label:'duracion',field:'duracion',name:'duracion',sortable:true},
-        {label:'paisOrigen',field:'paisOrigen',name:'paisOrigen',sortable:true},
-        {label:'genero',field:'genero',name:'genero',sortable:true},
-        {label:'clasificacion',field:'clasificacion',name:'clasificacion',sortable:true},
-        {label:'fechaEstreno',field:'fechaEstreno',name:'fechaEstreno',sortable:true},
-        {label:'distributor_id',field:row=>row.distributor.nombre,name:'distributor_id',sortable:true},
-      ],
+
       calendarOptions: {
+        slotMinTime: "09:00:00",
+
         selectable:true,
         plugins: [ dayGridPlugin, timeGridPlugin,interactionPlugin], headerToolbar: {
           left: 'prev,next',
@@ -77,6 +141,36 @@ export default {
     }
   },
   created() {
+    let str = formatDate(new Date(), {
+      month: 'long',
+      year: 'numeric',
+      day: 'numeric'
+    });
+    if(!this.store.salaSingleTon) {
+      this.$q.loading.show()
+      this.store.salaSingleTon=true
+      this.$api.get('sala').then(res=>{
+        this.store.salas=res.data
+        this.$q.loading.hide()
+      })
+    }
+    if(!this.store.priceSingleTon) {
+      this.$q.loading.show()
+      this.store.priceSingleTon=true
+      this.$api.get('price').then(res=>{
+        this.store.prices=res.data
+        this.$q.loading.hide()
+      })
+
+    }
+    if(!this.store.movieSingleTon) {
+      this.$q.loading.show()
+      this.store.movieSingleTon=true
+      this.$api.get('movie').then(res=>{
+        this.store.movies=res.data
+        this.$q.loading.hide()
+      })
+    }
     //if(!this.store.movieSingleTon) {
      // this.$q.loading.show()
       //this.store.movieSingleTon=true
@@ -85,12 +179,104 @@ export default {
       //  this.$q.loading.hide()
       //})
     //}
-    this.listado()
+    this.listado(0)
+    this.cargar()
   },
   methods: {
-    listado(){
+    cargar(){
+      this.listtarifa=[]
+      this.listsalas=[]
+      this.listpelis=[]
+      this.store.prices.forEach(p=>{
+        p.label=p.serie+' '+p.precio+' Bs.'
+        this.listtarifa.push(p);
+      })
+      this.store.movies.forEach(p=>{
+        p.label=p.nombre
+        this.listpelis.push(p);
+      })
+      this.store.salas.forEach(p=>{
+        p.label=p.nombre
+        this.listsalas.push(p);
+      })
+      this.filsala=this.listsalas
+      this.filpelis=this.listpelis
+      this.filtarifa=this.listtarifa
+    },
+    filterSala(val, update) {
+        if (val === '') {
+          update(() => {
+            this.listsalas = this.filsala
+
+            // here you have access to "ref" which
+            // is the Vue reference of the QSelect
+          })
+          return
+        }
+
+        update(() => {
+          const needle = val.toLowerCase()
+          this.listsalas = this.filsala.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+        })
+
+    },
+    filterPelicula(val, update) {
+      if (val === '') {
+        update(() => {
+          this.listpelis = this.filpelis
+
+          // here you have access to "ref" which
+          // is the Vue reference of the QSelect
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.listpelis = this.filpelis.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+      })
+
+    },
+
+    filterTarifa(val, update) {
+      if (val === '') {
+        update(() => {
+          this.listtarifa = this.filtarifa
+
+          // here you have access to "ref" which
+          // is the Vue reference of the QSelect
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.listtarifa = this.filtarifa.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+      })
+
+    },
+    listado(num){
+       this.events=[]
+      this.funcion=[]
         this.$api.get('programa').then(res=>{
             console.log(res.data)
+          let col=0
+          res.data.forEach(r=>{
+            this.funcion.push(r)
+            console.log(r.sala.nro)
+            col=r.sala.nro
+            if(num==0){
+              this.events.push({ title: r.movie.nombre, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
+              }
+            else{
+            if(num==r.sala.id)
+              this.events.push({ title: r.movie.nombre, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
+            }
+
+        })
+          console.log(this.events)
+          this.calendarOptions.events=this.events
+
         })
 
     },

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('salas', function (Blueprint $table) {
             $table->id();
-            $table->string('nro')->nullable();
+            $table->integer('nro')->nullable();
             $table->string('nombre');
             $table->integer('filas');
             $table->integer('columnas');
