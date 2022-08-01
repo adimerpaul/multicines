@@ -67,8 +67,8 @@
           </q-card-section>
 
           <q-card-actions align="right" class="text-primary">
-            <q-btn flat label="Cancel" v-close-popup />
-            <q-btn flat label="Add address" v-close-popup />
+            <q-btn flat label="CANCELAR" v-close-popup />
+            <q-btn flat label="REGISTRAR" @click="registrarFuncion" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -183,6 +183,16 @@ export default {
     this.cargar()
   },
   methods: {
+    registrarFuncion(){
+      this.programa.movie=this.pelicula
+      this.programa.price=this.tarifa
+      this.programa.sala=this.sala
+
+      this.$api.post('programa',this.programa).then(res=>{
+        console.log(res.data)
+      })
+
+        },
     cargar(){
       this.listtarifa=[]
       this.listsalas=[]

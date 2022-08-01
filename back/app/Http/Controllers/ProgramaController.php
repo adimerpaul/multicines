@@ -38,6 +38,42 @@ class ProgramaController extends Controller
     public function store(StoreProgramaRequest $request)
     {
         //
+        $duracion=$request->movie['duracion'];
+        $hora=$request->hora;
+        $horafin= strtotime ( '+'.$duracion.' minutes' , strtotime ($hora) );
+        //return   $request->fechaini.' '.date ( 'H:i' , $horafin);
+        $horafin=date('H:i',$horafin).':00';
+
+        $fecha1=  date_create($request->fechaini);
+        $fecha2=  date_create($request->fechafin);
+        $contador = date_diff($fecha1, $fecha2);
+        $dias=$contador->format('%a') + 1;
+        $fecha=$request->fechaini;
+        for ($i=1;$i<=$dias;$i++){
+            $programa=new Programa;
+            $programa->fecha=$fecha;
+            $numfuncion=Programa::whereDate('fecha',$fecha)->count() + 1;
+
+            $programa->horaInicio=date('Y-m-d H:i:s', strtotime("$fecha $hora"));
+            $programa->horaFin=date('Y-m-d H:i:s', strtotime("$fecha $horafin"));
+            $programa->subtitulada=$request->subtitulada;
+            $programa->formato=$request->formato;
+            $programa->activo='ACTIVO';
+            $programa->nroFuncion=$numfuncion;
+            //$programa->user_id=$request->user()->id;
+            $programa->movie_id=$request->movie['id'];
+            $programa->sala_id=$request->sala['id'];
+            $programa->price_id=$request->price['id'];
+            $programa->save();
+            //return $programa;
+            $fecha =  date ( 'Y-m-d' , strtotime ( '+1 day' , strtotime ($fecha) ));
+
+        }
+
+// El resultados sera 3 dias
+        return ;
+
+
     }
 
     /**
@@ -72,6 +108,24 @@ class ProgramaController extends Controller
     public function update(UpdateProgramaRequest $request, Programa $programa)
     {
         //
+        $programa=Programa::find($request->id);
+        $duracion=$request->movie['duracion'];
+        $hora=$request->hora;
+        $horafin= strtotime ( '+'.$duracion.' minutes' , strtotime ($hora) );
+        //return   $request->fechaini.' '.date ( 'H:i' , $horafin);
+        $horafin=date('H:i',$horafin).':00';
+        $fecha=$programa->fecha;
+
+
+            $programa->horaInicio=date('Y-m-d H:i:s', strtotime("$fecha $hora"));
+            $programa->horaFin=date('Y-m-d H:i:s', strtotime("$fecha $horafin"));
+            $programa->subtitulada=$request->subtitulada;
+            $programa->formato=$request->formato;
+            $programa->activo=$request->activo;
+            $programa->movie_id=$request->movie['id'];
+            $programa->sala_id=$request->sala['id'];
+            $programa->price_id=$request->price['id'];
+            $programa->save();
     }
 
     /**
