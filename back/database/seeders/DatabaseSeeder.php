@@ -29,6 +29,9 @@ class DatabaseSeeder extends Seeder
             SeatSeeder::class,
             PriceSeeder::class,
             ProgramaSeeder::class,
+            ClientSeeder::class,
+            SaleSeeder::class,
+            TicketSeeder::class,
         ]);
     }
 }

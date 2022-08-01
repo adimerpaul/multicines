@@ -46,7 +46,7 @@
     <div class="row">
       <div class="col-3">
         <div class="text-bold text-center">{{movie.nombre}}</div>
-        <q-btn :loading="loading" size="12px" class="q-ma-xs full-width flex flex-center" v-for="h in hours" color="primary" :key="h.id" >
+        <q-btn @click="clickSala(h)" :loading="loading" size="12px" class="q-ma-xs full-width flex flex-center" v-for="h in hours" color="primary" :key="h.id" >
           <q-icon name="schedule" left/>
           <q-badge color="red">S{{h.sala.nro}}</q-badge> {{h.horaInicio.substring(10,16)}} <q-badge color="secondary">{{h.formato}}</q-badge> {{h.price.precio+'Bs'}}
         </q-btn>
@@ -58,6 +58,41 @@
 
   </q-card-section>
 </q-card>
+<q-dialog full-width full-height v-model="salaDialog">
+<q-card>
+  <q-card-section >
+    <div class="row">
+      <div class="col-12">
+        <div class="text-bold">{{movie.nombre}} <q-icon name="schedule" left/><q-badge color="red">{{hour.sala.nombre}}</q-badge> {{hour.horaInicio.substring(10,16)}} <q-badge color="secondary">{{hour.formato}}</q-badge> {{hour.price.precio+'Bs'}}</div>
+      </div>
+      <div class="col-12">
+        <table>
+          <thead>
+          <tr>
+            <th :colspan="parseInt(hour.sala.columnas)+1" class="bg-blue-10 text-bold text-white">PANTALLA</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th v-for="(c,i) in parseInt(hour.sala.columnas)" :key="i">{{hour.sala.columnas-c+1}}</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(f,i) in parseInt(hour.sala.filas)" :key="i">
+            <th>{{letra[i+1]}}</th>
+            <td v-for="(c,j) in parseInt(hour.sala.columnas)" click="cambio(f,c)" :key="j" class="text-center tdx" style="padding: 0px;margin: 0px;border: 0px">
+              <q-btn color="green-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()"/>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-12">
+        <pre>{{hour.sala}}</pre>
+      </div>
+    </div>
+  </q-card-section>
+</q-card>
+</q-dialog>
 </q-page>
 </template>
 
@@ -68,7 +103,9 @@ export default {
   name: `Sale`,
   data() {
     return {
+      letra:['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB'],
       url:process.env.API,
+      salaDialog:false,
       now:date.formatDate(new Date(), "YYYY-MM-DD"),
       fecha: date.formatDate(new Date(), "YYYY-MM-DD"),
       movies:[],
@@ -82,7 +119,13 @@ export default {
     this.myMovies(this.fecha)
   },
   methods: {
+    clickSala(h){
+      this.hour=h
+      this.salaDialog=true
+    },
     myMovies(fecha) {
+      this.movie={}
+      this.hours=[]
       this.$api.post('movies',{fecha:fecha}).then(res => {
         this.movies = res.data
         this.movie = this.movies[0].movie
@@ -95,6 +138,8 @@ export default {
       this.$api.post('hours',{fecha:this.fecha,id:movie.id}).then(res => {
         this.loading=false
         this.hours = res.data
+        this.hour = this.hours[0]
+        this.clickSala(this.hour)
       });
     }
   }
@@ -102,5 +147,15 @@ export default {
 </script>
 
 <style scoped>
-
+table{
+  width: 100%;
+}
+table, .tdx, th {
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+input{
+  border: 1px solid #ddd;
+}
 </style>

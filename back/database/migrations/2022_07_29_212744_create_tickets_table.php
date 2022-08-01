@@ -23,8 +23,9 @@ return new class extends Migration
             $table->string('serieTarifa')->nullable();
             $table->date('fechaFuncion')->nullable();
             $table->datetime('horaFuncion')->nullable();
-            $table->string('fila')->nullable();
-            $table->string('columna')->nullable();
+            $table->integer('fila')->nullable();
+            $table->integer('columna')->nullable();
+            $table->string('letra')->nullable();
             $table->string('costo')->nullable();
             $table->string('titulo')->nullable();
             $table->string('devuelto')->nullable();
@@ -35,12 +36,14 @@ return new class extends Migration
             $table->foreign("client_id")->references("id")->on("clients");
             $table->unsignedBigInteger("programa_id")->nullable();
             $table->foreign("programa_id")->references("id")->on("programas");
-            $table->unsignedBigInteger("seat_id")->nullable();
-            $table->foreign("seat_id")->references("id")->on("seats");
+//            $table->unsignedBigInteger("seat_id")->nullable();
+//            $table->foreign("seat_id")->references("id")->on("seats");
             $table->unsignedBigInteger("sale_id")->nullable();
             $table->foreign("sale_id")->references("id")->on("sales");
             $table->unsignedBigInteger("price_id")->nullable();
             $table->foreign("price_id")->references("id")->on("prices");
+            $table->unsignedBigInteger("sala_id")->nullable();
+            $table->foreign("sala_id")->references("id")->on("salas");
             $table->timestamps();
         });
     }

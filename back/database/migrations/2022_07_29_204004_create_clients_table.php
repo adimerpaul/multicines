@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
             $table->string("nombreRazonSocial")->nullable();
-            $table->string("codigoTipoDocumentoIdentidad")->nullable();
+            $table->string("codigoTipoDocumentoIdentidad")->nullable()->default("1");
             $table->string("numeroDocumento")->nullable();
             $table->string("complemento")->nullable();
             $table->timestamps();

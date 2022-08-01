@@ -31,7 +31,7 @@ class SalaSeeder extends Seeder
                 "capacidad" => "92",
             ],
             [
-                "nro"=>"2",
+                "nro"=>"3",
                 "nombre" => "Sala 3",
                 "filas" => "7",
                 "columnas" => "19",

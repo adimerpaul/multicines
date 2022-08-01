@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ClientSeeder extends Seeder
 {
@@ -14,6 +15,11 @@ class ClientSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table("clients")->insert([
+            [
+                "nombreRazonSocial"=>"CHambi",
+                "numeroDocumento"=>"7336199017",
+            ]
+        ]);
     }
 }

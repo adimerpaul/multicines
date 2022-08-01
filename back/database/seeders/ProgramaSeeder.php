@@ -17,7 +17,7 @@ class ProgramaSeeder extends Seeder
     {
         DB::table("programas")->insert([
             [
-                'fecha'=>"2022-07-30",
+                'fecha'=>"2022-07-31",
                 "horaInicio"=>"2022-07-30 10:00:00",
                 "horaFin"=>"2022-07-30 12:00:00",
                 "subtitulada"=>"NO",
@@ -25,11 +25,11 @@ class ProgramaSeeder extends Seeder
                 "nroFuncion"=>"1",
                 "user_id"=>"1",
                 "movie_id"=>"1",
-                "sala_id"=>"1",
+                "sala_id"=>"3",
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-07-30",
+                'fecha'=>"2022-07-31",
                 "horaInicio"=>"2022-07-30 13:00:00",
                 "horaFin"=>"2022-07-30 15:00:00",
                 "subtitulada"=>"NO",
@@ -41,7 +41,7 @@ class ProgramaSeeder extends Seeder
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-07-30",
+                'fecha'=>"2022-07-31",
                 "horaInicio"=>"2022-07-30 10:00:00",
                 "horaFin"=>"2022-07-30 12:00:00",
                 "subtitulada"=>"NO",
@@ -49,11 +49,11 @@ class ProgramaSeeder extends Seeder
                 "nroFuncion"=>"1",
                 "user_id"=>"1",
                 "movie_id"=>"2",
-                "sala_id"=>"1",
+                "sala_id"=>"2",
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-07-30",
+                'fecha'=>"2022-07-31",
                 "horaInicio"=>"2022-07-30 13:00:00",
                 "horaFin"=>"2022-07-30 15:00:00",
                 "subtitulada"=>"NO",
