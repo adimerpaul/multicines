@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 //Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
+Route::post('/upload', [\App\Http\Controllers\UploadController::class,'upload']);
+
 Route::resource('movie', \App\Http\Controllers\MovieController::class);
 Route::resource('distributor', \App\Http\Controllers\DistributorController::class);
 Route::resource('sala', \App\Http\Controllers\SalaController::class);
@@ -26,5 +28,6 @@ Route::resource('programa', \App\Http\Controllers\ProgramaController::class);
 Route::resource('cufd', \App\Http\Controllers\CufdController::class);
 Route::resource('activity', \App\Http\Controllers\ActivityController::class);
 Route::resource('sale', \App\Http\Controllers\SaleController::class);
+Route::resource('rubro', \App\Http\Controllers\RubroController::class);
 Route::post('movies', [\App\Http\Controllers\SaleController::class, 'movies']);
 Route::post('hours', [\App\Http\Controllers\SaleController::class, 'hours']);

@@ -45,6 +45,8 @@ return new class extends Migration
             $table->unsignedBigInteger("sala_id")->nullable();
             $table->foreign("sala_id")->references("id")->on("salas");
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 

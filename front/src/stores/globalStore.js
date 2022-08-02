@@ -12,6 +12,8 @@ export const globalStore = defineStore('global', {
     salaSingleTon: false,
     prices: [],
     priceSingleTon: false,
+    rubros: [],
+    rubroSingleTon: false,
 
   }),
   getters: {

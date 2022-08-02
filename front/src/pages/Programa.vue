@@ -262,6 +262,8 @@ export default {
       this.programa={'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO','formato':'2D'},
       this.$api.post('programa',this.programa).then(res=>{
         console.log(res.data)
+        this.listado(0)
+        this.programaDialog=false
       })
 
     },
@@ -270,13 +272,16 @@ export default {
       this.programa2.price=this.tarifa
       this.programa2.sala=this.sala
       this.$api.put('programa/'+this.programa2.id,this.programa2).then(res=>{
-          console.log(res.data)
+        console.log(res.data)
+        this.listado(0);
+        this.programaUpdateDialog=false
         })
 
     },
     eliminarFuncion(){
       this.$api.delete('programa/'+this.programa2.id).then(res=>{
         console.log(res.data)
+        this.listado(0)
       })
     },
     cargar(){

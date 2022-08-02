@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string("numeroDocumento")->nullable();
             $table->string("complemento")->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 

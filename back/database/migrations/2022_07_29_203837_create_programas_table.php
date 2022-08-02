@@ -31,6 +31,8 @@ return new class extends Migration
             $table->unsignedBigInteger("price_id")->nullable();
             $table->foreign("price_id")->references("id")->on("prices");
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
