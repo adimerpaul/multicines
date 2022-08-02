@@ -29,15 +29,15 @@ return new class extends Migration
             $table->string('costo')->nullable();
             $table->string('titulo')->nullable();
             $table->string('devuelto')->nullable();
-//            $table->string('idCupon')->nullable();
+            $table->string('idCupon')->nullable();
             $table->string('tarjeta')->nullable();
             $table->string('credito')->nullable();
             $table->unsignedBigInteger("client_id")->nullable();
             $table->foreign("client_id")->references("id")->on("clients");
             $table->unsignedBigInteger("programa_id")->nullable();
             $table->foreign("programa_id")->references("id")->on("programas");
-//            $table->unsignedBigInteger("seat_id")->nullable();
-//            $table->foreign("seat_id")->references("id")->on("seats");
+            $table->unsignedBigInteger("seat_id")->nullable();
+            $table->foreign("seat_id")->references("id")->on("seats");
             $table->unsignedBigInteger("sale_id")->nullable();
             $table->foreign("sale_id")->references("id")->on("sales");
             $table->unsignedBigInteger("price_id")->nullable();

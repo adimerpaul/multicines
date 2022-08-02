@@ -50,9 +50,12 @@
           <q-icon name="schedule" left/>
           <q-badge color="red">S{{h.sala.nro}}</q-badge> {{h.horaInicio.substring(10,16)}} <q-badge color="secondary">{{h.formato}}</q-badge> {{h.price.precio+'Bs'}}
         </q-btn>
+
         <pre>{{hours}}</pre>
       </div>
-      <div class="col-3"></div>
+      <div class="col-3">
+        <q-input v-model="numeroboleto" label="numero boletos" type="number"/>
+      </div>
       <div class="col-6"></div>
     </div>
 
@@ -80,7 +83,8 @@
           <tr v-for="(f,i) in parseInt(hour.sala.filas)" :key="i">
             <th>{{letra[i+1]}}</th>
             <td v-for="(c,j) in parseInt(hour.sala.columnas)" click="cambio(f,c)" :key="j" class="text-center tdx" style="padding: 0px;margin: 0px;border: 0px">
-              <q-btn color="green-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()"/>
+              <q-btn :color="green-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-if="hour.sala.seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='ACTIVO'" @click="seleccionar(hour,hour.sala.columnas*(f-1)+(c-1))"/>
+              <q-btn color="grey-6" class="full-width full-height"  v-else/>
             </td>
           </tr>
           </tbody>
@@ -112,6 +116,8 @@ export default {
       movie:{},
       hours:[],
       hour:{},
+      temporal:[],
+      numeroboleto:0,
       loading:false
     }
   },
@@ -121,6 +127,7 @@ export default {
   methods: {
     clickSala(h){
       this.hour=h
+      //console.log(h)
       this.salaDialog=true
     },
     myMovies(fecha) {
@@ -141,6 +148,10 @@ export default {
         this.hour = this.hours[0]
         this.clickSala(this.hour)
       });
+    },
+    seleccionar(funcion,indice){
+      this.hour.sala.seats[indice]['activo']
+        this.temporal.push(asiento)
     }
   }
 }
