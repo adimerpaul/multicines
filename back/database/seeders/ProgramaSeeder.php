@@ -17,9 +17,9 @@ class ProgramaSeeder extends Seeder
     {
         DB::table("programas")->insert([
             [
-                'fecha'=>"2022-07-31",
-                "horaInicio"=>"2022-07-30 10:00:00",
-                "horaFin"=>"2022-07-30 12:00:00",
+                'fecha'=>"2022-08-02",
+                "horaInicio"=>"2022-08-02 10:00:00",
+                "horaFin"=>"2022-08-02 12:00:00",
                 "subtitulada"=>"NO",
                 "formato"=>"2D",
                 "nroFuncion"=>"1",
@@ -29,9 +29,9 @@ class ProgramaSeeder extends Seeder
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-07-31",
-                "horaInicio"=>"2022-07-30 13:00:00",
-                "horaFin"=>"2022-07-30 15:00:00",
+                'fecha'=>"2022-08-02",
+                "horaInicio"=>"2022-08-02 13:00:00",
+                "horaFin"=>"2022-08-02 15:00:00",
                 "subtitulada"=>"NO",
                 "formato"=>"2D",
                 "nroFuncion"=>"1",
@@ -41,9 +41,9 @@ class ProgramaSeeder extends Seeder
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-07-31",
-                "horaInicio"=>"2022-07-30 10:00:00",
-                "horaFin"=>"2022-07-30 12:00:00",
+                'fecha'=>"2022-08-02",
+                "horaInicio"=>"2022-08-02 10:00:00",
+                "horaFin"=>"2022-08-02 12:00:00",
                 "subtitulada"=>"NO",
                 "formato"=>"2D",
                 "nroFuncion"=>"1",
@@ -53,9 +53,9 @@ class ProgramaSeeder extends Seeder
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-07-31",
-                "horaInicio"=>"2022-07-30 13:00:00",
-                "horaFin"=>"2022-07-30 15:00:00",
+                'fecha'=>"2022-08-02",
+                "horaInicio"=>"2022-08-02 13:00:00",
+                "horaFin"=>"2022-08-02 15:00:00",
                 "subtitulada"=>"NO",
                 "formato"=>"2D",
                 "nroFuncion"=>"1",

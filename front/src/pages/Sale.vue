@@ -83,15 +83,17 @@
           <tr v-for="(f,i) in parseInt(hour.sala.filas)" :key="i">
             <th>{{letra[i+1]}}</th>
             <td v-for="(c,j) in parseInt(hour.sala.columnas)" click="cambio(f,c)" :key="j" class="text-center tdx" style="padding: 0px;margin: 0px;border: 0px">
-              <q-btn color="green-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-if="hour.sala.seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='ACTIVO'" @click="seleccionar(hour,hour.sala.columnas*(f-1)+(c-1))"/>
-              <q-btn color="grey-6" class="full-width full-height"  v-else/>
+              <q-btn color="green-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-if="seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='LIBRE'" @click="seleccionar(hour,seats[hour.sala.columnas*(f-1)+(c-1)])"/>
+              <q-btn color="red-6" class="full-width"  v-else-if="seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='OCUPADO'"/>
+              <q-btn color="blue-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-else-if="seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='RESERVADO'" @click="seleccionar(hour,seats[hour.sala.columnas*(f-1)+(c-1)])"/>
+              <q-btn color="grey-6" class="full-width" v-else/>
             </td>
           </tr>
           </tbody>
         </table>
       </div>
       <div class="col-12">
-        <pre>{{hour.sala}}</pre>
+        <pre>{{seats}}</pre>
       </div>
     </div>
   </q-card-section>
@@ -116,6 +118,8 @@ export default {
       movie:{},
       hours:[],
       hour:{},
+      seats:[],
+      seat:{},
       temporal:[],
       numeroboleto:0,
       loading:false
@@ -127,8 +131,13 @@ export default {
   methods: {
     clickSala(h){
       this.hour=h
-      //console.log(h)
-      this.salaDialog=true
+      this.loading=true
+      this.$api.post('mySeats',{id:h.id}).then(res=>{
+        // console.log(res.data)
+        this.salaDialog=true
+        this.loading=false
+        this.seats=res.data
+      })
     },
     myMovies(fecha) {
       this.movie={}
@@ -149,9 +158,15 @@ export default {
         this.clickSala(this.hour)
       });
     },
-    seleccionar(funcion,indice){
-      this.hour.sala.seats[indice]['activo']
-        this.temporal.push(asiento)
+    seleccionar(funcion,seat){
+      if(seat.activo=='RESERVADO'){
+        seat.activo='LIBRE'
+      }else{
+        seat.activo='RESERVADO'
+      }
+      // console.log(seat)
+      // this.hour.sala.seats[indice]['activo']
+      //   this.temporal.push(asiento)
     }
   }
 }

@@ -31,7 +31,7 @@ class Programa extends Model
     }
     public function sala()
     {
-        return $this->belongsTo(Sala::class)->with('seats');
+        return $this->belongsTo(Sala::class);
     }
     public function price()
     {

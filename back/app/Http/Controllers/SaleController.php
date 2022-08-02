@@ -7,6 +7,7 @@ use App\Models\Sale;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
@@ -42,6 +43,19 @@ class SaleController extends Controller
      * @param  \App\Http\Requests\StoreSaleRequest  $request
      * @return \Illuminate\Http\Response
      */
+    public function mySeats(Request $request){
+        $seats=DB::select("SELECT a.fila,a.columna,a.letra,(
+        IF(a.activo='ACTIVO',
+           IF((SELECT COUNT(*) FROM tickets t WHERE t.programa_id=p.id AND t.fila=a.fila AND t.columna=a.columna AND t.letra=a.letra)=1, 'OCUPADO', 'LIBRE')
+           , 'INACTIVO')
+        ) activo
+        FROM programas p
+        INNER JOIN salas s ON s.id=p.sala_id
+        INNER JOIN seats a ON a.sala_id=s.id
+        WHERE p.id=".$request->id.";");
+        return $seats;
+
+    }
     public function store(StoreSaleRequest $request)
     {
         //
