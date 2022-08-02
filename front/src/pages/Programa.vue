@@ -73,6 +73,58 @@
         </q-card>
       </q-dialog>
 
+      <q-dialog v-model="programaUpdateDialog" full-width>
+        <q-card >
+          <q-card-section>
+            <div class="text-h6">MODIFICAR FUNCION</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            <div class="row">
+
+              <div class="col-4"><q-select v-model="sala" label="SALAS" :options="listsalas"  use-input input-debounce="0" @filter="filterSala">
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select></div>
+              <div class="col-4"><q-select v-model="pelicula" label="PELICULAS" :options="listpelis" use-input input-debounce="0" @filter="filterPelicula">
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select></div>
+              <div class="col-4"><q-select v-model="tarifa" label="TARIFAS"  :options="listtarifa" use-input input-debounce="0" @filter="filterTarifa">
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select></div>
+              <div class="col-6"><q-input v-model="programa2.fecha" label="Fecha " type="date" readonly/></div>
+              <div class="col-6"><q-input v-model="programa2.hora" label="Hora" type="time"/></div>
+              <div class="col-4"><q-checkbox v-model="programa2.subtitulada" label="SUBTITULADA" size="xl" true-value="SI" false-value="NO"/></div>
+              <div class="col-4"><q-toggle v-model="programa2.formato" color="green" :label="programa2.formato" size="xl"  false-value="2D" true-value="3D"/> </div>
+              <div class="col-4"><q-toggle v-model="programa2.activo" color="purple" :label="programa2.activo" size="xl"  false-value="INACTVO" true-value="ACTIVO"/> </div>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right" class="text-primary">
+            <q-btn flat label="CANCELAR" v-close-popup />
+            <q-btn flat label="Eliminar" @click="eliminarFuncion" icon="delete" color="red"/>
+            <q-btn flat label="Modificar" @click="modificarFuncion" icon="edit" color="yellow"/>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
     </div>
   </q-page>
 </template>
@@ -100,12 +152,14 @@ export default {
       tarifa:{label:'',value:{}},
       funcion:[],
       programa:{'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO','formato':'2D'},
+      programa2:{},
       listpelis:[],
       listsalas:[],
       filsala:[],
       filpelis:[],
       filtarifa:[],
       listtarifa:[],
+      programaUpdateDialog:false,
       color: ["indigo", "blue", "green", "cyan-4","orange","light-green","lime","amber", "light-blue", "purple", "pink","teal","lime", "deep-orange", "#1b5e20", "#ff5722","#795548","#e65100","#827717","#01579b", "#006064", "#1b5e20", "#ff5722","#795548"],
       programaDialog:false,
       store: globalStore(),
@@ -183,16 +237,48 @@ export default {
     this.cargar()
   },
   methods: {
+    eventTitleClick: function(args) {
+     // console.log(args.event.id)
+      this.funcion.forEach(r=>{
+        if(r.id==args.event.id)
+          this.programa2=r
+      })
+      console.log(this.programa2)
+      this.pelicula=this.programa2.movie
+      this.pelicula.label=this.pelicula.nombre
+      this.tarifa=this.programa2.price
+      this.tarifa.label=this.tarifa.serie+' '+this.tarifa.precio+' Bs'
+      this.sala=this.programa2.sala
+      this.sala.label=this.sala.nombre
+      this.programa2.hora=date.formatDate(this.programa2.horaInicio, "H:mm")
+      this.programaUpdateDialog=true
+      //console.log(date.formatDate(this.programa2.horaInicio, "H:mm"))
+    },
+
     registrarFuncion(){
       this.programa.movie=this.pelicula
       this.programa.price=this.tarifa
       this.programa.sala=this.sala
-
+      this.programa={'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO','formato':'2D'},
       this.$api.post('programa',this.programa).then(res=>{
         console.log(res.data)
       })
 
-        },
+    },
+    modificarFuncion(){
+      this.programa2.movie=this.pelicula
+      this.programa2.price=this.tarifa
+      this.programa2.sala=this.sala
+      this.$api.put('programa/'+this.programa2.id,this.programa2).then(res=>{
+          console.log(res.data)
+        })
+
+    },
+    eliminarFuncion(){
+      this.$api.delete('programa/'+this.programa2.id).then(res=>{
+        console.log(res.data)
+      })
+    },
     cargar(){
       this.listtarifa=[]
       this.listsalas=[]
@@ -276,11 +362,11 @@ export default {
             console.log(r.sala.nro)
             col=r.sala.nro
             if(num==0){
-              this.events.push({ title: r.movie.nombre, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
+              this.events.push({ title: r.movie.nombre+' '+r.formato, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
               }
             else{
             if(num==r.sala.id)
-              this.events.push({ title: r.movie.nombre, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
+              this.events.push({ title: r.movie.nombre+' '+r.formato, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
             }
 
         })
@@ -290,50 +376,9 @@ export default {
         })
 
     },
-    movieCreate(){
-      this.loading=true
-      this.movie.distributor_id=this.store.distributor.id
-      this.$api.post('movie',this.movie).then(res=>{
-        this.loading=false
-        this.store.movies.push(res.data)
-        this.movieDialog=false
-      })
-    },
-    movieUpdate(){
-      this.$q.loading.show()
-      this.$api.put('movie/'+this.movie2.id,this.movie2).then(res=>{
-        this.$q.loading.hide()
-        console.log(res.data)
-        this.movie2={}
-        let index = this.store.movies.findIndex(m => m.id == res.data.id);
-        this.store.movies[index]=res.data
-        this.movieUpdateDialog=false
-      })
-    },
-    movieDelete(id,pageIndex){
-      this.$q.dialog({
-        title: 'Eliminar Pelicula',
-        message: '¿Esta seguro de eliminar la pelicula?',
-        ok: {
-          push: true
-        },
-        cancel: {
-          push: true,
-          color: 'negative'
-        },
-      }).onOk(() => {
-        this.$q.loading.show()
-        this.$api.delete('movie/'+id).then(res=>{
-          this.store.movies.splice(pageIndex,1)
-          this.$q.loading.hide()
-          this.$q.notify({
-            message: 'Pelicula eliminada',
-            color: 'positive',
-            icon: 'done'
-          })
-        })
-      })
-    }
+
+
+
   }
 }
 </script>
