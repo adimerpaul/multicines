@@ -83,7 +83,7 @@
           <tr v-for="(f,i) in parseInt(hour.sala.filas)" :key="i">
             <th>{{letra[i+1]}}</th>
             <td v-for="(c,j) in parseInt(hour.sala.columnas)" click="cambio(f,c)" :key="j" class="text-center tdx" style="padding: 0px;margin: 0px;border: 0px">
-              <q-btn :color="green-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-if="hour.sala.seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='ACTIVO'" @click="seleccionar(hour,hour.sala.columnas*(f-1)+(c-1))"/>
+              <q-btn color="green-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-if="hour.sala.seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='ACTIVO'" @click="seleccionar(hour,hour.sala.columnas*(f-1)+(c-1))"/>
               <q-btn color="grey-6" class="full-width full-height"  v-else/>
             </td>
           </tr>
