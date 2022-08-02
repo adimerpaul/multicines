@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Rubro;
 use App\Http\Requests\StoreRubroRequest;
 use App\Http\Requests\UpdateRubroRequest;
+use http\Env\Request;
 
 class RubroController extends Controller
 {
@@ -43,6 +44,7 @@ class RubroController extends Controller
         $rubro->descripcion=$request->descripcion;
         $rubro->imagen=$request->imagen;
         $rubro->color=$request->color;
+        $rubro->activo='ACTIVO';
         $rubro->save();
         return $rubro;
     }
@@ -79,6 +81,24 @@ class RubroController extends Controller
     public function update(UpdateRubroRequest $request, Rubro $rubro)
     {
         //
+        $rubro= Rubro::find($request->id);
+        $rubro->nombre=$request->nombre;
+        $rubro->descripcion=$request->descripcion;
+        $rubro->activo=$request->activo;
+        $rubro->color=$request->color;
+        $rubro->save();
+
+        return $rubro;
+    }
+
+    public function upimagenrubro(UpdateRubroRequest $request)
+    {
+        //
+        $rubro= Rubro::find($request->id);
+        $rubro->imagen=$request->imagen;
+        $rubro->save();
+
+        return $rubro;
     }
 
     /**

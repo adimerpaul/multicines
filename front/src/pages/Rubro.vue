@@ -17,11 +17,14 @@
           </template>
           <template v-slot:body-cell-imagen="props">
             <q-td auto-width :props="props">
-              <q-img :src="url+'../imagenes/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
+              <div :style="'background: '+props.row.color" >
 
+              <q-img :src="url+'../imagenes/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
+              </div>
             </q-td>
 
           </template>
+
           <template v-slot:body-cell-opciones="props">
             <q-td auto-width :props="props">
               <q-btn-dropdown color="info" label="Opciones" dropdown-icon="change_history">
@@ -31,7 +34,7 @@
                       <q-item-label>Actualizar</q-item-label>
                     </q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup @click="rubroImagen(props.row.id)">
+                  <q-item clickable v-close-popup @click="rubro2=props.row; dialog_img=true;">
                     <q-item-section>
                       <q-item-label>Cambiar Imagen</q-item-label>
                     </q-item-section>
@@ -46,7 +49,6 @@
             </q-td>
           </template>
         </q-table>
-        <pre>{{store.movies}}</pre>
       </div>
     </div>
 
@@ -71,6 +73,7 @@
                   label="Color Fondo"
                   outlined
                   dense
+                  no-header
                   v-model="rubro.color"
                   class="Color Fondo"
                   :rules="[val => val.length>0 || 'Seleccionar color']"
@@ -111,7 +114,7 @@
     <q-dialog v-model="rubroUpdateDialog" full-width>
       <q-card>
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Modificar Distribuidor</div>
+          <div class="text-h6">Modificar Rubro</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
@@ -119,33 +122,77 @@
           <q-form @submit.prevent="rubroUpdate">
             <div class="row">
               <div class="col-3">
-                <q-input dense outlined label="Nombre" v-model="rubro2.nombre" />
+                <q-input dense outlined label="Nombre" v-model="rubro2.nombre" :rules="[val => val.length>0 || 'Ingresar Nombre']"/>
               </div>
               <div class="col-3">
-                <q-input dense outlined label="Direccion" v-model="rubro2.dir" />
-              </div>
-              <div class="col-3">
-                <q-input dense outlined label="Localidad" v-model="rubro2.loc" />
+                <q-input dense outlined label="Descripcion" v-model="rubro2.descripcion" />
               </div>
 
+
               <div class="col-3">
-                <q-input dense outlined label="NIT" v-model="rubro2.nit" />
+                <q-input
+                  label="Color Fondo"
+                  outlined
+                  dense
+                  v-model="rubro2.color"
+                  class="Color Fondo"
+                  :rules="[val => val.length>0 || 'Seleccionar color']"
+                >
+                  <template v-slot:append>
+                    <q-icon name="colorize" class="cursor-pointer">
+                      <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                        <q-color v-model="rubro2.color" />
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
               </div>
               <div class="col-3">
-                <q-input dense outlined label="Telefono" v-model="rubro2.tel" />
+                <q-toggle v-model="rubro2.activo" color="green" :label="rubro2.activo" size="xl"  false-value="INACTVO" true-value="ACTIVO"/>
+
               </div>
-              <div class="col-3">
-                <q-input dense outlined label="Email" v-model="rubro2.email" />
-              </div>
-              <div class="col-3">
-                <q-input dense outlined label="Responsable" v-model="rubro2.responsable" />
-              </div>
+
               <div class="col-12">
                 <q-btn color="yellow-8" icon="edit" class="full-width" type="submit" label="Modificar" />
               </div>
             </div>
           </q-form>
         </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="dialog_img">
+      <q-card>
+        <q-card-section class="bg-amber-14 text-white">
+          <div class="text-h6">Modificar imagen</div>
+        </q-card-section>
+        <q-card-section class="q-pt-xs">
+          <q-form
+            @submit="onModImagen"
+            class="q-gutter-md"
+          >
+            <div class="col-12 text-center flex flex-center">
+              <q-uploader
+                accept=".jpg, .png"
+                @added="uploadFile"
+                auto-upload
+                max-files="1"
+                label="Ingresar Imagen"
+                flat
+                max-file-size="2000000"
+                @rejected="onRejected"
+                bordered
+              />
+            </div>
+            <div>
+              <q-btn label="Modificar" type="submit" color="positive" icon="add_circle"/>
+              <q-btn  label="Cancelar" icon="delete" color="negative" v-close-popup />
+            </div>
+
+          </q-form>
+        </q-card-section>
+
+
       </q-card>
     </q-dialog>
   </q-page>
@@ -166,6 +213,7 @@ export default {
       rubro2:{},
       rubroDialog:false,
       rubroUpdateDialog:false,
+      dialog_img:false,
       store: globalStore(),
       foto:'',
       rubroColumns:[
@@ -189,6 +237,18 @@ export default {
     }
   },
   methods: {
+    onModImagen(){
+      this.rubro2.imagen=this.foto
+      this.$q.loading.show()
+      this.$api.post('upimagenrubro',this.rubro2).then(res=>{
+        this.$q.loading.hide()
+        console.log(res.data)
+        this.rubro2={}
+        let index = this.store.rubros.findIndex(m => m.id == res.data.id);
+        this.store.rubros[index]=res.data
+        this.dialog_img=false
+      })
+    },
     uploadFile (file) {
       let dialog = this.$q.dialog({
         message: 'Subiendo... 0%',

@@ -31,3 +31,4 @@ Route::resource('sale', \App\Http\Controllers\SaleController::class);
 Route::resource('rubro', \App\Http\Controllers\RubroController::class);
 Route::post('movies', [\App\Http\Controllers\SaleController::class, 'movies']);
 Route::post('hours', [\App\Http\Controllers\SaleController::class, 'hours']);
+Route::post('upimagenrubro', [\App\Http\Controllers\RubroController::class, 'upimagenrubro']);
