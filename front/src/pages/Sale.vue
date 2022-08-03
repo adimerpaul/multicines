@@ -284,7 +284,7 @@ export default {
           columna:seat.columna,
           letra:seat.letra,
           fecha:funcion.horaInicio,
-          pelicula:funcion.movie.nombre,
+          pelicula:funcion.movie.nombre+' '+funcion.formato,
           precio:funcion.price.precio,
         }).then(res=>{
           if (res.data==1){
