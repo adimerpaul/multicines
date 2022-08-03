@@ -39,6 +39,28 @@
   </q-card-section>
   <q-separator />
   <q-card-section>
+    <div class="col-12 col-sm-12 q-pa-xs flex flex-center">
+      <div  style="font-size: 10px; font-weight: bold">
+            <q-icon name="event_seat" />
+            Disponibles:
+          |
+
+        <q-icon name="credit_card" />
+
+        Vendidas:
+          |
+
+        <q-icon name="settings_backup_restore" />
+
+        Devueltas:
+          |
+
+        <q-icon name="apartment" />
+
+        Capacidad: 
+
+      </div>
+    </div>
 
   </q-card-section>
   <q-separator />
