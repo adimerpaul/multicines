@@ -14,6 +14,7 @@ use App\Http\Requests\StoreActivityRequest;
 use App\Http\Requests\UpdateActivityRequest;
 use App\Models\Cui;
 use App\Models\Sector;
+use App\Models\Tipopago;
 
 class ActivityController extends Controller
 {
@@ -273,6 +274,114 @@ class ActivityController extends Controller
             $documentsector->codigoSucursal = $request->codigoSucursal;
             $documentsector->save();
         }
+
+        $result= $client->sincronizarParametricaTipoEmision([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+
+        $result= $client->sincronizarParametricaTipoHabitacion([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+
+        Tipopago::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
+        $result= $client->sincronizarParametricaTipoMetodoPago([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
+            $tipopago = new Tipopago();
+            $tipopago->codigoClasificador = $l->codigoClasificador;
+            $tipopago->descripcion = $l->descripcion;
+            $tipopago->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $tipopago->codigoSucursal = $request->codigoSucursal;
+            $tipopago->save();
+        }
+            //BOLIVIANO DOLAR
+        $result= $client->sincronizarParametricaTipoMoneda([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+//               <codigoClasificador>1</codigoClasificador>
+//               <descripcion>PUNTO VENTA COMISIONISTA</descripcion>
+//               <codigoClasificador>2</codigoClasificador>
+//               <descripcion>PUNTO VENTA VENTANILLA DE COBRANZA</descripcion>
+//               <codigoClasificador>3</codigoClasificador>
+//               <descripcion>PUNTO DE VENTA MOVILES</descripcion>
+//               <codigoClasificador>4</codigoClasificador>
+//               <descripcion>PUNTO DE VENTA YPFB</descripcion>
+//               <codigoClasificador>5</codigoClasificador>
+//               <descripcion>PUNTO DE VENTA CAJEROS</descripcion>
+//               <codigoClasificador>6</codigoClasificador>
+//               <descripcion>PUNTO DE VENTA CONJUNTA</descripcion>
+        $result= $client->sincronizarParametricaTipoPuntoVenta([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        //              <codigoClasificador>1</codigoClasificador>
+        //               <descripcion>FACTURA CON DERECHO A CREDITO FISCAL</descripcion>
+        //               <codigoClasificador>2</codigoClasificador>
+        //               <descripcion>FACTURA SIN DERECHO A CREDITO FISCAL</descripcion>
+        //               <codigoClasificador>3</codigoClasificador>
+        //               <descripcion>DOCUMENTO DE AJUSTE</descripcion>
+        //               <codigoClasificador>4</codigoClasificador>
+        //               <descripcion>DOCUMENTO EQUIVALENTE</descripcion>
+        $result= $client->sincronizarParametricaTiposFactura([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+        //unidades
+        $result= $client->sincronizarParametricaUnidadMedida([
+            "SolicitudSincronizacion"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "codigoSucursal"=>$request->codigoSucursal,
+                "cuis"=>$cui->first()->codigo,
+                "nit"=>env('NIT'),
+            ]
+        ]);
+
+
+
 
         return response()->json(['success' => 'Actividades sincronizadas'], 200);
     }

@@ -19,7 +19,7 @@
             <q-td auto-width :props="props">
               <div :style="'background: '+props.row.color" >
 
-              <q-img :src="url+'../imagenes/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
+              <q-img :src="url+'../imagen/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
               </div>
             </q-td>
 

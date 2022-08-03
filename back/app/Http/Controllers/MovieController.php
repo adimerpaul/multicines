@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateRubroRequest;
 use App\Models\Movie;
 use App\Http\Requests\StoreMovieRequest;
 use App\Http\Requests\UpdateMovieRequest;
+use App\Models\Rubro;
 
 class MovieController extends Controller
 {
@@ -74,7 +76,24 @@ class MovieController extends Controller
         $movie->update($request->all());
         return $movie->with('distributor')->get();
     }
+    public function upimagenmovie(UpdateMovieRequest $request)
+    {
+        //
+        $movie= Movie::find($request->id);
+        $movie->imagen=$request->imagen;
+        $movie->save();
 
+        return $movie;
+    }
+    public function upimagenrubro(UpdateRubroRequest $request)
+    {
+        //
+        $rubro= Rubro::find($request->id);
+        $rubro->imagen=$request->imagen;
+        $rubro->save();
+
+        return $rubro;
+    }
     /**
      * Remove the specified resource from storage.
      *
