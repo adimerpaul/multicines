@@ -44,6 +44,8 @@ return new class extends Migration
             $table->foreign("price_id")->references("id")->on("prices");
             $table->unsignedBigInteger("sala_id")->nullable();
             $table->foreign("sala_id")->references("id")->on("salas");
+            $table->unsignedBigInteger("user_id")->nullable();
+            $table->foreign("user_id")->references("id")->on("users");
             $table->timestamps();
             $table->softDeletes();
 

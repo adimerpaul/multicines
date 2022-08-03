@@ -45,14 +45,15 @@ class SaleController extends Controller
      */
     public function mySeats(Request $request){
         $seats=DB::select("SELECT a.fila,a.columna,a.letra,(
-        IF(a.activo='ACTIVO',
-           IF((SELECT COUNT(*) FROM tickets t WHERE t.programa_id=p.id AND t.fila=a.fila AND t.columna=a.columna AND t.letra=a.letra)=1, 'OCUPADO', 'LIBRE')
-           , 'INACTIVO')
-        ) activo
-        FROM programas p
-        INNER JOIN salas s ON s.id=p.sala_id
-        INNER JOIN seats a ON a.sala_id=s.id
-        WHERE p.id=".$request->id.";");
+            IF(a.activo='ACTIVO',
+               IF((SELECT COUNT(*) FROM tickets t WHERE t.programa_id=p.id AND t.fila=a.fila AND t.columna=a.columna AND t.letra=a.letra)=1, 'OCUPADO',
+                 IF((SELECT COUNT(*) FROM momentaneos m WHERE m.programa_id=p.id AND m.fila=a.fila AND m.columna=a.columna AND m.letra=a.letra)=1,'RESERVADO','LIBRE'))
+               , 'INACTIVO')
+            ) activo
+            FROM programas p
+            INNER JOIN salas s ON s.id=p.sala_id
+            INNER JOIN seats a ON a.sala_id=s.id
+            WHERE p.id=".$request->id.";");
         return $seats;
 
     }

@@ -44,29 +44,109 @@
   <q-separator />
   <q-card-section>
     <div class="row">
-      <div class="col-3">
+      <div class="col-4">
         <div class="text-bold text-center">{{movie.nombre}}</div>
         <q-btn @click="clickSala(h)" :loading="loading" size="12px" class="q-ma-xs full-width flex flex-center" v-for="h in hours" color="primary" :key="h.id" >
           <q-icon name="schedule" left/>
           <q-badge color="red">S{{h.sala.nro}}</q-badge> {{h.horaInicio.substring(10,16)}} <q-badge color="secondary">{{h.formato}}</q-badge> {{h.price.precio+'Bs'}}
         </q-btn>
+      </div>
+      <div class="col-4">
+      </div>
+      <div class="col-4">
+        <div class="text-bold q-pa-xs bg-grey-8 text-white"> Detalle venta
+          <q-btn color="red" :loading="loading" @click="momentaneoDeleteAll" dense label="Cancelar Venta" no-caps icon="o_delete"/>
+          <q-btn color="green" :loading="loading" @click="momentaneoDeleteAll" dense label="Terminar Venta" no-caps icon="check_circle"/>
+        </div>
+        <table>
+          <thead>
+          <tr>
+            <th colspan="4">Detalle de venta</th>
+          </tr>
+          <tr>
+            <th>Fecha</th>
+            <th>Cantidad</th>
+            <th>Pelicula</th>
+            <th>Subtotal</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(d,i) in detalleVenta" :key="i">
+            <td class="tdx">{{d.fecha}}</td>
+            <td class="tdx">{{d.cantidad}}</td>
+            <td class="tdx">{{d.pelicula}}</td>
+            <td class="tdx text-right">{{d.subtotal}} Bs</td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <td colspan="3" class="text-right text-bold">TOTAL: </td>
+            <td class="text-right">{{total}} Bs</td>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
 
-        <pre>{{hours}}</pre>
-      </div>
-      <div class="col-3">
-        <q-input v-model="numeroboleto" label="numero boletos" type="number"/>
-      </div>
-      <div class="col-6"></div>
+<!--      <div class="col-4">-->
+<!--        <div class="row">-->
+<!--          <div class="col-12">-->
+<!--            <div class="text-bold">Operaciones</div>-->
+<!--          </div>-->
+<!--          <div class="col-6">-->
+<!--            <q-btn size="12px" class="q-ma-xs flex flex-center full-width">-->
+<!--              <div class="row items-center no-wrap">-->
+<!--                <q-icon left name="remove_circle_outline" />-->
+<!--                <div class="text-center">-->
+<!--                  Entradas-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </q-btn>-->
+<!--          </div>-->
+<!--          <div class="col-6">-->
+<!--            <q-btn size="12px" class="q-ma-xs flex flex-center full-width">-->
+<!--              <div class="row items-center no-wrap">-->
+<!--                <q-icon left name="add_circle_outline" />-->
+<!--                <div class="text-center">-->
+<!--                  Entradas-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </q-btn>-->
+<!--          </div>-->
+<!--          <div class="col-6">-->
+<!--            <q-btn color="red" size="12px" class="q-ma-xs flex flex-center full-width">-->
+<!--              <div class="row items-center no-wrap">-->
+<!--                <q-icon left name="highlight_off" />-->
+<!--                <div class="text-center">-->
+<!--                  Entradas-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </q-btn>-->
+<!--          </div>-->
+<!--          <div class="col-6">-->
+<!--            <q-btn size="12px" class="q-ma-xs flex flex-center full-width">-->
+<!--              <div class="row items-center no-wrap">-->
+<!--                <q-icon left name="add_circle_outline" />-->
+<!--                <div class="text-center">-->
+<!--                  Entradas-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </q-btn>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
 
   </q-card-section>
 </q-card>
-<q-dialog full-width full-height v-model="salaDialog">
+<q-dialog full-width v-model="salaDialog" persistent>
 <q-card>
   <q-card-section >
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 row items-center q-pb-none">
         <div class="text-bold">{{movie.nombre}} <q-icon name="schedule" left/><q-badge color="red">{{hour.sala.nombre}}</q-badge> {{hour.horaInicio.substring(10,16)}} <q-badge color="secondary">{{hour.formato}}</q-badge> {{hour.price.precio+'Bs'}}</div>
+        <q-space />
+        <div class="text-bold">CANTIDAD: {{seleccionados.length}} SUBTOTAL: {{seleccionados.length*hour.price.precio}}</div>
+        <q-btn icon="highlight_off" color="red" flat round dense @click="salaDialogClose" />
       </div>
       <div class="col-12">
         <table>
@@ -85,15 +165,17 @@
             <td v-for="(c,j) in parseInt(hour.sala.columnas)" click="cambio(f,c)" :key="j" class="text-center tdx" style="padding: 0px;margin: 0px;border: 0px">
               <q-btn color="green-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-if="seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='LIBRE'" @click="seleccionar(hour,seats[hour.sala.columnas*(f-1)+(c-1)])"/>
               <q-btn color="red-6" class="full-width"  v-else-if="seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='OCUPADO'"/>
-              <q-btn color="blue-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-else-if="seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='RESERVADO'" @click="seleccionar(hour,seats[hour.sala.columnas*(f-1)+(c-1)])"/>
+              <q-btn color="yellow-6" class="full-width"  v-else-if="seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='RESERVADO'"/>
+              <q-btn color="blue-6" class="full-width" :label="letra[i+1]+'-'+(hour.sala.columnas-c+1).toString()" v-else-if="seats[hour.sala.columnas*(f-1)+(c-1)]['activo']=='SELECCIONADO'" @click="seleccionar(hour,seats[hour.sala.columnas*(f-1)+(c-1)])"/>
               <q-btn color="grey-6" class="full-width" v-else/>
             </td>
           </tr>
           </tbody>
         </table>
       </div>
-      <div class="col-12">
-        <pre>{{seats}}</pre>
+      <div class="col-12 text-center">
+        <q-btn icon="check_circle" class="q-ml-lg" :disable="seleccionados.length==0" color="primary" label="Agregar" @click="myMomentaneo();salaDialog=false"/>
+        <q-btn icon="highlight_off" class="q-ml-lg" color="red" label="Cancelar" @click="salaDialogClose"/>
       </div>
     </div>
   </q-card-section>
@@ -118,6 +200,8 @@ export default {
       movie:{},
       hours:[],
       hour:{},
+      momentaneos:[],
+      momentaneo:{},
       seats:[],
       seat:{},
       temporal:[],
@@ -127,8 +211,31 @@ export default {
   },
   created() {
     this.myMovies(this.fecha)
+    this.myMomentaneo();
   },
   methods: {
+    momentaneoDeleteAll(){
+      this.loading=true
+      this.$api.post('momentaneoDeleteall').then(res=>{
+        this.loading=false
+        this.myMomentaneo();
+      });
+    },
+    myMomentaneo(){
+      this.$api.get('momentaneo').then(res=>{
+        // console.log(res.data)
+        this.momentaneos=res.data
+      });
+    },
+    salaDialogClose(){
+      this.$api.post('momentaneoDeleteUser',{
+        programa_id:this.hour.id
+      }).then(res=>{
+        this.myMomentaneo()
+      })
+      this.salaDialog=false
+
+    },
     clickSala(h){
       this.hour=h
       this.loading=true
@@ -144,8 +251,8 @@ export default {
       this.hours=[]
       this.$api.post('movies',{fecha:fecha}).then(res => {
         this.movies = res.data
-        this.movie = this.movies[0].movie
-        this.myHours(this.movie)
+        // this.movie = this.movies[0].movie //
+        // this.myHours(this.movie) //
       });
     },
     myHours(movie) {
@@ -155,18 +262,71 @@ export default {
         this.loading=false
         this.hours = res.data
         this.hour = this.hours[0]
-        this.clickSala(this.hour)
+        // this.clickSala(this.hour) //
       });
     },
     seleccionar(funcion,seat){
-      if(seat.activo=='RESERVADO'){
+      if(seat.activo=='SELECCIONADO'){
         seat.activo='LIBRE'
+        this.$api.post('momentaneoDelete',{
+          user_id:1,
+          programa_id:funcion.id,
+          fila:seat.fila,
+          columna:seat.columna,
+          letra:seat.letra,
+        })
       }else{
-        seat.activo='RESERVADO'
+        seat.activo='SELECCIONADO'
+        this.$api.post('momentaneo',{
+          user_id:1,
+          programa_id:funcion.id,
+          fila:seat.fila,
+          columna:seat.columna,
+          letra:seat.letra,
+          fecha:funcion.horaInicio,
+          pelicula:funcion.movie.nombre,
+          precio:funcion.price.precio,
+        }).then(res=>{
+          if (res.data==1){
+            this.clickSala(funcion)
+          }
+        })
       }
       // console.log(seat)
       // this.hour.sala.seats[indice]['activo']
       //   this.temporal.push(asiento)
+    }
+  },
+  computed:{
+    seleccionados(){
+      let array=[]
+      this.seats.forEach(s=>{
+        if (s.activo=="SELECCIONADO"){
+          array.push(s)
+        }
+      })
+      return array
+    },
+    detalleVenta(){
+      let array=[]
+      let find
+      this.momentaneos.forEach(m=>{
+        find=array.find(mo=>mo.programa_id===m.programa_id)
+        if (find==undefined){
+          array.push({fecha:m.fecha,cantidad:1,pelicula:m.pelicula,subtotal:m.precio,programa_id:m.programa_id})
+        }else{
+          find.cantidad=find.cantidad+1
+          find.subtotal=find.cantidad*m.precio
+        }
+      })
+      return array
+    },
+    total(){
+      let t=0
+      this.detalleVenta.forEach(d=>{
+        t+= parseFloat(d.subtotal)
+      })
+      return t.toFixed(2)
     }
   }
 }
