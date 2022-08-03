@@ -9,6 +9,7 @@ import Cufd from "pages/Cufd";
 import Programa from "pages/Programa";
 import Sale from "pages/Sale";
 import Rubro from "pages/Rubro";
+import Productos from "pages/Productos";
 
 
 const routes = [
@@ -27,6 +28,7 @@ const routes = [
       { path: 'sale', component: Sale },
       { path: 'programa', component: Programa },
       { path: 'rubro', component: Rubro },
+      { path: 'productos', component: Productos },
     ]
   },
 

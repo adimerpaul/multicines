@@ -41,6 +41,7 @@
         <q-expansion-item dense exact expand-separator icon="o_living" label="Salas" to="salas" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="o_price_change" label="Tarifas" to="tarifas" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="format_list_bulleted" label="Rubro" to="rubro" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="receipt_long" label="Producto" to="productos" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="calendar_month" label="Programación" to="programa" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Venta de boletos" to="sale" expand-icon="null"/>
       </q-list>

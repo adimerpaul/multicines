@@ -110,5 +110,6 @@ class RubroController extends Controller
     public function destroy(Rubro $rubro)
     {
         //
+        $rubro->delete();
     }
 }

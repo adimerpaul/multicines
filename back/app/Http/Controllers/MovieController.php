@@ -83,6 +83,7 @@ class MovieController extends Controller
         $movie->imagen=$request->imagen;
         $movie->save();
 
+        $movie=Movie::with('distributor')->where('id',$request->id)->first();
         return $movie;
     }
     public function upimagenrubro(UpdateRubroRequest $request)

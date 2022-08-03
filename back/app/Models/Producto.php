@@ -11,5 +11,9 @@ class Producto extends Model
     use HasFactory;
     use SoftDeletes;
     use HasFactory;
-    protected $fillable=['nro','nombre','filas','columnas','capacidad'];
+    protected $fillable=['nombre','descripcion','precio','activo','imagen','color',"rubro_id"];
+    public function rubro()
+    {
+        return $this->belongsTo(Rubro::class);
+    }
 }
