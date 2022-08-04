@@ -37,7 +37,6 @@ class ProgramaController extends Controller
      */
     public function store(StoreProgramaRequest $request)
     {
-        //
         $duracion=$request->movie['duracion'];
         $hora=$request->hora;
         $horafin= strtotime ( '+'.$duracion.' minutes' , strtotime ($hora) );

@@ -57,7 +57,7 @@
 
         <q-icon name="apartment" />
 
-        Capacidad: 
+        Capacidad:
 
       </div>
     </div>
@@ -102,8 +102,8 @@
           </tbody>
           <tfoot>
           <tr>
-            <td colspan="3" class="text-right text-bold">TOTAL: </td>
-            <td class="text-right">{{total}} Bs</td>
+            <td colspan="3" class=" tdx text-right text-bold">TOTAL: </td>
+            <td class="text-right tdx">{{total}}Bs</td>
           </tr>
           </tfoot>
         </table>
@@ -167,7 +167,7 @@
       <div class="col-12 row items-center q-pb-none">
         <div class="text-bold">{{movie.nombre}} <q-icon name="schedule" left/><q-badge color="red">{{hour.sala.nombre}}</q-badge> {{hour.horaInicio.substring(10,16)}} <q-badge color="secondary">{{hour.formato}}</q-badge> {{hour.price.precio+'Bs'}}</div>
         <q-space />
-        <div class="text-bold">CANTIDAD: {{seleccionados.length}} SUBTOTAL: {{seleccionados.length*hour.price.precio}}</div>
+        <div class="text-bold">CANTIDAD: <span class="text-red text-bold text-h4">{{seleccionados.length}}</span>  SUBTOTAL: <span class="text-red text-bold text-h4">{{seleccionados.length*hour.price.precio}}Bs. </span></div>
         <q-btn icon="highlight_off" color="red" flat round dense @click="salaDialogClose" />
       </div>
       <div class="col-12">

@@ -1,22 +1,16 @@
 <template>
   <q-page>
-    <div class="row">
+    <div class="row q-pa-xs">
       <div class="col-12">
       <div class="text-h5">PROGRAMACION DE FUNCIONES</div>
-        <q-btn label="Registrar" color="green" @click="programaDialog=true; "/>
-
-
+        <q-btn label="Registrar" icon="add_circle" color="primary" @click="programaDialog=true; "/>
       <div class="col-12">
         <div class="row">
-          <div class="col"><q-btn label="TODOS" :color="color[0]" @click="listado(0)"/></div>
-          <div class="col" v-for="s in store.salas" :key="s">
-            <q-btn  :label="s.nombre" :color="color[s.nro]" @click="listado(s.id)"/>
+          <div class="col q-ma-xs"><q-btn  icon="list" class="full-width " label="TODOS" :color="color[0]" @click="listado(0)"/></div>
+          <div class="col q-ma-xs" v-for="s in store.salas" :key="s">
+            <q-btn class="full-width " icon="play_circle_outline"  :label="s.nombre" :color="color[s.nro]" @click="listado(s.id)"/>
           </div>
-
-
-
         </div>
-
       </div>
         <FullCalendar class="full-height" :options="calendarOptions" />
 
@@ -25,13 +19,13 @@
       <q-dialog v-model="programaDialog" full-width>
         <q-card >
           <q-card-section>
-            <div class="text-h6">REGISTRO DE FUNCION</div>
+            <div class="text-h6">REGISTRAR DE FUNCION PELICULA</div>
           </q-card-section>
 
           <q-card-section class="q-pt-none">
             <div class="row">
 
-            <div class="col-4"><q-select v-model="sala" label="SALAS" :options="listsalas"  use-input input-debounce="0" @filter="filterSala">
+            <div class="col-4"><q-select outlined v-model="sala" label="SALAS" :options="listsalas"  use-input input-debounce="0" @filter="filterSala">
               <template v-slot:no-option>
                 <q-item>
                   <q-item-section class="text-grey">
@@ -40,7 +34,7 @@
                 </q-item>
               </template>
               </q-select></div>
-              <div class="col-4"><q-select v-model="pelicula" label="PELICULAS" :options="listpelis" use-input input-debounce="0" @filter="filterPelicula">
+              <div class="col-4"><q-select outlined v-model="pelicula" label="PELICULAS" :options="listpelis" use-input input-debounce="0" @filter="filterPelicula">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -49,7 +43,7 @@
                   </q-item>
                 </template>
               </q-select></div>
-              <div class="col-4"><q-select v-model="tarifa" label="TARIFAS"  :options="listtarifa" use-input input-debounce="0" @filter="filterTarifa">
+              <div class="col-4"><q-select outlined v-model="tarifa" label="TARIFAS"  :options="listtarifa" use-input input-debounce="0" @filter="filterTarifa">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -58,17 +52,17 @@
                   </q-item>
                 </template>
               </q-select></div>
-            <div class="col-4"><q-input v-model="programa.fechaini" label="Fecha Inicial" type="date"/></div>
-            <div class="col-4"><q-input v-model="programa.fechafin" label="Fecha Final" type="date"/></div>
-            <div class="col-4"><q-input v-model="programa.hora" label="Hora" type="time"/></div>
+            <div class="col-4"><q-input outlined v-model="programa.fechaini" @update:model-value="cambioFecha" label="Fecha Inicial" type="date"/></div>
+            <div class="col-4"><q-input outlined v-model="programa.fechafin" label="Fecha Final" type="date"/></div>
+            <div class="col-4"><q-input outlined v-model="programa.hora" required label="Hora" type="time"/></div>
               <div class="col-4"><q-checkbox v-model="programa.subtitulada" label="SUBTITULADA" size="xl" true-value="SI" false-value="NO"/></div>
               <div class="col-4">    <q-toggle v-model="programa.formato" color="green" :label="programa.formato" size="xl"  false-value="2D" true-value="3D"/> </div>
             </div>
           </q-card-section>
 
           <q-card-actions align="right" class="text-primary">
-            <q-btn flat label="CANCELAR" v-close-popup />
-            <q-btn flat label="REGISTRAR" @click="registrarFuncion" />
+            <q-btn color="red " icon="o_delete" label="CANCELAR" v-close-popup />
+            <q-btn color="green" icon="o_check_circle" :loading="loading" label="REGISTRAR" @click="registrarFuncion" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -82,7 +76,7 @@
           <q-card-section class="q-pt-none">
             <div class="row">
 
-              <div class="col-4"><q-select v-model="sala" label="SALAS" :options="listsalas"  use-input input-debounce="0" @filter="filterSala">
+              <div class="col-4"><q-select outlined v-model="sala" label="SALAS" :options="listsalas"  use-input input-debounce="0" @filter="filterSala">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -91,7 +85,7 @@
                   </q-item>
                 </template>
               </q-select></div>
-              <div class="col-4"><q-select v-model="pelicula" label="PELICULAS" :options="listpelis" use-input input-debounce="0" @filter="filterPelicula">
+              <div class="col-4"><q-select outlined v-model="pelicula" label="PELICULAS" :options="listpelis" use-input input-debounce="0" @filter="filterPelicula">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -100,7 +94,7 @@
                   </q-item>
                 </template>
               </q-select></div>
-              <div class="col-4"><q-select v-model="tarifa" label="TARIFAS"  :options="listtarifa" use-input input-debounce="0" @filter="filterTarifa">
+              <div class="col-4"><q-select outlined v-model="tarifa" label="TARIFAS"  :options="listtarifa" use-input input-debounce="0" @filter="filterTarifa">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -109,8 +103,8 @@
                   </q-item>
                 </template>
               </q-select></div>
-              <div class="col-6"><q-input v-model="programa2.fecha" label="Fecha " type="date" readonly/></div>
-              <div class="col-6"><q-input v-model="programa2.hora" label="Hora" type="time"/></div>
+              <div class="col-6"><q-input outlined v-model="programa2.fecha" label="Fecha " type="date" readonly/></div>
+              <div class="col-6"><q-input outlined v-model="programa2.hora" label="Hora" type="time"/></div>
               <div class="col-4"><q-checkbox v-model="programa2.subtitulada" label="SUBTITULADA" size="xl" true-value="SI" false-value="NO"/></div>
               <div class="col-4"><q-toggle v-model="programa2.formato" color="green" :label="programa2.formato" size="xl"  false-value="2D" true-value="3D"/> </div>
               <div class="col-4"><q-toggle v-model="programa2.activo" color="purple" :label="programa2.activo" size="xl"  false-value="INACTVO" true-value="ACTIVO"/> </div>
@@ -118,9 +112,9 @@
           </q-card-section>
 
           <q-card-actions align="right" class="text-primary">
-            <q-btn flat label="CANCELAR" v-close-popup />
-            <q-btn flat label="Eliminar" @click="eliminarFuncion" icon="delete" color="red"/>
-            <q-btn flat label="Modificar" @click="modificarFuncion" icon="edit" color="yellow"/>
+            <q-btn color="red-10" label="Atras" icon="arrow_back" v-close-popup />
+            <q-btn color="red" label="Eliminar" @click="eliminarFuncion" icon="delete" />
+            <q-btn  label="Modificar" :loading="loading" @click="modificarFuncion" icon="edit" color="yellow"/>
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -137,7 +131,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import esLocale from "@fullcalendar/core/locales/es";
-
+import moment from "moment"
 export default {
   name: `Programa`,
   components: {
@@ -165,7 +159,7 @@ export default {
       store: globalStore(),
 
       calendarOptions: {
-        slotMinTime: "09:00:00",
+        // slotMinTime: "09:00:00",
 
         selectable:true,
         plugins: [ dayGridPlugin, timeGridPlugin,interactionPlugin], headerToolbar: {
@@ -195,6 +189,7 @@ export default {
     }
   },
   created() {
+    this.cambioFecha(this.programa.fechaini)
     let str = formatDate(new Date(), {
       month: 'long',
       year: 'numeric',
@@ -237,20 +232,23 @@ export default {
     this.cargar()
   },
   methods: {
+    cambioFecha(fecha){
+      this.programa.fechafin=(moment(fecha).add(7, 'days').format("YYYY-MM-DD"));
+    },
     eventTitleClick: function(args) {
      // console.log(args.event.id)
       this.funcion.forEach(r=>{
         if(r.id==args.event.id)
           this.programa2=r
       })
-      console.log(this.programa2)
+      // console.log(this.programa2)
       this.pelicula=this.programa2.movie
       this.pelicula.label=this.pelicula.nombre
       this.tarifa=this.programa2.price
       this.tarifa.label=this.tarifa.serie+' '+this.tarifa.precio+' Bs'
       this.sala=this.programa2.sala
       this.sala.label=this.sala.nombre
-      this.programa2.hora=date.formatDate(this.programa2.horaInicio, "H:mm")
+      this.programa2.hora=date.formatDate(this.programa2.horaInicio, "HH:mm")
       this.programaUpdateDialog=true
       //console.log(date.formatDate(this.programa2.horaInicio, "H:mm"))
     },
@@ -259,11 +257,16 @@ export default {
       this.programa.movie=this.pelicula
       this.programa.price=this.tarifa
       this.programa.sala=this.sala
-      this.programa={'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO','formato':'2D'},
+      this.loading=true
       this.$api.post('programa',this.programa).then(res=>{
         console.log(res.data)
         this.listado(0)
+        this.loading=false
+        this.programa={'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO','formato':'2D'}
         this.programaDialog=false
+      }).catch(err=>{
+        console.error(err)
+        this.loading=false
       })
 
     },
@@ -271,16 +274,18 @@ export default {
       this.programa2.movie=this.pelicula
       this.programa2.price=this.tarifa
       this.programa2.sala=this.sala
+      this.loading=true
       this.$api.put('programa/'+this.programa2.id,this.programa2).then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         this.listado(0);
+        this.loading=false
         this.programaUpdateDialog=false
         })
 
     },
     eliminarFuncion(){
       this.$api.delete('programa/'+this.programa2.id).then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         this.listado(0)
       })
     },
@@ -357,14 +362,14 @@ export default {
 
     },
     listado(num){
-       this.events=[]
+      this.events=[]
       this.funcion=[]
         this.$api.get('programa').then(res=>{
-            console.log(res.data)
+            // console.log(res.data)
           let col=0
           res.data.forEach(r=>{
             this.funcion.push(r)
-            console.log(r.sala.nro)
+            // console.log(r.sala.nro)
             col=r.sala.nro
             if(num==0){
               this.events.push({ title: r.movie.nombre+' '+r.formato, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
@@ -384,6 +389,11 @@ export default {
 
 
 
+  },
+  computed:{
+    listapelis(){
+      return 0
+    }
   }
 }
 </script>
