@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string("numeroFactura")->nullable();
             $table->string("cuf")->nullable();
             $table->string("cufd")->nullable();
+            $table->string("cui")->nullable();
             $table->integer("codigoSucursal")->nullable();
             $table->integer("codigoPuntoVenta")->nullable();
             $table->dateTime("fechaEmision")->nullable();

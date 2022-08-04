@@ -37,7 +37,7 @@ class CuiController extends Controller
     public function store(StoreCuiRequest $request)
     {
         if (Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()>=1){
-            return response()->json(['error' => 'El CUI ya existe'], 400);
+            return response()->json(['message' => 'El CUI ya existe'], 400);
         }else{
             $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?WSDL",  [
                 'stream_context' => stream_context_create([

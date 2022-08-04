@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\Cufd;
+use App\Models\Cui;
+use App\Models\Detail;
+use App\Models\Momentaneo;
 use App\Models\Programa;
 use App\Models\Sale;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -59,7 +65,108 @@ class SaleController extends Controller
     }
     public function store(StoreSaleRequest $request)
     {
-        //
+        if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->exists()) {
+            $client=Client::find($request->client['id']);
+            $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
+            $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
+            $client->save();
+        }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->exists()){
+            $client=Client::find($request->client['id']);
+            $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
+            $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
+            $client->save();
+        }else{
+            $client=new Client();
+            $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
+            $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
+            $client->numeroDocumento=$request->client['numeroDocumento'];
+            $client->complemento=$request->client['complemento'];
+            $client->save();
+        }
+
+        $codigoPuntoVenta=0;
+        $codigoSucursal=0;
+        $codigoDocumentoSector=1;
+        $user=(object)["name"=>"admin","id"=>1];
+
+        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
+        }
+        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No exite CUFD para la venta!!'], 400);
+        }
+        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->first();
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->first();
+        if (Sale::where('cui', $cui->codigo)->count()==0){
+            $numeroFactura=1;
+        }else{
+            $sale=sale::where('cui',$cui->codigo)->orderBy('numeroFactura', 'desc')->first();
+            $numeroFactura=$sale->numeroFactura+1;
+        }
+        $sale=new Sale();
+        $sale->numeroFactura=$numeroFactura;
+        $sale->cuf="";
+        $sale->cufd=$cufd->codigo;
+        $sale->cui=$cui->codigo;
+        $sale->codigoSucursal=$codigoSucursal;
+        $sale->codigoPuntoVenta=$codigoPuntoVenta;
+        $sale->fechaEmision=now();
+        $sale->montoTotal=$request->montoTotal;
+        $sale->usuario=$user->name;
+        $sale->codigoDocumentoSector=$codigoDocumentoSector;
+        $sale->user_id=$user->id;
+        $sale->client_id=$client->id;
+        $sale->save();
+        $momentaneos=Momentaneo::where('user_id',$user->id)->get();
+//        return $momentaneos;
+        $data=[];
+        $dataDetail=[];
+
+        foreach ($momentaneos as $m){
+            $programa=Programa::find($m->programa_id);
+            $numBoleto=Ticket::where('programa_id',$m->programa_id)->count()+1;
+//            return $programa->sala;
+            $d=[
+                "numboc"=>$programa->sala->nro.$programa->sala->id.date('Ymd', strtotime($programa->fecha)).$programa->nroFuncion.$programa->price->serie.'-'.$numBoleto,
+                "numero"=>$numBoleto,
+                "fecha"=>now(),
+                "numeroFuncion"=>$programa->nroFuncion,
+                "nombreSala"=>$programa->sala->nombre,
+                "serieTarifa"=>$programa->price->serie,
+                "fechaFuncion"=>$programa->fecha,
+                "horaFuncion"=>$programa->horaInicio,
+                "fila"=>$m->fila,
+                "columna"=>$m->columna,
+                "letra"=>$m->letra,
+                "costo"=>$programa->price->precio,
+                "titulo"=>$m->pelicula,
+                "devuelto"=>"",
+                "idCupon"=>"",
+                "tarjeta"=>"",
+                "credito"=>"",
+                "client_id"=>$client->id,
+                "programa_id"=>$programa->id,
+                "sale_id"=>$sale->id,
+                "price_id"=>$programa->price->id,
+                "sala_id"=>$programa->sala->id,
+                "user_id"=>$user->id,
+            ];
+            array_push($data, $d);
+        }
+//        return $request->detalleVenta ;
+        foreach ($request->detalleVenta as $detalle){
+            $d=[
+                'actividadEconomica'=>"590000",
+                'codigoProductoSin'=>"99100",
+                'cantidad'=>$detalle['cantidad'],
+                'precioUnitario'=>$detalle['precio'],
+                'subTotal'=>$detalle['subtotal'],
+                'sale_id'=>$sale->id,
+            ];
+            array_push($dataDetail, $d);
+        }
+        Ticket::insert($data);
+        Detail::insert($dataDetail);
     }
 
     /**

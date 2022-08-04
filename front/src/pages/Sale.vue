@@ -76,9 +76,12 @@
       <div class="col-4">
       </div>
       <div class="col-4">
-        <div class="text-bold q-pa-xs bg-grey-8 text-white"> Detalle venta
-          <q-btn color="red" :loading="loading" @click="momentaneoDeleteAll" dense label="Cancelar Venta" no-caps icon="o_delete"/>
-          <q-btn color="green" :loading="loading" @click="momentaneoDeleteAll" dense label="Terminar Venta" no-caps icon="check_circle"/>
+        <div class="text-bold q-pa-xs bg-grey-8 text-white">
+          <div class="row">
+            <div class="col-4">Detalle venta</div>
+            <div class="col-4"><q-btn color="red" :loading="loading" @click="momentaneoDeleteAll" dense label="Cancelar Venta" no-caps icon="o_delete"/></div>
+            <div class="col-4"><q-btn color="green" :disable="detalleVenta.length==0" :loading="loading" @click="saleCreate" dense label="Terminar Venta" no-caps icon="check_circle"/></div>
+          </div>
         </div>
         <table>
           <thead>
@@ -196,13 +199,71 @@
         </table>
       </div>
       <div class="col-12 text-center">
-        <q-btn icon="check_circle" class="q-ml-lg" :disable="seleccionados.length==0" color="primary" label="Agregar" @click="myMomentaneo();salaDialog=false"/>
+        <q-btn icon="check_circle" class="q-ml-lg" :disable="seleccionados.length==0" color="primary" :loading="loading" label="Agregar" @click="myMomentaneo();salaDialog=false"/>
         <q-btn icon="highlight_off" class="q-ml-lg" color="red" label="Cancelar" @click="salaDialogClose"/>
       </div>
     </div>
   </q-card-section>
 </q-card>
 </q-dialog>
+  <q-dialog full-width v-model="saleDialog">
+    <q-card>
+      <q-card-section class="row items-center q-pb-none">
+        <div class="text-h6">Realizar venta</div>
+        <q-space />
+        <q-btn icon="close" flat round dense v-close-popup />
+      </q-card-section>
+      <q-form @submit.prevent="saleInsert">
+      <q-card-section>
+        <div class="row">
+          <div class="col-3">
+            <q-input outlined label="NIT/CARNET" @keyup="searchClient" required v-model="client.numeroDocumento" />
+          </div>
+          <div class="col-3">
+            <q-input outlined label="Complemento"  @keyup="searchClient" v-model="client.complemento" />
+          </div>
+          <div class="col-3">
+            <q-input outlined label="nombreRazonSocial"  v-model="client.nombreRazonSocial" />
+          </div>
+          <div class="col-3">
+            <q-select v-model="document" outlined :options="documents"/>
+          </div>
+        </div>
+      </q-card-section>
+      <q-separator/>
+      <q-card-section>
+        <div class="row">
+          <div class="col-3">
+            <q-input outlined label="TOTAL A PAGAR:" disable v-model="total" />
+          </div>
+          <div class="col-3">
+            <q-input outlined label="EFECTIVO BS."  @keyup="cambio" v-model="efectivo" />
+          </div>
+          <div class="col-2">
+            <q-input outlined label="CAMBIO:" disable v-model="cambio" />
+          </div>
+          <div class="col-2 flex flex-center">
+            <q-checkbox outlined label="T CREDITO" v-model="credito" color="primary"/>
+          </div>
+          <div class="col-2 flex flex-center">
+            <q-checkbox outlined label="N CORTESIA" v-model="cortesia" color="primary"/>
+          </div>
+        </div>
+      </q-card-section>
+      <q-separator/>
+      <q-card-section>
+        <div class="row">
+          <div class="col-6">
+            <q-btn type="submit" class="full-width" icon="o_add_circle" label="Realizar venta" :loading="loading" no-caps color="green" />
+          </div>
+          <div class="col-6">
+            <q-btn class="full-width" icon="undo" @click="saleDialog=false" label="Atras" no-caps color="red" />
+          </div>
+        </div>
+      </q-card-section>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </q-page>
 </template>
 
@@ -211,8 +272,10 @@ import {date} from "quasar";
 
 export default {
   name: `Sale`,
+
   data() {
     return {
+      saleDialog:false,
       letra:['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB'],
       url:process.env.API,
       salaDialog:false,
@@ -221,21 +284,79 @@ export default {
       movies:[],
       movie:{},
       hours:[],
+      efectivo:'',
       hour:{},
       momentaneos:[],
       momentaneo:{},
       seats:[],
       seat:{},
+      client:{complemento:''},
       temporal:[],
       numeroboleto:0,
-      loading:false
+      loading:false,
+      documents:[],
+      document:{},
+      credito:false,
+      cortesia:false,
     }
   },
   created() {
     this.myMovies(this.fecha)
     this.myMomentaneo();
+    this.$api.get('document').then(res=>{
+      res.data.forEach(r=>{
+        r.label=r.descripcion
+      })
+      this.documents=res.data
+      this.document=this.documents[0]
+    })
   },
   methods: {
+    saleInsert(){
+      this.loading=true
+      this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
+      this.$api.post('sale',{
+        client:this.client,
+        montoTotal:this.total,
+        detalleVenta:this.detalleVenta,
+      }).then(res=>{
+        console.log(res.data)
+        // this.client={complemento:''}
+        // this.saleDialog=false
+        // this.myMomentaneo();
+        // this.myMovies(this.fecha)
+        this.loading=false
+      }).catch(err=>{
+        console.log(err)
+        this.loading=false
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          message: err.response.data.message,
+          position: 'top',
+          timeout: 5000,
+        })
+      })
+    },
+    searchClient(){
+      // console.log(this.client)
+      this.document=this.documents[0]
+      this.client.nombreRazonSocial=''
+      this.client.id=undefined
+      this.$api.post('searchClient',this.client).then(res=>{
+        // console.log(res.data)
+        if (res.data.nombreRazonSocial!=undefined) {
+          this.client.nombreRazonSocial=res.data.nombreRazonSocial
+          this.client.id=res.data.id
+          let documento=this.documents.find(r=>r.codigoClasificador==res.data.codigoTipoDocumentoIdentidad)
+          documento.label=documento.descripcion
+          this.document=documento
+        }
+      })
+    },
+    saleCreate(){
+      this.saleDialog=true
+    },
     momentaneoDeleteAll(){
       this.loading=true
       this.$api.post('momentaneoDeleteall').then(res=>{
@@ -288,6 +409,7 @@ export default {
       });
     },
     seleccionar(funcion,seat){
+      this.loading=true
       if(seat.activo=='SELECCIONADO'){
         seat.activo='LIBRE'
         this.$api.post('momentaneoDelete',{
@@ -296,6 +418,9 @@ export default {
           fila:seat.fila,
           columna:seat.columna,
           letra:seat.letra,
+        }).then(res=>{
+          this.loading=false
+          this.myMomentaneo()
         })
       }else{
         seat.activo='SELECCIONADO'
@@ -309,6 +434,8 @@ export default {
           pelicula:funcion.movie.nombre+' '+funcion.formato,
           precio:funcion.price.precio,
         }).then(res=>{
+          this.loading=false
+          this.myMomentaneo()
           if (res.data==1){
             this.clickSala(funcion)
           }
@@ -320,6 +447,10 @@ export default {
     }
   },
   computed:{
+    cambio(){
+      let cambio=parseFloat(this.efectivo==''?0:this.efectivo)- parseFloat(this.total)
+      return  Math.round(cambio*100)/100
+    },
     seleccionados(){
       let array=[]
       this.seats.forEach(s=>{
@@ -335,7 +466,7 @@ export default {
       this.momentaneos.forEach(m=>{
         find=array.find(mo=>mo.programa_id===m.programa_id)
         if (find==undefined){
-          array.push({fecha:m.fecha,cantidad:1,pelicula:m.pelicula,subtotal:m.precio,programa_id:m.programa_id})
+          array.push({fecha:m.fecha,precio:m.precio,cantidad:1,pelicula:m.pelicula,subtotal:m.precio,programa_id:m.programa_id})
         }else{
           find.cantidad=find.cantidad+1
           find.subtotal=find.cantidad*m.precio

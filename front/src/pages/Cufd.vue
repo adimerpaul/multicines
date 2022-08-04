@@ -21,7 +21,7 @@
     <q-dialog v-model="cuiDialog">
       <q-card>
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Registrar Cuis</div>
+          <div class="text-h6">Registrar Cufd</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>

@@ -17,9 +17,22 @@ class ClientSeeder extends Seeder
     {
         DB::table("clients")->insert([
             [
-                "nombreRazonSocial"=>"CHambi",
+                "nombreRazonSocial"=>"Chambi",
                 "numeroDocumento"=>"7336199017",
-            ]
+                "codigoTipoDocumentoIdentidad"=>"5",
+                "complemento"=>"",
+            ],
+            [
+                "nombreRazonSocial"=>"Adimer Paul",
+                "numeroDocumento"=>"7336199",
+                "codigoTipoDocumentoIdentidad"=>"1",
+                "complemento"=>"",
+            ],            [
+                "nombreRazonSocial"=>"Ajata",
+                "numeroDocumento"=>"7336199",
+                "codigoTipoDocumentoIdentidad"=>"1",
+                "complemento"=>"A1",
+            ],
         ]);
     }
 }
