@@ -61,8 +61,15 @@ class SaleController extends Controller
             INNER JOIN seats a ON a.sala_id=s.id
             WHERE p.id=".$request->id.";");
         return $seats;
-
     }
+
+    public function disponibleSeats(Request $request){
+        return DB::SELECT("Select (select count(*) from tickets t where t.programa_id=$request->id and t.devuelto=0) as venta,
+       (selecT COUNT(*) from momentaneos m where m.programa_id=$request->id) as temp,
+       (select count(*) from tickets t where t.programa_id=$request->id and t.devuelto=1) as dev,
+       (SELECT s.capacidad from salas s, programas p where s.id=p.sala_id and p.id=$request->id) as salatotal;");
+    }
+
     public function store(StoreSaleRequest $request)
     {
         if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->exists()) {

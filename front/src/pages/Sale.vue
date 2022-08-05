@@ -39,28 +39,7 @@
   </q-card-section>
   <q-separator />
   <q-card-section>
-    <div class="col-12 col-sm-12 q-pa-xs flex flex-center">
-      <div  style="font-size: 10px; font-weight: bold">
-            <q-icon name="event_seat" />
-            Disponibles:
-          |
 
-        <q-icon name="credit_card" />
-
-        Vendidas:
-          |
-
-        <q-icon name="settings_backup_restore" />
-
-        Devueltas:
-          |
-
-        <q-icon name="apartment" />
-
-        Capacidad:
-
-      </div>
-    </div>
 
   </q-card-section>
   <q-separator />
@@ -168,7 +147,15 @@
   <q-card-section >
     <div class="row">
       <div class="col-12 row items-center q-pb-none">
-        <div class="text-bold">{{movie.nombre}} <q-icon name="schedule" left/><q-badge color="red">{{hour.sala.nombre}}</q-badge> {{hour.horaInicio.substring(10,16)}} <q-badge color="secondary">{{hour.formato}}</q-badge> {{hour.price.precio+'Bs'}}</div>
+        <div class="col-4 text-bold">{{movie.nombre}} <q-icon name="schedule" left/><q-badge color="red">{{hour.sala.nombre}}</q-badge> {{hour.horaInicio.substring(10,16)}} <q-badge color="secondary">{{hour.formato}}</q-badge> {{hour.price.precio+'Bs'}}</div>
+        <div class="q-pa-xs flex flex-center">
+          <div  style="font-size: 12px; font-weight: bold">
+            <q-icon name="event_seat" /> Disponibles: <span style="font-size: 14px;font-weight:  bolder;">{{disponible}}|</span>
+            <q-icon name="credit_card" /> Vendidas:  <span style="font-size: 14px;font-weight:  bolder;">{{vendido}}|</span>
+            <q-icon name="settings_backup_restore" /> Devueltas: <span style="font-size: 14px;font-weight:  bolder;">{{devueltos}}|</span>
+            <q-icon name="apartment" />Capacidad:<span style="font-size: 14px;font-weight:  bolder;">{{capacidad}}</span>
+          </div>
+        </div>
         <q-space />
         <div class="text-bold">CANTIDAD: <span class="text-red text-bold text-h4">{{seleccionados.length}}</span>  SUBTOTAL: <span class="text-red text-bold text-h4">{{seleccionados.length*hour.price.precio}}Bs. </span></div>
         <q-btn icon="highlight_off" color="red" flat round dense @click="salaDialogClose" />
@@ -298,6 +285,11 @@ export default {
       document:{},
       credito:false,
       cortesia:false,
+      disponible:0,
+      vendido:0,
+      devueltos:0,
+      capacidad:0
+
     }
   },
   created() {
@@ -384,9 +376,21 @@ export default {
       this.loading=true
       this.$api.post('mySeats',{id:h.id}).then(res=>{
         // console.log(res.data)
-        this.salaDialog=true
-        this.loading=false
         this.seats=res.data
+
+        this.$api.post('disponibleSeats',{id:h.id}).then(res=>{
+              console.log(res)
+          let valores=res.data[0]
+            this.disponible=parseInt(valores.salatotal) - parseInt(valores.venta) - parseInt(valores.temp)
+            this.vendido=parseInt(valores.venta)
+            this.devueltos=parseInt(valores.dev)
+            this.capacidad=parseInt(valores.salatotal)
+            this.salaDialog=true
+            this.loading=false
+          })
+
+
+
       })
     },
     myMovies(fecha) {
