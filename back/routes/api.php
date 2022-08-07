@@ -45,3 +45,4 @@ Route::post('disponibleSeats', [\App\Http\Controllers\SaleController::class, 'di
 Route::post('upimagenrubro', [\App\Http\Controllers\RubroController::class, 'upimagenrubro']);
 Route::post('upimagenmovie', [\App\Http\Controllers\MovieController::class, 'upimagenmovie']);
 Route::post('upimagenproducto', [\App\Http\Controllers\ProductoController::class, 'upimagenproducto']);
+Route::post('listadoprod', [\App\Http\Controllers\RubroController::class, 'listadoprod']);

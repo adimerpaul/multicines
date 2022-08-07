@@ -19,7 +19,9 @@ class RubroController extends Controller
         //
         return Rubro::all();
     }
-
+    public function listadoprod(){
+        return Rubro::where('activo','ACTIVO')->with('productos')->get();
+    }
     /**
      * Show the form for creating a new resource.
      *

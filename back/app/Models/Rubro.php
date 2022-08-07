@@ -11,4 +11,9 @@ class Rubro extends Model
     use SoftDeletes;
     use HasFactory;
     protected $fillable=['nombre','descripcion','activo','imagen','color'];
+
+    public function productos()
+    {
+        return $this->hasMany(Producto::class);
+    }
 }

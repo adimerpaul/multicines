@@ -31,6 +31,7 @@ class ProductoController extends Controller
         //
     }
 
+
     /**
      * Store a newly created resource in storage.
      *
@@ -49,7 +50,9 @@ class ProductoController extends Controller
         $producto->color=$request->color;
         $producto->rubro_id=$request->rubro_id;
         $producto->save();
-        return $producto;
+
+
+        return Producto::where('id',$producto->id)->with('rubro')->first();
     }
 
     /**
@@ -92,7 +95,9 @@ class ProductoController extends Controller
         $producto->color=$request->color;
         $producto->rubro_id=$request->rubro_id;
         $producto->save();
-        return $producto;
+
+        return Producto::where('id',$producto->id)->with('rubro')->first();
+
     }
     public function upimagenproducto(UpdateProductoRequest $request)
     {
