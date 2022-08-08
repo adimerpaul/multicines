@@ -210,7 +210,7 @@
             <q-input outlined label="Complemento"  @keyup="searchClient" v-model="client.complemento" />
           </div>
           <div class="col-3">
-            <q-input outlined label="nombreRazonSocial"  v-model="client.nombreRazonSocial" />
+            <q-input outlined label="nombreRazonSocial" required v-model="client.nombreRazonSocial" />
           </div>
           <div class="col-3">
             <q-select v-model="document" outlined :options="documents"/>

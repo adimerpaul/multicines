@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string("cantidad")->nullable();
             $table->string("precioUnitario")->nullable();
             $table->string("subTotal")->nullable();
+            $table->string("programa_id")->nullable();
+            $table->string("descripcion")->nullable();
             $table->unsignedBigInteger("sale_id")->nullable();
             $table->foreign("sale_id")->references("id")->on("sales");
             $table->timestamps();

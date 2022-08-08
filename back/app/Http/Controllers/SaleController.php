@@ -12,8 +12,11 @@ use App\Models\Sale;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
 use App\Models\Ticket;
+use CUF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use SimpleXMLElement;
+use DOMDocument;
 
 class SaleController extends Controller
 {
@@ -72,12 +75,14 @@ class SaleController extends Controller
 
     public function store(StoreSaleRequest $request)
     {
-        if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->exists()) {
+
+        if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
+            return $request->client;
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->save();
-        }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->exists()){
+        }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->count()==1){
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
@@ -90,10 +95,19 @@ class SaleController extends Controller
             $client->complemento=$request->client['complemento'];
             $client->save();
         }
-
+        $codigoAmbiente=env('CODIGO_AMBIENTE');
+        $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoPuntoVenta=0;
+        $codigoEmision=1; // 1 online 2 offline 3 masivo
+        $codigoModalidad=env('CODIGO_MODALIDAD'); //1 electronica 2 computarizada
+        $codigoPuntoVenta=1;
+        $codigoSistema=env('CODIGO_SISTEMA');
+        $codigoSucursal=0;
+        $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
+
         $codigoSucursal=0;
         $codigoDocumentoSector=1;
+
         $user=(object)["name"=>"admin","id"=>1];
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()==0){
@@ -110,6 +124,7 @@ class SaleController extends Controller
             $sale=sale::where('cui',$cui->codigo)->orderBy('numeroFactura', 'desc')->first();
             $numeroFactura=$sale->numeroFactura+1;
         }
+
         $sale=new Sale();
         $sale->numeroFactura=$numeroFactura;
         $sale->cuf="";
@@ -161,7 +176,20 @@ class SaleController extends Controller
             array_push($data, $d);
         }
 //        return $request->detalleVenta ;
+        $detalleFactura="";
         foreach ($request->detalleVenta as $detalle){
+            $detalleFactura.="<detalle>
+                <actividadEconomica>590000</actividadEconomica>
+                <codigoProductoSin>99100</codigoProductoSin>
+                <codigoProducto>".$detalle['programa_id']."</codigoProducto>
+                <descripcion>".$detalle['pelicula']."</descripcion>
+                <cantidad>".$detalle['cantidad']."</cantidad>
+                <unidadMedida>62</unidadMedida>
+                <precioUnitario>".$detalle['precio']."</precioUnitario>
+                <montoDescuento>0</montoDescuento>
+                <numeroSerie xsi:nil='true'/>
+                <numeroImei xsi:nil='true'/>
+            </detalle>";
             $d=[
                 'actividadEconomica'=>"590000",
                 'codigoProductoSin'=>"99100",
@@ -169,11 +197,106 @@ class SaleController extends Controller
                 'precioUnitario'=>$detalle['precio'],
                 'subTotal'=>$detalle['subtotal'],
                 'sale_id'=>$sale->id,
+                'programa_id'=>$detalle['programa_id'],
+                'descripcion'=>$detalle['pelicula'],
             ];
             array_push($dataDetail, $d);
         }
         Ticket::insert($data);
         Detail::insert($dataDetail);
+
+        $cuf = new CUF();
+        //     * @param nit NIT emisor
+//     * @param fh Fecha y Hora en formato yyyyMMddHHmmssSSS
+//     * @param sucursal
+//     * @param mod Modalidad
+//     * @param temision Tipo de Emision
+//     * @param cdf Codigo Documento Fiscal
+//     * @param tds Tipo Documento Sector
+//     * @param nf Numero de Factura
+//     * @param pos Punto de Venta
+        $fechaEnvio=date("Y-m-d\TH:i:s.000");
+        $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
+        $cuf=$cuf.$cufd->codigoControl;
+        $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>    <cabecera>
+        <nitEmisor>".env('NIT')."</nitEmisor>
+        <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
+        <municipio>Oruro</municipio>
+        <telefono>2846005</telefono>
+        <numeroFactura>$numeroFactura</numeroFactura>
+        <cuf>$cuf</cuf>
+        <cufd>$cufd</cufd>
+        <codigoSucursal>$codigoSucursal</codigoSucursal>
+        <direccion>".env('DIRECCION')."</direccion>
+        <codigoPuntoVenta>$codigoPuntoVenta</codigoPuntoVenta>
+        <fechaEmision>$fechaEnvio</fechaEmision>
+        <nombreRazonSocial>".$client->nombreRazonSocial."</nombreRazonSocial>
+        <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
+        <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
+        <complemento>".$client->complemento."</complemento>
+        <codigoCliente>".$client->id."</codigoCliente>
+        <codigoMetodoPago>1</codigoMetodoPago>
+        <numeroTarjeta xsi:nil='true'/>
+        <montoTotal>".$sale->montoTotal."</montoTotal>
+        <montoTotalSujetoIva>".$sale->montoTotal."</montoTotalSujetoIva>
+        <codigoMoneda>1</codigoMoneda>
+        <tipoCambio>1</tipoCambio>
+        <montoTotalMoneda>".$sale->montoTotal."</montoTotalMoneda>
+        <montoGiftCard xsi:nil='true'/>
+        <descuentoAdicional>0</descuentoAdicional>
+        <codigoExcepcion xsi:nil='true'/>
+        <cafc xsi:nil='true'/>
+        <leyenda>Ley N° 453: Tienes derecho a un trato equitativo sin discriminación en la oferta de servicios.</leyenda>
+        <usuario>".explode(" ", $user->name)[0]."</usuario>
+        <codigoDocumentoSector>".$codigoDocumentoSector."</codigoDocumentoSector>
+        </cabecera>";
+        $text.=$detalleFactura;
+        $text.="</facturaElectronicaCompraVenta>";
+        $xml = new SimpleXMLElement($text);
+        $dom = new DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
+        $nameFile=microtime();
+        $dom->save("archivos/".$nameFile.'.xml');
+        exit;
+
+
+
+        $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta?WSDL",  [
+            'stream_context' => stream_context_create([
+                'http' => [
+                    'header' => "apikey: TokenApi " . env('TOKEN'),
+                ]
+            ]),
+            'cache_wsdl' => WSDL_CACHE_NONE,
+            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+            'trace' => 1,
+            'use' => SOAP_LITERAL,
+            'style' => SOAP_DOCUMENT,
+        ]);
+        $result= $client->recepcionFactura([
+            "SolicitudServicioRecepcionFactura"=>[
+                "codigoAmbiente"=>$codigoAmbiente,
+                "codigoDocumentoSector"=>$codigoDocumentoSector,
+                "codigoEmision"=>$codigoEmision,
+                "codigoModalidad"=>$codigoModalidad,
+                "codigoPuntoVenta"=>$codigoPuntoVenta,
+                "codigoSistema"=>$codigoSistema,
+                "codigoSucursal"=>$codigoSucursal,
+                "cufd"=>$cufd->codigo,
+                "cuis"=>$cui->codigo,
+                "nit"=>env('NIT'),
+                "tipoFacturaDocumento"=>$tipoFacturaDocumento,
+                "archivo"=>$archivo,
+                "fechaEnvio"=>$fechaEnvio,
+                "hashArchivo"=>$hashArchivo,
+            ]
+        ]);
+        var_dump($result);
+
+
     }
 
     /**

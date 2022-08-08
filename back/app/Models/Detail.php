@@ -14,6 +14,8 @@ class Detail extends Model
         'cantidad',
         'precioUnitario',
         'subTotal',
-        'sale_id'
+        'sale_id',
+        'programa_id',
+        'descripcion',
     ];
 }
