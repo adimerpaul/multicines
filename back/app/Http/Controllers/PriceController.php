@@ -42,6 +42,7 @@ class PriceController extends Controller
         $price->serie=strtoupper($request->serie);
         $price->precio=$request->precio;
         $price->descripcion=strtoupper($request->descripcion);
+        $price->promo=$request->promo;
         $price->save();
 
 
@@ -83,6 +84,7 @@ class PriceController extends Controller
         $price->serie=strtoupper($request->serie);
         $price->precio=$request->precio;
         $price->descripcion=strtoupper($request->descripcion);
+        $price->promo=$request->promo;
         $price->save();
         return  $price;
     }

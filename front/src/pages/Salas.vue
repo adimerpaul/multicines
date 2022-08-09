@@ -198,7 +198,7 @@ export default {
       letra:['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB'],
       salaColumns:[
         {label:'OPCIONES',field:'opciones',name:'opciones'},
-        // {label:'NRO',field:'nro',name:'nro',sortable:true},
+         {label:'NRO',field:'nro',name:'nro',sortable:true},
         {label:'NOMBRE',field:'nombre',name:'nombre',sortable:true},
         {label:'FILAS',field:'filas',name:'filas',sortable:true},
         {label:'COLUMNAS',field:'columnas',name:'columnas',sortable:true},

@@ -55,6 +55,16 @@
               <div class="col-3">
                 <q-input dense outlined label="Descripcion" v-model="price.descripcion" />
               </div>
+              <div class="col-3">
+                <q-toggle
+                false-value="NO"
+                :label="'Promo '+ price.promo"
+                true-value="SI"
+                color="green"
+                v-model="price.promo"
+              />
+
+              </div>
 
               <div class="col-12">
                 <q-btn :loading="loading" color="green" icon="add_circle" class="full-width" type="submit" label="Guardar" />
@@ -84,7 +94,16 @@
               <div class="col-3">
                 <q-input dense outlined label="Descripcion" v-model="price2.descripcion" />
               </div>
+              <div class="col-3">
+                <q-toggle
+                  false-value="NO"
+                  :label="'Promo '+ price2.promo"
+                  true-value="SI"
+                  color="green"
+                  v-model="price2.promo"
+                />
 
+              </div>
               <div class="col-12">
                 <q-btn color="yellow-8" icon="edit" class="full-width" type="submit" label="Modificar" />
               </div>
@@ -106,7 +125,7 @@ export default {
     return {
       loading: false,
       priceFilter:'',
-      price:{
+      price:{'promo':'NO'
       },
       price2:{},
       priceDialog:false,
@@ -116,6 +135,7 @@ export default {
         {label:'OPCIONES',field:'opciones',name:'opciones'},
         {label:'SERIE',field:'serie',name:'serie',sortable:true},
         {label:'PRECIO',field:'precio',name:'precio',sortable:true},
+        {label:'PROMO',field:'promo',name:'promo',sortable:true},
         {label:'DESCRIPCION',field:'descripcion',name:'descripcion'},
       ]
     }

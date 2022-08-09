@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Leyenda;
 use App\Models\Activity;
+use App\Models\Medida;
 use App\Models\Servicio;
 use App\Models\Message;
 use App\Models\Event;
@@ -369,6 +370,10 @@ class ActivityController extends Controller
             ]
         ]);
         //unidades
+
+
+        Medida::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+
         $result= $client->sincronizarParametricaUnidadMedida([
             "SolicitudSincronizacion"=>[
                 "codigoAmbiente"=>env('AMBIENTE'),
@@ -380,6 +385,14 @@ class ActivityController extends Controller
             ]
         ]);
 
+        foreach ($result->RespuestaListaParametricas->listaCodigos as $l) {
+            $medida = new Medida();
+            $medida->codigoClasificador = $l->codigoClasificador;
+            $medida->descripcion = $l->descripcion;
+            $medida->codigoPuntoVenta = $request->codigoPuntoVenta;
+            $medida->codigoSucursal = $request->codigoSucursal;
+            $medida->save();
+        }
 
 
 
