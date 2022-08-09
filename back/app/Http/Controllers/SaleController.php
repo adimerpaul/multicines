@@ -12,7 +12,8 @@ use App\Models\Sale;
 use App\Http\Requests\StoreSaleRequest;
 use App\Http\Requests\UpdateSaleRequest;
 use App\Models\Ticket;
-use CUF;
+//require 'CUF.php';
+//use CUF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use SimpleXMLElement;
@@ -77,7 +78,6 @@ class SaleController extends Controller
     {
 
         if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
-            return $request->client;
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
@@ -95,18 +95,15 @@ class SaleController extends Controller
             $client->complemento=$request->client['complemento'];
             $client->save();
         }
-        $codigoAmbiente=env('CODIGO_AMBIENTE');
+        $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
-        $codigoPuntoVenta=0;
         $codigoEmision=1; // 1 online 2 offline 3 masivo
-        $codigoModalidad=env('CODIGO_MODALIDAD'); //1 electronica 2 computarizada
+        $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
         $codigoPuntoVenta=1;
         $codigoSistema=env('CODIGO_SISTEMA');
-        $codigoSucursal=0;
         $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
 
         $codigoSucursal=0;
-        $codigoDocumentoSector=1;
 
         $user=(object)["name"=>"admin","id"=>1];
 
@@ -176,6 +173,7 @@ class SaleController extends Controller
             array_push($data, $d);
         }
 //        return $request->detalleVenta ;
+
         $detalleFactura="";
         foreach ($request->detalleVenta as $detalle){
             $detalleFactura.="<detalle>
@@ -187,6 +185,7 @@ class SaleController extends Controller
                 <unidadMedida>62</unidadMedida>
                 <precioUnitario>".$detalle['precio']."</precioUnitario>
                 <montoDescuento>0</montoDescuento>
+                <subTotal>".$detalle['subtotal']."</subTotal>
                 <numeroSerie xsi:nil='true'/>
                 <numeroImei xsi:nil='true'/>
             </detalle>";
@@ -202,8 +201,11 @@ class SaleController extends Controller
             ];
             array_push($dataDetail, $d);
         }
+
         Ticket::insert($data);
+
         Detail::insert($dataDetail);
+
 
         $cuf = new CUF();
         //     * @param nit NIT emisor
@@ -226,7 +228,7 @@ class SaleController extends Controller
         <telefono>2846005</telefono>
         <numeroFactura>$numeroFactura</numeroFactura>
         <cuf>$cuf</cuf>
-        <cufd>$cufd</cufd>
+        <cufd>".$cufd->codigo."</cufd>
         <codigoSucursal>$codigoSucursal</codigoSucursal>
         <direccion>".env('DIRECCION')."</direccion>
         <codigoPuntoVenta>$codigoPuntoVenta</codigoPuntoVenta>
@@ -253,6 +255,7 @@ class SaleController extends Controller
         </cabecera>";
         $text.=$detalleFactura;
         $text.="</facturaElectronicaCompraVenta>";
+
         $xml = new SimpleXMLElement($text);
         $dom = new DOMDocument('1.0');
         $dom->preserveWhiteSpace = false;
@@ -260,7 +263,35 @@ class SaleController extends Controller
         $dom->loadXML($xml->asXML());
         $nameFile=microtime();
         $dom->save("archivos/".$nameFile.'.xml');
-        exit;
+
+        $firmar = new Firmar();
+        $firmar->firmar("archivos/".$nameFile.'.xml');
+
+
+        $xml = new DOMDocument();
+        $xml->load("archivos/".$nameFile.'.xml');
+        if (!$xml->schemaValidate('./facturaElectronicaCompraVenta.xsd')) {
+            echo "invalid";
+        }
+        else {
+//            echo "validated";
+        }
+//        exit;
+
+
+        $file = "archivos/".$nameFile.'.xml';
+        $gzfile = "archivos/".$nameFile.'.xml'.'.gz';
+        $fp = gzopen ($gzfile, 'w9');
+        gzwrite ($fp, file_get_contents($file));
+        gzclose($fp);
+        unlink($file);
+
+
+        $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
+        $hashArchivo=hash('sha256', $archivo);
+        unlink($gzfile);
+//        return $request;
+//        exit;
 
 
 
@@ -343,4 +374,7 @@ class SaleController extends Controller
     {
         //
     }
+
+
 }
+

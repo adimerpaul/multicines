@@ -318,17 +318,20 @@ export default {
         // this.myMomentaneo();
         // this.myMovies(this.fecha)
         this.loading=false
-      }).catch(err=>{
-        console.log(err)
+      }).finally(()=>{
         this.loading=false
-        this.$q.notify({
-          color: 'negative',
-          textColor: 'white',
-          message: err.response.data.message,
-          position: 'top',
-          timeout: 5000,
-        })
       })
+      //   .catch(err=>{
+      //   console.log(err)
+      //   this.loading=false
+      //   this.$q.notify({
+      //     color: 'negative',
+      //     textColor: 'white',
+      //     message: err.response.data.message,
+      //     position: 'top',
+      //     timeout: 5000,
+      //   })
+      // })
     },
     searchClient(){
       // console.log(this.client)
