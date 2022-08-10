@@ -99,7 +99,7 @@ class SaleController extends Controller
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
         $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
-        $codigoPuntoVenta=1;
+        $codigoPuntoVenta=0;
         $codigoSistema=env('CODIGO_SISTEMA');
         $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
 
@@ -325,6 +325,9 @@ class SaleController extends Controller
                 "hashArchivo"=>$hashArchivo,
             ]
         ]);
+        $sale->cuf=$cuf;
+        $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
+        $sale->save();
         var_dump($result);
 
 

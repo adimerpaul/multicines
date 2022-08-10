@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string("codigoControl")->nullable();
             $table->string("direccion")->nullable();
             $table->dateTime("fechaVigencia")->nullable();
+            $table->dateTime("fechaCreacion")->nullable();
             $table->integer("codigoPuntoVenta")->nullable();
             $table->integer("codigoSucursal")->nullable();
             $table->timestamps();

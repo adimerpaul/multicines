@@ -16,7 +16,7 @@ class CufdController extends Controller
      */
     public function index()
     {
-        return Cufd::all();
+        return Cufd::orderBy('id', 'desc')->get();
     }
 
     /**
@@ -37,10 +37,10 @@ class CufdController extends Controller
      */
     public function store(StoreCufdRequest $request)
     {
-        if (Cufd::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()>=1){
+        if (Cufd::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->where('fechaVigencia','>=', now())->count()>=1){
             return response()->json(['message' => 'El CUFD ya existe'], 400);
         }else{
-            $cui=Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->whereDate('fechaVigencia','>=', now());
+            $cui=Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->where('fechaVigencia','>=', now());
             if ($cui->count()==0){
                 return response()->json(['message' => 'El CUI no existe'], 400);
             }
@@ -71,6 +71,7 @@ class CufdController extends Controller
             $cufd->codigo = $result->RespuestaCufd->codigo;
             $cufd->codigoControl = $result->RespuestaCufd->codigoControl;
             $cufd->fechaVigencia =  date('Y-m-d H:i:s', strtotime($result->RespuestaCufd->fechaVigencia));
+            $cufd->fechaCreacion =  date('Y-m-d H:i:s');
             $cufd->codigoPuntoVenta = $request->codigoPuntoVenta;
             $cufd->codigoSucursal = $request->codigoSucursal;
             $cufd->save();

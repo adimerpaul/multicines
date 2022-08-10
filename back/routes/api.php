@@ -33,6 +33,8 @@ Route::resource('producto', \App\Http\Controllers\ProductoController::class);
 Route::resource('momentaneo', \App\Http\Controllers\MomentaneoController::class);
 Route::resource('document', \App\Http\Controllers\DocumentController::class);
 Route::resource('client', \App\Http\Controllers\ClientController::class);
+Route::resource('eventoSignificativo', \App\Http\Controllers\EventoSignificativoController::class);
+
 Route::post('searchClient', [\App\Http\Controllers\ClientController::class,'searchClient']);
 
 Route::post('momentaneoDelete', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDelete']);
