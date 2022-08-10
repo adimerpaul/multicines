@@ -11,6 +11,7 @@ import Sale from "pages/Sale";
 import Rubro from "pages/Rubro";
 import Productos from "pages/Productos";
 import Candy from "pages/Candy";
+import ListaVenta from "pages/ListaVenta";
 
 
 const routes = [
@@ -31,6 +32,7 @@ const routes = [
       { path: 'rubro', component: Rubro },
       { path: 'productos', component: Productos },
       { path: 'candy', component: Candy },
+      { path: 'listaVenta', component: ListaVenta },
     ]
   },
 

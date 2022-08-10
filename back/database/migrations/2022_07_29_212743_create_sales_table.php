@@ -25,6 +25,10 @@ return new class extends Migration
             $table->double("montoTotal",11,2)->nullable();
             $table->string("usuario")->nullable();
             $table->string("codigoRecepcion")->nullable();
+            $table->boolean("siatEnviado")->nullable();
+            $table->string("codigoRecepcionEventoSignificativo")->nullable();
+            $table->boolean("siatAnulado")->nullable()->default(false);
+//            $table->string("codigoRecepcionEventoSignificativo")->nullable();
             $table->integer("codigoDocumentoSector")->nullable();
             $table->unsignedBigInteger("user_id")->nullable();
             $table->foreign("user_id")->references("id")->on("users");

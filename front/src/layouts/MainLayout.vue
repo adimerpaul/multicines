@@ -44,7 +44,11 @@
         <q-expansion-item dense exact expand-separator icon="format_list_bulleted" label="Rubro" to="rubro" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="receipt_long" label="Producto" to="productos" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="calendar_month" label="Programación" to="programa" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Venta de boletos" to="sale" expand-icon="null"/>
+<!--        <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Venta de boletos" to="sale" expand-icon="null"/>-->
+        <q-expansion-item expand-separator dense exact icon="o_local_activity" label="Venta Boletria">
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_local_activity" label="Venta de boletos" default-opened to="sale" expand-icon="null"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVenta" expand-icon="null"/>
+        </q-expansion-item>
         <q-expansion-item dense exact expand-separator icon="o_store" label="Candy Bar" to="candy" expand-icon="null"/>
       </q-list>
     </q-drawer>
