@@ -295,40 +295,57 @@ class SaleController extends Controller
 
 
 
-        $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta?WSDL",  [
-            'stream_context' => stream_context_create([
-                'http' => [
-                    'header' => "apikey: TokenApi " . env('TOKEN'),
+
+        try {
+            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta?WSDL",  [
+                'stream_context' => stream_context_create([
+                    'http' => [
+                        'header' => "apikey: TokenApi " . env('TOKEN'),
+                    ]
+                ]),
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                'trace' => 1,
+                'use' => SOAP_LITERAL,
+                'style' => SOAP_DOCUMENT,
+            ]);
+            $result= $client->recepcionFactura([
+                "SolicitudServicioRecepcionFactura"=>[
+                    "codigoAmbiente"=>$codigoAmbiente,
+                    "codigoDocumentoSector"=>$codigoDocumentoSector,
+                    "codigoEmision"=>$codigoEmision,
+                    "codigoModalidad"=>$codigoModalidad,
+                    "codigoPuntoVenta"=>$codigoPuntoVenta,
+                    "codigoSistema"=>$codigoSistema,
+                    "codigoSucursal"=>$codigoSucursal,
+                    "cufd"=>$cufd->codigo,
+                    "cuis"=>$cui->codigo,
+                    "nit"=>env('NIT'),
+                    "tipoFacturaDocumento"=>$tipoFacturaDocumento,
+                    "archivo"=>$archivo,
+                    "fechaEnvio"=>$fechaEnvio,
+                    "hashArchivo"=>$hashArchivo,
                 ]
-            ]),
-            'cache_wsdl' => WSDL_CACHE_NONE,
-            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
-            'trace' => 1,
-            'use' => SOAP_LITERAL,
-            'style' => SOAP_DOCUMENT,
-        ]);
-        $result= $client->recepcionFactura([
-            "SolicitudServicioRecepcionFactura"=>[
-                "codigoAmbiente"=>$codigoAmbiente,
-                "codigoDocumentoSector"=>$codigoDocumentoSector,
-                "codigoEmision"=>$codigoEmision,
-                "codigoModalidad"=>$codigoModalidad,
-                "codigoPuntoVenta"=>$codigoPuntoVenta,
-                "codigoSistema"=>$codigoSistema,
-                "codigoSucursal"=>$codigoSucursal,
-                "cufd"=>$cufd->codigo,
-                "cuis"=>$cui->codigo,
-                "nit"=>env('NIT'),
-                "tipoFacturaDocumento"=>$tipoFacturaDocumento,
-                "archivo"=>$archivo,
-                "fechaEnvio"=>$fechaEnvio,
-                "hashArchivo"=>$hashArchivo,
-            ]
-        ]);
+            ]);
+            $sale->siatEnviado=true;
+            $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
+        }catch (\Exception $e) {
+//            return response()->json(['error' => $e->getMessage()]);
+            $sale->siatEnviado=false;
+        }
+
+//        return $result;
+//        if (isset($result->RespuestaServicioFacturacion)){
+//
+//        }else{
+//
+//        }
+
         $sale->cuf=$cuf;
-        $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
+
+//
         $sale->save();
-        var_dump($result);
+//        var_dump($result);
 
 
     }

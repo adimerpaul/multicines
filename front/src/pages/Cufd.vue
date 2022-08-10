@@ -17,7 +17,7 @@
           </template>
           <template v-slot:body-cell-Opciones="props">
             <q-td :props="props" auto-width>
-              <q-btn size="10px" icon="add_circle_outline" @click="eventoSignificativoDialog=true;cufd=props.row;cufdEvento=cufds[props.pageIndex+1]" color="primary" label="Evento significativo" no-caps/>
+              <q-btn v-if="props.pageIndex == 0" size="10px" icon="add_circle_outline" @click="eventoSignificativoDialog=true;cufd=props.row;cufdEvento=cufds[props.pageIndex+1]" color="primary" label="Evento significativo" no-caps/>
             </q-td>
           </template>
         </q-table>
@@ -59,20 +59,8 @@
         <q-card-section>
           <q-form @submit.prevent="cuiCreate">
             <div class="row">
-              <div class="col-6">
-                <q-select :options="cufds" dense outlined label="codigoPuntoVenta" v-model="cufd" />
-              </div>
-              <div class="col-6">
-                Inicio:{{ cufd.fechaCreacion }}  Fin:{{ cufd.fechaVigencia }}
-              </div>
-              <div class="col-6">
-                <q-select :options="cufds" dense outlined label="codigoSucursal" v-model="cufdEvento" />
-              </div>
-              <div class="col-6">
-                Inicio:{{ cufdEvento.fechaCreacion }}  Fin:{{ cufdEvento.fechaVigencia }}
-              </div>
               <div class="col-12 flex flex-center">
-                <q-btn dense class="full-width" :loading="loading" type="submit" color="green" icon="check" label="Guardar" />
+                <q-btn dense class="full-width" :loading="loading" type="submit" color="green" icon="check" label="Crear evento significativo" />
               </div>
             </div>
           </q-form>
