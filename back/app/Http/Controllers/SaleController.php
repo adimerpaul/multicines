@@ -95,6 +95,7 @@ class SaleController extends Controller
             $client->complemento=$request->client['complemento'];
             $client->save();
         }
+
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
@@ -118,7 +119,7 @@ class SaleController extends Controller
         if (Sale::where('cui', $cui->codigo)->count()==0){
             $numeroFactura=1;
         }else{
-            $sale=sale::where('cui',$cui->codigo)->orderBy('numeroFactura', 'desc')->first();
+            $sale=Sale::where('cui',$cui->codigo)->orderBy('numeroFactura', 'desc')->first();
             $numeroFactura=$sale->numeroFactura+1;
         }
 
