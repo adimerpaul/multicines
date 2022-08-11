@@ -123,7 +123,7 @@
           <div class="row">
             <div class="col-12">
               <q-form
-                @submit.prevent="onsubmit"
+                @submit.prevent="saleInsert"
                 class="q-gutter-md"
               >
                 <div class="row">
@@ -223,7 +223,7 @@ export default {
       url:process.env.API,
       now:date.formatDate(new Date(), "YYYY-MM-DD"),
       efectivo:'',
-      btn:true,
+      btn:false,
       rubros:[],
       productos:[],
       client:{complemento:''},
@@ -257,7 +257,7 @@ export default {
       })
   },
   methods: {
-    onsubmit(){},
+
     verificar(){
       // console.log(this.booltargeta)
       this.codigo=''
@@ -310,16 +310,12 @@ export default {
     saleInsert(){
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
-      this.$api.post('sale',{
+      this.$api.post('salecandy',{
         client:this.client,
         montoTotal:this.total,
-        detalleVenta:this.detalleVenta,
+        detalleVenta:this.store.detallecandy,
       }).then(res=>{
         console.log(res.data)
-        // this.client={complemento:''}
-        // this.saleDialog=false
-        // this.myMomentaneo();
-        // this.myMovies(this.fecha)
         this.loading=false
       }).catch(err=>{
         console.log(err)
