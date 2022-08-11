@@ -3,7 +3,7 @@
     <q-card>
       <q-card-section class="q-py-xs bg-purple-7 text-white text-bold" >
         <div class="row">
-          <div class="col-12 flex flex-center text-h4">
+          <div class="col-12 flex flex-center text-h5">
             <q-icon name="storefront" left/> CANDY BAR
           </div>
         </div>
@@ -22,7 +22,8 @@
               <q-card @click="productos=r.productos" class="q-pa-xs">
                 <q-img
                   :style="'background: '+r.color"
-                  :src="url+'../imagen/'+r.imagen"
+                  :src="r.imagen!=null?url+'../imagen/'+r.imagen:''"
+                  :alt="r.nombre"
                   basic
                   style="height: 140px"
                 >
@@ -45,7 +46,8 @@
             <q-card @click="miventa(p)"  class="q-ma-xs" :style="'background: '+p.color">
               <q-img
                 :style="'background: '+p.color"
-                :src="url+'../imagen/'+p.imagen"
+                :src="p.imagen!=null?url+'../imagen/'+p.imagen:''"
+                :alt="p.nombre"
                 basic
                 style="height: 140px"
               >
@@ -110,6 +112,98 @@
       </div>
 </div>
     </q-card>
+    <q-dialog v-model="icon" full-width>
+      <q-card style="width: 700px; max-width: 80vw;">
+        <q-card-section class="row items-center q-pa-xs bg-green-14 text-white">
+          <div class="text-h6"> <q-icon name="send"></q-icon> Realizar venta</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section>
+          <div class="row">
+            <div class="col-12">
+              <q-form
+                @submit.prevent="onsubmit"
+                class="q-gutter-md"
+              >
+                <div class="row">
+                  <div class="col-3">
+                    <q-input
+                      required
+                      @keyup="searchClient"
+                      outlined
+                      v-model="client.numeroDocumento"
+                      label="CI / NIT *"
+                      hint="Carnet o nit"
+                      lazy-rules
+                      :rules="[ val => val && val.length > 0 || 'Dato obligatorio']"
+                    />
+                  </div>
+                  <div class="col-3">
+                    <q-input
+                      @keyup="searchClient"
+                      outlined
+                      v-model="client.complemento"
+                      label="COMPLEMENTO"
+                    />
+                  </div>
+                  <div class="col-3">
+                    <q-input
+                      required
+                      outlined
+                      v-model="client.nombreRazonSocial"
+                      label="Nombre y razon *"
+                      hint="Razon social"
+                      style="text-transform: uppercase"
+                      lazy-rules
+                      :rules="[ val => val && val.length > 0 || 'Dato obligatorio']"
+                    />
+                  </div>
+                  <div class="col-3">
+                    <q-select v-model="document" outlined :options="documents"/>
+                  </div>
+                  <div class="col-3 q-pa-xs">
+                    <q-input
+                      required
+                      outlined
+                      disable
+                      v-model="total"
+                      label="Total*"
+                      lazy-rules
+                    />
+                  </div>
+                  <div class="col-3 q-pa-xs">
+                    <q-input
+                      v-model="efectivo"
+                      outlined
+                      label="Monto recibido"
+                      required
+                    />
+                  </div>
+                  <div class="col-3 q-pa-xs">
+                    <q-input
+                      outlined
+                      disable
+                      label="Cambio"
+                      v-model="cambio"
+                    />
+                  </div>
+                  <div class="col-2"><q-checkbox v-model="credito"  label="T Credito"/></div>
+                  <div class="col-2"><q-checkbox @input="verificar" v-model="tarjeta"  label="Tarjeta"/></div>
+
+                </div>
+                <div>
+                  <q-btn  label="venta" icon="send" type="submit" color="positive" :disable="btn"/>
+                  <q-btn label="Cerrar" type="button" size="md" icon="delete" color="negative" class="q-ml-sm" @click="icon=false" />
+                </div>
+              </q-form>
+
+
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
 
 
@@ -129,6 +223,7 @@ export default {
       url:process.env.API,
       now:date.formatDate(new Date(), "YYYY-MM-DD"),
       efectivo:'',
+      btn:true,
       rubros:[],
       productos:[],
       client:{complemento:''},
@@ -138,6 +233,8 @@ export default {
       document:{},
       credito:false,
       store: globalStore(),
+      icon:false,
+      tarjeta:false,
 
 
     }
@@ -150,9 +247,32 @@ export default {
       })
       this.documents=res.data
       this.document=this.documents[0]
-    })
+    });
+      this.$api.get('document').then(res=>{
+        res.data.forEach(r=>{
+          r.label=r.descripcion
+        })
+        this.documents=res.data
+        this.document=this.documents[0]
+      })
   },
   methods: {
+    onsubmit(){},
+    verificar(){
+      // console.log(this.booltargeta)
+      this.codigo=''
+      this.nombresaldo=''
+      if (!this.booltargeta){
+        if (this.tienerebaja){
+          this.$store.state.products.forEach(r=>{
+            r.precio=(1.25*r.precio).toFixed(2)
+            r.subtotal=(1.25*r.subtotal).toFixed(2)
+          })
+          this.btn=false
+          this.tienerebaja=false
+        }
+      }
+    },
     reset(){
       this.store.detallecandy=[]
     },

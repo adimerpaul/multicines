@@ -312,6 +312,7 @@ export default {
         this.store.productos.push(res.data)
         this.foto=''
         this.productoDialog=false
+        this.producto={}
       })
     },
     productoUpdate(){
@@ -323,6 +324,7 @@ export default {
         let index = this.store.productos.findIndex(m => m.id == res.data.id);
         this.store.productos[index]=res.data
         this.productoUpdateDialog=false
+        this.producto2={}
       })
     },
     productoDelete(id,pageIndex){

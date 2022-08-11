@@ -291,6 +291,7 @@ export default {
         this.loading=false
         this.store.rubros.push(res.data)
         this.rubroDialog=false
+        this.rubro={}
       })
     },
     rubroUpdate(){
@@ -302,6 +303,7 @@ export default {
         let index = this.store.rubros.findIndex(m => m.id == res.data.id);
         this.store.rubros[index]=res.data
         this.rubroUpdateDialog=false
+        this.rubro2={}
       })
     },
     rubroDelete(id,pageIndex){
