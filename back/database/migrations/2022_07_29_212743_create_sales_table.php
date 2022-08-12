@@ -28,6 +28,7 @@ return new class extends Migration
             $table->boolean("siatEnviado")->nullable();
             $table->string("codigoRecepcionEventoSignificativo")->nullable();
             $table->boolean("siatAnulado")->nullable()->default(false);
+            $table->string("tipo")->nullable()->default('BOLETERIA');
             $table->integer("codigoDocumentoSector")->nullable();
             $table->unsignedBigInteger("user_id")->nullable();
             $table->foreign("user_id")->references("id")->on("users");

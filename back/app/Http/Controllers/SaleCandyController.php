@@ -104,6 +104,7 @@ class SaleCandyController extends Controller
         $sale->usuario=$user->name;
         $sale->codigoDocumentoSector=$codigoDocumentoSector;
         $sale->user_id=$user->id;
+        $sale->tipo="CANDY";
         $sale->client_id=$client->id;
         $sale->save();
 

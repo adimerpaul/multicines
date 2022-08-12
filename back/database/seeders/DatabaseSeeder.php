@@ -32,6 +32,8 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             SaleSeeder::class,
             TicketSeeder::class,
+            RubroSeeder::class,
+            ProductoSeeder::class,
         ]);
     }
 }

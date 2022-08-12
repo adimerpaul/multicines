@@ -71,10 +71,15 @@
       <div class="col-12 col-md-4">
         <q-card>
           <q-card-section class="bg-accent text-white q-pa-xs">
-            <q-icon name="point_of_sale"></q-icon> Venta <q-btn @click="reset"  color="negative" size="xs" icon="restart_alt" label="cancelar"/><q-btn @click="icon = true;tienerebaja=false;"  color="positive" label="Venta" size="xs" icon="add_circle"/>
+            <div class="row">
+              <div class="col-4 flex flex-center" ><q-icon name="point_of_sale"></q-icon> VENTA </div>
+              <div class="col-4 text-center" ><q-btn @click="reset"  color="negative" size="14px" icon="restart_alt" label="cancelar"/></div>
+              <div class="col-4 text-center" ><q-btn @click="icon = true;tienerebaja=false;"  color="positive" label="Venta" size="14px" icon="add_circle"/></div>
+            </div>
+
           </q-card-section>
           <q-card-section class="q-pa-xs">
-            <table style="width: 100%;border: 1px solid black" >
+            <table >
               <thead>
               <tr class="bg-accent text-white">
                 <th>#</th>
@@ -88,12 +93,12 @@
               <tr v-for="(i,index) in store.detallecandy" :key="index">
                 <td>{{index+1}}</td>
                 <td>{{i.nombre}}</td>
-                <td>{{i.cantidad}}</td>
-                <td>{{i.subtotal}}</td>
+                <td class="text-center">{{i.cantidad}}</td>
+                <td class="text-right">{{i.subtotal}}Bs</td>
                 <td>
-                  <q-btn @click="agregar(index)" size="xs" icon="add" color="green"></q-btn>
-                  <q-btn @click="disminuir(index)" size="xs" icon="remove" color="warning"></q-btn>
-                  <q-btn @click="quitar(index)" size="xs" icon="delete" color="negative"></q-btn>
+                  <q-btn @click="agregar(index)" size="12px" icon="add_circle_outline" color="green"></q-btn>
+                  <q-btn @click="disminuir(index)" size="12px" icon="remove_circle_outline" color="warning"></q-btn>
+                  <q-btn @click="quitar(index)" size="12px" icon="o_delete" color="negative"></q-btn>
                 </td>
               </tr>
               </tbody>
@@ -101,9 +106,8 @@
               <tr>
                 <th></th>
                 <th></th>
-                <th></th>
                 <th>TOTAL</th>
-                <th>{{total}}</th>
+                <th class="text-right">{{total}}Bs</th>
               </tr>
               </tfoot>
             </table>

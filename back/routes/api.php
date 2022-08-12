@@ -35,6 +35,7 @@ Route::resource('document', \App\Http\Controllers\DocumentController::class);
 Route::resource('client', \App\Http\Controllers\ClientController::class);
 Route::resource('eventoSignificativo', \App\Http\Controllers\EventoSignificativoController::class);
 Route::resource('salecandy', \App\Http\Controllers\SaleCandyController::class);
+Route::resource('listaVentaBoleteria', \App\Http\Controllers\ListaVentaBoleteriaController::class);
 
 Route::post('searchClient', [\App\Http\Controllers\ClientController::class,'searchClient']);
 
