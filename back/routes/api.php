@@ -44,6 +44,7 @@ Route::post('momentaneoDeleteall', [\App\Http\Controllers\MomentaneoController::
 Route::post('movies', [\App\Http\Controllers\SaleController::class, 'movies']);
 Route::post('hours', [\App\Http\Controllers\SaleController::class, 'hours']);
 Route::post('mySeats', [\App\Http\Controllers\SaleController::class, 'mySeats']);
+Route::post('eventSearch', [\App\Http\Controllers\SaleController::class, 'eventSearch']);
 Route::post('disponibleSeats', [\App\Http\Controllers\SaleController::class, 'disponibleSeats']);
 Route::post('upimagenrubro', [\App\Http\Controllers\RubroController::class, 'upimagenrubro']);
 Route::post('upimagenmovie', [\App\Http\Controllers\MovieController::class, 'upimagenmovie']);

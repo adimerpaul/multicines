@@ -29,11 +29,11 @@
           <q-form @submit.prevent="cuiCreate">
             <div class="row">
               <div class="col-12">
-                <q-select :options="[0,1,2]" dense outlined label="codigoPuntoVenta" v-model="cui.codigoPuntoVenta" />
+                <q-select :options="[0,1]" dense outlined label="codigoPuntoVenta" v-model="cui.codigoPuntoVenta" />
               </div>
-              <div class="col-12">
-                <q-select :options="[0,1,2]" dense outlined label="codigoSucursal" v-model="cui.codigoSucursal" />
-              </div>
+<!--              <div class="col-12">-->
+<!--                <q-select :options="[0,1,2]" dense outlined label="codigoSucursal" v-model="cui.codigoSucursal" />-->
+<!--              </div>-->
               <div class="col-12 flex flex-center">
                 <q-btn dense class="full-width" :loading="loading" type="submit" color="green" icon="check" label="Guardar" />
               </div>
@@ -90,7 +90,7 @@ export default {
         this.loading=false
         this.$q.notify({
           color: 'negative',
-          message: err.response.data.error,
+          message: err.response.data.message,
           position: 'top',
           icon: 'error',
           timeout: 5000

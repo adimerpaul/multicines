@@ -13,6 +13,7 @@ class Cui extends Model
     protected $fillable= [
         'codigo',
         'fechaVigencia',
+        'fechaCreacion',
         'codigoPuntoVenta',
         'codigoSucursal',
     ];

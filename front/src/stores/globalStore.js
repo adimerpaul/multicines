@@ -4,6 +4,7 @@ export const globalStore = defineStore('global', {
   state: () => ({
     counter: 0,
     movies: [],
+    eventNumber: 0,
     movieSingleTon: false,
     distributors: [],
     distributor: {},

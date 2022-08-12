@@ -256,12 +256,13 @@
 
 <script>
 import {date} from "quasar";
-
+import {globalStore} from "stores/globalStore";
 export default {
   name: `Sale`,
 
   data() {
     return {
+      store:globalStore(),
       saleDialog:false,
       letra:['','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB'],
       url:process.env.API,
@@ -288,13 +289,13 @@ export default {
       disponible:0,
       vendido:0,
       devueltos:0,
-      capacidad:0
-
+      capacidad:0,
     }
   },
   created() {
     this.myMovies(this.fecha)
-    this.myMomentaneo();
+    this.myMomentaneo()
+    this.eventSearch()
     this.$api.get('document').then(res=>{
       res.data.forEach(r=>{
         r.label=r.descripcion
@@ -304,6 +305,11 @@ export default {
     })
   },
   methods: {
+    eventSearch(){
+      this.$api.post('eventSearch').then(res=>{
+        this.store.eventNumber=res.data
+      })
+    },
     saleInsert(){
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
@@ -318,6 +324,7 @@ export default {
         // this.myMomentaneo();
         // this.myMovies(this.fecha)
         this.loading=false
+        this.eventSearch()
       }).finally(()=>{
         this.loading=false
       }).catch(err=>{

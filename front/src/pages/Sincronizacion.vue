@@ -23,6 +23,36 @@
 <!--          </template>-->
 <!--        </q-table>-->
       </div>
+      <div class="col-12">
+        <q-table :rows="activities" dense title="Actividades" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="documents" dense title="Documentos" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="documentsectors" dense title="Documento Sector" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="events" dense title="Eventos" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="leyendas" dense title="Leyendas" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="medidas" dense title="Medidas" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="messages" dense title="Mensajes" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="sectors" dense title="Sectores" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="servicios" dense title="Servicios" />
+      </div>
+      <div class="col-12">
+        <q-table :rows="tipopagos" dense title="Tipo Pagos" />
+      </div>
     </div>
     <q-dialog v-model="cuiDialog">
       <q-card>
@@ -34,12 +64,12 @@
         <q-card-section>
           <q-form @submit.prevent="activityCreate">
             <div class="row">
-              <div class="col-12">
-                <q-select :options="[0,1,2]" dense outlined label="codigoPuntoVenta" v-model="cui.codigoPuntoVenta" />
-              </div>
-              <div class="col-12">
-                <q-select :options="[0,1,2]" dense outlined label="codigoSucursal" v-model="cui.codigoSucursal" />
-              </div>
+<!--              <div class="col-12">-->
+<!--                <q-select :options="[0,1]" dense outlined label="codigoPuntoVenta" v-model="cui.codigoPuntoVenta" />-->
+<!--              </div>-->
+<!--              <div class="col-12">-->
+<!--                <q-select :options="[0,1,2]" dense outlined label="codigoSucursal" v-model="cui.codigoSucursal" />-->
+<!--              </div>-->
               <div class="col-12 flex flex-center">
                 <q-btn dense class="full-width" :loading="loading" type="submit" color="green" icon="check" label="Sincronizar" />
               </div>
@@ -63,6 +93,17 @@ export default {
       },
       cuiDialog:false,
       cuiFilter: '',
+      activities:[],
+      documents:[],
+      documentsectors:[],
+      events:[],
+      leyendas:[],
+      medidas:[],
+      messages:[],
+      motivos:[],
+      sectors:[],
+      servicios:[],
+      tipopagos:[],
       cuisColums:[
         {name:'id',label:'id',field:'id',sortable:true},
         {name:'codigo',label:'codigo',field:'codigo',sortable:true},
@@ -73,21 +114,31 @@ export default {
     }
   },
   created() {
-    this.getCuis();
+    this.datosGet();
   },
   methods: {
-    getCuis() {
-      this.$api.get('cui').then(res => {
-        this.cuis = res.data
+    datosGet(){
+      this.$api.get('activity').then(res => {
+        this.activities=res.data.activities;
+        this.documents=res.data.documents;
+        this.documentsectors=res.data.documentsectors;
+        this.events=res.data.events;
+        this.leyendas=res.data.leyendas;
+        this.medidas=res.data.medidas;
+        this.messages=res.data.messages;
+        this.motivos=res.data.motivos;
+        this.sectors=res.data.sectors;
+        this.servicios=res.data.servicios;
+        this.tipopagos=res.data.tipopagos;
       })
     },
     activityCreate() {
       this.loading=true
       this.$api.post('activity', this.cui).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
+        this.datosGet()
         this.loading=false
         this.cuiDialog = false
-        this.getCuis()
         this.$q.notify({
           color: 'positive',
           message: 'Registro creado correctamente',

@@ -43,6 +43,10 @@ class SaleController extends Controller
     {
         return Programa::select('movie_id')->groupBy('movie_id')->with('movie')->whereDate('fecha',$request->fecha)->get();
     }
+    public function eventSearch(Request $request)
+    {
+        return Sale::where('siatEnviado',false)->count();
+    }
     public function hours(Request $request)
     {
         return Programa::with('sala')->with('price')->with('movie')->whereDate('fecha',$request->fecha)->where('movie_id',$request->id)->get();
@@ -108,14 +112,14 @@ class SaleController extends Controller
 
         $user=(object)["name"=>"admin","id"=>1];
 
-        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()==0){
+        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
         }
-        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()==0){
+        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No exite CUFD para la venta!!'], 400);
         }
-        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->first();
-        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia','>=', now())->first();
+        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         if (Sale::where('cui', $cui->codigo)->count()==0){
             $numeroFactura=1;
         }else{
@@ -298,7 +302,7 @@ class SaleController extends Controller
 
 
         try {
-            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta?WSDL",  [
+            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVentasd?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi " . env('TOKEN'),
@@ -346,7 +350,7 @@ class SaleController extends Controller
 
 //
         $sale->save();
-//        var_dump($result);
+
 
 
     }

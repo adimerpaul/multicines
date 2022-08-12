@@ -15,7 +15,7 @@ class CuiController extends Controller
      */
     public function index()
     {
-        return Cui::all();
+        return Cui::orderBy('id','desc')->get();
     }
 
     /**
@@ -36,7 +36,7 @@ class CuiController extends Controller
      */
     public function store(StoreCuiRequest $request)
     {
-        if (Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->whereDate('fechaVigencia','>=', now())->count()>=1){
+        if (Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->where('fechaVigencia','>=', now())->count()>=1){
             return response()->json(['message' => 'El CUI ya existe'], 400);
         }else{
             $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?WSDL",  [
@@ -66,6 +66,7 @@ class CuiController extends Controller
             $cui->fechaVigencia =  date('Y-m-d H:i:s', strtotime($result->RespuestaCuis->fechaVigencia));
             $cui->codigoPuntoVenta = $request->codigoPuntoVenta;
             $cui->codigoSucursal = $request->codigoSucursal;
+            $cui->fechaCreacion= date('Y-m-d H:i:s');
             $cui->save();
             return response()->json(['success' => 'CUI creado correctamente'], 200);
         }

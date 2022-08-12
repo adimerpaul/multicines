@@ -19,12 +19,14 @@ class CuiSeeder extends Seeder
             [
                 'codigo' => 'A15EF75C',
                 'fechaVigencia' => '2023-07-26 19:24:41',
+                'fechaCreacion' => '2022-07-26 19:24:41',
                 'codigoPuntoVenta' => 0,
                 'codigoSucursal' => 0,
             ],
             [
                 'codigo' => 'F727E9CB',
                 'fechaVigencia' => '2023-07-26 19:25:12',
+                'fechaCreacion' => '2022-07-26 19:24:41',
                 'codigoPuntoVenta' => 1,
                 'codigoSucursal' => 0,
             ],

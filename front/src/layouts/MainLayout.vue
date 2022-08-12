@@ -15,7 +15,10 @@
           MultiCines PLAZA
         </q-toolbar-title>
 
-        <div>Usuario: </div>
+        <div>
+          <q-chip  color="red" v-if="store.eventNumber!=0" text-color="white" icon="warning_amber" :label="store.eventNumber+' Facturas no enviadas'" />
+          Usuario:
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -45,7 +48,7 @@
         <q-expansion-item dense exact expand-separator icon="receipt_long" label="Producto" to="productos" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="calendar_month" label="Programación" to="programa" expand-icon="null"/>
 <!--        <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Venta de boletos" to="sale" expand-icon="null"/>-->
-        <q-expansion-item expand-separator dense exact icon="o_local_activity" label="Venta Boletria">
+        <q-expansion-item expand-separator dense exact icon="o_local_activity" label="Venta Boleteria">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_local_activity" label="Venta de boletos" default-opened to="sale" expand-icon="null"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVenta" expand-icon="null"/>
         </q-expansion-item>
@@ -60,11 +63,14 @@
 </template>
 
 <script>
+import {globalStore} from "stores/globalStore";
+
 export default {
     name: `MainLayout`,
     data() {
       return {
-        leftDrawerOpen: false
+        leftDrawerOpen: false,
+        store:globalStore()
       }
     },
     methods: {

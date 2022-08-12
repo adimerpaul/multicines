@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Leyenda extends Model
 {
     use HasFactory;
-
+    protected $hidden = ['created_at', 'updated_at'];
 }
