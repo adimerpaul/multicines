@@ -177,7 +177,7 @@
                       v-model="efectivo"
                       outlined
                       label="Monto recibido"
-                      required
+
                     />
                   </div>
                   <div class="col-3 q-pa-xs">

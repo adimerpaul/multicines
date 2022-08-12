@@ -11,6 +11,8 @@ use App\Models\Sale;
 use App\Models\SaleCandy;
 use App\Http\Requests\StoreSaleCandyRequest;
 use App\Http\Requests\UpdateSaleCandyRequest;
+use DOMDocument;
+use SimpleXMLElement;
 
 class SaleCandyController extends Controller
 {
@@ -83,14 +85,14 @@ class SaleCandyController extends Controller
         }
         $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
-        if (SaleCandy::where('cui', $cui->codigo)->count()==0){
+        if (Sale::where('cui', $cui->codigo)->count()==0){
             $numeroFactura=1;
         }else{
-            $sale=SaleCandy::where('cui',$cui->codigo)->orderBy('numeroFactura', 'desc')->first();
+            $sale=Sale::where('cui',$cui->codigo)->orderBy('numeroFactura', 'desc')->first();
             $numeroFactura=$sale->numeroFactura+1;
         }
 
-        $sale=new SaleCandy();
+        $sale=new Sale();
         $sale->numeroFactura=$numeroFactura;
         $sale->cuf="";
         $sale->cufd=$cufd->codigo;
@@ -105,7 +107,7 @@ class SaleCandyController extends Controller
         $sale->client_id=$client->id;
         $sale->save();
 
-        $data=[];
+        //$data=[];
         $dataDetail=[];
         $detalleFactura="";
 
@@ -114,7 +116,7 @@ class SaleCandyController extends Controller
                 <actividadEconomica>472000</actividadEconomica>
                 <codigoProductoSin>99100</codigoProductoSin>
                 <codigoProducto>".$detalle['product_id']."</codigoProducto>
-                <descripcion>".$detalle['nommbre']."</descripcion>
+                <descripcion>".$detalle['nombre']."</descripcion>
                 <cantidad>".$detalle['cantidad']."</cantidad>
                 <unidadMedida>62</unidadMedida>
                 <precioUnitario>".$detalle['precio']."</precioUnitario>
@@ -154,7 +156,7 @@ class SaleCandyController extends Controller
         $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
         $cuf=$cuf.$cufd->codigoControl;
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>    <cabecera>
+        <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>    <cabecera>
         <nitEmisor>".env('NIT')."</nitEmisor>
         <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
         <municipio>Oruro</municipio>
