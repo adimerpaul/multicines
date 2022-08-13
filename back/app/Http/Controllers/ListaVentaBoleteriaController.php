@@ -42,6 +42,7 @@ class ListaVentaBoleteriaController extends Controller
             ->with('client')
             ->with('details')
             ->with('tickets')
+            ->orderBy('id', 'desc')
             ->get();
     }
 

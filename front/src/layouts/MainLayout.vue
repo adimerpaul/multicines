@@ -73,7 +73,15 @@ export default {
         store:globalStore()
       }
     },
-    methods: {
+  created() {
+      this.eventSearch()
+  },
+  methods: {
+      eventSearch(){
+        this.$api.post('eventSearch').then(res=>{
+          this.store.eventNumber=res.data
+        })
+      },
       toggleLeftDrawer() {
         this.leftDrawerOpen = !this.leftDrawerOpen
       }
