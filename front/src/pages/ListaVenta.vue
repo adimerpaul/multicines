@@ -40,9 +40,9 @@
 
     </div>
     <div>
-      <img :src="qrImage">
-
+      <img :src="qrImage" style="visibility: hidden">
     </div>
+    <div id="myelement" class="hidden">{{lorem}}</div>
   </q-page>
 </template>
 <script>
@@ -54,6 +54,7 @@ export default {
   name: `LisaVenta`,
   data() {
     return {
+      lorem: 'lorem impus',
       loading:false,
       fechaIni:date.formatDate(new Date(),'YYYY-MM-DD'),
       fechaFin:date.formatDate(new Date(),'YYYY-MM-DD'),
@@ -86,6 +87,15 @@ export default {
   },
   mounted() {
     // this.printFactura()
+//     const cssText = `
+//   h1 {
+//     color: black;
+//     font-family: sans-serif;
+//   }
+// `
+//
+//     const d = new Printd()
+//     d.print( document.getElementById('myelement'), [ cssText ] )
     this.listaVentaBoleteriaGet();
   },
   methods: {
@@ -198,13 +208,17 @@ facturación en línea”</div><br>\
       //}
       // const d = new Printd()
       // d.print( options)
-      let myWindow = window.open("", "Imprimir", "width=1000,height=1000");
-      myWindow.document.write(cadena);
-      // myWindow.document.close();
-      setTimeout(() => {
-        myWindow.print();
-        myWindow.close();
-      }, 10);
+
+      // let myWindow = window.open("", "Imprimir", "width=1000,height=1000");
+      // myWindow.document.write(cadena);
+      // // myWindow.document.close();
+      // setTimeout(() => {
+      //   myWindow.print();
+      //   myWindow.close();
+      // }, 10);
+      document.getElementById('myelement').innerHTML = cadena
+      const d = new Printd()
+      d.print( document.getElementById('myelement') )
 
     },
     listaVentaBoleteriaGet() {
