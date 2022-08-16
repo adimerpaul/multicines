@@ -57,8 +57,20 @@
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-card-section>
-          <q-form @submit.prevent="cuiCreate">
+          <q-form @submit.prevent="eventoSignificativoCreate">
             <div class="row">
+              <div class="col-12">
+                <q-select :options="cufds" dense outlined label="CufdEvento" v-model="cufdEvento" />
+              </div>
+              <div class="col-12">
+                <q-select :options="events" dense outlined label="codigoMotivoEvento" v-model="event" />
+              </div>
+              <div class="col-12">
+                <q-input dense outlined label="fechaHoraInicioEvento" v-model="fechaHoraInicioEvento" />
+              </div>
+              <div class="col-12">
+                <q-input dense outlined label="fechaHoraFinEvento" v-model="fechaHoraFinEvento" />
+              </div>
               <div class="col-12 flex flex-center">
                 <q-btn dense class="full-width" :loading="loading" type="submit" color="green" icon="check" label="Crear evento significativo" />
               </div>
@@ -70,15 +82,21 @@
   </q-page>
 </template>
 <script>
+import {date} from "quasar";
+
 export default {
   name: `Cuis`,
   data() {
     return {
       loading:false,
       eventoSignificativoDialog:false,
+      fechaHoraInicioEvento:date.formatDate(new Date(),'YYYY-MM-DD HH:mm:ss'),
+      fechaHoraFinEvento:date.formatDate(new Date(),'YYYY-MM-DD HH:mm:ss'),
       cufd:{},
       cufdEvento:{},
       cufds:[],
+      events:[],
+      event:{},
       cui:{
         codigoPuntoVenta:0,
         codigoSucursal:0
@@ -99,25 +117,42 @@ export default {
   },
   created() {
     this.cufdGet();
+    this.$api.get('event').then(response => {
+      response.data.forEach(r=>{
+        r.label= r.codigoClasificador+' '+r.descripcion;
+      })
+      this.events = response.data
+      this.event=this.events[0]
+    });
   },
   methods: {
     cufdGet() {
       this.$api.get('cufd').then(res => {
         res.data.forEach(r=>{
-          r.label='Punto venta'+r.codigoPuntoVenta+' ID:'+r.id;
+          r.label='Punto venta'+r.codigoPuntoVenta+' ID:'+r.id+' Fecha:'+r.fechaCreacion+'-'+r.fechaVigencia;
         })
         this.cufds = res.data
       })
     },
-    cuiCreate() {
+    eventoSignificativoCreate() {
       this.loading=true
-      this.$api.post('cufd', this.cui).then(res => {
+      this.$api.post('eventoSignificativo',{
+        codigoPuntoVenta:this.cufd.codigoPuntoVenta,
+        codigoSucursal:this.cufd.codigoSucursal,
+        fechaHoraFinEvento:this.fechaHoraFinEvento,
+        fechaHoraInicioEvento:this.fechaHoraInicioEvento,
+        codigoMotivoEvento:this.event.codigoClasificador,
+        descripcion:this.event.descripcion,
+        cufd:this.cufd.codigo,
+        cufdEvento:this.cufdEvento.codigo,
+      }).then(res => {
+        console.log(res.data)
         this.loading=false
         this.cuiDialog = false
-        this.cufdGet()
+        // this.cufdGet()
         this.$q.notify({
           color: 'positive',
-          message: 'Cui registrado correctamente',
+          message: 'Evento significativo  registrado correctamente',
           icon: 'done'
         })
       })

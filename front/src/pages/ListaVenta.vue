@@ -73,7 +73,7 @@ export default {
       qrImage:'',
       opts : {
         errorCorrectionLevel: 'M',
-        type: 'png  ',
+        type: 'png',
         quality: 0.95,
         width: 100,
         margin: 1,
@@ -200,9 +200,12 @@ facturación en línea”</div><br>\
       // d.print( options)
       let myWindow = window.open("", "Imprimir", "width=1000,height=1000");
       myWindow.document.write(cadena);
-      myWindow.document.close();
-      myWindow.print();
-      myWindow.close();
+      // myWindow.document.close();
+      setTimeout(() => {
+        myWindow.print();
+        myWindow.close();
+      }, 10);
+
     },
     listaVentaBoleteriaGet() {
       this.loading= true
