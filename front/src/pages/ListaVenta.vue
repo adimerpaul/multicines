@@ -26,6 +26,7 @@
           <template v-slot:body-cell-Opciones="props">
             <q-td :props="props" auto-width>
               <q-btn icon="print" @click="printFactura(props.row)"/>
+              <q-btn icon="list" @click="detalleimp(props.row)"/>
 
               <q-btn type="a" label="CLick" target="_blank" :href="`https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=329448023&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
             </q-td>
@@ -36,13 +37,38 @@
             </q-td>
           </template>
         </q-table>
+
       </div>
 
     </div>
+    <q-dialog v-model="ticketsDialog" full-width>
+      <q-card >
+        <q-card-section>
+          <div class="text-h6">Boletos</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-table label="Boletos" :columns="boletoColums" :rows="tickets">
+            <template v-slot:body-cell-opcion="props">
+              <q-td :props="props">
+                <q-btn color="info" icon="print" @click="boletoprint(props.row)" />
+              </q-td>
+            </template>
+          </q-table>
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Cancel" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <div>
       <img :src="qrImage" style="visibility: hidden">
     </div>
     <div id="myelement" class="hidden">{{lorem}}</div>
+
+
+
   </q-page>
 </template>
 <script>
@@ -55,11 +81,13 @@ export default {
   data() {
     return {
       lorem: 'lorem impus',
+      ticketsDialog:false,
       loading:false,
       fechaIni:date.formatDate(new Date(),'YYYY-MM-DD'),
       fechaFin:date.formatDate(new Date(),'YYYY-MM-DD'),
       listaVentaBoleteria:[],
       facturadetalle:{},
+      cine:{},
       listaColums:[
         {name:'Opciones',label:'Opciones',field:'Opciones'},
         {name:'numeroFactura',label:'numeroFactura',field:'numeroFactura',sortable:true},
@@ -71,6 +99,16 @@ export default {
         {name:'siatAnulado',label:'siatAnulado',field:'siatAnulado',sortable:true},
         {name:'id',label:'id',field:'id',sortable:true},
       ],
+      boletoColums:[
+        {name:'opcion',label:'Opcion',field:'opcion'},
+        {name:'titulo',label:'titulo',field:'titulo',sortable:true},
+        {name:'nombreSala',label:'nombreSala',field:'nombreSala',sortable:true},
+        {name:'horaFuncion',label:'horaFuncion',field:'horaFuncion',sortable:true},
+        {name:'letra',label:'letra',field:'letra',sortable:true},
+        {name:'columna',label:'columna',field:'columna',sortable:true},
+        {name:'costo',label:'costo',field:'costo',sortable:true},
+      ],
+      tickets:[],
       qrImage:'',
       opts : {
         errorCorrectionLevel: 'M',
@@ -97,8 +135,66 @@ export default {
 //     const d = new Printd()
 //     d.print( document.getElementById('myelement'), [ cssText ] )
     this.listaVentaBoleteriaGet();
+    this.encabezado();
   },
   methods: {
+    encabezado(){
+      this.$api.get('datocine').then(res => {
+        this.cine = res.data;
+        console.log(this.cine)
+        })
+        },
+    boletoprint(bol){
+      console.log(bol)
+      let ticket=""
+      ticket+="<style>\
+        .titulo{\
+        font-size: 14px;\
+        text-align: center;\
+        font-weight: bold;\
+      }\
+      \        .tifecha{\
+        font-size: 14px;\
+      }\
+      \        .titnit{\
+        font-size: 10px;\
+        text-align: center;\
+      }\
+      \      hr{\
+      border-top: 1px dashed   ;\
+    }\
+         .titpelicula{\
+        font-size: 18px;\
+        text-align: center;\
+        font-weight: bold;\
+      }\
+        </style>"
+      ticket+="<div class='titulo'>"+this.cine.razon+"</div>"
+      ticket+="<div class='titnit'>NIT:"+this.cine.nit+"</div>";
+      ticket+="<hr>";
+      ticket+="<div class='titpelicula'>" + bol.titulo+"<br> " + bol.nombreSala+"</div><br>";
+      ticket+="<div class='tifecha'>Fecha:  <span style='font-size: 20px;'>"+bol.fechaFuncion+"</span>  <span style='float:right'>Bs. "+bol.costo+"</span></div>";
+      ticket+="<div class='tifecha'>Butaca: <span style='font-size:22px;'>"+bol.letra +" - "+ bol.columna+"</span><div style='float:right'> Hora: <span style='font-size:20px;'>"+bol.horaFuncion.substring(11)+ "</span></div></div>";
+      ticket+="<hr>";
+      ticket+="<div style='font-size: 12px' >Cod: "+bol.numboc + "<br>"
+      ticket+="Trans: "+bol.id+"</div>";
+      document.getElementById('myelement').innerHTML = ticket
+      const d = new Printd()
+      d.print( document.getElementById('myelement') )
+
+    },
+    detalleimp(factura){
+      console.log(factura.tickets)
+      this.tickets=factura.tickets
+      this.ticketsDialog=true
+      // let myWindow = window.open("", "Imprimir", "width=1000,height=1000");
+       //myWindow.document.write(this.boletoprint(factura.tickets[0]));
+        //myWindow.document.close();
+    //   setTimeout(() => {
+     //    myWindow.print();
+      //   myWindow.close();
+       //}, 10);
+    },
     async printFactura(factura) {
       console.log(factura)
       this.facturadetalle = factura
@@ -148,17 +244,16 @@ export default {
   }</style>\
     <div id='myelement'>\
       <div class='titulo'>FACTURA <br>CON DERECHO A CREDITO FISCAL</div>\
-      <div class='titulo2'>MULTISALAS<br>\
+      <div class='titulo2'>"+this.cine.razon+"<br>\
         Casa Matriz<br>\
         No. Punto de Venta 0<br>\
-        AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN<br>\
-        Nª2337 ZONA ESTE<br>\
-        Tel. 2846005<br>\
+        "+this.cine.direccion.substring(0,38)+"<br>"+this.cine.direccion.substring(38)+"<br>\
+        Tel. "+this.cine.telefono+"<br>\
         Oruro\
       </div>\
       <hr>\
       <div class='titulo'>NIT</div>\
-      <div class='titulo2'>329448023</div>\
+      <div class='titulo2'>"+this.cine.nit+"</div>\
       <div class='titulo'>FACTURA N°</div>\
       <div class='titulo2'>"+factura.numeroFactura+"</div>\
       <div class='titulo'>CÓD. AUTORIZACIÓN</div>\

@@ -366,6 +366,14 @@ class SaleController extends Controller
         //
     }
 
+    public function datocine(){
+        $nit=env('NIT');
+        $razon=env("RAZON");
+        $dir=env("DIRECCION");
+        $tel=env("TELEFONO");
+        return json_encode(['nit'=>$nit,'razon'=>$razon,'direccion'=>$dir,'telefono'=>$tel]);
+
+    }
     /**
      * Show the form for editing the specified resource.
      *
