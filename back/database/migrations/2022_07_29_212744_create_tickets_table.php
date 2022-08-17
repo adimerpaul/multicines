@@ -28,10 +28,10 @@ return new class extends Migration
             $table->string('letra')->nullable();
             $table->string('costo')->nullable();
             $table->string('titulo')->nullable();
-            $table->string('devuelto')->nullable();
+            $table->string('devuelto')->nullable()->default(0);
             $table->string('idCupon')->nullable();
-            $table->string('tarjeta')->nullable();
-            $table->string('credito')->nullable();
+            $table->string('tarjeta')->nullable()->default('NO');
+            $table->string('credito')->nullable()->default('NO');
             $table->unsignedBigInteger("client_id")->nullable();
             $table->foreign("client_id")->references("id")->on("clients");
             $table->unsignedBigInteger("programa_id")->nullable();

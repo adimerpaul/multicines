@@ -14,7 +14,7 @@
   <q-card-section class="q-py-none">
     <div class="row">
       <div class="col-6"><div class="text-h6"><q-icon name="o_confirmation_number"/> PELICULAS</div></div>
-      <div class="col-6 text-right"><div class="text-subtitle2">Venta de boletos vendidos: 000</div></div>
+      <div class="col-6 text-right"><div class="text-subtitle2">Venta de boletos vendidos: {{ totalventa }}</div></div>
     </div>
   </q-card-section>
   <q-separator />
@@ -26,7 +26,7 @@
             <div class="absolute-bottom text-subtitle2 text-center" style="padding: 0px;margin:0px;border: 0px">
               <div class="row">
                 <div class="col-6 q-pa-none q-ma-none">
-                  {{m.movie.nombre}}
+                  {{m.movie.nombre}} {{m.formato}}
                 </div>
                 <div class="col-6 text-right flex flex-center">0</div>
               </div>
@@ -251,12 +251,15 @@
       </q-form>
     </q-card>
   </q-dialog>
+  <div id="myelement" class="hidden"></div>
+
 </q-page>
 </template>
 
 <script>
 import {date} from "quasar";
 import {globalStore} from "stores/globalStore";
+import {Printd} from "printd";
 export default {
   name: `Sale`,
 
@@ -290,10 +293,15 @@ export default {
       vendido:0,
       devueltos:0,
       capacidad:0,
+      totalventa:0,
+      cine:{},
+
     }
   },
   created() {
+    this.encabezado()
     this.myMovies(this.fecha)
+    this.tventa()
     this.myMomentaneo()
     this.eventSearch()
     this.$api.get('document').then(res=>{
@@ -305,6 +313,19 @@ export default {
     })
   },
   methods: {
+    encabezado(){
+      this.$api.get('datocine').then(res => {
+        this.cine = res.data;
+        console.log(this.cine)
+      })
+    },
+    tventa(){
+      this.$api.post('totalventa',{'fecha':this.fecha}).then(res => {
+         // console.log(res.data)
+        this.totalventa=res.data
+      })
+
+        },
     eventSearch(){
       this.$api.post('eventSearch').then(res=>{
         this.store.eventNumber=res.data
@@ -319,10 +340,14 @@ export default {
         detalleVenta:this.detalleVenta,
       }).then(res=>{
         console.log(res.data)
-        // this.client={complemento:''}
-        // this.saleDialog=false
-        // this.myMomentaneo();
-        // this.myMovies(this.fecha)
+        res.data.forEach(r=>{
+          this.boletoprint(r)
+        })
+        this.momentaneoDeleteAll()
+        this.tventa()
+        this.client={complemento:''}
+         this.saleDialog=false
+         this.myMovies(this.fecha)
         this.loading=false
         this.eventSearch()
       }).finally(()=>{
@@ -338,6 +363,45 @@ export default {
           timeout: 5000,
         })
       })
+    },
+    boletoprint(bol){
+      console.log(bol)
+      let ticket=""
+      ticket+="<style>\
+        .titulo{\
+        font-size: 14px;\
+        text-align: center;\
+        font-weight: bold;\
+      }\
+      \        .tifecha{\
+        font-size: 14px;\
+      }\
+      \        .titnit{\
+        font-size: 10px;\
+        text-align: center;\
+      }\
+      \      hr{\
+      border-top: 1px dashed   ;\
+    }\
+         .titpelicula{\
+        font-size: 18px;\
+        text-align: center;\
+        font-weight: bold;\
+      }\
+        </style>"
+      ticket+="<div class='titulo'>"+this.cine.razon+"</div>"
+      ticket+="<div class='titnit'>NIT:"+this.cine.nit+"</div>";
+      ticket+="<hr>";
+      ticket+="<div class='titpelicula'>" + bol.titulo+"<br> " + bol.nombreSala+"</div><br>";
+      ticket+="<div class='tifecha'>Fecha:  <span style='font-size: 20px;'>"+bol.fechaFuncion+"</span>  <span style='float:right'>Bs. "+bol.costo+"</span></div>";
+      ticket+="<div class='tifecha'>Butaca: <span style='font-size:22px;'>"+bol.letra +" - "+ bol.columna+"</span><div style='float:right'> Hora: <span style='font-size:20px;'>"+bol.horaFuncion.substring(11)+ "</span></div></div>";
+      ticket+="<hr>";
+      ticket+="<div style='font-size: 12px' >Cod: "+bol.numboc + "<br>"
+      ticket+="Trans: "+bol.id+"</div>";
+      document.getElementById('myelement').innerHTML = ticket
+      const d = new Printd()
+      d.print( document.getElementById('myelement') )
+
     },
     searchClient(){
       // console.log(this.client)
@@ -407,7 +471,9 @@ export default {
       this.movie={}
       this.hours=[]
       this.$api.post('movies',{fecha:fecha}).then(res => {
+        console.log(res.data)
         this.movies = res.data
+        this.tventa()
         // this.movie = this.movies[0].movie //
         // this.myHours(this.movie) //
       });

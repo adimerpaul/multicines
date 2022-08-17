@@ -43,6 +43,9 @@ class SaleController extends Controller
     {
         return Programa::select('movie_id')->groupBy('movie_id')->with('movie')->whereDate('fecha',$request->fecha)->get();
     }
+    public function movietotal(Request $request){
+        return DB::SELECT("SELECT p.movie_id,COUNT(*) from tickets t inner JOIN programas p on t.programa_id=p.id where t.fechaFuncion='2022-08-17' GROUP by p.movie_id");
+    }
     public function eventSearch(Request $request)
     {
         return Sale::where('siatEnviado',false)->count();
@@ -165,7 +168,7 @@ class SaleController extends Controller
                 "letra"=>$m->letra,
                 "costo"=>$programa->price->precio,
                 "titulo"=>$m->pelicula,
-                "devuelto"=>"",
+                "devuelto"=>"0",
                 "idCupon"=>"",
                 "tarjeta"=>"",
                 "credito"=>"",
@@ -354,8 +357,12 @@ class SaleController extends Controller
 
 
 
+
     }
 
+    public function listBoletos(Request $request){
+        return Ticket::where('sale_id',$request->id)->get();
+    }
     /**
      * Display the specified resource.
      *
@@ -365,6 +372,10 @@ class SaleController extends Controller
     public function show(Sale $sale)
     {
         //
+    }
+
+    public function totalventa(Request $request){
+        return Ticket::whereDate('fechaFuncion',$request->fecha)->where('devuelto','0')->count();
     }
 
     public function datocine(){

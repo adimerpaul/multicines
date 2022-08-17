@@ -43,6 +43,7 @@ Route::resource('event', \App\Http\Controllers\EventController::class);
 
 Route::post('searchClient', [\App\Http\Controllers\ClientController::class,'searchClient']);
 Route::get('datocine', [\App\Http\Controllers\SaleController::class,'datocine']);
+Route::post('totalventa', [\App\Http\Controllers\SaleController::class,'totalventa']);
 
 Route::post('momentaneoDelete', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDelete']);
 Route::post('momentaneoDeleteUser', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDeleteUser']);
