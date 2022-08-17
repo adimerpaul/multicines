@@ -16,7 +16,9 @@ class CufdController extends Controller
      */
     public function index()
     {
-        return Cufd::orderBy('id', 'desc')->get();
+        return Cufd::orderBy('id', 'desc')->with(array('sales' => function($query) {
+            $query->where('siatEnviado', false);
+        }))->get();
     }
 
     /**

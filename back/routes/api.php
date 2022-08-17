@@ -34,6 +34,9 @@ Route::resource('momentaneo', \App\Http\Controllers\MomentaneoController::class)
 Route::resource('document', \App\Http\Controllers\DocumentController::class);
 Route::resource('client', \App\Http\Controllers\ClientController::class);
 Route::resource('eventoSignificativo', \App\Http\Controllers\EventoSignificativoController::class);
+Route::post('recepcionPaqueteFactura', [\App\Http\Controllers\EventoSignificativoController::class,'recepcionPaqueteFactura']);
+Route::post('cantidadFacturas', [\App\Http\Controllers\EventoSignificativoController::class,'cantidadFacturas']);
+
 Route::resource('salecandy', \App\Http\Controllers\SaleCandyController::class);
 Route::resource('listaVentaBoleteria', \App\Http\Controllers\ListaVentaBoleteriaController::class);
 Route::resource('event', \App\Http\Controllers\EventController::class);

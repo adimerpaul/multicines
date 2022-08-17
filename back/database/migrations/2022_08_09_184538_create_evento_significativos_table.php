@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('cufd')->nullable();
             $table->string('cufdEvento')->nullable();
             $table->string('codigoRecepcionEventoSignificativo')->nullable();
+            $table->unsignedBigInteger("cufd_id")->nullable();
+            $table->foreign("cufd_id")->references("id")->on("cufds");
             $table->timestamps();
         });
     }

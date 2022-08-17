@@ -25,6 +25,7 @@ class Sale extends Model
         'tipo',
         'codigoDocumentoSector',
         'user_id',
+        'cufd_id',
         'client_id',
     ];
     public function user()

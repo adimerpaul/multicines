@@ -357,6 +357,7 @@ export default {
     },
     saleCreate(){
       this.saleDialog=true
+      this.client={complemento:''}
     },
     momentaneoDeleteAll(){
       this.loading=true

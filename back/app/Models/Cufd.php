@@ -18,4 +18,7 @@ class Cufd extends Model
         'codigoPuntoVenta',
         'codigoSucursal',
     ];
+    public function sales(){
+        return $this->hasMany(Sale::class);
+    }
 }

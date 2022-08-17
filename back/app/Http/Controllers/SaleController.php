@@ -139,6 +139,7 @@ class SaleController extends Controller
         $sale->usuario=$user->name;
         $sale->codigoDocumentoSector=$codigoDocumentoSector;
         $sale->user_id=$user->id;
+        $sale->cufd_id=$cufd->id;
         $sale->client_id=$client->id;
         $sale->save();
         $momentaneos=Momentaneo::where('user_id',$user->id)->get();
@@ -266,7 +267,7 @@ class SaleController extends Controller
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
-        $nameFile=microtime();
+        $nameFile=$sale->id;
         $dom->save("archivos/".$nameFile.'.xml');
 
         $firmar = new Firmar();
@@ -289,7 +290,7 @@ class SaleController extends Controller
         $fp = gzopen ($gzfile, 'w9');
         gzwrite ($fp, file_get_contents($file));
         gzclose($fp);
-        unlink($file);
+//        unlink($file);
 
 
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');

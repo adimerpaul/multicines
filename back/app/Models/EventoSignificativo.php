@@ -18,5 +18,12 @@ class EventoSignificativo extends Model
         'cufd',
         'cufdEvento',
         'codigoRecepcionEventoSignificativo',
+        'cufd_id'
     ];
+    public function cufd()
+    {
+        return $this->belongsTo(Cufd::class)->with(array('sales' => function($query) {
+        $query->where('siatEnviado', false);
+    }));
+    }
 }

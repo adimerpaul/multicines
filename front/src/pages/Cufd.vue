@@ -17,12 +17,18 @@
           </template>
           <template v-slot:body-cell-Opciones="props">
             <q-td :props="props" auto-width>
-              <q-btn v-if="props.pageIndex == 0" size="10px" icon="add_circle_outline" @click="eventoSignificativoDialog=true;cufd=props.row;cufdEvento=cufds[props.pageIndex+1]" color="primary" label="Evento significativo" no-caps/>
+              <q-btn size="10px" icon="add_circle_outline" @click="eventoSignificativoClick(props.row)" color="primary" label="Evento significativo" no-caps/>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-sales="props">
+            <q-td :props="props" auto-width>
+              {{props.row.sales.length}}
             </q-td>
           </template>
         </q-table>
-        <pre>{{cufd}}</pre>
-        <pre>{{cufdEvento}}</pre>
+<!--        <pre>{{cufds}}</pre>-->
+<!--        <pre>{{cufd}}</pre>-->
+<!--        <pre>{{cufdEvento}}</pre>-->
       </div>
     </div>
     <q-dialog v-model="cuiDialog">
@@ -59,9 +65,9 @@
         <q-card-section>
           <q-form @submit.prevent="eventoSignificativoCreate">
             <div class="row">
-              <div class="col-12">
-                <q-select :options="cufds" dense outlined label="CufdEvento" v-model="cufdEvento" />
-              </div>
+<!--              <div class="col-12">-->
+<!--                <q-select :options="cufds" dense outlined label="CufdEvento" v-model="cufdEvento" />-->
+<!--              </div>-->
               <div class="col-12">
                 <q-select :options="events" dense outlined label="codigoMotivoEvento" v-model="event" />
               </div>
@@ -106,10 +112,11 @@ export default {
       cufdsColums:[
         {name:'Opciones',label:'Opciones',field:'Opciones'},
         {name:'codigoPuntoVenta',label:'codigoPuntoVenta',field:'codigoPuntoVenta',sortable:true},
-        {name:'codigoSucursal',label:'codigoSucursal',field:'codigoSucursal',sortable:true},
+        {name:'sales',label:'sales',field:'sales',sortable:true},
         {name:'fechaCreacion',label:'fechaCreacion',field:'fechaCreacion',sortable:true},
         {name:'fechaVigencia',label:'fechaVigencia',field:'fechaVigencia',sortable:true},
         {name:'id',label:'id',field:'id',sortable:true},
+        {name:'codigoSucursal',label:'codigoSucursal',field:'codigoSucursal',sortable:true},
         {name:'codigo',label:'codigo',field:'codigo',sortable:true},
         {name:'codigoControl',label:'codigoControl',field:'codigoControl',sortable:true},
       ]
@@ -126,6 +133,13 @@ export default {
     });
   },
   methods: {
+    eventoSignificativoClick(cufdEvento){
+      this.eventoSignificativoDialog=true;
+      // this.cufd=props.row;
+      this.cufdEvento=cufdEvento;
+      this.fechaHoraInicioEvento=this.cufdEvento.fechaCreacion
+      this.fechaHoraFinEvento=this.cufdEvento.fechaVigencia
+    },
     cufdGet() {
       this.$api.get('cufd').then(res => {
         res.data.forEach(r=>{
@@ -134,29 +148,53 @@ export default {
         this.cufds = res.data
       })
     },
+    cuiCreate() {
+      this.loading = true
+      this.$api.post('cufd', this.cui).then(res => {
+        this.loading = false
+        this.cuiDialog = false
+        this.cufdGet()
+        // this.cufdGet()
+        this.$q.notify({
+          color: 'positive',
+          message: 'Cui registrado correctamente',
+          icon: 'done'
+        })
+      }).catch(err=>{
+        this.loading=false
+        this.$q.notify({
+          color: 'negative',
+          message: err.response.data.message,
+          position: 'top',
+          icon: 'error',
+          timeout: 5000
+        })
+      })
+    },
     eventoSignificativoCreate() {
       this.loading=true
       this.$api.post('eventoSignificativo',{
-        codigoPuntoVenta:this.cufd.codigoPuntoVenta,
-        codigoSucursal:this.cufd.codigoSucursal,
+        codigoPuntoVenta:this.cufdEvento.codigoPuntoVenta,
+        codigoSucursal:this.cufdEvento.codigoSucursal,
         fechaHoraFinEvento:this.fechaHoraFinEvento,
         fechaHoraInicioEvento:this.fechaHoraInicioEvento,
         codigoMotivoEvento:this.event.codigoClasificador,
         descripcion:this.event.descripcion,
-        cufd:this.cufd.codigo,
+        // cufd:this.cufd.codigo,
         cufdEvento:this.cufdEvento.codigo,
+        cufdEventoId:this.cufdEvento.id,
       }).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         this.loading=false
         this.cuiDialog = false
+        this.eventoSignificativoDialog=false
         // this.cufdGet()
         this.$q.notify({
           color: 'positive',
           message: 'Evento significativo  registrado correctamente',
           icon: 'done'
         })
-      })
-        .catch(err=>{
+      }).catch(err=>{
         this.loading=false
         this.$q.notify({
           color: 'negative',

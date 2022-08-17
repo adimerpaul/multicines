@@ -12,6 +12,7 @@ import Rubro from "pages/Rubro";
 import Productos from "pages/Productos";
 import Candy from "pages/Candy";
 import ListaVenta from "pages/ListaVenta";
+import EventoSignificativo from "pages/EventoSignificativo";
 
 
 const routes = [
@@ -33,6 +34,7 @@ const routes = [
       { path: 'productos', component: Productos },
       { path: 'candy', component: Candy },
       { path: 'listaVenta', component: ListaVenta },
+      { path: 'eventoSignificativo', component: EventoSignificativo },
     ]
   },
 

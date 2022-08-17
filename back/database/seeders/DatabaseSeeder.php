@@ -30,8 +30,8 @@ class DatabaseSeeder extends Seeder
             PriceSeeder::class,
             ProgramaSeeder::class,
             ClientSeeder::class,
-            SaleSeeder::class,
-            TicketSeeder::class,
+//            SaleSeeder::class,
+//            TicketSeeder::class,
             RubroSeeder::class,
             ProductoSeeder::class,
         ]);
