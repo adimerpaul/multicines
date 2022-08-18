@@ -19,7 +19,6 @@ return new class extends Migration
             $table->dateTime("horaInicio")->nullable();
             $table->dateTime("horaFin")->nullable();
             $table->string("subtitulada")->nullable();
-            $table->string("formato")->nullable();
             $table->string("activo")->nullable()->default('ACTIVO');
             $table->string("nroFuncion")->nullable();
             $table->unsignedBigInteger("user_id")->nullable();

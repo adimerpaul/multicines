@@ -56,7 +56,6 @@
             <div class="col-4"><q-input outlined v-model="programa.fechafin" label="Fecha Final" type="date"/></div>
             <div class="col-4"><q-input outlined v-model="programa.hora" required label="Hora" type="time"/></div>
               <div class="col-4"><q-checkbox v-model="programa.subtitulada" label="SUBTITULADA" size="xl" true-value="SI" false-value="NO"/></div>
-              <div class="col-4">    <q-toggle v-model="programa.formato" color="green" :label="programa.formato" size="xl"  false-value="2D" true-value="3D"/> </div>
             </div>
           </q-card-section>
 
@@ -106,7 +105,6 @@
               <div class="col-6"><q-input outlined v-model="programa2.fecha" label="Fecha " type="date" readonly/></div>
               <div class="col-6"><q-input outlined v-model="programa2.hora" label="Hora" type="time"/></div>
               <div class="col-4"><q-checkbox v-model="programa2.subtitulada" label="SUBTITULADA" size="xl" true-value="SI" false-value="NO"/></div>
-              <div class="col-4"><q-toggle v-model="programa2.formato" color="green" :label="programa2.formato" size="xl"  false-value="2D" true-value="3D"/> </div>
               <div class="col-4"><q-toggle v-model="programa2.activo" color="purple" :label="programa2.activo" size="xl"  false-value="INACTVO" true-value="ACTIVO"/> </div>
             </div>
           </q-card-section>
@@ -145,7 +143,7 @@ export default {
       pelicula:{label:'',value:{}},
       tarifa:{label:'',value:{}},
       funcion:[],
-      programa:{'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO','formato':'2D'},
+      programa:{'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO'},
       programa2:{},
       listpelis:[],
       listsalas:[],
@@ -262,7 +260,7 @@ export default {
         console.log(res.data)
         this.listado(0)
         this.loading=false
-        this.programa={'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO','formato':'2D'}
+        this.programa={'fechaini':date.formatDate(new Date(), "YYYY-MM-DD"),'fechafin':date.formatDate(new Date(), "YYYY-MM-DD"),'hora':'00:00','subtitulada':'NO'}
         this.programaDialog=false
       }).catch(err=>{
         console.error(err)
@@ -372,11 +370,11 @@ export default {
             // console.log(r.sala.nro)
             col=r.sala.nro
             if(num==0){
-              this.events.push({ title: r.movie.nombre+' '+r.formato, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
+              this.events.push({ title: r.movie.nombre+' '+r.movie.formato, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
               }
             else{
             if(num==r.sala.id)
-              this.events.push({ title: r.movie.nombre+' '+r.formato, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
+              this.events.push({ title: r.movie.nombre+' '+r.movie.formato, start: r.horaInicio,end:r.horaFin,color:this.color[col],id:r.id })
             }
 
         })

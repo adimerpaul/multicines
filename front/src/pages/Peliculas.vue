@@ -70,6 +70,8 @@
               <div class="col-3">
                 <q-select dense outlined label="genero" v-model="movie.genero" :options="['Accion','Animacion','Animada','Aventura','Aventuras','Ciencia Ficcion','Comedia','Deporte','Documental','Drama','Historica','Infantil','Musical','Romantica','Suspenso','Terror','Thiller','Western','Otros']"/>
               </div>
+              <div class="col-3"><q-toggle v-model="movie.formato" color="green" :label="movie.formato" size="xl"  false-value="2D" true-value="3D"/> </div>
+
               <div class="col-3">
                 <q-input dense outlined label="sipnosis" v-model="movie.sipnosis" />
               </div>
@@ -128,6 +130,8 @@
               <div class="col-3">
                 <q-select dense outlined label="genero" v-model="movie2.genero" :options="['Accion','Animacion','Animada','Aventura','Aventuras','Ciencia Ficcion','Comedia','Deporte','Documental','Drama','Historica','Infantil','Musical','Romantica','Suspenso','Terror','Thiller','Western','Otros']"/>
               </div>
+              <div class="col-3"><q-toggle v-model="movie2.formato" color="green" :label="movie2.formato" size="xl"  false-value="2D" true-value="3D"/> </div>
+
               <div class="col-3">
                 <q-input dense outlined label="sipnosis" v-model="movie2.sipnosis" />
               </div>
@@ -203,6 +207,7 @@ export default {
       dialog_img:false,
       movie:{
         clasificacion:'+13',
+        formmato:'2D',
         genero:'Accion',
         fechaEstreno:date.formatDate(new Date(),'YYYY-MM-DD'),
       },
@@ -217,6 +222,7 @@ export default {
         {label:'duracion',field:'duracion',name:'duracion',sortable:true},
         {label:'paisOrigen',field:'paisOrigen',name:'paisOrigen',sortable:true},
         {label:'genero',field:'genero',name:'genero',sortable:true},
+        {label:'formato',field:'formato',name:'formato',sortable:true},
         {label:'clasificacion',field:'clasificacion',name:'clasificacion',sortable:true},
         {label:'fechaEstreno',field:'fechaEstreno',name:'fechaEstreno',sortable:true},
         {label:'Imagen',field:'imagen',name:'imagen',sortable:true},
@@ -301,6 +307,12 @@ export default {
         this.store.movies.push(res.data)
         this.foto=''
         this.movieDialog=false
+        this.movie={
+          clasificacion:'+13',
+            formmato:'2D',
+            genero:'Accion',
+            fechaEstreno:date.formatDate(new Date(),'YYYY-MM-DD'),
+        }
       })
     },
     movieUpdate(){

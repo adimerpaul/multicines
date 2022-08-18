@@ -56,7 +56,6 @@ class ProgramaController extends Controller
             $programa->horaInicio=date('Y-m-d H:i:s', strtotime("$fecha $hora"));
             $programa->horaFin=date('Y-m-d H:i:s', strtotime("$fecha $horafin"));
             $programa->subtitulada=$request->subtitulada;
-            $programa->formato=$request->formato;
             $programa->activo='ACTIVO';
             $programa->nroFuncion=$numfuncion;
             //$programa->user_id=$request->user()->id;
@@ -119,7 +118,6 @@ class ProgramaController extends Controller
             $programa->horaInicio=date('Y-m-d H:i:s', strtotime("$fecha $hora"));
             $programa->horaFin=date('Y-m-d H:i:s', strtotime("$fecha $horafin"));
             $programa->subtitulada=$request->subtitulada;
-            $programa->formato=$request->formato;
             $programa->activo=$request->activo;
             $programa->movie_id=$request->movie['id'];
             $programa->sala_id=$request->sala['id'];

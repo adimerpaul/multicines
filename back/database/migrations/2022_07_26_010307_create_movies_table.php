@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string("paisOrigen")->nullable();
             $table->string("genero")->nullable();
             $table->string("sipnosis")->nullable();
+            $table->string("formato")->nullable()->default('2D');
             $table->string("urlTrailer")->nullable();
             $table->string("imagen")->nullable()->default('default.jpg');
             $table->string("clasificacion")->nullable();

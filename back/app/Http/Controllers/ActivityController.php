@@ -418,6 +418,257 @@ class ActivityController extends Controller
 
     }
 
+    public function sss(StoreActivityRequest $request)
+    {
+        try {
+
+                $cui=Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->where('fechaVigencia','>=', now());
+            if ($cui->count()==0){
+                return response()->json(['message' => 'El CUI no existe'], 400);
+            }
+
+            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion?WSDL",  [
+                'stream_context' => stream_context_create([
+                    'http' => [
+                        'header' => "apikey: TokenApi ".env('TOKEN'),
+                    ]
+                ]),
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                'trace' => 1,
+                'use' => SOAP_LITERAL,
+                'style' => SOAP_DOCUMENT,
+            ]);
+
+                $result = $client->sincronizarActividades([
+                    "SolicitudSincronizacion" => [
+                        "codigoAmbiente" => env('AMBIENTE'),
+                        "codigoPuntoVenta" => $request->codigoPuntoVenta,
+                        "codigoSistema" => env('CODIGO_SISTEMA'),
+                        "codigoSucursal" => $request->codigoSucursal,
+                        "cuis" => $cui->first()->codigo,
+                        "nit" => env('NIT'),
+                    ]
+                ]);
+
+                $result = $client->sincronizarListaActividadesDocumentoSector([
+                    "SolicitudSincronizacion" => [
+                        "codigoAmbiente" => env('AMBIENTE'),
+                        "codigoPuntoVenta" => $request->codigoPuntoVenta,
+                        "codigoSistema" => env('CODIGO_SISTEMA'),
+                        "codigoSucursal" => $request->codigoSucursal,
+                        "cuis" => $cui->first()->codigo,
+                        "nit" => env('NIT'),
+                    ]
+                ]);
+
+
+                $result= $client->sincronizarListaLeyendasFactura([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+            $result= $client->sincronizarListaMensajesServicios([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+            $result= $client->sincronizarListaProductosServicios([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+            $result= $client->sincronizarParametricaEventosSignificativos([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+            $result= $client->sincronizarParametricaMotivoAnulacion([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+            //paieses
+            $result= $client->sincronizarParametricaPaisOrigen([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+            //fecha y hora
+            $result= $client->sincronizarFechaHora([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+            $result= $client->sincronizarParametricaTipoDocumentoIdentidad([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+
+            $result= $client->sincronizarParametricaTipoDocumentoSector([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+            $result= $client->sincronizarParametricaTipoEmision([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+            $result= $client->sincronizarParametricaTipoHabitacion([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+
+            $result= $client->sincronizarParametricaTipoMetodoPago([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+            //BOLIVIANO DOLAR
+            $result= $client->sincronizarParametricaTipoMoneda([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+//               <codigoClasificador>1</codigoClasificador>
+//               <descripcion>PUNTO VENTA COMISIONISTA</descripcion>
+//               <codigoClasificador>2</codigoClasificador>
+//               <descripcion>PUNTO VENTA VENTANILLA DE COBRANZA</descripcion>
+//               <codigoClasificador>3</codigoClasificador>
+//               <descripcion>PUNTO DE VENTA MOVILES</descripcion>
+//               <codigoClasificador>4</codigoClasificador>
+//               <descripcion>PUNTO DE VENTA YPFB</descripcion>
+//               <codigoClasificador>5</codigoClasificador>
+//               <descripcion>PUNTO DE VENTA CAJEROS</descripcion>
+//               <codigoClasificador>6</codigoClasificador>
+//               <descripcion>PUNTO DE VENTA CONJUNTA</descripcion>
+            $result= $client->sincronizarParametricaTipoPuntoVenta([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+            //              <codigoClasificador>1</codigoClasificador>
+            //               <descripcion>FACTURA CON DERECHO A CREDITO FISCAL</descripcion>
+            //               <codigoClasificador>2</codigoClasificador>
+            //               <descripcion>FACTURA SIN DERECHO A CREDITO FISCAL</descripcion>
+            //               <codigoClasificador>3</codigoClasificador>
+            //               <descripcion>DOCUMENTO DE AJUSTE</descripcion>
+            //               <codigoClasificador>4</codigoClasificador>
+            //               <descripcion>DOCUMENTO EQUIVALENTE</descripcion>
+            $result= $client->sincronizarParametricaTiposFactura([
+                "SolicitudSincronizacion"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoPuntoVenta"=>$request->codigoPuntoVenta,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>$request->codigoSucursal,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                ]
+            ]);
+            //unidades
+
+
+                $result = $client->sincronizarParametricaUnidadMedida([
+                    "SolicitudSincronizacion" => [
+                        "codigoAmbiente" => env('AMBIENTE'),
+                        "codigoPuntoVenta" => $request->codigoPuntoVenta,
+                        "codigoSistema" => env('CODIGO_SISTEMA'),
+                        "codigoSucursal" => $request->codigoSucursal,
+                        "cuis" => $cui->first()->codigo,
+                        "nit" => env('NIT'),
+                    ]
+                ]);
+
+            return response()->json(['success' => 'Actividades sincronizadas'], 200);
+        }catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
+
+    }
+
     /**
      * Display the specified resource.
      *

@@ -26,7 +26,7 @@
             <div class="absolute-bottom text-subtitle2 text-center" style="padding: 0px;margin:0px;border: 0px">
               <div class="row">
                 <div class="col-6 q-pa-none q-ma-none">
-                  {{m.movie.nombre}} {{m.formato}}
+                  {{m.movie.nombre}} {{m.movie.formato}}
                 </div>
                 <div class="col-6 text-right flex flex-center">0</div>
               </div>
@@ -49,7 +49,7 @@
         <div class="text-bold text-center">{{movie.nombre}}</div>
         <q-btn @click="clickSala(h)" :loading="loading" size="12px" class="q-ma-xs full-width flex flex-center" v-for="h in hours" color="primary" :key="h.id" >
           <q-icon name="schedule" left/>
-          <q-badge color="red">S{{h.sala.nro}}</q-badge> {{h.horaInicio.substring(10,16)}} <q-badge color="secondary">{{h.formato}}</q-badge> {{h.price.precio+'Bs'}}
+          <q-badge color="red" >{{h.sala.nombre}}</q-badge> {{h.horaInicio.substring(10,16)}} - {{h.price.precio+'Bs'}}
         </q-btn>
       </div>
       <div class="col-4">
@@ -147,7 +147,7 @@
   <q-card-section >
     <div class="row">
       <div class="col-12 row items-center q-pb-none">
-        <div class="col-4 text-bold">{{movie.nombre}} <q-icon name="schedule" left/><q-badge color="red">{{hour.sala.nombre}}</q-badge> {{hour.horaInicio.substring(10,16)}} <q-badge color="secondary">{{hour.formato}}</q-badge> {{hour.price.precio+'Bs'}}</div>
+        <div class="col-4 text-bold">{{movie.nombre}} {{ movie.formato }}<q-icon name="schedule" left/><q-badge color="red">{{hour.sala.nombre}}</q-badge> {{hour.horaInicio.substring(10,16)}} - {{hour.price.precio+'Bs'}}</div>
         <div class="q-pa-xs flex flex-center">
           <div  style="font-size: 12px; font-weight: bold">
             <q-icon name="event_seat" /> Disponibles: <span style="font-size: 14px;font-weight:  bolder;">{{disponible}}|</span>
@@ -520,7 +520,7 @@ export default {
           columna:seat.columna,
           letra:seat.letra,
           fecha:funcion.horaInicio,
-          pelicula:funcion.movie.nombre+' '+funcion.formato,
+          pelicula:funcion.movie.nombre+' '+funcion.movie.formato,
           precio:funcion.price.precio,
         }).then(res=>{
           this.loading=false
