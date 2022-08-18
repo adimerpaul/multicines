@@ -2,25 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSaleRequest;
 use App\Models\Client;
 use App\Models\Cufd;
 use App\Models\Cui;
 use App\Models\Detail;
-use App\Models\Leyenda;
 use App\Models\Momentaneo;
 use App\Models\Programa;
+use App\Models\Rental;
+use App\Http\Requests\StoreRentalRequest;
+use App\Http\Requests\UpdateRentalRequest;
 use App\Models\Sale;
-use App\Http\Requests\StoreSaleRequest;
-use App\Http\Requests\UpdateSaleRequest;
 use App\Models\Ticket;
-//require 'CUF.php';
-//use CUF;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use SimpleXMLElement;
-use DOMDocument;
+use http\Client\Request;
 
-class SaleController extends Controller
+class RentalController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -31,6 +27,13 @@ class SaleController extends Controller
     {
         //
     }
+    public function rentalConsulta(Request $request)
+    {
+        $rental = Rental::where('fechaEmision','>=', $request->fechaInicio)
+            ->where('fechaEmision','<=', $request->fechaFin)
+            ->get();
+        return response()->json($rental);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -39,52 +42,17 @@ class SaleController extends Controller
      */
     public function create()
     {
+        //
     }
-    public function movies(Request $request)
-    {
-        return Programa::select('movie_id')->groupBy('movie_id')->with('movie')->whereDate('fecha',$request->fecha)->get();
-    }
-    public function movietotal(Request $request){
-        return DB::SELECT("SELECT p.movie_id,COUNT(*) from tickets t inner JOIN programas p on t.programa_id=p.id where t.fechaFuncion='2022-08-17' GROUP by p.movie_id");
-    }
-    public function eventSearch(Request $request)
-    {
-        return Sale::where('siatEnviado',false)->count();
-    }
-    public function hours(Request $request)
-    {
-        return Programa::with('sala')->with('price')->with('movie')->whereDate('fecha',$request->fecha)->where('movie_id',$request->id)->get();
-    }
+
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreSaleRequest  $request
+     * @param  \App\Http\Requests\StoreRentalRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function mySeats(Request $request){
-        $seats=DB::select("SELECT a.fila,a.columna,a.letra,(
-            IF(a.activo='ACTIVO',
-               IF((SELECT COUNT(*) FROM tickets t WHERE t.programa_id=p.id AND t.fila=a.fila AND t.columna=a.columna AND t.letra=a.letra)=1, 'OCUPADO',
-                 IF((SELECT COUNT(*) FROM momentaneos m WHERE m.programa_id=p.id AND m.fila=a.fila AND m.columna=a.columna AND m.letra=a.letra)=1,'RESERVADO','LIBRE'))
-               , 'INACTIVO')
-            ) activo
-            FROM programas p
-            INNER JOIN salas s ON s.id=p.sala_id
-            INNER JOIN seats a ON a.sala_id=s.id
-            WHERE p.id=".$request->id.";");
-        return $seats;
-    }
-
-    public function disponibleSeats(Request $request){
-        return DB::SELECT("Select (select count(*) from tickets t where t.programa_id=$request->id and t.devuelto=0) as venta,
-       (selecT COUNT(*) from momentaneos m where m.programa_id=$request->id) as temp,
-       (select count(*) from tickets t where t.programa_id=$request->id and t.devuelto=1) as dev,
-       (SELECT s.capacidad from salas s, programas p where s.id=p.sala_id and p.id=$request->id) as salatotal;");
-    }
-
     public function store(StoreSaleRequest $request)
     {
-
         if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
@@ -105,7 +73,7 @@ class SaleController extends Controller
         }
 
         $codigoAmbiente=env('AMBIENTE');
-        $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
+        $codigoDocumentoSector=2; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
         $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
         $codigoPuntoVenta=0;
@@ -138,7 +106,20 @@ class SaleController extends Controller
             $numeroFactura=intval($sale->numeroFactura)+1;
         }
 
-        $sale=new Sale();
+        $sale=new Rental();
+//        $sale->numeroFactura=$numeroFactura;
+//        $sale->cuf="";
+//        $sale->cufd=$cufd->codigo;
+//        $sale->cui=$cui->codigo;
+//        $sale->codigoSucursal=$codigoSucursal;
+//        $sale->codigoPuntoVenta=$codigoPuntoVenta;
+//        $sale->fechaEmision=now();
+//        $sale->montoTotal=$request->montoTotal;
+//        $sale->usuario=$user->name;
+//        $sale->codigoDocumentoSector=$codigoDocumentoSector;
+//        $sale->user_id=$user->id;
+//        $sale->cufd_id=$cufd->id;
+//        $sale->client_id=$request->client->id;
         $sale->numeroFactura=$numeroFactura;
         $sale->cuf="";
         $sale->cufd=$cufd->codigo;
@@ -148,80 +129,21 @@ class SaleController extends Controller
         $sale->fechaEmision=now();
         $sale->montoTotal=$request->montoTotal;
         $sale->usuario=$user->name;
+        $sale->periodoFacturado=$request->periodoFacturado;
         $sale->codigoDocumentoSector=$codigoDocumentoSector;
+        $sale->actividadEconomica=681011;
+        $sale->codigoProductoSin=72111;
+        $sale->codigoProducto="10101";
+        $sale->descripcion=$request->periodoFacturado;
+        $sale->cantidad=1;
+        $sale->unidadMedida=1;
+        $sale->precioUnitario=$request->montoTotal;
+        $sale->montoDescuento=0;
+        $sale->subTotal=$request->montoTotal;
         $sale->user_id=$user->id;
         $sale->cufd_id=$cufd->id;
         $sale->client_id=$client->id;
         $sale->save();
-        $momentaneos=Momentaneo::where('user_id',$user->id)->get();
-//        return $momentaneos;
-        $data=[];
-        $dataDetail=[];
-
-        foreach ($momentaneos as $m){
-            $programa=Programa::find($m->programa_id);
-            $numBoleto=Ticket::where('programa_id',$m->programa_id)->count()+1;
-//            return $programa->sala;
-            $d=[
-                "numboc"=>$programa->sala->nro.$programa->sala->id.date('Ymd', strtotime($programa->fecha)).$programa->nroFuncion.$programa->price->serie.'-'.$numBoleto,
-                "numero"=>$numBoleto,
-                "fecha"=>now(),
-                "numeroFuncion"=>$programa->nroFuncion,
-                "nombreSala"=>$programa->sala->nombre,
-                "serieTarifa"=>$programa->price->serie,
-                "fechaFuncion"=>$programa->fecha,
-                "horaFuncion"=>$programa->horaInicio,
-                "fila"=>$m->fila,
-                "columna"=>$m->columna,
-                "letra"=>$m->letra,
-                "costo"=>$programa->price->precio,
-                "titulo"=>$m->pelicula,
-                "devuelto"=>"0",
-                "idCupon"=>"",
-                "tarjeta"=>"",
-                "credito"=>"",
-                "client_id"=>$client->id,
-                "programa_id"=>$programa->id,
-                "sale_id"=>$sale->id,
-                "price_id"=>$programa->price->id,
-                "sala_id"=>$programa->sala->id,
-                "user_id"=>$user->id,
-            ];
-            array_push($data, $d);
-        }
-//        return $request->detalleVenta ;
-
-        $detalleFactura="";
-        foreach ($request->detalleVenta as $detalle){
-            $detalleFactura.="<detalle>
-                <actividadEconomica>590000</actividadEconomica>
-                <codigoProductoSin>99100</codigoProductoSin>
-                <codigoProducto>".$detalle['programa_id']."</codigoProducto>
-                <descripcion>".$detalle['pelicula']."</descripcion>
-                <cantidad>".$detalle['cantidad']."</cantidad>
-                <unidadMedida>62</unidadMedida>
-                <precioUnitario>".$detalle['precio']."</precioUnitario>
-                <montoDescuento>0</montoDescuento>
-                <subTotal>".$detalle['subtotal']."</subTotal>
-                <numeroSerie xsi:nil='true'/>
-                <numeroImei xsi:nil='true'/>
-            </detalle>";
-            $d=[
-                'actividadEconomica'=>"590000",
-                'codigoProductoSin'=>"99100",
-                'cantidad'=>$detalle['cantidad'],
-                'precioUnitario'=>$detalle['precio'],
-                'subTotal'=>$detalle['subtotal'],
-                'sale_id'=>$sale->id,
-                'programa_id'=>$detalle['programa_id'],
-                'descripcion'=>$detalle['pelicula'],
-            ];
-            array_push($dataDetail, $d);
-        }
-
-        Ticket::insert($data);
-
-        Detail::insert($dataDetail);
 
 
         $cuf = new CUF();
@@ -234,21 +156,18 @@ class SaleController extends Controller
 //     * @param tds Tipo Documento Sector
 //     * @param nf Numero de Factura
 //     * @param pos Punto de Venta
-        $leyenda=Leyenda::where("codigoActividad","590000")->get();
-        $count=$leyenda->count();
-        $leyenda=$leyenda[rand(0,$count-1)]->descripcionLeyenda;
-
         $fechaEnvio=date("Y-m-d\TH:i:s.000");
-
         $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
         $cuf=$cuf.$cufd->codigoControl;
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>    <cabecera>
+<facturaElectronicaAlquilerBienInmueble xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+                                        xsi:noNamespaceSchemaLocation='facturaElectronicaAlquilerBienInmueble.xsd'>
+    <cabecera>
         <nitEmisor>".env('NIT')."</nitEmisor>
         <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
         <municipio>Oruro</municipio>
         <telefono>".env('TELEFONO')."</telefono>
-        <numeroFactura>$numeroFactura</numeroFactura>
+        <numeroFactura>1</numeroFactura>
         <cuf>$cuf</cuf>
         <cufd>".$cufd->codigo."</cufd>
         <codigoSucursal>$codigoSucursal</codigoSucursal>
@@ -260,23 +179,33 @@ class SaleController extends Controller
         <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
         <complemento>".$client->complemento."</complemento>
         <codigoCliente>".$client->id."</codigoCliente>
+        <periodoFacturado>."$request->periodoFacturado".</periodoFacturado>
         <codigoMetodoPago>1</codigoMetodoPago>
         <numeroTarjeta xsi:nil='true'/>
-        <montoTotal>".$sale->montoTotal."</montoTotal>
-        <montoTotalSujetoIva>".$sale->montoTotal."</montoTotalSujetoIva>
+        <montoTotal>".$request->montoTotal."</montoTotal>
+        <montoTotalSujetoIva>".$request->montoTotal."</montoTotalSujetoIva>
         <codigoMoneda>1</codigoMoneda>
         <tipoCambio>1</tipoCambio>
-        <montoTotalMoneda>".$sale->montoTotal."</montoTotalMoneda>
-        <montoGiftCard xsi:nil='true'/>
-        <descuentoAdicional>0</descuentoAdicional>
-        <codigoExcepcion xsi:nil='true'/>
+        <montoTotalMoneda>100</montoTotalMoneda>
+        <descuentoAdicional xsi:nil='true'/>
+        <codigoExcepcion>0</codigoExcepcion>
         <cafc xsi:nil='true'/>
-        <leyenda>$leyenda</leyenda>
-        <usuario>".explode(" ", $user->name)[0]."</usuario>
-        <codigoDocumentoSector>".$codigoDocumentoSector."</codigoDocumentoSector>
-        </cabecera>";
-        $text.=$detalleFactura;
-        $text.="</facturaElectronicaCompraVenta>";
+        <leyenda>Una leyenda</leyenda>
+        <usuario>vjcm</usuario>
+        <codigoDocumentoSector>2</codigoDocumentoSector>
+    </cabecera>
+    <detalle>
+        <actividadEconomica>451010</actividadEconomica>
+        <codigoProductoSin>49111</codigoProductoSin>
+        <codigoProducto>123</codigoProducto>
+        <descripcion>Alquiler mes de Febrero</descripcion>
+        <cantidad>1</cantidad>
+        <unidadMedida>1</unidadMedida>
+        <precioUnitario>100</precioUnitario>
+        <montoDescuento>0</montoDescuento>
+        <subTotal>100</subTotal>
+    </detalle>
+</facturaElectronicaAlquilerBienInmueble>";
 
         $xml = new SimpleXMLElement($text);
         $dom = new DOMDocument('1.0');
@@ -319,7 +248,7 @@ class SaleController extends Controller
 
 
         try {
-            $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
+            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi " . env('TOKEN'),
@@ -371,39 +300,24 @@ class SaleController extends Controller
 
     }
 
-    public function listBoletos(Request $request){
-        return Ticket::where('sale_id',$request->id)->get();
-    }
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Sale  $sale
+     * @param  \App\Models\Rental  $rental
      * @return \Illuminate\Http\Response
      */
-    public function show(Sale $sale)
+    public function show(Rental $rental)
     {
         //
     }
 
-    public function totalventa(Request $request){
-        return Ticket::whereDate('fechaFuncion',$request->fecha)->where('devuelto','0')->count();
-    }
-
-    public function datocine(){
-        $nit=env('NIT');
-        $razon=env("RAZON");
-        $dir=env("DIRECCION");
-        $tel=env("TELEFONO");
-        return json_encode(['nit'=>$nit,'razon'=>$razon,'direccion'=>$dir,'telefono'=>$tel]);
-
-    }
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Sale  $sale
+     * @param  \App\Models\Rental  $rental
      * @return \Illuminate\Http\Response
      */
-    public function edit(Sale $sale)
+    public function edit(Rental $rental)
     {
         //
     }
@@ -411,11 +325,11 @@ class SaleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateSaleRequest  $request
-     * @param  \App\Models\Sale  $sale
+     * @param  \App\Http\Requests\UpdateRentalRequest  $request
+     * @param  \App\Models\Rental  $rental
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateSaleRequest $request, Sale $sale)
+    public function update(UpdateRentalRequest $request, Rental $rental)
     {
         //
     }
@@ -423,14 +337,11 @@ class SaleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Sale  $sale
+     * @param  \App\Models\Rental  $rental
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Sale $sale)
+    public function destroy(Rental $rental)
     {
         //
     }
-
-
 }
-

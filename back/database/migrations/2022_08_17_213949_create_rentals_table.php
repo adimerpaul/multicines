@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('sales', function (Blueprint $table) {
+        Schema::create('rentals', function (Blueprint $table) {
             $table->id();
             $table->integer("numeroFactura")->nullable();
             $table->string("cuf")->nullable();
@@ -24,12 +24,21 @@ return new class extends Migration
             $table->dateTime("fechaEmision")->nullable();
             $table->double("montoTotal",11,2)->nullable();
             $table->string("usuario")->nullable();
+            $table->string("periodoFacturado")->nullable();
             $table->string("codigoRecepcion")->nullable();
-            $table->boolean("siatEnviado")->nullable()->default(false);
+            $table->boolean("siatEnviado")->nullable();
             $table->string("codigoRecepcionEventoSignificativo")->nullable();
             $table->boolean("siatAnulado")->nullable()->default(false);
-            $table->string("tipo")->nullable()->default('BOLETERIA');
             $table->integer("codigoDocumentoSector")->nullable();
+            $table->string("actividadEconomica")->nullable();
+            $table->string("codigoProductoSin")->nullable();
+            $table->string("codigoProducto")->nullable();
+            $table->string("descripcion")->nullable();
+            $table->string("cantidad")->nullable();
+            $table->string("unidadMedida")->nullable();
+            $table->string("precioUnitario")->nullable();
+            $table->string("montoDescuento")->nullable();
+            $table->string("subTotal")->nullable();
             $table->unsignedBigInteger("user_id")->nullable();
             $table->foreign("user_id")->references("id")->on("users");
             $table->unsignedBigInteger("cufd_id")->nullable();
@@ -37,8 +46,6 @@ return new class extends Migration
             $table->unsignedBigInteger("client_id")->nullable();
             $table->foreign("client_id")->references("id")->on("clients");
             $table->timestamps();
-            $table->softDeletes();
-
         });
     }
 
@@ -49,6 +56,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sales');
+        Schema::dropIfExists('rentals');
     }
 };

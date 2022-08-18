@@ -332,6 +332,14 @@ export default {
       })
     },
     saleInsert(){
+      if (this.client.numeroDocumento==0) {
+        this.$q.notify({
+          color: 'red',
+          textColor: 'white',
+          message: 'Debe ingresar un numero de documento'
+        })
+       return false
+      }
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
       this.$api.post('sale',{
@@ -339,8 +347,8 @@ export default {
         montoTotal:this.total,
         detalleVenta:this.detalleVenta,
       }).then(res=>{
-        console.log(res.data)
-        res.data.forEach(r=>{
+        // console.log(res.data)
+        res.data.tickets.forEach(r=>{
           this.boletoprint(r)
         })
         this.momentaneoDeleteAll()
@@ -352,20 +360,21 @@ export default {
         this.eventSearch()
       }).finally(()=>{
         this.loading=false
-      }).catch(err=>{
-        console.log(err)
-        this.loading=false
-        this.$q.notify({
-          color: 'negative',
-          textColor: 'white',
-          message: err.response.data.message,
-          position: 'top',
-          timeout: 5000,
-        })
       })
+      //   .catch(err=>{
+      //   console.log(err)
+      //   this.loading=false
+      //   this.$q.notify({
+      //     color: 'negative',
+      //     textColor: 'white',
+      //     message: err.response.data.message,
+      //     position: 'top',
+      //     timeout: 5000,
+      //   })
+      // })
     },
     boletoprint(bol){
-      console.log(bol)
+      // console.log(bol)
       let ticket=""
       ticket+="<style>\
         .titulo{\

@@ -79,6 +79,7 @@ export default {
   methods: {
       eventSearch(){
         this.$api.post('eventSearch').then(res=>{
+          console.log(res.data)
           this.store.eventNumber=res.data
         })
       },

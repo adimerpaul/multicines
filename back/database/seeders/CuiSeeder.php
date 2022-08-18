@@ -17,14 +17,14 @@ class CuiSeeder extends Seeder
     {
         DB::table('cuis')->insert([
             [
-                'codigo' => 'A15EF75C',
+                'codigo' => '5B5A5502',
                 'fechaVigencia' => '2023-07-26 19:24:41',
                 'fechaCreacion' => '2022-07-26 19:24:41',
                 'codigoPuntoVenta' => 0,
                 'codigoSucursal' => 0,
             ],
             [
-                'codigo' => 'F727E9CB',
+                'codigo' => 'B5BEEE8A',
                 'fechaVigencia' => '2023-07-26 19:25:12',
                 'fechaCreacion' => '2022-07-26 19:24:41',
                 'codigoPuntoVenta' => 1,
