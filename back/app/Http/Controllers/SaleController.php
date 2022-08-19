@@ -42,10 +42,12 @@ class SaleController extends Controller
     }
     public function movies(Request $request)
     {
-        return Programa::select('movie_id')->groupBy('movie_id')->with('movie')->whereDate('fecha',$request->fecha)->get();
+        //return Programa::select('movie_id')->groupBy('movie_id')->with('movie')->whereDate('fecha',$request->fecha)->get();
+        return DB::SELECT("select m.id,m.nombre,m.duracion,m.formato,m.imagen,count(*) as cantidad from programas p,movies m,tickets t where p.movie_id=m.id and t.programa_id=p.id and p.fecha='$request->fecha' GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen");
     }
+
     public function movietotal(Request $request){
-        return DB::SELECT("SELECT p.movie_id,COUNT(*) from tickets t inner JOIN programas p on t.programa_id=p.id where t.fechaFuncion='2022-08-17' GROUP by p.movie_id");
+        return DB::SELECT("SELECT p.movie_id,COUNT(*) from tickets t inner JOIN programas p on t.programa_id=p.id where t.fechaFuncion='$request->fecha' GROUP by p.movie_id");
     }
     public function eventSearch(Request $request)
     {
@@ -161,6 +163,10 @@ class SaleController extends Controller
         foreach ($momentaneos as $m){
             $programa=Programa::find($m->programa_id);
             $numBoleto=Ticket::where('programa_id',$m->programa_id)->count()+1;
+            if(Ticket::where('programa_id',$m->programa_id)
+                ->where("fila",$m->fila)
+                ->where("columna",$m->columna)
+                ->where("letra",$m->letra)->where("sala_id",$programa->sala->id)->count()==0){
 //            return $programa->sala;
             $d=[
                 "numboc"=>$programa->sala->nro.$programa->sala->id.date('Ymd', strtotime($programa->fecha)).$programa->nroFuncion.$programa->price->serie.'-'.$numBoleto,
@@ -188,7 +194,7 @@ class SaleController extends Controller
                 "user_id"=>$user->id,
             ];
             array_push($data, $d);
-        }
+        }}
 //        return $request->detalleVenta ;
 
         $detalleFactura="";

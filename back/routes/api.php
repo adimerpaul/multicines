@@ -36,6 +36,7 @@ Route::resource('client', \App\Http\Controllers\ClientController::class);
 Route::resource('eventoSignificativo', \App\Http\Controllers\EventoSignificativoController::class);
 Route::resource('rental', \App\Http\Controllers\RentalController::class);
 Route::post('rentalConsulta', [\App\Http\Controllers\RentalController::class,'rentalConsulta']);
+Route::post('listleyenda', [\App\Http\Controllers\ActivityController::class,'listleyenda']);
 
 Route::post('recepcionPaqueteFactura', [\App\Http\Controllers\EventoSignificativoController::class,'recepcionPaqueteFactura']);
 Route::post('cantidadFacturas', [\App\Http\Controllers\EventoSignificativoController::class,'cantidadFacturas']);
@@ -53,6 +54,7 @@ Route::post('momentaneoDelete', [\App\Http\Controllers\MomentaneoController::cla
 Route::post('momentaneoDeleteUser', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDeleteUser']);
 Route::post('momentaneoDeleteall', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDeleteall']);
 Route::post('movies', [\App\Http\Controllers\SaleController::class, 'movies']);
+Route::post('movietotal', [\App\Http\Controllers\SaleController::class, 'movietotal']);
 Route::post('hours', [\App\Http\Controllers\SaleController::class, 'hours']);
 Route::post('mySeats', [\App\Http\Controllers\SaleController::class, 'mySeats']);
 Route::post('eventSearch', [\App\Http\Controllers\SaleController::class, 'eventSearch']);

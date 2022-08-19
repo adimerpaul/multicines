@@ -16,6 +16,8 @@ use App\Http\Requests\UpdateActivityRequest;
 use App\Models\Cui;
 use App\Models\Sector;
 use App\Models\Tipopago;
+use Illuminate\Http\Request;
+
 
 class ActivityController extends Controller
 {
@@ -416,6 +418,10 @@ class ActivityController extends Controller
             ], 500);
         }
 
+    }
+
+    public function listleyenda(Request $request){
+        return Leyenda::where('codigoActividad',$request->codigo)->get();
     }
 
     public function sss(StoreActivityRequest $request)

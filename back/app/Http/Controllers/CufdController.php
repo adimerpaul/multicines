@@ -81,6 +81,39 @@ class CufdController extends Controller
         }
     }
 
+    public function lllll(StoreCufdRequest $request)
+    {
+            $cui=Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->where('fechaVigencia','>=', now());
+            if ($cui->count()==0){
+                return response()->json(['message' => 'El CUI no existe'], 400);
+            }
+            for($i=0;$i<100;$i++) {
+                $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?WSDL", [
+                    'stream_context' => stream_context_create([
+                        'http' => [
+                            'header' => "apikey: TokenApi " . env('TOKEN'),
+                        ]
+                    ]),
+                    'cache_wsdl' => WSDL_CACHE_NONE,
+                    'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                    'trace' => 1,
+                    'use' => SOAP_LITERAL,
+                    'style' => SOAP_DOCUMENT,
+                ]);
+                $result = $client->cufd([
+                    "SolicitudCufd" => [
+                        "codigoAmbiente" => env('AMBIENTE'),
+                        "codigoModalidad" => env('MODALIDAD'),
+                        "codigoPuntoVenta" => $request->codigoPuntoVenta,
+                        "codigoSistema" => env('CODIGO_SISTEMA'),
+                        "codigoSucursal" => $request->codigoSucursal,
+                        "cuis" => $cui->first()->codigo,
+                        "nit" => env('NIT'),
+                    ]
+                ]);
+            }
+            return response()->json(['success' => 'CUFD creado correctamente'], 200);
+    }
     /**
      * Display the specified resource.
      *

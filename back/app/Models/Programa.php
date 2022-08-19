@@ -37,4 +37,8 @@ class Programa extends Model
     {
         return $this->belongsTo(Price::class);
     }
+
+    public function tickets(){
+        return $this->hasMany(Ticket::class);
+    }
 }

@@ -109,6 +109,7 @@ export default {
         {name:'costo',label:'costo',field:'costo',sortable:true},
       ],
       tickets:[],
+      leyendas:[],
       qrImage:'',
       opts : {
         errorCorrectionLevel: 'M',
@@ -136,8 +137,16 @@ export default {
 //     d.print( document.getElementById('myelement'), [ cssText ] )
     this.listaVentaBoleteriaGet();
     this.encabezado();
+    this.cargarLeyenda();
   },
   methods: {
+    cargarLeyenda(){
+      this.$api.post('listleyenda',{codigo:'590000'}).then(res => {
+        console.log(res.data)
+          this.leyendas=res.data;
+      })
+
+        },
     encabezado(){
       this.$api.get('datocine').then(res => {
         this.cine = res.data;
@@ -146,6 +155,7 @@ export default {
         },
     boletoprint(bol){
       console.log(bol)
+
       let ticket=""
       ticket+="<style>\
         .titulo{\
@@ -197,6 +207,9 @@ export default {
     },
     async printFactura(factura) {
       console.log(factura)
+      let max=this.leyendas.length - 1;
+      let pos=Math.round(Math.random() * (max - 0) + 0)
+      let ley=this.leyendas[pos].descripcionLeyenda
       this.facturadetalle = factura
       let ClaseConversor = conversor.conversorNumerosALetras;
       let miConversor = new ClaseConversor();
@@ -268,7 +281,7 @@ export default {
       <hr>\
       <div class='titulo'>DETALLE</div>"
       factura.details.forEach(r => {
-        cadena += "<div><b>" + r.programa_id + " - " + r.descripcion + "</b></div>"
+        cadena += "<div style='font-size: 12px'><b>" + r.programa_id + " - " + r.descripcion + "</b></div>"
         cadena += "<div>" + r.cantidad + "  " + parseFloat(r.precioUnitario).toFixed(2) + " 0.00<span style='float:right'>" + parseFloat(r.subTotal).toFixed(2) + "</span></div>"
       })
       cadena += "<hr>\
@@ -285,8 +298,7 @@ export default {
       <div class='titulo2' style='font-size: 9px'>ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,<br>\
 EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE<br>\
 ACUERDO A LEY<br><br>\
-Ley N° 453: Tienes derecho a un trato equitativo sin discriminación en la <br>\
-oferta de servicios. <br><br>\
+"+ley+" <br><br>\
 “Este documento es la Representación Gráfica de un<br>\
 Documento Fiscal Digital emitido en una modalidad de<br>\
 facturación en línea”</div><br>\
