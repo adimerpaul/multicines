@@ -34,6 +34,9 @@ class DatabaseSeeder extends Seeder
 //            TicketSeeder::class,
             RubroSeeder::class,
             ProductoSeeder::class,
+            ActivitySeeder::class,
+            LeyendaSeeder::class,
+            DocumentSeeder::class,
         ]);
     }
 }

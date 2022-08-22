@@ -39,7 +39,7 @@ class CuiController extends Controller
         if (Cui::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->where('fechaVigencia','>=', now())->count()>=1){
             return response()->json(['message' => 'El CUI ya existe'], 400);
         }else{
-            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?WSDL",  [
+            $client = new \SoapClient(env("URL_SIAT")."FacturacionCodigos?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi ".env('TOKEN'),

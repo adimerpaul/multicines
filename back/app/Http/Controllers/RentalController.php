@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Cufd;
 use App\Models\Cui;
 use App\Models\Detail;
+use App\Models\Leyenda;
 use App\Models\Momentaneo;
 use App\Models\Programa;
 use App\Models\Rental;
@@ -14,7 +15,7 @@ use App\Http\Requests\StoreRentalRequest;
 use App\Http\Requests\UpdateRentalRequest;
 use App\Models\Sale;
 use App\Models\Ticket;
-use http\Client\Request;
+use Illuminate\Http\Request;
 
 class RentalController extends Controller
 {
@@ -99,10 +100,10 @@ class RentalController extends Controller
 //            $numeroFactura=intval($sale->numeroFactura)+1;
 //        }
 
-        if (Sale::where('cufd', $cufd->codigo)->count()==0){
+        if (Rental::where('cufd', $cufd->codigo)->count()==0){
             $numeroFactura=1;
         }else{
-            $sale=Sale::where('cufd',$cufd->codigo)->orderBy('numeroFactura', 'desc')->first();
+            $sale=Rental::where('cufd',$cufd->codigo)->orderBy('numeroFactura', 'desc')->first();
             $numeroFactura=intval($sale->numeroFactura)+1;
         }
 
@@ -136,7 +137,7 @@ class RentalController extends Controller
         $sale->codigoProducto="10101";
         $sale->descripcion=$request->periodoFacturado;
         $sale->cantidad=1;
-        $sale->unidadMedida=1;
+        $sale->unidadMedida=57;
         $sale->precioUnitario=$request->montoTotal;
         $sale->montoDescuento=0;
         $sale->subTotal=$request->montoTotal;
@@ -144,6 +145,10 @@ class RentalController extends Controller
         $sale->cufd_id=$cufd->id;
         $sale->client_id=$client->id;
         $sale->save();
+
+        $leyenda=Leyenda::where("codigoActividad","681011")->get();
+        $count=$leyenda->count();
+        $leyenda=$leyenda[rand(0,$count-1)]->descripcionLeyenda;
 
 
         $cuf = new CUF();
@@ -179,31 +184,31 @@ class RentalController extends Controller
         <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
         <complemento>".$client->complemento."</complemento>
         <codigoCliente>".$client->id."</codigoCliente>
-        <periodoFacturado>."$request->periodoFacturado".</periodoFacturado>
+        <periodoFacturado>".$request->periodoFacturado."</periodoFacturado>
         <codigoMetodoPago>1</codigoMetodoPago>
         <numeroTarjeta xsi:nil='true'/>
         <montoTotal>".$request->montoTotal."</montoTotal>
         <montoTotalSujetoIva>".$request->montoTotal."</montoTotalSujetoIva>
         <codigoMoneda>1</codigoMoneda>
         <tipoCambio>1</tipoCambio>
-        <montoTotalMoneda>100</montoTotalMoneda>
+        <montoTotalMoneda>".$request->montoTotal."</montoTotalMoneda>
         <descuentoAdicional xsi:nil='true'/>
         <codigoExcepcion>0</codigoExcepcion>
         <cafc xsi:nil='true'/>
-        <leyenda>Una leyenda</leyenda>
-        <usuario>vjcm</usuario>
+        <leyenda>$leyenda</leyenda>
+        <usuario>".$user->name."</usuario>
         <codigoDocumentoSector>2</codigoDocumentoSector>
     </cabecera>
     <detalle>
-        <actividadEconomica>451010</actividadEconomica>
-        <codigoProductoSin>49111</codigoProductoSin>
-        <codigoProducto>123</codigoProducto>
-        <descripcion>Alquiler mes de Febrero</descripcion>
+        <actividadEconomica>681011</actividadEconomica>
+        <codigoProductoSin>72111</codigoProductoSin>
+        <codigoProducto>10101</codigoProducto>
+        <descripcion>".$request->periodoFacturado."</descripcion>
         <cantidad>1</cantidad>
-        <unidadMedida>1</unidadMedida>
-        <precioUnitario>100</precioUnitario>
+        <unidadMedida>57</unidadMedida>
+        <precioUnitario>".$request->montoTotal."</precioUnitario>
         <montoDescuento>0</montoDescuento>
-        <subTotal>100</subTotal>
+        <subTotal>".$request->montoTotal."</subTotal>
     </detalle>
 </facturaElectronicaAlquilerBienInmueble>";
 
@@ -213,32 +218,32 @@ class RentalController extends Controller
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
         $nameFile=$sale->id;
-        $dom->save("archivos/".$nameFile.'.xml');
+        $dom->save("rentals/".$nameFile.'.xml');
 
         $firmar = new Firmar();
-        $firmar->firmar("archivos/".$nameFile.'.xml');
+        $firmar->firmar("rentals/".$nameFile.'.xml');
 
 
         $xml = new DOMDocument();
-        $xml->load("archivos/".$nameFile.'.xml');
-        if (!$xml->schemaValidate('./facturaElectronicaCompraVenta.xsd')) {
+        $xml->load("rentals/".$nameFile.'.xml');
+        if (!$xml->schemaValidate('./facturaElectronicaAlquilerBienInmueble.xsd')) {
             echo "invalid";
         }
         else {
-//            echo "validated";
+            echo "validated";
         }
-//        exit;
+        exit;
 
 
-        $file = "archivos/".$nameFile.'.xml';
-        $gzfile = "archivos/".$nameFile.'.xml'.'.gz';
+        $file = "rentals/".$nameFile.'.xml';
+        $gzfile = "rentals/".$nameFile.'.xml'.'.gz';
         $fp = gzopen ($gzfile, 'w9');
         gzwrite ($fp, file_get_contents($file));
         gzclose($fp);
 //        unlink($file);
 
 
-        $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
+        $archivo=$firmar->getFileGzip("rentals/".$nameFile.'.xml'.'.gz');
         $hashArchivo=hash('sha256', $archivo);
         unlink($gzfile);
 //        return $request;
@@ -248,7 +253,7 @@ class RentalController extends Controller
 
 
         try {
-            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta?WSDL",  [
+            $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi " . env('TOKEN'),

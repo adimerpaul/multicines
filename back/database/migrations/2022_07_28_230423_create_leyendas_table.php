@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('codigoActividad')->nullable();
             $table->string('descripcionLeyenda')->nullable();
-            $table->integer("codigoPuntoVenta")->nullable();
-            $table->integer("codigoSucursal")->nullable();
+            $table->integer("codigoPuntoVenta")->nullable()->default(0);
+            $table->integer("codigoSucursal")->nullable()->default(0);
             $table->timestamps();
         });
     }

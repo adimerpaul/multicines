@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string("codigo")->nullable();
             $table->dateTime("fechaVigencia")->nullable();
             $table->dateTime("fechaCreacion")->nullable();
-            $table->integer("codigoPuntoVenta")->nullable();
-            $table->integer("codigoSucursal")->nullable();
+            $table->integer("codigoPuntoVenta")->nullable()->default(0);
+            $table->integer("codigoSucursal")->nullable()->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

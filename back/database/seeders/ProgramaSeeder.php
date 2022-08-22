@@ -17,9 +17,9 @@ class ProgramaSeeder extends Seeder
     {
         DB::table("programas")->insert([
             [
-                'fecha'=>"2022-08-18",
-                "horaInicio"=>"2022-08-18 10:00:00",
-                "horaFin"=>"2022-08-18 12:00:00",
+                'fecha'=>"2022-08-22",
+                "horaInicio"=>"2022-08-22 10:00:00",
+                "horaFin"=>"2022-08-22 12:00:00",
                 "subtitulada"=>"NO",
                 "nroFuncion"=>"1",
                 "user_id"=>"1",
@@ -28,9 +28,9 @@ class ProgramaSeeder extends Seeder
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-08-18",
-                "horaInicio"=>"2022-08-18 13:00:00",
-                "horaFin"=>"2022-08-18 15:00:00",
+                'fecha'=>"2022-08-22",
+                "horaInicio"=>"2022-08-22 13:00:00",
+                "horaFin"=>"2022-08-22 15:00:00",
                 "subtitulada"=>"NO",
                 "nroFuncion"=>"1",
                 "user_id"=>"1",
@@ -39,9 +39,9 @@ class ProgramaSeeder extends Seeder
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-08-18",
-                "horaInicio"=>"2022-08-18 10:00:00",
-                "horaFin"=>"2022-08-18 12:00:00",
+                'fecha'=>"2022-08-22",
+                "horaInicio"=>"2022-08-22 10:00:00",
+                "horaFin"=>"2022-08-22 12:00:00",
                 "subtitulada"=>"NO",
                 "nroFuncion"=>"1",
                 "user_id"=>"1",
@@ -50,9 +50,9 @@ class ProgramaSeeder extends Seeder
                 "price_id"=>"1",
             ],
             [
-                'fecha'=>"2022-08-18",
-                "horaInicio"=>"2022-08-18 13:00:00",
-                "horaFin"=>"2022-08-18 15:00:00",
+                'fecha'=>"2022-08-22",
+                "horaInicio"=>"2022-08-22 13:00:00",
+                "horaFin"=>"2022-08-22 15:00:00",
                 "subtitulada"=>"NO",
                 "nroFuncion"=>"1",
                 "user_id"=>"1",

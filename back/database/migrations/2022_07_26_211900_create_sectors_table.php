@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('codigoActividad')->nullable();
             $table->string('codigoDocumentoSector')->nullable();
             $table->string('tipoDocumentoSector')->nullable();
-            $table->integer("codigoPuntoVenta")->nullable();
-            $table->integer("codigoSucursal")->nullable();
+            $table->integer("codigoPuntoVenta")->nullable()->default(0);
+            $table->integer("codigoSucursal")->nullable()->default(0);
             $table->timestamps();
         });
     }

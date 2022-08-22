@@ -19,6 +19,12 @@ export const globalStore = defineStore('global', {
     productos: [],
     productoSingleTon: false,
     detallecandy:[],
+    salas2:[],
+    salas3:[],
+    movies2:[],
+    movies3:[],
+    prices2:[],
+    prices3:[],
   }),
   getters: {
     doubleCount: (state) => state.counter * 2,

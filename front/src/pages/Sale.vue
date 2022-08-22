@@ -298,7 +298,18 @@ export default {
       totalventa:0,
       cine:{},
       leyendas:[],
-      totventa:[]
+      totventa:[],
+      opts : {
+        errorCorrectionLevel: 'M',
+        type: 'png',
+        quality: 0.95,
+        width: 100,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFF',
+        },
+      }
 
     }
   },
@@ -337,7 +348,7 @@ export default {
     encabezado(){
       this.$api.get('datocine').then(res => {
         this.cine = res.data;
-        console.log(this.cine)
+        // console.log(this.cine)
       })
     },
     tventa(){
@@ -368,7 +379,7 @@ export default {
         montoTotal:this.total,
         detalleVenta:this.detalleVenta,
       }).then(res=>{
-        // console.log(res.data)
+        console.log(res.data)
         this.printFactura(res.data.sale)
         res.data.tickets.forEach(r=>{
           this.boletoprint(r)
@@ -382,18 +393,17 @@ export default {
         this.eventSearch()
       }).finally(()=>{
         this.loading=false
+      }).catch(err=>{
+        console.log(err)
+        this.loading=false
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          message: err.response.data.message,
+          position: 'top',
+          timeout: 5000,
+        })
       })
-      //   .catch(err=>{
-      //   console.log(err)
-      //   this.loading=false
-      //   this.$q.notify({
-      //     color: 'negative',
-      //     textColor: 'white',
-      //     message: err.response.data.message,
-      //     position: 'top',
-      //     timeout: 5000,
-      //   })
-      // })
     },
     boletoprint(bol){
       // console.log(bol)
@@ -435,7 +445,7 @@ export default {
 
     },
     async printFactura(factura) {
-      console.log(factura)
+      // console.log(factura)
       let max=this.leyendas.length - 1;
       let pos=Math.round(Math.random() * (max - 0) + 0)
       let ley=this.leyendas[pos].descripcionLeyenda
@@ -443,7 +453,7 @@ export default {
       let ClaseConversor = conversor.conversorNumerosALetras;
       let miConversor = new ClaseConversor();
       let a = miConversor.convertToText(factura.montoTotal);
-      this.qrImage = await QRCode.toDataURL("https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=329448023&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
+      this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
       //console.log(this.qrImage)
       // return false
       let cadena = "<style>\
@@ -608,7 +618,7 @@ facturación en línea”</div><br>\
         this.seats=res.data
 
         this.$api.post('disponibleSeats',{id:h.id}).then(res=>{
-              console.log(res)
+              // console.log(res)
           let valores=res.data[0]
             this.disponible=parseInt(valores.salatotal) - parseInt(valores.venta) - parseInt(valores.temp)
             this.vendido=parseInt(valores.venta)

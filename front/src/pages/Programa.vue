@@ -24,8 +24,8 @@
 
           <q-card-section class="q-pt-none">
             <div class="row">
-
-            <div class="col-4"><q-select outlined v-model="sala" label="SALAS" :options="listsalas"  use-input input-debounce="0" @filter="filterSala">
+              <div class="col-12"></div>
+            <div class="col-4"><q-select outlined v-model="sala" label="SALAS" :options="store.salas2"  use-input input-debounce="0" @filter="filterSala">
               <template v-slot:no-option>
                 <q-item>
                   <q-item-section class="text-grey">
@@ -34,7 +34,7 @@
                 </q-item>
               </template>
               </q-select></div>
-              <div class="col-4"><q-select outlined v-model="pelicula" label="PELICULAS" :options="listpelis" use-input input-debounce="0" @filter="filterPelicula">
+              <div class="col-4"><q-select outlined v-model="pelicula" label="PELICULAS" :options="store.movies2" use-input input-debounce="0" @filter="filterPelicula">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -43,7 +43,7 @@
                   </q-item>
                 </template>
               </q-select></div>
-              <div class="col-4"><q-select outlined v-model="tarifa" label="TARIFAS"  :options="listtarifa" use-input input-debounce="0" @filter="filterTarifa">
+              <div class="col-4"><q-select outlined v-model="tarifa" label="TARIFAS"  :options="store.prices2" use-input input-debounce="0" @filter="filterTarifa">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -75,7 +75,7 @@
           <q-card-section class="q-pt-none">
             <div class="row">
 
-              <div class="col-4"><q-select outlined v-model="sala" label="SALAS" :options="listsalas"  use-input input-debounce="0" @filter="filterSala">
+              <div class="col-4"><q-select outlined v-model="sala" label="SALAS" :options="store.salas2"  use-input input-debounce="0" @filter="filterSala">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -84,7 +84,7 @@
                   </q-item>
                 </template>
               </q-select></div>
-              <div class="col-4"><q-select outlined v-model="pelicula" label="PELICULAS" :options="listpelis" use-input input-debounce="0" @filter="filterPelicula">
+              <div class="col-4"><q-select outlined v-model="pelicula" label="PELICULAS" :options="store.movies2" use-input input-debounce="0" @filter="filterPelicula">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -93,7 +93,7 @@
                   </q-item>
                 </template>
               </q-select></div>
-              <div class="col-4"><q-select outlined v-model="tarifa" label="TARIFAS"  :options="listtarifa" use-input input-debounce="0" @filter="filterTarifa">
+              <div class="col-4"><q-select outlined v-model="tarifa" label="TARIFAS"  :options="store.prices2" use-input input-debounce="0" @filter="filterTarifa">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -188,15 +188,16 @@ export default {
   },
   created() {
     this.cambioFecha(this.programa.fechaini)
-    let str = formatDate(new Date(), {
-      month: 'long',
-      year: 'numeric',
-      day: 'numeric'
-    });
+
     if(!this.store.salaSingleTon) {
       this.$q.loading.show()
       this.store.salaSingleTon=true
       this.$api.get('sala').then(res=>{
+        res.data.forEach(p=>{
+          p.label=p.nombre
+        })
+        this.store.salas2=res.data
+        this.store.salas3=res.data
         this.store.salas=res.data
         this.$q.loading.hide()
       })
@@ -205,6 +206,11 @@ export default {
       this.$q.loading.show()
       this.store.priceSingleTon=true
       this.$api.get('price').then(res=>{
+        res.data.forEach(p=>{
+          p.label=p.serie+' '+p.precio+' Bs.'
+        })
+        this.store.prices2=res.data
+        this.store.prices3=res.data
         this.store.prices=res.data
         this.$q.loading.hide()
       })
@@ -214,6 +220,11 @@ export default {
       this.$q.loading.show()
       this.store.movieSingleTon=true
       this.$api.get('movie').then(res=>{
+        res.data.forEach(p=>{
+          p.label=p.nombre+' ' + p.formato
+        })
+        this.store.movies2=res.data
+        this.store.movies3=res.data
         this.store.movies=res.data
         this.$q.loading.hide()
       })
@@ -227,7 +238,7 @@ export default {
       //})
     //}
     this.listado(0)
-    this.cargar()
+    // this.cargar()
   },
   methods: {
     cambioFecha(fecha){
@@ -310,8 +321,7 @@ export default {
     filterSala(val, update) {
         if (val === '') {
           update(() => {
-            this.listsalas = this.filsala
-
+            this.store.salas2 = this.store.salas3
             // here you have access to "ref" which
             // is the Vue reference of the QSelect
           })
@@ -320,14 +330,14 @@ export default {
 
         update(() => {
           const needle = val.toLowerCase()
-          this.listsalas = this.filsala.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+          this.store.salas2 = this.store.salas3.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
         })
 
     },
     filterPelicula(val, update) {
       if (val === '') {
         update(() => {
-          this.listpelis = this.filpelis
+          this.store.movies2 = this.store.movies3
 
           // here you have access to "ref" which
           // is the Vue reference of the QSelect
@@ -337,7 +347,7 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        this.listpelis = this.filpelis.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+        this.store.movies2 = this.store.movies3.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
       })
 
     },
@@ -345,7 +355,7 @@ export default {
     filterTarifa(val, update) {
       if (val === '') {
         update(() => {
-          this.listtarifa = this.filtarifa
+          this.store.prices2 = this.store.prices3
 
           // here you have access to "ref" which
           // is the Vue reference of the QSelect
@@ -355,7 +365,7 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        this.listtarifa = this.filtarifa.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+        this.store.prices2 = this.store.prices3.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
       })
 
     },

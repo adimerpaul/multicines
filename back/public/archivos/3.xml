@@ -4,14 +4,14 @@
     <nitEmisor>329448023</nitEmisor>
     <razonSocialEmisor>MULTISALAS S.R.L.</razonSocialEmisor>
     <municipio>Oruro</municipio>
-    <telefono>2846005</telefono>
+    <telefono>5281290</telefono>
     <numeroFactura>3</numeroFactura>
-    <cuf>168AB0075CF0FFB8802678AB1762C119ED63A113E9664C7852E9B6D74</cuf>
-    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qj5UQU1VU0lXVUFIxRDQ0NDQwMEFFM</cufd>
+    <cuf>168AB0075CF100AD95C79054A39518D6BF23A113E037344ABB0BB6D74</cuf>
+    <cufd>BQUFlQ3deZ0FBNzDRCMTBDQkZBREU=QsKhMXBFVFhJV1VIxRDQ0NDQwMEFFM</cufd>
     <codigoSucursal>0</codigoSucursal>
     <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN Nª2337 ZONA ESTE</direccion>
     <codigoPuntoVenta>0</codigoPuntoVenta>
-    <fechaEmision>2022-08-17T22:03:50.000</fechaEmision>
+    <fechaEmision>2022-08-22T19:12:54.000</fechaEmision>
     <nombreRazonSocial>LOPEZ</nombreRazonSocial>
     <codigoTipoDocumentoIdentidad>1</codigoTipoDocumentoIdentidad>
     <numeroDocumento>1010</numeroDocumento>
@@ -19,34 +19,34 @@
     <codigoCliente>4</codigoCliente>
     <codigoMetodoPago>1</codigoMetodoPago>
     <numeroTarjeta xsi:nil="true"/>
-    <montoTotal>100.00</montoTotal>
-    <montoTotalSujetoIva>100.00</montoTotalSujetoIva>
+    <montoTotal>30.00</montoTotal>
+    <montoTotalSujetoIva>30.00</montoTotalSujetoIva>
     <codigoMoneda>1</codigoMoneda>
     <tipoCambio>1</tipoCambio>
-    <montoTotalMoneda>100.00</montoTotalMoneda>
+    <montoTotalMoneda>30.00</montoTotalMoneda>
     <montoGiftCard xsi:nil="true"/>
     <descuentoAdicional>0</descuentoAdicional>
     <codigoExcepcion xsi:nil="true"/>
     <cafc xsi:nil="true"/>
-    <leyenda>Ley N° 453: Tienes derecho a un trato equitativo sin discriminación en la oferta de servicios.</leyenda>
+    <leyenda>Ley N° 453: Los servicios deben suministrarse en condiciones de inocuidad, calidad y seguridad.</leyenda>
     <usuario>admin</usuario>
     <codigoDocumentoSector>1</codigoDocumentoSector>
   </cabecera>
   <detalle>
     <actividadEconomica>590000</actividadEconomica>
     <codigoProductoSin>99100</codigoProductoSin>
-    <codigoProducto>5</codigoProducto>
+    <codigoProducto>3</codigoProducto>
     <descripcion>minions 2: nace un villano 3D</descripcion>
     <cantidad>2</cantidad>
     <unidadMedida>62</unidadMedida>
-    <precioUnitario>50</precioUnitario>
+    <precioUnitario>15</precioUnitario>
     <montoDescuento>0</montoDescuento>
-    <subTotal>100</subTotal>
+    <subTotal>30</subTotal>
     <numeroSerie xsi:nil="true"/>
     <numeroImei xsi:nil="true"/>
   </detalle>
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>82iq4gIYaAMhu/qt1Loqk2XFPX909i8LHFoyBRQCQlU=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>jz8Bd8aIwBVyBDyDG3Y6lIWouewWl96hO6hl7H9Q70RxdsOicuggMuFMvQ6n96QnFFZVL8b+bs4Wp/gcLWFi4428Yo+qFUdFalllL41kohH+2HijOlYk136lFhBKDqw0hL4mmCSfovNspmtZSLciKcjNTJfT6WlbIa2K9hCPiNE61UbRlcHPSPMdDCGQnMMsNFJRCiCDM4MijvYjlt1iVZUxl7VEjqItV1DhWtgJtdLG5ioXA/ikmdjLd7qze6EcimhTY68OkRZvQqbnVVHL4QaY3KvF7asybIK+7CSqGtN3Rh5FtSC7kGPNGqw76OM/CbOfm+3lhUBCb/bmprc0UA==</ds:SignatureValue>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>CIS2VwIy57n0POgB/dkS3KqFojerDrWAk8PpUPWnyu0=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>Ry4I8kNv069sZJnJFstmScFtEQNsGkbCeT26RbNEf7hTvjF3qSnXc5lx3Rz7mpbvNmN6K8/vjRjB0/GbhIdDVEmggLzbMx6qk4sRckDicTJPE+iI4lfZdPtTJgELKrSL5bbmUlI07k0EoiULUsqbVtMeRQ9hjduKubiT2izH8+hP/9EonhMfmGCb5uAheWB/vV4BGAiXR41cRwNa0WxTZJ7df6fxOPefwfc9015G1aoOubf0V6RtDlKXiHjM72VRq4NaUU+KBZHv2g0odbAuVRTJX5B8h5NB0epMPyJcXebIpDTtKgRlbaxPBvBaDTD6gMAXqVX1W3Jnt8SnY3h/hQ==</ds:SignatureValue>
 <ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIYfiNI5DC9AAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDgwOTE1MjYwMloXDTIyMDkwODE1MjYwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEAS0HlsyZxtN7YEGl4skZ3WU07oZZ6yrPRkzGBD7EDnlFnEizBDymFJK+mUFMTMg6bhWhszETFtzCZxt2nQ2Ang7iAiFDz+W3Zjtra08z87Hf+t4XwviEO24K+CJetCE70UZ3tg8uTkShPEUcj3o6Jijir8ViBnJ/e0xC1rpFe66ZFjZ1F38bc39Uh4FFdQEDyhdjiN69mvTFDMdTKXxldbkgKFU3YAvWbNLaUxKWpBlQcMNOimUMtn+AcICuP2zwe/QsVGgw0a5Eix3YCTgougUdj+sq+uI7NlRjig/K0nNxsE1H+EcgfwJmoB/UwgU7othZN35nKyUy3Kxb9JCsGZg==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaCompraVenta>

@@ -68,7 +68,7 @@ class ActivityController extends Controller
                 return response()->json(['message' => 'El CUI no existe'], 400);
             }
             Activity::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
-            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion?WSDL",  [
+            $client = new \SoapClient(env("URL_SIAT")."FacturacionSincronizacion?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi ".env('TOKEN'),
@@ -433,7 +433,7 @@ class ActivityController extends Controller
                 return response()->json(['message' => 'El CUI no existe'], 400);
             }
 
-            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionSincronizacion?WSDL",  [
+            $client = new \SoapClient(env("URL_SIAT")."FacturacionSincronizacion?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi ".env('TOKEN'),

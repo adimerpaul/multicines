@@ -28,7 +28,7 @@
               <q-btn icon="print" @click="printFactura(props.row)"/>
               <q-btn icon="list" @click="detalleimp(props.row)"/>
 
-              <q-btn type="a" label="CLick" target="_blank" :href="`https://pilotosiat.impuestos.gob.bo/consulta/QR?nit=329448023&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+              <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
             </q-td>
           </template>
           <template v-slot:body-cell-siatEnviado="props">
@@ -150,9 +150,9 @@ export default {
     encabezado(){
       this.$api.get('datocine').then(res => {
         this.cine = res.data;
-        console.log(this.cine)
-        })
-        },
+        // console.log(this.cine)
+      })
+    },
     boletoprint(bol){
       console.log(bol)
 

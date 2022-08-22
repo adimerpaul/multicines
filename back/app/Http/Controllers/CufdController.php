@@ -46,7 +46,7 @@ class CufdController extends Controller
             if ($cui->count()==0){
                 return response()->json(['message' => 'El CUI no existe'], 400);
             }
-            $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?WSDL",  [
+            $client = new \SoapClient(env("URL_SIAT")."FacturacionCodigos?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi ".env('TOKEN'),
@@ -88,7 +88,7 @@ class CufdController extends Controller
                 return response()->json(['message' => 'El CUI no existe'], 400);
             }
             for($i=0;$i<100;$i++) {
-                $client = new \SoapClient("https://pilotosiatservicios.impuestos.gob.bo/v2/FacturacionCodigos?WSDL", [
+                $client = new \SoapClient(env("url_siat")."FacturacionCodigos?WSDL", [
                     'stream_context' => stream_context_create([
                         'http' => [
                             'header' => "apikey: TokenApi " . env('TOKEN'),

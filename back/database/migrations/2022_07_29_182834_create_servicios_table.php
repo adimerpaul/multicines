@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('codigoActividad')->nullable();
             $table->string('codigoProducto')->nullable();
             $table->string('descripcionProducto')->nullable();
-            $table->integer("codigoPuntoVenta")->nullable();
-            $table->integer("codigoSucursal")->nullable();
+            $table->integer("codigoPuntoVenta")->nullable()->default(0);
+            $table->integer("codigoSucursal")->nullable()->default(0);
             $table->timestamps();
         });
     }

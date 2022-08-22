@@ -43,7 +43,14 @@ class SaleController extends Controller
     public function movies(Request $request)
     {
         //return Programa::select('movie_id')->groupBy('movie_id')->with('movie')->whereDate('fecha',$request->fecha)->get();
-        return DB::SELECT("select m.id,m.nombre,m.duracion,m.formato,m.imagen,count(*) as cantidad from programas p,movies m,tickets t where p.movie_id=m.id and t.programa_id=p.id and p.fecha='$request->fecha' GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen");
+//        return DB::SELECT("select m.id,m.nombre,m.duracion,m.formato,m.imagen,count(*) as cantidad from programas p,movies m,tickets t where p.movie_id=m.id and t.programa_id=p.id and p.fecha='$request->fecha' GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen");
+        return DB::select("
+        select m.id,m.nombre,m.duracion,m.formato,m.imagen,(
+        SELECT count(*) FROM tickets WHERE programa_id=p.id
+        ) as cantidad
+        from programas p
+        INNER JOIN movies m ON p.movie_id=m.id
+        GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen;");
     }
 
     public function movietotal(Request $request){
@@ -361,19 +368,10 @@ class SaleController extends Controller
 //            return response()->json(['error' => $e->getMessage()]);
             $sale->siatEnviado=false;
         }
-
-//        return $result;
-//        if (isset($result->RespuestaServicioFacturacion)){
-//
-//        }else{
-//
-//        }
-
         $sale->cuf=$cuf;
-
-//
         $sale->save();
-        return response()->json(['sale' => $sale->with('details'),"tickets"=>$data]);
+        $tickets=Ticket::where('sale_id',$sale->id)->get();
+        return response()->json(['sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first(),"tickets"=>$tickets]);
 
     }
 
@@ -400,7 +398,9 @@ class SaleController extends Controller
         $razon=env("RAZON");
         $dir=env("DIRECCION");
         $tel=env("TELEFONO");
-        return json_encode(['nit'=>$nit,'razon'=>$razon,'direccion'=>$dir,'telefono'=>$tel]);
+        $url=env("URL_SIAT");
+        $url2=env("URL_SIAT2");
+        return json_encode(['nit'=>$nit,'razon'=>$razon,'direccion'=>$dir,'telefono'=>$tel,'url'=>$url,'url2'=>$url2]);
 
     }
     /**
