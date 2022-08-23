@@ -7,6 +7,7 @@
         color="green"
         icon="add_circle"
         label="Sincronizar"
+        :loading="loading"
         @click="cuiDialog=true"/>
 <!--        <q-table :rows="cuis" dense title="Gestionar sincronizacion" :columns="cuisColums" :rows-per-page-options="[0]">-->
 <!--          <template v-slot:top-right>-->
@@ -118,7 +119,9 @@ export default {
   },
   methods: {
     datosGet(){
+      this.loading=true
       this.$api.get('activity').then(res => {
+        this.loading=false
         this.activities=res.data.activities;
         this.documents=res.data.documents;
         this.documentsectors=res.data.documentsectors;

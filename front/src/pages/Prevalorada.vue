@@ -5,12 +5,12 @@
     <div class="row">
       <div class="col-3"><q-input dense type="date" outlined label="fechaInicio" v-model="fechaInicio" /></div>
       <div class="col-3"><q-input dense type="date" outlined label="fechaFin" v-model="fechaFin" /></div>
-      <div class="col-3 flex flex-center"><q-btn color="primary" :loading="loading" label="Consultar" class="full-width"  icon="search" @click="rentalConsulta" /></div>
-      <div class="col-3 flex flex-center"><q-btn color="green" label="AGREGAR " class="full-width"  icon="add_circle_outline" @click="rentalClickCreate" /></div>
+      <div class="col-3 flex flex-center"><q-btn color="primary" :loading="loading" label="Consultar" class="full-width"  icon="search" @click="prevaloradaConsulta" /></div>
+      <div class="col-3 flex flex-center"><q-btn color="green" label="AGREGAR " class="full-width"  icon="add_circle_outline" @click="prevaloradaClickCreate" /></div>
     </div>
   </div>
   <div class="col-12">
-    <q-table label="FACTURA DE ALQUILER DE AMBIENTES" :rows="rentals" :columns="columns">
+    <q-table label="FACTURA DE ALQUILER DE AMBIENTES" :rows="prevaloradas" :columns="columns">
       <template v-slot:body-cell-Opciones="props">
         <q-td :props="props" auto-width>
 <!--          <q-btn icon="print" @click="printFactura(props.row)"/>-->
@@ -27,37 +27,37 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
-      <q-form @submit.prevent="rentalInsert">
+      <q-form @submit.prevent="prevaloradaInsert">
+<!--        <q-card-section>-->
+<!--          <div class="row">-->
+<!--            <div class="col-3">-->
+<!--              <q-input outlined label="NIT/CARNET" @keyup="searchClient" required v-model="client.numeroDocumento" />-->
+<!--            </div>-->
+<!--            <div class="col-3">-->
+<!--              <q-input outlined label="Complemento"  @keyup="searchClient" v-model="client.complemento" />-->
+<!--            </div>-->
+<!--            <div class="col-3">-->
+<!--              <q-input outlined label="nombreRazonSocial" required v-model="client.nombreRazonSocial" />-->
+<!--            </div>-->
+<!--            <div class="col-3">-->
+<!--              <q-select v-model="document" outlined :options="documents"/>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </q-card-section>-->
+<!--        <q-separator/>-->
         <q-card-section>
           <div class="row">
             <div class="col-3">
-              <q-input outlined label="NIT/CARNET" @keyup="searchClient" required v-model="client.numeroDocumento" />
+              <q-input outlined label="TOTAL A PAGAR:" v-model="prevalorada.montoTotal" step="0.01" type="number" required />
             </div>
+<!--            <div class="col-3">-->
+<!--              <q-select outlined label="Mes:" v-model="prevalorada.mes" :options="meses" />-->
+<!--            </div>-->
+<!--            <div class="col-3">-->
+<!--              <q-select outlined label="Periodo:" v-model="prevalorada.gestion" :options="gestiones" />-->
+<!--            </div>-->
             <div class="col-3">
-              <q-input outlined label="Complemento"  @keyup="searchClient" v-model="client.complemento" />
-            </div>
-            <div class="col-3">
-              <q-input outlined label="nombreRazonSocial" required v-model="client.nombreRazonSocial" />
-            </div>
-            <div class="col-3">
-              <q-select v-model="document" outlined :options="documents"/>
-            </div>
-          </div>
-        </q-card-section>
-        <q-separator/>
-        <q-card-section>
-          <div class="row">
-            <div class="col-3">
-              <q-input outlined label="TOTAL A PAGAR:" v-model="rental.montoTotal" step="0.01" type="number" required />
-            </div>
-            <div class="col-3">
-              <q-select outlined label="Mes:" v-model="rental.mes" :options="meses" />
-            </div>
-            <div class="col-3">
-              <q-select outlined label="Periodo:" v-model="rental.gestion" :options="gestiones" />
-            </div>
-            <div class="col-3">
-              <q-input outlined label="Descripcion:" v-model="rental.descripcion" required />
+              <q-input outlined label="Descripcion:" v-model="prevalorada.descripcion" required />
             </div>
           </div>
         </q-card-section>
@@ -84,14 +84,14 @@
 import {date} from "quasar";
 
 export default {
-  name: `Rental`,
+  name: `Prevalorada`,
 
   data(){
     return{
       loading:false,
       fechaInicio:date.formatDate(new Date(),'YYYY-MM-DD'),
       fechaFin:date.formatDate(new Date(),'YYYY-MM-DD'),
-      rentals:[],
+      prevaloradas:[],
       meses:['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
       gestiones:[
         parseInt(date.formatDate(new Date(),'YYYY')) -2,
@@ -100,7 +100,7 @@ export default {
         parseInt(date.formatDate(new Date(),'YYYY')) + 1,
         parseInt(date.formatDate(new Date(),'YYYY')) + 2,
       ],
-      rental:{
+      prevalorada:{
         montoTotal:0,
         periodoFacturado:'ENERO 2022',
         mes:'ENERO',
@@ -116,11 +116,11 @@ export default {
         {label:"Factura",name:"numeroFactura",field:"numeroFactura",sortable:"true"},
         {label:'siatEnviado',name:'siatEnviado',field:'siatEnviado',sortable:true},
         {label:"Fecha Emision",name:"fechaEmision",field:"fechaEmision",sortable:"true"},
-        {label:"Periodo Facturado",name:"periodoFacturado",field:"periodoFacturado",sortable:"true"},
+        // {label:"Periodo Facturado",name:"periodoFacturado",field:"periodoFacturado",sortable:"true"},
         {label:"Descripcion",name:"descripcion",field:"descripcion",sortable:"true"},
         {label:"Monto",name:"montoTotal",field:"montoTotal",sortable:"true"},
         {label:"Usuario",name:"usuario",field:"usuario",sortable:"true"},
-        {label:'client_id',name:'client_id',field:row=>row.client.nombreRazonSocial,sortable:true},
+        // {label:'client_id',name:'client_id',field:row=>row.client.nombreRazonSocial,sortable:true},
         {label:'siatAnulado',name:'siatAnulado',field:'siatAnulado',sortable:true},
         {label:'id',name:'id',field:'id',sortable:true},
       ]
@@ -128,11 +128,10 @@ export default {
     }
   },
   mounted() {
-    this.rental.mes=this.meses[parseInt(date.formatDate(new Date(),'M')-1)]
     this.$api.get('datocine').then(res => {
       this.cine = res.data;
     })
-    this.rentalConsulta();
+    this.prevaloradaConsulta();
     this.$api.get('document').then(res=>{
       res.data.forEach(r=>{
         r.label=r.descripcion
@@ -142,14 +141,14 @@ export default {
     })
   },
   methods:{
-    rentalInsert(){
+    prevaloradaInsert(){
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
-      this.$api.post('rental',{
+      this.$api.post('prevalorada',{
         client:this.client,
-        montoTotal:this.rental.montoTotal,
-        descripcion:this.rental.descripcion,
-        periodoFacturado:this.rental.mes+' '+this.rental.gestion,
+        montoTotal:this.prevalorada.montoTotal,
+        descripcion:this.prevalorada.descripcion,
+        // periodoFacturado:this.prevalorada.mes+' '+this.prevalorada.gestion,
       }).then(res=>{
         console.log(res.data)
         // this.printFactura(res.data.sale)
@@ -194,21 +193,21 @@ export default {
         }
       })
     },
-    rentalClickCreate(){
-      this.rental.montoTotal=''
-      this.rental.descripcion=''
+    prevaloradaClickCreate(){
+      this.prevalorada.montoTotal=''
+      this.prevalorada.descripcion=''
       this.saleDialog=true
       this.client={complemento:''}
     },
-    rentalConsulta(){
+    prevaloradaConsulta(){
       this.loading=true
-      this.$api.post('rentalConsulta',{
+      this.$api.post('prevaloradaConsulta',{
         fechaInicio:this.fechaInicio,
         fechaFin:this.fechaFin,
       }).then(res=>{
         this.loading=false
         // console.log(res.data)
-        this.rentals=res.data
+        this.prevaloradas=res.data
       })
     }
   }

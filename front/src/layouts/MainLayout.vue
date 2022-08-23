@@ -54,6 +54,7 @@
         </q-expansion-item>
         <q-expansion-item dense exact expand-separator icon="o_store" label="Candy Bar" to="candy" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="o_home_work" label="Factura de Alquiler " to="rental" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Prevalorada " to="prevalorada" expand-icon="null"/>
       </q-list>
     </q-drawer>
 
