@@ -16,7 +16,8 @@ use App\Http\Requests\UpdateRentalRequest;
 use App\Models\Sale;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
-
+use SimpleXMLElement;
+use DOMDocument;
 class RentalController extends Controller
 {
     /**
@@ -30,8 +31,8 @@ class RentalController extends Controller
     }
     public function rentalConsulta(Request $request)
     {
-        $rental = Rental::where('fechaEmision','>=', $request->fechaInicio)
-            ->where('fechaEmision','<=', $request->fechaFin)
+        $rental = Rental::whereDate('fechaEmision','>=', $request->fechaInicio)
+            ->whereDate('fechaEmision','<=', $request->fechaFin)
             ->with('client')->with('user')
             ->get();
         return response()->json($rental);
@@ -87,10 +88,10 @@ class RentalController extends Controller
         $user=(object)["name"=>"admin","id"=>1];
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
-            return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
+            return response()->json(['message' => 'No existe CUI para la venta!!'], 500);
         }
         if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
-            return response()->json(['message' => 'No exite CUFD para la venta!!'], 400);
+            return response()->json(['message' => 'No exite CUFD para la venta!!'], 500);
         }
         $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
@@ -122,6 +123,7 @@ class RentalController extends Controller
 //        $sale->user_id=$user->id;
 //        $sale->cufd_id=$cufd->id;
 //        $sale->client_id=$request->client->id;
+        $unidadMedida=68;
         $sale->numeroFactura=$numeroFactura;
         $sale->cuf="";
         $sale->cufd=$cufd->codigo;
@@ -136,9 +138,9 @@ class RentalController extends Controller
         $sale->actividadEconomica=681011;
         $sale->codigoProductoSin=72111;
         $sale->codigoProducto="10101";
-        $sale->descripcion=$request->periodoFacturado;
+        $sale->descripcion=$request->descripcion;
         $sale->cantidad=1;
-        $sale->unidadMedida=57;
+        $sale->unidadMedida=$unidadMedida;
         $sale->precioUnitario=$request->montoTotal;
         $sale->montoDescuento=0;
         $sale->subTotal=$request->montoTotal;
@@ -173,7 +175,7 @@ class RentalController extends Controller
         <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
         <municipio>Oruro</municipio>
         <telefono>".env('TELEFONO')."</telefono>
-        <numeroFactura>1</numeroFactura>
+        <numeroFactura>$numeroFactura</numeroFactura>
         <cuf>$cuf</cuf>
         <cufd>".$cufd->codigo."</cufd>
         <codigoSucursal>$codigoSucursal</codigoSucursal>
@@ -204,9 +206,9 @@ class RentalController extends Controller
         <actividadEconomica>681011</actividadEconomica>
         <codigoProductoSin>72111</codigoProductoSin>
         <codigoProducto>10101</codigoProducto>
-        <descripcion>".$request->periodoFacturado."</descripcion>
+        <descripcion>".$request->descripcion."</descripcion>
         <cantidad>1</cantidad>
-        <unidadMedida>57</unidadMedida>
+        <unidadMedida>$unidadMedida</unidadMedida>
         <precioUnitario>".$request->montoTotal."</precioUnitario>
         <montoDescuento>0</montoDescuento>
         <subTotal>".$request->montoTotal."</subTotal>
@@ -228,12 +230,12 @@ class RentalController extends Controller
         $xml = new DOMDocument();
         $xml->load("rentals/".$nameFile.'.xml');
         if (!$xml->schemaValidate('./facturaElectronicaAlquilerBienInmueble.xsd')) {
-            echo "invalid";
+            return "invalid";
         }
         else {
-            echo "validated";
+//            return "validated";
         }
-        exit;
+//        exit;
 
 
         $file = "rentals/".$nameFile.'.xml';
@@ -254,7 +256,7 @@ class RentalController extends Controller
 
 
         try {
-            $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
+            $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionElectronica?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi " . env('TOKEN'),
@@ -284,6 +286,8 @@ class RentalController extends Controller
                     "hashArchivo"=>$hashArchivo,
                 ]
             ]);
+//            return var_dump($result);
+//            exit;
             $sale->siatEnviado=true;
             $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
         }catch (\Exception $e) {
@@ -302,7 +306,7 @@ class RentalController extends Controller
 
 //
         $sale->save();
-        return response()->json(['sale' => $sale->with('details'),"tickets"=>$data]);
+        return response()->json(['rental' => Rental::where('id',$sale->id)->with('client')->first()]);
 
     }
 

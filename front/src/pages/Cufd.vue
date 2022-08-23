@@ -8,6 +8,7 @@
               color="green"
               icon="add_circle"
               label="Agregar"
+              :loading="loading"
               @click="cuiDialog=true"/>
             <q-input outlined dense debounce="300" v-model="cudfFilter" placeholder="Buscar">
               <template v-slot:append>
@@ -141,10 +142,12 @@ export default {
       this.fechaHoraFinEvento=this.cufdEvento.fechaVigencia
     },
     cufdGet() {
+      this.loading=true
       this.$api.get('cufd').then(res => {
         res.data.forEach(r=>{
           r.label='Punto venta'+r.codigoPuntoVenta+' ID:'+r.id+' Fecha:'+r.fechaCreacion+'-'+r.fechaVigencia;
         })
+        this.loading=false
         this.cufds = res.data
       })
     },

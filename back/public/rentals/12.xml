@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<facturaElectronicaAlquilerBienInmueble xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="facturaElectronicaAlquilerBienInmueble.xsd">
+  <cabecera>
+    <nitEmisor>329448023</nitEmisor>
+    <razonSocialEmisor>MULTISALAS S.R.L.</razonSocialEmisor>
+    <municipio>Oruro</municipio>
+    <telefono>5281290</telefono>
+    <numeroFactura>1</numeroFactura>
+    <cuf>168AB0075CF100AE8F058FE2FF25303E5980754F8437344ABB0BB6D74</cuf>
+    <cufd>BQUFlQ3deZ0FBNzDRCMTBDQkZBREU=QsKhMXBFVFhJV1VIxRDQ0NDQwMEFFM</cufd>
+    <codigoSucursal>0</codigoSucursal>
+    <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN Nª2337 ZONA ESTE</direccion>
+    <codigoPuntoVenta>0</codigoPuntoVenta>
+    <fechaEmision>2022-08-22T21:10:01.000</fechaEmision>
+    <nombreRazonSocial>LOPEZ</nombreRazonSocial>
+    <codigoTipoDocumentoIdentidad>1</codigoTipoDocumentoIdentidad>
+    <numeroDocumento>1010</numeroDocumento>
+    <complemento/>
+    <codigoCliente>4</codigoCliente>
+    <periodoFacturado>ENERO 2022</periodoFacturado>
+    <codigoMetodoPago>1</codigoMetodoPago>
+    <numeroTarjeta xsi:nil="true"/>
+    <montoTotal>100</montoTotal>
+    <montoTotalSujetoIva>100</montoTotalSujetoIva>
+    <codigoMoneda>1</codigoMoneda>
+    <tipoCambio>1</tipoCambio>
+    <montoTotalMoneda>100</montoTotalMoneda>
+    <descuentoAdicional xsi:nil="true"/>
+    <codigoExcepcion>0</codigoExcepcion>
+    <cafc xsi:nil="true"/>
+    <leyenda>Ley N° 453: Tienes derecho a recibir información sobre las características y contenidos de los servicios que utilices.</leyenda>
+    <usuario>admin</usuario>
+    <codigoDocumentoSector>2</codigoDocumentoSector>
+  </cabecera>
+  <detalle>
+    <actividadEconomica>681011</actividadEconomica>
+    <codigoProductoSin>72111</codigoProductoSin>
+    <codigoProducto>10101</codigoProducto>
+    <descripcion>asdsadsa</descripcion>
+    <cantidad>1</cantidad>
+    <unidadMedida>68</unidadMedida>
+    <precioUnitario>100</precioUnitario>
+    <montoDescuento>0</montoDescuento>
+    <subTotal>100</subTotal>
+  </detalle>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+    <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>LwSp2dQT8ZaEkG6NAexW2iUkd5MHWyyzgUAoIvcqg1k=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>gksxJlOdtXhaVxrQx2GxhMIwAweacNrmNKk8iEbjKSHSThwQ7YMWR2nz6zwv1KVKkU4PSii1Jh8MATJl0eQkutVIJ0upCGch+WX/3oQnrkD+pPJzdeuZ8IxcPoRSqZK0R/aw05KblmwpAT6Vh3h+udVv1PgUmrBu+z1pW4regAJXyVNji5w+YosjwcGXXc4izQ/zjj5Ggp59oUccNDOssLnjVlkUIB7MU4Y4lGua6NfQHBwIXzhG1sNFTbmsWgg0Kcrs25rk3UVhY8PJMr/KrKoVY1P9JYp7j6UHUahX9bT/Q7bJgSmwX8KESigzIX0x3JoIyAXqSCCQtlF/W7n1Lg==</ds:SignatureValue>
+<ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIYfiNI5DC9AAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDgwOTE1MjYwMloXDTIyMDkwODE1MjYwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEAS0HlsyZxtN7YEGl4skZ3WU07oZZ6yrPRkzGBD7EDnlFnEizBDymFJK+mUFMTMg6bhWhszETFtzCZxt2nQ2Ang7iAiFDz+W3Zjtra08z87Hf+t4XwviEO24K+CJetCE70UZ3tg8uTkShPEUcj3o6Jijir8ViBnJ/e0xC1rpFe66ZFjZ1F38bc39Uh4FFdQEDyhdjiN69mvTFDMdTKXxldbkgKFU3YAvWbNLaUxKWpBlQcMNOimUMtn+AcICuP2zwe/QsVGgw0a5Eix3YCTgougUdj+sq+uI7NlRjig/K0nNxsE1H+EcgfwJmoB/UwgU7othZN35nKyUy3Kxb9JCsGZg==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaAlquilerBienInmueble>
