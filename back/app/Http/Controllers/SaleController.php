@@ -50,6 +50,7 @@ class SaleController extends Controller
         ) as cantidad
         from programas p
         INNER JOIN movies m ON p.movie_id=m.id
+        where p.fecha='$request->fecha'
         GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen;");
     }
 
@@ -432,6 +433,36 @@ class SaleController extends Controller
      * @param  \App\Models\Sale  $sale
      * @return \Illuminate\Http\Response
      */
+
+    public function anularSale(Request $request){
+        $codigoAmbiente=env('AMBIENTE');
+        $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
+        $codigoEmision=1; // 1 online 2 offline 3 masivo
+        $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
+        $codigoPuntoVenta=0;
+        $codigoSistema=env('CODIGO_SISTEMA');
+        $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
+        $codigoSucursal=0;
+        $nit=ENV('NIT');
+
+        $user=(object)["name"=>"admin","id"=>1];
+
+        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
+        }
+        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No exite CUFD para la venta!!'], 400);
+        }
+        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+
+        //codigomotivo
+        //cuf
+
+        //DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=$request->id");
+
+    }
+
     public function destroy(Sale $sale)
     {
         //
