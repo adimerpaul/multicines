@@ -424,6 +424,10 @@ class ActivityController extends Controller
         return Leyenda::where('codigoActividad',$request->codigo)->get();
     }
 
+    public function motivoanular(){
+        return Motivo::all();
+    }
+
     public function sss(StoreActivityRequest $request)
     {
         try {
@@ -675,7 +679,7 @@ class ActivityController extends Controller
 
     }
 
-    /**
+     /**
      * Display the specified resource.
      *
      * @param  \App\Models\Activity  $activity

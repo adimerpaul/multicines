@@ -25,10 +25,10 @@
           </template>
           <template v-slot:body-cell-Opciones="props">
             <q-td :props="props" auto-width>
-              <q-btn icon="print" @click="printFactura(props.row)"/>
-              <q-btn icon="list" @click="detalleimp(props.row)"/>
-              <q-btn icon="cancel_presentation" color="red" @click="anularSale(props.row)"/>
-              <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+              <q-btn icon="print" @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
+              <q-btn icon="list" @click="detalleimp(props.row)" v-if="props.row.siatAnulado==0"/>
+              <q-btn icon="cancel_presentation" color="red" @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
+              <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" v-if="props.row.siatAnulado==0"/>
             </q-td>
           </template>
           <template v-slot:body-cell-siatEnviado="props">
@@ -51,7 +51,7 @@
           <q-table label="Boletos" :columns="boletoColums" :rows="tickets">
             <template v-slot:body-cell-opcion="props">
               <q-td :props="props">
-                <q-btn color="info" icon="print" @click="boletoprint(props.row)" />
+                <q-btn color="info" icon="print" @click="boletoprint(props.row)" v-if="props.row.devuelto==0"/>
               </q-td>
             </template>
           </q-table>
@@ -67,7 +67,22 @@
     </div>
     <div id="myelement" class="hidden">{{lorem}}</div>
 
+    <q-dialog v-model="dialogAnular" >
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">ANULAR FACTURA</div>
+        </q-card-section>
 
+        <q-card-section class="q-pt-none">
+          <q-select label="motivo" :options="motivos" v-model="motivo"/>
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Cancel" v-close-popup />
+          <q-btn flat label="ANULAR" @click="enviarAnular" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
   </q-page>
 </template>
@@ -87,7 +102,9 @@ export default {
       fechaFin:date.formatDate(new Date(),'YYYY-MM-DD'),
       listaVentaBoleteria:[],
       facturadetalle:{},
+      factura:{},
       cine:{},
+      dialogAnular:false,
       listaColums:[
         {name:'Opciones',label:'Opciones',field:'Opciones'},
         {name:'numeroFactura',label:'numeroFactura',field:'numeroFactura',sortable:true},
@@ -111,6 +128,8 @@ export default {
       tickets:[],
       leyendas:[],
       qrImage:'',
+      motivos:[],
+      motivo:{},
       opts : {
         errorCorrectionLevel: 'M',
         type: 'png',
@@ -138,11 +157,28 @@ export default {
     this.listaVentaBoleteriaGet();
     this.encabezado();
     this.cargarLeyenda();
+    this.cargarMotivo()
   },
   methods: {
+    enviarAnular(){
+      this.$api.post('anularSale',{sale:this.factura,motivo:this.motivo}).then(res => {
+        console.log(res.data)
+      })
+
+        },
+    cargarMotivo(){
+      this.$api.get('motivoanular').then(res => {
+        res.data.forEach(r=>{
+          r.label=r.descripcion
+        })
+        this.motivos=res.data;
+
+        this.motivo=this.motivos[0]
+      })
+
+    },
     cargarLeyenda(){
       this.$api.post('listleyenda',{codigo:'590000'}).then(res => {
-        console.log(res.data)
           this.leyendas=res.data;
       })
 
@@ -194,7 +230,9 @@ export default {
 
     },
     anularSale(factura){
-        console.log(factura)
+        //console.log(factura)
+        this.factura=factura
+        this.dialogAnular=true
     },
     detalleimp(factura){
       console.log(factura.tickets)

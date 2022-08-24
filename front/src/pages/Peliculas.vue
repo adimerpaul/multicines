@@ -207,7 +207,7 @@ export default {
       dialog_img:false,
       movie:{
         clasificacion:'+13',
-        formmato:'2D',
+        formato:'2D',
         genero:'Accion',
         fechaEstreno:date.formatDate(new Date(),'YYYY-MM-DD'),
       },

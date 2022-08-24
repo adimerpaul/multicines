@@ -39,6 +39,7 @@ Route::resource('prevalorada', \App\Http\Controllers\PrevaloradaController::clas
 Route::post('rentalConsulta', [\App\Http\Controllers\RentalController::class,'rentalConsulta']);
 Route::post('prevaloradaConsulta', [\App\Http\Controllers\PrevaloradaController::class,'prevaloradaConsulta']);
 Route::post('listleyenda', [\App\Http\Controllers\ActivityController::class,'listleyenda']);
+Route::get('motivoanular', [\App\Http\Controllers\ActivityController::class,'motivoanular']);
 
 Route::post('recepcionPaqueteFactura', [\App\Http\Controllers\EventoSignificativoController::class,'recepcionPaqueteFactura']);
 Route::post('cantidadFacturas', [\App\Http\Controllers\EventoSignificativoController::class,'cantidadFacturas']);
@@ -51,6 +52,7 @@ Route::resource('event', \App\Http\Controllers\EventController::class);
 Route::post('searchClient', [\App\Http\Controllers\ClientController::class,'searchClient']);
 Route::get('datocine', [\App\Http\Controllers\SaleController::class,'datocine']);
 Route::post('totalventa', [\App\Http\Controllers\SaleController::class,'totalventa']);
+Route::post('anularSale', [\App\Http\Controllers\SaleController::class,'anularSale']);
 
 Route::post('momentaneoDelete', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDelete']);
 Route::post('momentaneoDeleteUser', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDeleteUser']);

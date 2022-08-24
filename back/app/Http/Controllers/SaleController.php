@@ -435,6 +435,7 @@ class SaleController extends Controller
      */
 
     public function anularSale(Request $request){
+        //return $request->sale['id'];
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
@@ -459,7 +460,45 @@ class SaleController extends Controller
         //codigomotivo
         //cuf
 
-        //DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=$request->id");
+        DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
+        try {
+            $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
+                'stream_context' => stream_context_create([
+                    'http' => [
+                        'header' => "apikey: TokenApi " . env('TOKEN'),
+                    ]
+                ]),
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                'trace' => 1,
+                'use' => SOAP_LITERAL,
+                'style' => SOAP_DOCUMENT,
+            ]);
+            $result= $client->anulacionFactura([
+                "SolicitudServicioAnulacionFactura"=>[
+                    "codigoAmbiente"=>$codigoAmbiente,
+                    "codigoDocumentoSector"=>$codigoDocumentoSector,
+                    "codigoEmision"=>$codigoEmision,
+                    "codigoModalidad"=>$codigoModalidad,
+                    "codigoPuntoVenta"=>$codigoPuntoVenta,
+                    "codigoSistema"=>$codigoSistema,
+                    "codigoSucursal"=>$codigoSucursal,
+                    "cufd"=>$request->sale['cufd'],
+                    "cuis"=>$request->sale['cui'],
+                    "nit"=>env('NIT'),
+                    "tipoFacturaDocumento"=>$tipoFacturaDocumento,
+                    "codigoMotivo"=>$request->motivo['codigoClasificador'],
+                    "cuf"=>$request->sale['cuf']
+                ]
+            ]);
+            if($result->RespuestaServicioFacturacion->transaccion){
+                $sale=Sale::find($request->sale['id']);
+                $sale->siatAnulado=1;
+                $sale->save();
+            }
+        }catch (\Exception $e) {
+//            return response()->json(['error' => $e->getMessage()]);
+        }
 
     }
 

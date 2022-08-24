@@ -380,7 +380,8 @@ export default {
         detalleVenta:this.detalleVenta,
       }).then(res=>{
         console.log(res.data)
-        this.printFactura(res.data.sale)
+        if(res.data.sale.siatEnviado==1){
+        this.printFactura(res.data.sale)}
         res.data.tickets.forEach(r=>{
           this.boletoprint(r)
         })
