@@ -46,7 +46,7 @@ class SaleController extends Controller
 //        return DB::SELECT("select m.id,m.nombre,m.duracion,m.formato,m.imagen,count(*) as cantidad from programas p,movies m,tickets t where p.movie_id=m.id and t.programa_id=p.id and p.fecha='$request->fecha' GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen");
         return DB::select("
         select m.id,m.nombre,m.duracion,m.formato,m.imagen,(
-        SELECT count(*) FROM tickets WHERE programa_id=p.id
+        SELECT count(*) FROM tickets WHERE programa_id=p.id and devuelto=0
         ) as cantidad
         from programas p
         INNER JOIN movies m ON p.movie_id=m.id
@@ -74,7 +74,7 @@ class SaleController extends Controller
     public function mySeats(Request $request){
         $seats=DB::select("SELECT a.fila,a.columna,a.letra,(
             IF(a.activo='ACTIVO',
-               IF((SELECT COUNT(*) FROM tickets t WHERE t.programa_id=p.id AND t.fila=a.fila AND t.columna=a.columna AND t.letra=a.letra)=1, 'OCUPADO',
+               IF((SELECT COUNT(*) FROM tickets t WHERE t.programa_id=p.id AND t.fila=a.fila AND t.columna=a.columna AND t.letra=a.letra and t.devuelto=0)=1, 'OCUPADO',
                  IF((SELECT COUNT(*) FROM momentaneos m WHERE m.programa_id=p.id AND m.fila=a.fila AND m.columna=a.columna AND m.letra=a.letra)=1,'RESERVADO','LIBRE'))
                , 'INACTIVO')
             ) activo

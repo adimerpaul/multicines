@@ -28,7 +28,7 @@
               <q-btn icon="print" @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
               <q-btn icon="list" @click="detalleimp(props.row)" v-if="props.row.siatAnulado==0"/>
               <q-btn icon="cancel_presentation" color="red" @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
-              <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" v-if="props.row.siatAnulado==0"/>
+              <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
             </q-td>
           </template>
           <template v-slot:body-cell-siatEnviado="props">
