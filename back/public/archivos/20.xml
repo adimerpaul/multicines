@@ -5,30 +5,30 @@
     <razonSocialEmisor>MULTISALAS S.R.L.</razonSocialEmisor>
     <municipio>Oruro</municipio>
     <telefono>5281290</telefono>
-    <numeroFactura>17</numeroFactura>
-    <cuf>168AB0075CF0FFB8AB1A284AF7CB59C38D5BB670A909AA3F73E9B6D74</cuf>
-    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=QksxUUZXU0lXVUFIxRDQ0NDQwMEFFM</cufd>
+    <numeroFactura>20</numeroFactura>
+    <cuf>168AB0075CF10207A94BDACCB1ACD23A4383BB04812D01EABDACB6D74</cuf>
+    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qnl+NmhVZUlXVUFIxRDQ0NDQwMEFFM</cufd>
     <codigoSucursal>0</codigoSucursal>
     <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN Nª2337 ZONA ESTE</direccion>
     <codigoPuntoVenta>0</codigoPuntoVenta>
-    <fechaEmision>2022-08-17T22:37:53.000</fechaEmision>
-    <nombreRazonSocial>SN</nombreRazonSocial>
-    <codigoTipoDocumentoIdentidad>1</codigoTipoDocumentoIdentidad>
-    <numeroDocumento>0</numeroDocumento>
-    <complemento/>
+    <fechaEmision>2022-08-29T21:05:14.000</fechaEmision>
+    <nombreRazonSocial>CHICA</nombreRazonSocial>
+    <codigoTipoDocumentoIdentidad>2</codigoTipoDocumentoIdentidad>
+    <numeroDocumento>123456</numeroDocumento>
+    <complemento>E</complemento>
     <codigoCliente>5</codigoCliente>
     <codigoMetodoPago>1</codigoMetodoPago>
     <numeroTarjeta xsi:nil="true"/>
-    <montoTotal>50.00</montoTotal>
-    <montoTotalSujetoIva>50.00</montoTotalSujetoIva>
+    <montoTotal>17.50</montoTotal>
+    <montoTotalSujetoIva>17.50</montoTotalSujetoIva>
     <codigoMoneda>1</codigoMoneda>
     <tipoCambio>1</tipoCambio>
-    <montoTotalMoneda>50.00</montoTotalMoneda>
+    <montoTotalMoneda>17.50</montoTotalMoneda>
     <montoGiftCard xsi:nil="true"/>
     <descuentoAdicional>0</descuentoAdicional>
     <codigoExcepcion xsi:nil="true"/>
     <cafc xsi:nil="true"/>
-    <leyenda>Ley N° 453: El proveedor deberá suministrar el servicio en las modalidades y términos ofertados o convenidos.</leyenda>
+    <leyenda>Ley N° 453: La interrupción del servicio debe comunicarse con anterioridad a las Autoridades que correspondan y a los usuarios afectados.</leyenda>
     <usuario>admin</usuario>
     <codigoDocumentoSector>1</codigoDocumentoSector>
   </cabecera>
@@ -36,17 +36,17 @@
     <actividadEconomica>590000</actividadEconomica>
     <codigoProductoSin>99100</codigoProductoSin>
     <codigoProducto>5</codigoProducto>
-    <descripcion>minions 2: nace un villano 3D</descripcion>
+    <descripcion>minions 2: nace un villano 2D</descripcion>
     <cantidad>1</cantidad>
     <unidadMedida>62</unidadMedida>
-    <precioUnitario>50</precioUnitario>
+    <precioUnitario>17.5</precioUnitario>
     <montoDescuento>0</montoDescuento>
-    <subTotal>50</subTotal>
+    <subTotal>17.5</subTotal>
     <numeroSerie xsi:nil="true"/>
     <numeroImei xsi:nil="true"/>
   </detalle>
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>5VCJatOeJ7kaquOfQUqfVcNThd3m4LOsTp981eQosPE=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>FgPSZo4ZU8OF/DpG2Jr91k1nHOgVhNTSrIoCC132+A7tEequ8QJJejoShesE0ljxHe3fMxwbNPhfKDfgbEYV+//YHwZ2GSLZ6G+V8KcOxtV9LTgQmabkMrtLBM2JWhtdiR9S3lAv2XEfyZAN2FL0r43J8y+r+8G/C2YdaMio+CmEpZ+cnc9StGZezN226nSYMEJusXeluzJJLgC5eKeZ/8xnJWNFvOqDXZmoskh9adGiVg/iMPVKh59SkKslhLJHbA+t8u5AoWVBt4Bn6O5vE672HMmsUiZrmsxIVIWMKGQh9LIr1zFYN8lF2WqZ2jEE4+TR+gYQl5xeVp9tVXDI3g==</ds:SignatureValue>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>kgqUUK1s2lBKXdhtsXHkfU+z4qdIt3AphIRSZnfajws=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>YG99yjPswzjxSU/LJzys16i5+qxEWQjIKjfYavamKgkuVB2CAkiW2r6Fa2ChyYg8ubQalWz/vf7TVJO1ThNlcO/9dstmkPNiX7gmt9xsziS53HtvHJJn6P6HhaI5iIDER1uxiNq6xwtXrXI0/UiCpHzc2vkNJMe3xaRWqqCqBNVIw8nNJQJKqPVify1cqKFYcF2VhGkBIRVfgnrVaU/jtARxTbcRuzQ2jpVpZ8Q2rY08oeRccepY/xCDDryWbtZopKK1XZm9JGrvrMffweObyxkFAo5pGoa/vHV05dZckh30nGINKVKRq/ObMhGaMGB6n6hLUqIQEQ1xB+r5gGO5LQ==</ds:SignatureValue>
 <ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIYfiNI5DC9AAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDgwOTE1MjYwMloXDTIyMDkwODE1MjYwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEAS0HlsyZxtN7YEGl4skZ3WU07oZZ6yrPRkzGBD7EDnlFnEizBDymFJK+mUFMTMg6bhWhszETFtzCZxt2nQ2Ang7iAiFDz+W3Zjtra08z87Hf+t4XwviEO24K+CJetCE70UZ3tg8uTkShPEUcj3o6Jijir8ViBnJ/e0xC1rpFe66ZFjZ1F38bc39Uh4FFdQEDyhdjiN69mvTFDMdTKXxldbkgKFU3YAvWbNLaUxKWpBlQcMNOimUMtn+AcICuP2zwe/QsVGgw0a5Eix3YCTgougUdj+sq+uI7NlRjig/K0nNxsE1H+EcgfwJmoB/UwgU7othZN35nKyUy3Kxb9JCsGZg==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaCompraVenta>

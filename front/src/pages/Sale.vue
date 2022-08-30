@@ -235,6 +235,9 @@
           <div class="col-2 flex flex-center">
             <q-checkbox outlined label="N CORTESIA" v-model="cortesia" color="primary"/>
           </div>
+          <div class="col-12 text-red text-bold" v-if="error!=''">
+            {{error}}
+          </div>
         </div>
       </q-card-section>
       <q-separator/>
@@ -299,6 +302,7 @@ export default {
       cine:{},
       leyendas:[],
       totventa:[],
+      error:'',
       opts : {
         errorCorrectionLevel: 'M',
         type: 'png',
@@ -340,7 +344,7 @@ export default {
         },
     cargarLeyenda(){
       this.$api.post('listleyenda',{codigo:'590000'}).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         this.leyendas=res.data;
       })
 
@@ -356,8 +360,7 @@ export default {
          // console.log(res.data)
         this.totalventa=res.data
       })
-
-        },
+    },
     eventSearch(){
       this.$api.post('eventSearch').then(res=>{
         this.store.eventNumber=res.data
@@ -372,6 +375,7 @@ export default {
         })
        return false
       }
+      this.error=''
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
       this.$api.post('sale',{
@@ -380,22 +384,32 @@ export default {
         detalleVenta:this.detalleVenta,
       }).then(res=>{
         console.log(res.data)
+        if (res.data.error!=''){
+          this.$q.notify({
+            color: 'negative',
+            textColor: 'white',
+            message: res.data.error,
+            position: 'top',
+            timeout: 5000,
+          })
+        }
         if(res.data.sale.siatEnviado==1){
-        this.printFactura(res.data.sale)}
+          this.printFactura(res.data.sale)
+        }
         res.data.tickets.forEach(r=>{
           this.boletoprint(r)
         })
         this.momentaneoDeleteAll()
         this.tventa()
         this.client={complemento:''}
-         this.saleDialog=false
-         this.myMovies(this.fecha)
+        this.saleDialog=false
+        this.myMovies(this.fecha)
         this.loading=false
         this.eventSearch()
       }).finally(()=>{
         this.loading=false
       }).catch(err=>{
-        console.log(err)
+        this.error=err.response.data.message
         this.loading=false
         this.$q.notify({
           color: 'negative',
@@ -453,7 +467,7 @@ export default {
       this.facturadetalle = factura
       let ClaseConversor = conversor.conversorNumerosALetras;
       let miConversor = new ClaseConversor();
-      let a = miConversor.convertToText(factura.montoTotal);
+      let a = miConversor.convertToText( parseInt(factura.montoTotal));
       this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
       //console.log(this.qrImage)
       // return false

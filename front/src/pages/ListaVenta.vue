@@ -25,10 +25,36 @@
           </template>
           <template v-slot:body-cell-Opciones="props">
             <q-td :props="props" auto-width>
-              <q-btn icon="print" @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
-              <q-btn icon="list" @click="detalleimp(props.row)" v-if="props.row.siatAnulado==0"/>
-              <q-btn icon="cancel_presentation" color="red" @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
-              <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+              <q-btn-dropdown color="primary" label="Opciones">
+                <q-list>
+                  <q-item clickable v-close-popup>
+                    <q-item-section>
+                      <q-btn icon="print" color="primary" class="full-width" label="Imprimir" no-caps @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item clickable v-close-popup>
+                    <q-item-section>
+                      <q-btn icon="list" color="green" class="full-width" label="Imp Boletos" no-caps @click="detalleimp(props.row)" v-if="props.row.siatAnulado==0"/>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item clickable v-close-popup>
+                    <q-item-section>
+                      <q-btn icon="cancel_presentation" color="red" class="full-width" label="Anular" no-caps @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup>
+                    <q-item-section>
+                      <q-btn type="a" label="Imp Impuestos " class="full-width" color="info" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+
+
+
+
             </q-td>
           </template>
           <template v-slot:body-cell-siatEnviado="props">
@@ -254,7 +280,7 @@ export default {
       this.facturadetalle = factura
       let ClaseConversor = conversor.conversorNumerosALetras;
       let miConversor = new ClaseConversor();
-      let a = miConversor.convertToText(factura.montoTotal);
+      let a = miConversor.convertToText( parseInt(factura.montoTotal));
       this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
       //console.log(this.qrImage)
      // return false
