@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Cufd;
 use App\Models\Cui;
 use App\Models\Detail;
+use App\Models\Leyenda;
 use App\Models\Momentaneo;
 use App\Models\Sale;
 use App\Models\SaleCandy;
@@ -85,11 +86,19 @@ class SaleCandyController extends Controller
         }
         $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
-        if (Sale::where('cui', $cui->codigo)->count()==0){
+
+//        if (Sale::where('cui', $cui->codigo)->count()==0){
+//            $numeroFactura=1;
+//        }else{
+//            $sale=Sale::where('cui',$cui->codigo)->orderBy('numeroFactura', 'desc')->first();
+//            $numeroFactura=$sale->numeroFactura+1;
+//        }
+
+        if (Sale::where('cufd', $cufd->codigo)->where('tipo','CANDY')->count()==0){
             $numeroFactura=1;
         }else{
-            $sale=Sale::where('cui',$cui->codigo)->orderBy('numeroFactura', 'desc')->first();
-            $numeroFactura=$sale->numeroFactura+1;
+            $sale=Sale::where('cufd',$cufd->codigo)->where('tipo','CANDY')->orderBy('numeroFactura', 'desc')->first();
+            $numeroFactura=intval($sale->numeroFactura)+1;
         }
 
         $sale=new Sale();
@@ -152,6 +161,9 @@ class SaleCandyController extends Controller
 //     * @param tds Tipo Documento Sector
 //     * @param nf Numero de Factura
 //     * @param pos Punto de Venta
+        $leyenda=Leyenda::where("codigoActividad","590000")->get();
+        $count=$leyenda->count();
+        $leyenda=$leyenda[rand(0,$count-1)]->descripcionLeyenda;
 
         $fechaEnvio=date("Y-m-d\TH:i:s.000");
         $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
@@ -161,7 +173,7 @@ class SaleCandyController extends Controller
         <nitEmisor>".env('NIT')."</nitEmisor>
         <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
         <municipio>Oruro</municipio>
-        <telefono>2846005</telefono>
+        <telefono>".env('TELEFONO')."</telefono>
         <numeroFactura>$numeroFactura</numeroFactura>
         <cuf>$cuf</cuf>
         <cufd>".$cufd->codigo."</cufd>
@@ -185,7 +197,7 @@ class SaleCandyController extends Controller
         <descuentoAdicional>0</descuentoAdicional>
         <codigoExcepcion xsi:nil='true'/>
         <cafc xsi:nil='true'/>
-        <leyenda>Ley N° 453: Tienes derecho a un trato equitativo sin discriminación en la oferta de servicios.</leyenda>
+        <leyenda>$leyenda</leyenda>
         <usuario>".explode(" ", $user->name)[0]."</usuario>
         <codigoDocumentoSector>".$codigoDocumentoSector."</codigoDocumentoSector>
         </cabecera>";
@@ -198,7 +210,7 @@ class SaleCandyController extends Controller
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
-        $nameFile=microtime();
+        $nameFile=$sale->id;
         $dom->save("archivos/".$nameFile.'.xml');
 
         $firmar = new Firmar();
@@ -221,7 +233,7 @@ class SaleCandyController extends Controller
         $fp = gzopen ($gzfile, 'w9');
         gzwrite ($fp, file_get_contents($file));
         gzclose($fp);
-        unlink($file);
+     //   unlink($file);
 
 
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
@@ -282,6 +294,7 @@ class SaleCandyController extends Controller
 
 //
         $sale->save();
+        return response()->json(['sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first()]);
 
     }
 
