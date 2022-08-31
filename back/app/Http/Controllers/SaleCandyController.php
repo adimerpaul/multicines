@@ -307,7 +307,7 @@ class SaleCandyController extends Controller
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
         $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
-        $codigoPuntoVenta=0;
+        $codigoPuntoVenta=1;
         $codigoSistema=env('CODIGO_SISTEMA');
         $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
 
@@ -503,6 +503,7 @@ class SaleCandyController extends Controller
                         'subTotal'=>$detalle['subtotal'],
                         'sale_id'=>$sale->id,
 //                        'programa_id'=>$detalle['programa_id'],
+                        'product_id'=>$detalle['product_id'],
                         'descripcion'=>$detalle['nombre'],
                     ];
                     array_push($dataDetail, $d);
@@ -514,10 +515,10 @@ class SaleCandyController extends Controller
                 $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
                 $sale->cuf=$cuf;
                 $sale->save();
-                $tickets=Ticket::where('sale_id',$sale->id)->get();
+               // $tickets=Ticket::where('sale_id',$sale->id)->get();
                 return response()->json([
-                    'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first(),
-                    "tickets"=>$tickets,
+                    'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->with('user')->first(),
+                   // "tickets"=>$tickets,
                     "error"=>"",
                 ]);
             }else{
@@ -561,10 +562,10 @@ class SaleCandyController extends Controller
             $sale->codigoRecepcion="";
             $sale->cuf=$cuf;
             $sale->save();
-            $tickets=Ticket::where('sale_id',$sale->id)->get();
+           // $tickets=Ticket::where('sale_id',$sale->id)->get();
             return response()->json([
                 'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first(),
-                "tickets"=>$tickets,
+              // "tickets"=>$tickets,
                 "error"=>"Se creo la venta pero no se pudo enviar a siat!!!",
             ]);
             return response()->json(['message' => $e->getMessage()], 500);

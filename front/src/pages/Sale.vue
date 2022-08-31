@@ -319,11 +319,12 @@ export default {
   },
   created() {
     this.encabezado()
+    this.cargarLeyenda()
     this.myMovies(this.fecha)
     this.tventa()
     this.myMomentaneo()
     this.eventSearch()
-    this.cargarLeyenda()
+
     this.$api.get('document').then(res=>{
       res.data.forEach(r=>{
         r.label=r.descripcion
@@ -453,7 +454,7 @@ export default {
       ticket+="<div class='tifecha'>Butaca: <span style='font-size:22px;'>"+bol.letra +" - "+ bol.columna+"</span><div style='float:right'> Hora: <span style='font-size:20px;'>"+bol.horaFuncion.substring(11)+ "</span></div></div>";
       ticket+="<hr>";
       ticket+="<div style='font-size: 12px' >Cod: "+bol.numboc + "<br>"
-      ticket+="Trans: "+bol.id+"</div>";
+      ticket+="Trans: "+bol.sale_id+"</div>";
       document.getElementById('myelement').innerHTML = ticket
       const d = new Printd()
       d.print( document.getElementById('myelement') )
@@ -513,7 +514,7 @@ export default {
       <div class='titulo'>FACTURA <br>CON DERECHO A CREDITO FISCAL</div>\
       <div class='titulo2'>"+this.cine.razon+"<br>\
         Casa Matriz<br>\
-        No. Punto de Venta 0<br>\
+        No. Punto de Venta "+factura.codigoPuntoVenta+"<br>\
         "+this.cine.direccion.substring(0,38)+"<br>"+this.cine.direccion.substring(38)+"<br>\
         Tel. "+this.cine.telefono+"<br>\
         Oruro\

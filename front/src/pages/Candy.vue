@@ -209,6 +209,7 @@
       </q-card>
     </q-dialog>
 
+    <div id="myelement" class="hidden"></div>
 
 
   </q-page>
@@ -217,6 +218,9 @@
 <script>
 import {date} from "quasar";
 import {globalStore} from "stores/globalStore";
+import conversor from "conversor-numero-a-letras-es-ar";
+import QRCode from "qrcode";
+import {Printd} from "printd";
 
 export default {
   name: `Sale`,
@@ -239,12 +243,26 @@ export default {
       store: globalStore(),
       icon:false,
       tarjeta:false,
-
+      cine:{},
+      leyendas:[],
+      opts : {
+        errorCorrectionLevel: 'M',
+        type: 'png',
+        quality: 0.95,
+        width: 100,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFF',
+        },
+      }
 
     }
   },
   created() {
     this.listado()
+    this.encabezado()
+    this.cargarLeyenda()
     this.$api.get('document').then(res=>{
       res.data.forEach(r=>{
         r.label=r.descripcion
@@ -319,6 +337,10 @@ export default {
         montoTotal:this.total,
         detalleVenta:this.store.detallecandy,
       }).then(res=>{
+        this.reset()
+        this.printFactura(res.data.sale)
+        this.printComanda(res.data.sale)
+
         console.log(res.data)
         this.loading=false
       }).catch(err=>{
@@ -347,6 +369,237 @@ export default {
           documento.label=documento.descripcion
           this.document=documento
         }
+      })
+    },
+    async printFactura(factura) {
+      // console.log(factura)
+      let max=this.leyendas.length - 1;
+      let pos=Math.round(Math.random() * (max - 0) + 0)
+      let ley=this.leyendas[pos].descripcionLeyenda
+      this.facturadetalle = factura
+      let ClaseConversor = conversor.conversorNumerosALetras;
+      let miConversor = new ClaseConversor();
+      let a = miConversor.convertToText( parseInt(factura.montoTotal));
+      this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
+      //console.log(this.qrImage)
+      // return false
+      let cadena = "<style>\
+      .titulo{\
+      font-size: 12px;\
+      text-align: center;\
+      font-weight: bold;\
+      }\
+      .titulo2{\
+      font-size: 10px;\
+      text-align: center;\
+      }\
+            .titulo3{\
+      font-size: 10px;\
+      text-align: center;\
+      width:70%;\
+      }\
+            .contenido{\
+      font-size: 10px;\
+      text-align: left;\
+      }\
+      .conte2{\
+      font-size: 10px;\
+      text-align: right;\
+      }\
+      .titder{\
+      font-size: 12px;\
+      text-align: right;\
+      font-weight: bold;\
+      }\
+      hr{\
+  border-top: 1px dashed   ;\
+}\
+  table{\
+    width:100%\
+  }\
+  h1 {\
+    color: black;\
+    font-family: sans-serif;\
+  }</style>\
+    <div id='myelement'>\
+      <div class='titulo'>FACTURA <br>CON DERECHO A CREDITO FISCAL</div>\
+      <div class='titulo2'>"+this.cine.razon+"<br>\
+        Casa Matriz<br>\
+        No. Punto de Venta "+factura.codigoPuntoVenta+"<br>\
+        "+this.cine.direccion.substring(0,38)+"<br>"+this.cine.direccion.substring(38)+"<br>\
+        Tel. "+this.cine.telefono+"<br>\
+        Oruro\
+      </div>\
+      <hr>\
+      <div class='titulo'>NIT</div>\
+      <div class='titulo2'>"+this.cine.nit+"</div>\
+      <div class='titulo'>FACTURA N°</div>\
+      <div class='titulo2'>"+factura.numeroFactura+"</div>\
+      <div class='titulo'>CÓD. AUTORIZACIÓN</div>\
+      <div class='titulo2 ' >"+factura.cuf.substring(0,41)+"<br>"+factura.cuf.substring(41)+"</div>\
+      <hr>\
+      <table>\
+        <tr><td class='titder'>NOMBRE/RAZÓN SOCIAL:</td><td class='contenido'>" + factura.client.nombreRazonSocial + "</td></tr>\
+        <tr><td class='titder'>NIT/CI/CEX:</td><td class='contenido'>" + factura.client.numeroDocumento + "</td></tr>\
+        <tr><td class='titder'>COD. CLIENTE:</td ><td class='contenido'>" + factura.client.id + "</td></tr>\
+        <tr><td class='titder'>FECHA DE EMISIÓN:</td><td class='contenido'>" + factura.fechaEmision + "</td></tr>\
+      </table>\
+      <hr>\
+      <div class='titulo'>DETALLE</div>"
+      factura.details.forEach(r => {
+        cadena += "<div style='font-size: 12px'><b>" + r.product_id + " - " + r.descripcion + "</b></div>"
+        cadena += "<div>" + r.cantidad + "  " + parseFloat(r.precioUnitario).toFixed(2) + " 0.00<span style='float:right'>" + parseFloat(r.subTotal).toFixed(2) + "</span></div>"
+      })
+      cadena += "<hr>\
+      <table style='font-size: 8px;'>\
+      <tr><td class='titder' style='width: 60%'>SUBTOTAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      <tr><td class='titder'>DESCUENTO Bs</td><td class='conte2'>0.00</td></tr>\
+      <tr><td class='titder'>TOTAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      <tr><td class='titder'>MONTO GIFT CARD Bs</td ><td class='conte2'>0.00</td></tr>\
+      <tr><td class='titder'>MONTO A PAGAR Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      <tr><td class='titder' style='font-size: 8px'>IMPORTE BASE CRÉDITO FISCAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      </table><br>\
+      <div>Son " + a + " " + (parseFloat(factura.montoTotal).toFixed(2) - Math.floor(parseFloat(factura.montoTotal).toFixed(2))) * 100 + "/100 Bolivianos</div>\
+      <hr>\
+      <div class='titulo2' style='font-size: 9px'>ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,<br>\
+EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE<br>\
+ACUERDO A LEY<br><br>\
+"+ley+" <br><br>\
+“Este documento es la Representación Gráfica de un<br>\
+Documento Fiscal Digital emitido en una modalidad de<br>\
+facturación en línea”</div><br>\
+<div style='display: flex;justify-content: center;'>\
+  <img src="+this.qrImage+" >\
+      </div>\
+              </div>"
+      //
+      //const cuf = document.createElement('cuf')
+      //cuf.setAttribute('html', factura.cuf)
+      //const options = {
+      //  parent: document.getElementById('myelement'),
+      //  headElements: [ cuf ]
+      //}
+      // const d = new Printd()
+      // d.print( options)
+
+      // let myWindow = window.open("", "Imprimir", "width=1000,height=1000");
+      // myWindow.document.write(cadena);
+      // // myWindow.document.close();
+      // setTimeout(() => {
+      //   myWindow.print();
+      //   myWindow.close();
+      // }, 10);
+      document.getElementById('myelement').innerHTML = cadena
+      const d = new Printd()
+      d.print( document.getElementById('myelement') )
+
+    },
+    async printComanda(factura) {
+      this.facturadetalle = factura
+      let ClaseConversor = conversor.conversorNumerosALetras;
+      let miConversor = new ClaseConversor();
+      let a = miConversor.convertToText( parseInt(factura.montoTotal));
+      let cadena = "<style>\
+      .titulo{\
+      font-size: 12px;\
+      text-align: center;\
+      font-weight: bold;\
+      }\
+      .titulo2{\
+      font-size: 10px;\
+      text-align: center;\
+      }\
+            .titulo3{\
+      font-size: 10px;\
+      text-align: center;\
+      width:70%;\
+      }\
+            .contenido{\
+      font-size: 10px;\
+      text-align: left;\
+      }\
+      .conte2{\
+      font-size: 10px;\
+      text-align: right;\
+      }\
+      .campotd{\
+      text-align: center;\
+      }\
+      .titder{\
+      font-size: 12px;\
+      text-align: right;\
+      font-weight: bold;\
+      }\
+      hr{\
+  border-top: 1px dashed   ;\
+}\
+  table{\
+    width:100%\
+  }\
+  h1 {\
+    color: black;\
+    font-family: sans-serif;\
+  }</style>\
+    <div id='myelement'>\
+      <div class='titulo2'>"+this.cine.razon+"<br>\
+        Casa Matriz<br>\
+        No. Punto de Venta "+factura.codigoPuntoVenta+"<br>\
+        Oruro\
+      </div>\
+      <hr>\
+      <table>\
+        <tr><td class='titder'>FECHA DE EMISIÓN:</td><td class='contenido'>" + factura.fechaEmision + "</td></tr>\
+      </table>\
+      <hr>\
+      <div class='titulo'>DETALLE</div>\
+      <table style='font-size: 10px;'><thead>\
+      <tr><th>CANT</th><th>PROD</th><th>P.U.</th><th>SubT</th></tr>\
+      </thead><tbody>"
+      factura.details.forEach(r => {
+        cadena += "<tr><td class='campotd'>" + r.cantidad + "</td><td class='campotd'>  " +r.descripcion+"</td><td class='campotd'>"+ parseFloat(r.precioUnitario).toFixed(2) + " </td><td class='campotd'>" + parseFloat(r.subTotal).toFixed(2) + "</td></tr>"
+      })
+      cadena += "</tbody></table><hr>\
+      <table style='font-size: 8px;'>\
+      <tr><td class='titder'>TOTAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      </table><br>\
+      <div>Son " + a + " " + (parseFloat(factura.montoTotal).toFixed(2) - Math.floor(parseFloat(factura.montoTotal).toFixed(2))) * 100 + "/100 Bolivianos</div>\
+      <div>Usuario: "+factura.usuario+"</div>\
+      <div>Venta: "+factura.id+"</div>\
+      ";
+      //
+      //const cuf = document.createElement('cuf')
+      //cuf.setAttribute('html', factura.cuf)
+      //const options = {
+      //  parent: document.getElementById('myelement'),
+      //  headElements: [ cuf ]
+      //}
+      // const d = new Printd()
+      // d.print( options)
+
+      // let myWindow = window.open("", "Imprimir", "width=1000,height=1000");
+      // myWindow.document.write(cadena);
+      // // myWindow.document.close();
+      // setTimeout(() => {
+      //   myWindow.print();
+      //   myWindow.close();
+      // }, 10);
+      document.getElementById('myelement').innerHTML = cadena
+      const d = new Printd()
+      d.print( document.getElementById('myelement') )
+
+    },
+
+    cargarLeyenda(){
+      this.$api.post('listleyenda',{codigo:'590000'}).then(res => {
+        // console.log(res.data)
+        this.leyendas=res.data;
+      })
+
+    },
+    encabezado(){
+      this.$api.get('datocine').then(res => {
+        this.cine = res.data;
+        // console.log(this.cine)
       })
     },
 

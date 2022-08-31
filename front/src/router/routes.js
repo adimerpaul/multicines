@@ -12,6 +12,7 @@ import Rubro from "pages/Rubro";
 import Productos from "pages/Productos";
 import Candy from "pages/Candy";
 import ListaVenta from "pages/ListaVenta";
+import ListaVentaCandy from "pages/ListaVentaCandy";
 import EventoSignificativo from "pages/EventoSignificativo";
 import Rental from "pages/Rental";
 import Prevalorada from "pages/Prevalorada";
@@ -36,6 +37,7 @@ const routes = [
       { path: 'productos', component: Productos },
       { path: 'candy', component: Candy },
       { path: 'listaVenta', component: ListaVenta },
+      { path: 'listaVentaCandy', component: ListaVentaCandy },
       { path: 'eventoSignificativo', component: EventoSignificativo },
       { path: 'rental', component: Rental },
       { path: 'prevalorada', component: Prevalorada },

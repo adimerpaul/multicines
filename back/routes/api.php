@@ -47,6 +47,7 @@ Route::post('validarPaquete', [\App\Http\Controllers\EventoSignificativoControll
 
 Route::resource('salecandy', \App\Http\Controllers\SaleCandyController::class);
 Route::resource('listaVentaBoleteria', \App\Http\Controllers\ListaVentaBoleteriaController::class);
+Route::resource('listaVentaCandy', \App\Http\Controllers\ListaVentaCandyController::class);
 Route::resource('event', \App\Http\Controllers\EventController::class);
 
 Route::post('searchClient', [\App\Http\Controllers\ClientController::class,'searchClient']);

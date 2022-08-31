@@ -52,7 +52,11 @@
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_local_activity" label="Venta de boletos" default-opened to="sale" expand-icon="null"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVenta" expand-icon="null"/>
         </q-expansion-item>
-        <q-expansion-item dense exact expand-separator icon="o_store" label="Candy Bar" to="candy" expand-icon="null"/>
+        <q-expansion-item expand-separator dense exact icon="o_store" label="Candy Bar">
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Venta Candy Bar" default-opened to="candy" expand-icon="null"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVentaCandy" expand-icon="null"/>
+        </q-expansion-item>
+
         <q-expansion-item dense exact expand-separator icon="o_home_work" label="Factura de Alquiler " to="rental" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Prevalorada " to="prevalorada" expand-icon="null"/>
       </q-list>

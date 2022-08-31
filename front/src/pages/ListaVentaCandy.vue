@@ -2,7 +2,7 @@
   <q-page>
     <div class="row">
       <div class="col-12">
-        <q-form @submit.prevent="listaVentaBoleteriaGet">
+        <q-form @submit.prevent="listaVentaCandyGet">
           <div class="row">
             <div class="col-4 q-pa-xs">
               <q-input outlined label="FechaIni" type="date" v-model="fechaIni" />
@@ -17,7 +17,7 @@
         </q-form>
       </div>
       <div class="col-12">
-        <q-table :rows="listaVentaBoleteria" :columns="listaColums">
+        <q-table :rows="listaVentaCandy" :columns="listaColums">
           <template v-slot:body-cell-siatAnulado="props">
             <q-td :props="props" auto-width>
               <q-badge :color="props.row.siatAnulado?'red':'green'" :label="props.row.siatAnulado?'A':'V'"/>
@@ -35,7 +35,7 @@
 
                   <q-item clickable v-close-popup>
                     <q-item-section>
-                      <q-btn icon="list" color="green" class="full-width" label="Imp Boletos" no-caps @click="detalleimp(props.row)" v-if="props.row.siatAnulado==0"/>
+                      <q-btn icon="list" color="green" class="full-width" label="Comanda" no-caps @click="printComanda(props.row)" v-if="props.row.siatAnulado==0"/>
                     </q-item-section>
                   </q-item>
 
@@ -126,7 +126,7 @@ export default {
       loading:false,
       fechaIni:date.formatDate(new Date(),'YYYY-MM-DD'),
       fechaFin:date.formatDate(new Date(),'YYYY-MM-DD'),
-      listaVentaBoleteria:[],
+      listaVentaCandy:[],
       facturadetalle:{},
       factura:{},
       cine:{},
@@ -180,12 +180,90 @@ export default {
 //
 //     const d = new Printd()
 //     d.print( document.getElementById('myelement'), [ cssText ] )
-    this.listaVentaBoleteriaGet();
+    this.listaVentaCandyGet();
     this.encabezado();
     this.cargarLeyenda();
     this.cargarMotivo()
   },
   methods: {
+    async printComanda(factura) {
+      this.facturadetalle = factura
+      let ClaseConversor = conversor.conversorNumerosALetras;
+      let miConversor = new ClaseConversor();
+      let a = miConversor.convertToText( parseInt(factura.montoTotal));
+      let cadena = "<style>\
+      .titulo{\
+      font-size: 12px;\
+      text-align: center;\
+      font-weight: bold;\
+      }\
+      .titulo2{\
+      font-size: 10px;\
+      text-align: center;\
+      }\
+            .titulo3{\
+      font-size: 10px;\
+      text-align: center;\
+      width:70%;\
+      }\
+            .contenido{\
+      font-size: 10px;\
+      text-align: left;\
+      }\
+      .conte2{\
+      font-size: 10px;\
+      text-align: right;\
+      }\
+      .campotd{\
+      text-align: center;\
+      }\
+      .titder{\
+      font-size: 12px;\
+      text-align: right;\
+      font-weight: bold;\
+      }\
+      hr{\
+  border-top: 1px dashed   ;\
+}\
+  table{\
+    width:100%\
+  }\
+  h1 {\
+    color: black;\
+    font-family: sans-serif;\
+  }</style>\
+    <div id='myelement'>\
+      <div class='titulo2'>"+this.cine.razon+"<br>\
+        Casa Matriz<br>\
+        No. Punto de Venta "+factura.codigoPuntoVenta+"<br>\
+        Oruro\
+      </div>\
+      <hr>\
+      <table>\
+        <tr><td class='titder'>FECHA DE EMISIÓN:</td><td class='contenido'>" + factura.fechaEmision + "</td></tr>\
+      </table>\
+      <hr>\
+      <div class='titulo'>DETALLE</div>\
+      <table style='font-size: 10px;'><thead>\
+      <tr><th>CANT</th><th>PROD</th><th>P.U.</th><th>SubT</th></tr>\
+      </thead><tbody>"
+      factura.details.forEach(r => {
+        cadena += "<tr><td class='campotd'>" + r.cantidad + "</td><td class='campotd'>  " +r.descripcion+"</td><td class='campotd'>"+ parseFloat(r.precioUnitario).toFixed(2) + " </td><td class='campotd'>" + parseFloat(r.subTotal).toFixed(2) + "</td></tr>"
+      })
+      cadena += "</tbody></table><hr>\
+      <table style='font-size: 8px;'>\
+      <tr><td class='titder'>TOTAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      </table><br>\
+      <div>Son " + a + " " + (parseFloat(factura.montoTotal).toFixed(2) - Math.floor(parseFloat(factura.montoTotal).toFixed(2))) * 100 + "/100 Bolivianos</div>\
+      <div>Usuario: "+factura.usuario+"</div>\
+      <div>Venta: "+factura.id+"</div>\
+      ";
+      document.getElementById('myelement').innerHTML = cadena
+      const d = new Printd()
+      d.print( document.getElementById('myelement') )
+
+    },
+
     enviarAnular(){
       this.$api.post('anularSale',{sale:this.factura,motivo:this.motivo}).then(res => {
         console.log(res.data)
@@ -348,7 +426,7 @@ export default {
       <hr>\
       <div class='titulo'>DETALLE</div>"
       factura.details.forEach(r => {
-        cadena += "<div style='font-size: 12px'><b>" + r.programa_id + " - " + r.descripcion + "</b></div>"
+        cadena += "<div style='font-size: 12px'><b>" + r.product_id + " - " + r.descripcion + "</b></div>"
         cadena += "<div>" + r.cantidad + "  " + parseFloat(r.precioUnitario).toFixed(2) + " 0.00<span style='float:right'>" + parseFloat(r.subTotal).toFixed(2) + "</span></div>"
       })
       cadena += "<hr>\
@@ -395,14 +473,14 @@ facturación en línea”</div><br>\
       d.print( document.getElementById('myelement') )
 
     },
-    listaVentaBoleteriaGet() {
+    listaVentaCandyGet() {
       this.loading= true
-      this.$api.post('listaVentaBoleteria',{
+      this.$api.post('listaVentaCandy',{
         fechaIni:this.fechaIni,
         fechaFin:this.fechaFin,
       }).then(res => {
         this.loading= false;
-        this.listaVentaBoleteria=res.data
+        this.listaVentaCandy=res.data
       })
     },
   }
