@@ -108,7 +108,9 @@ class RentalController extends Controller
             $sale=Rental::where('cufd',$cufd->codigo)->orderBy('numeroFactura', 'desc')->first();
             $numeroFactura=intval($sale->numeroFactura)+1;
         }
-
+        $leyenda=Leyenda::where("codigoActividad","681011")->get();
+        $count=$leyenda->count();
+        $leyenda=$leyenda[rand(0,$count-1)]->descripcionLeyenda;
         $sale=new Rental();
 //        $sale->numeroFactura=$numeroFactura;
 //        $sale->cuf="";
@@ -141,6 +143,7 @@ class RentalController extends Controller
         $sale->descripcion=$request->descripcion;
         $sale->cantidad=1;
         $sale->unidadMedida=$unidadMedida;
+        $sale->leyenda=$leyenda;
         $sale->precioUnitario=$request->montoTotal;
         $sale->montoDescuento=0;
         $sale->subTotal=$request->montoTotal;
@@ -149,9 +152,7 @@ class RentalController extends Controller
         $sale->client_id=$client->id;
         $sale->save();
 
-        $leyenda=Leyenda::where("codigoActividad","681011")->get();
-        $count=$leyenda->count();
-        $leyenda=$leyenda[rand(0,$count-1)]->descripcionLeyenda;
+
 
 
         $cuf = new CUF();

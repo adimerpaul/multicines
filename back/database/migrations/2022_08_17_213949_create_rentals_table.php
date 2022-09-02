@@ -39,6 +39,7 @@ return new class extends Migration
             $table->string("precioUnitario")->nullable();
             $table->string("montoDescuento")->nullable();
             $table->string("subTotal")->nullable();
+            $table->string("leyenda")->nullable();
             $table->unsignedBigInteger("user_id")->nullable();
             $table->foreign("user_id")->references("id")->on("users");
             $table->unsignedBigInteger("cufd_id")->nullable();
