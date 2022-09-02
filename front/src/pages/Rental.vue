@@ -161,6 +161,8 @@ export default {
         // this.client={complemento:''}
         // this.saleDialog=false
         // this.myMovies(this.fecha)
+        this.saleDialog=false
+        this.rentalConsulta()
         this.loading=false
         // this.eventSearch()
       }).finally(()=>{
@@ -177,6 +179,9 @@ export default {
           timeout: 5000,
         })
       })
+    },
+    printFactura(){
+
     },
     searchClient(){
       // console.log(this.client)

@@ -356,6 +356,7 @@ class SaleController extends Controller
                 $sale->user_id=$user->id;
                 $sale->cufd_id=$cufd->id;
                 $sale->client_id=$client->id;
+                $sale->leyenda=$leyenda;
                 $sale->save();
                 $momentaneos=Momentaneo::where('user_id',$user->id)->get();
                 $data=[];
@@ -440,6 +441,7 @@ class SaleController extends Controller
             $sale->user_id=$user->id;
             $sale->cufd_id=$cufd->id;
             $sale->client_id=$client->id;
+            $sale->leyenda=$leyenda;
             $sale->save();
             $momentaneos=Momentaneo::where('user_id',$user->id)->get();
             $data=[];

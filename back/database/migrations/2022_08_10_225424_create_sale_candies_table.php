@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string("codigoRecepcion")->nullable();
             $table->boolean("siatEnviado")->nullable();
             $table->string("codigoRecepcionEventoSignificativo")->nullable();
+            $table->string("leyenda")->nullable();
             $table->boolean("siatAnulado")->nullable()->default(false);
 //            $table->string("codigoRecepcionEventoSignificativo")->nullable();
             $table->integer("codigoDocumentoSector")->nullable();

@@ -492,6 +492,7 @@ class SaleCandyController extends Controller
                 $sale->cufd_id=$cufd->id;
                 $sale->client_id=$client->id;
                 $sale->tipo="CANDY";
+                $sale->leyenda=$leyenda;
                 $sale->save();
                 $dataDetail=[];
                 foreach ($request->detalleVenta as $detalle){
@@ -540,6 +541,7 @@ class SaleCandyController extends Controller
             $sale->cufd_id=$cufd->id;
             $sale->client_id=$client->id;
             $sale->tipo="CANDY";
+            $sale->leyenda=$leyenda;
             $sale->save();
             $dataDetail=[];
             foreach ($request->detalleVenta as $detalle){

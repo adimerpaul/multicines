@@ -463,8 +463,8 @@ export default {
     async printFactura(factura) {
       // console.log(factura)
       let max=this.leyendas.length - 1;
-      let pos=Math.round(Math.random() * (max - 0) + 0)
-      let ley=this.leyendas[pos].descripcionLeyenda
+      //let pos=Math.round(Math.random() * (max - 0) + 0)
+      //let ley=this.leyendas[pos].descripcionLeyenda
       this.facturadetalle = factura
       let ClaseConversor = conversor.conversorNumerosALetras;
       let miConversor = new ClaseConversor();
@@ -553,7 +553,7 @@ export default {
       <div class='titulo2' style='font-size: 9px'>ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,<br>\
 EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE<br>\
 ACUERDO A LEY<br><br>\
-"+ley+" <br><br>\
+"+factura.leyenda+" <br><br>\
 “Este documento es la Representación Gráfica de un<br>\
 Documento Fiscal Digital emitido en una modalidad de<br>\
 facturación en línea”</div><br>\
