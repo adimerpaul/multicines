@@ -188,6 +188,9 @@ export default {
         // this.saleDialog=false
         // this.myMovies(this.fecha)
         this.saleDialog=false
+        if(res.data.sale.siatEnviado==1){
+          this.printFactura(res.data.sale)
+        }
         this.rentalConsulta()
         this.loading=false
         // this.eventSearch()
@@ -253,6 +256,18 @@ export default {
 }\
   table{\
     width:100%\
+    border-collapse: collapse;\
+  }\
+  .tabenc>tr>td{\
+  font-size: 12px;border: 1px solid;\
+  font-weight: bold;\
+  text-align: center;\
+  border-collapse: collapse;\
+  }\
+  \  .tabcont>tr>td{\
+  font-size: 10px;border: 1px solid;\
+  text-align: center;\
+  border-collapse: collapse;\
   }\
   h1 {\
     color: black;\
@@ -279,39 +294,31 @@ export default {
       <td></tr>\
     </table>\
       <div class='titulo'><span style='font-size: 12px'>FACTURA DE ALQUILER</span><br>\(Con Derecho a Crédito Fiscal) </div>\
-      <table>\
+      <table >\
         <tr><td class='titizq'>FECHA DE EMISIÓN:</td><td class='contenido'>" + factura.fechaEmision + "</td><td style='width: 20%'></td></tc><td class='titder'>NIT/CI/CEX:</td><td class='contenido'>" + factura.client.numeroDocumento + "</td></tr>\
         <tr><td class='titizq'>NOMBRE/RAZÓN SOCIAL:</td><td class='contenido'>" + factura.client.nombreRazonSocial + "</td><td style='width: 20%'></td><td class='titder'>Cod. Cliente:</td ><td class='contenido'>" + factura.client.id + "</td></tr>\
         <tr><td class='titizq'></td><td class='contenido'></td><td style='width: 20%'></td><td class='titder'>Periodo Facturado:</td><td class='contenido'>" + factura.periodoFacturado + "</td></tr>\
-      </table>\
-      <table>\
-      <thead>\
+      </table><br>\
+      <table style='width: 100%;border-collapse: collapse;'>\
+      <thead class='tabenc'>\
       <tr><td>CÓDIGO SERVICIO</td><td>CANTIDAD</td><td>UNIDAD DE MEDIDA</td><td>DESCRIPCIÓN</td><td>PRECIO UNITARIO</td><td>DESCUENTO</td><td>SUBTOTAL</td></tr>\
       </thead>\
-      </table>"
-
-      cadena += "\
-      <table style='font-size: 8px;'>\
-      <tr><td class='titder' style='width: 60%'>SUBTOTAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
-      <tr><td class='titder'>DESCUENTO Bs</td><td class='conte2'>0.00</td></tr>\
-      <tr><td class='titder'>TOTAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
-      <tr><td class='titder'>MONTO GIFT CARD Bs</td ><td class='conte2'>0.00</td></tr>\
-      <tr><td class='titder'>MONTO A PAGAR Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
-      <tr><td class='titder' style='font-size: 8px'>IMPORTE BASE CRÉDITO FISCAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
-      </table><br>\
+      <tbody class='tabcont'>\
+      <tr><td>"+factura.codigoProducto+"</td><td>"+factura.cantidad+"</td><td>"+factura.medida+"</td><td>"+factura.descripcion+"</td><td>"+factura.precioUnitario+"</td><td>"+factura.montoDescuento+"</td><td>"+factura.subTotal+"</td></tr>\
+      <tr><td colspan='4' style='border: 0'></td><td class='titder' colspan='2'>SUBTOTAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      <tr><td colspan='4' style='border: 0'></td><td class='titder' colspan='2'>DESCUENTO Bs</td><td class='conte2'>0.00</td></tr>\
+      <tr><td colspan='4' style='border: 0'></td><td class='titder' colspan='2'>TOTAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      <tr><td colspan='4' style='border: 0'></td><td class='titder' style='font-size: 8px' colspan='2'>IMPORTE BASE CRÉDITO FISCAL Bs</td><td class='conte2'>" + parseFloat(factura.montoTotal).toFixed(2) + "</td></tr>\
+      </tbody></table><br>\
       <div>Son " + a + " " + (parseFloat(factura.montoTotal).toFixed(2) - Math.floor(parseFloat(factura.montoTotal).toFixed(2))) * 100 + "/100 Bolivianos</div>\
-      <hr>\
-      <div class='titulo2' style='font-size: 9px'>ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,<br>\
-EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE<br>\
-ACUERDO A LEY<br><br>\
-"+factura.leyenda+" <br><br>\
-“Este documento es la Representación Gráfica de un<br>\
-Documento Fiscal Digital emitido en una modalidad de<br>\
-facturación en línea”</div><br>\
-<div style='display: flex;justify-content: center;'>\
+      <table><tr><td>\
+      <div class='titulo2 col-10' style='font-size: 9px'>ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY<br><br>\
+"+factura.leyenda+" <br>\
+“Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en línea”</div></td><td>\
+<div style='display: flex;justify-content: center;' class='col-2'>\
   <img src="+this.qrImage+" >\
-      </div>\
-              </div>"
+      </div></td></tr>\
+              </table>"
       document.getElementById('myelement').innerHTML = cadena
       const d = new Printd()
       d.print( document.getElementById('myelement') )

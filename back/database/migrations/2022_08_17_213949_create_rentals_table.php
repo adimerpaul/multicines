@@ -36,6 +36,7 @@ return new class extends Migration
             $table->string("descripcion")->nullable();
             $table->string("cantidad")->nullable();
             $table->string("unidadMedida")->nullable();
+            $table->string("medida")->nullable();
             $table->string("precioUnitario")->nullable();
             $table->string("montoDescuento")->nullable();
             $table->string("subTotal")->nullable();

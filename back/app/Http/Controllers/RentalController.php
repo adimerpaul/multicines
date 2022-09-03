@@ -126,6 +126,7 @@ class RentalController extends Controller
 //        $sale->cufd_id=$cufd->id;
 //        $sale->client_id=$request->client->id;
         $unidadMedida=68;
+        $medida='MESES';
         $sale->numeroFactura=$numeroFactura;
         $sale->cuf="";
         $sale->cufd=$cufd->codigo;
@@ -142,6 +143,7 @@ class RentalController extends Controller
         $sale->codigoProducto="10101";
         $sale->descripcion=$request->descripcion;
         $sale->cantidad=1;
+        $sale->medida=$medida;
         $sale->unidadMedida=$unidadMedida;
         $sale->leyenda=$leyenda;
         $sale->precioUnitario=$request->montoTotal;
