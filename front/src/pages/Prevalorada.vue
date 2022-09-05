@@ -48,17 +48,17 @@
         <q-card-section>
           <div class="row">
             <div class="col-3">
+             <q-select outlined v-model="vehiculo" :options="vehiculos" label="Tipo"/>
+            </div>
+            <div class="col-3">
+              <q-input outlined v-model="cantidad" label="Cantidad" type="number"/>
+            </div>
+<!--            <div class="col-3">
               <q-input outlined label="TOTAL A PAGAR:" v-model="prevalorada.montoTotal" step="0.01" type="number" required />
             </div>
-<!--            <div class="col-3">-->
-<!--              <q-select outlined label="Mes:" v-model="prevalorada.mes" :options="meses" />-->
-<!--            </div>-->
-<!--            <div class="col-3">-->
-<!--              <q-select outlined label="Periodo:" v-model="prevalorada.gestion" :options="gestiones" />-->
-<!--            </div>-->
             <div class="col-3">
               <q-input outlined label="Descripcion:" v-model="prevalorada.descripcion" required />
-            </div>
+            </div>-->
           </div>
         </q-card-section>
         <q-separator/>
@@ -92,6 +92,8 @@ export default {
       fechaInicio:date.formatDate(new Date(),'YYYY-MM-DD'),
       fechaFin:date.formatDate(new Date(),'YYYY-MM-DD'),
       prevaloradas:[],
+      cantidad:0,
+      vehiculos:[],
       meses:['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'],
       gestiones:[
         parseInt(date.formatDate(new Date(),'YYYY')) -2,
@@ -111,6 +113,7 @@ export default {
       documents:[],
       document:'',
       saleDialog:false,
+      vehiculo:{},
       columns:[
         {label:'Opciones',name:'Opciones',field:'Opciones'},
         {label:"Factura",name:"numeroFactura",field:"numeroFactura",sortable:"true"},
@@ -131,6 +134,13 @@ export default {
     this.$api.get('datocine').then(res => {
       this.cine = res.data;
     })
+    this.$api.get('vehiculo').then(res => {
+      res.data.forEach(r=>{
+        r.label=r.descripcion
+      })
+      this.vehiculos = res.data;
+      this.vehiculo=this.vehiculos[0]
+    })
     this.prevaloradaConsulta();
     this.$api.get('document').then(res=>{
       res.data.forEach(r=>{
@@ -139,15 +149,19 @@ export default {
       this.documents=res.data
       this.document=this.documents[0]
     })
+
   },
   methods:{
     prevaloradaInsert(){
+      if(this.cantidad==0 || this.cantidad==undefined || this.cantidad==''){
+          return false
+      }
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
       this.$api.post('prevalorada',{
         client:this.client,
-        montoTotal:this.prevalorada.montoTotal,
-        descripcion:this.prevalorada.descripcion,
+        vehiculo:this.vehiculo,
+        cantidad:this.cantidad,
         // periodoFacturado:this.prevalorada.mes+' '+this.prevalorada.gestion,
       }).then(res=>{
         console.log(res.data)
@@ -196,6 +210,7 @@ export default {
     prevaloradaClickCreate(){
       this.prevalorada.montoTotal=''
       this.prevalorada.descripcion=''
+      this.cantidad=1
       this.saleDialog=true
       this.client={complemento:''}
     },

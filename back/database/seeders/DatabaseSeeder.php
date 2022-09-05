@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
             ActivitySeeder::class,
             LeyendaSeeder::class,
             DocumentSeeder::class,
+            VehiculoSeeder::class,
         ]);
     }
 }

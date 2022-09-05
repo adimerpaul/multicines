@@ -36,6 +36,7 @@ Route::resource('client', \App\Http\Controllers\ClientController::class);
 Route::resource('eventoSignificativo', \App\Http\Controllers\EventoSignificativoController::class);
 Route::resource('rental', \App\Http\Controllers\RentalController::class);
 Route::resource('prevalorada', \App\Http\Controllers\PrevaloradaController::class);
+Route::resource('vehiculo', \App\Http\Controllers\VehiculoController::class);
 Route::post('rentalConsulta', [\App\Http\Controllers\RentalController::class,'rentalConsulta']);
 Route::post('prevaloradaConsulta', [\App\Http\Controllers\PrevaloradaController::class,'prevaloradaConsulta']);
 Route::post('listleyenda', [\App\Http\Controllers\ActivityController::class,'listleyenda']);
