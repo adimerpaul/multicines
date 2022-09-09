@@ -11,7 +11,9 @@ use App\Models\Prevalorada;
 use App\Http\Requests\StorePrevaloradaRequest;
 use App\Http\Requests\UpdatePrevaloradaRequest;
 use App\Models\Rental;
+use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use SimpleXMLElement;
 use DOMDocument;
 class PrevaloradaController extends Controller
@@ -83,6 +85,7 @@ class PrevaloradaController extends Controller
         $codigoSucursal=0;
 
         $user=(object)["name"=>"admin","id"=>1];
+        $retorno=[];
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 500);
@@ -316,7 +319,7 @@ class PrevaloradaController extends Controller
                 $sale->siatEnviado = true;
                 $sale->codigoRecepcion = $result->RespuestaServicioFacturacion->codigoRecepcion;
             } catch (\Exception $e) {
-//            return response()->json(['error' => $e->getMessage()]);
+                return response()->json(['error' => $e->getMessage(),'resp'=>$result->RespuestaServicioFacturacion]);
                 $sale->siatEnviado = false;
             }
 
@@ -328,14 +331,78 @@ class PrevaloradaController extends Controller
 //        }
 
             $sale->cuf = $cuf;
-
 //
             $sale->save();
+            array_push($retorno,$sale);
         }
-        return response()->json(['prevalorada' => Prevalorada::where('id',$sale->id)->first()]);
+        return response()->json($retorno);
 
     }
+    public function anularPrev(Request $request){
+        //return $request->sale['id'];
+        $codigoAmbiente=env('AMBIENTE');
+        $codigoDocumentoSector=23; // 1 compraventa 2 alquiler 23 prevaloradas
+        $codigoEmision=1; // 1 online 2 offline 3 masivo
+        $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
+        $codigoPuntoVenta=0;
+        $codigoSistema=env('CODIGO_SISTEMA');
+        $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
+        $codigoSucursal=0;
+        $nit=ENV('NIT');
 
+        $user=(object)["name"=>"admin","id"=>1];
+
+        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
+        }
+        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No exite CUFD para la venta!!'], 400);
+        }
+        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+
+        //codigomotivo
+        //cuf
+
+        try {
+            $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
+                'stream_context' => stream_context_create([
+                    'http' => [
+                        'header' => "apikey: TokenApi " . env('TOKEN'),
+                    ]
+                ]),
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                'trace' => 1,
+                'use' => SOAP_LITERAL,
+                'style' => SOAP_DOCUMENT,
+            ]);
+            $result= $client->anulacionFactura([
+                "SolicitudServicioAnulacionFactura"=>[
+                    "codigoAmbiente"=>$codigoAmbiente,
+                    "codigoDocumentoSector"=>$codigoDocumentoSector,
+                    "codigoEmision"=>$codigoEmision,
+                    "codigoModalidad"=>$codigoModalidad,
+                    "codigoPuntoVenta"=>$codigoPuntoVenta,
+                    "codigoSistema"=>$codigoSistema,
+                    "codigoSucursal"=>$codigoSucursal,
+                    "cufd"=>$request->sale['cufd'],
+                    "cuis"=>$request->sale['cui'],
+                    "nit"=>env('NIT'),
+                    "tipoFacturaDocumento"=>$tipoFacturaDocumento,
+                    "codigoMotivo"=>$request->motivo['codigoClasificador'],
+                    "cuf"=>$request->sale['cuf']
+                ]
+            ]);
+            if($result->RespuestaServicioFacturacion->transaccion){
+                $sale=Sale::find($request->sale['id']);
+                $sale->siatAnulado=1;
+                $sale->save();
+            }
+        }catch (\Exception $e) {
+//            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
     /**
      * Display the specified resource.
      *

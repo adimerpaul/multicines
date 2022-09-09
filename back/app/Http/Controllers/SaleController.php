@@ -636,7 +636,6 @@ class SaleController extends Controller
         }catch (\Exception $e) {
 //            return response()->json(['error' => $e->getMessage()]);
         }
-
     }
 
     public function destroy(Sale $sale)

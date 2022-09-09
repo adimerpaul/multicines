@@ -13,8 +13,8 @@
     <q-table label="FACTURA DE ALQUILER DE AMBIENTES" :rows="prevaloradas" :columns="columns">
       <template v-slot:body-cell-Opciones="props">
         <q-td :props="props" auto-width>
-<!--          <q-btn icon="print" @click="printFactura(props.row)"/>-->
-<!--          <q-btn icon="list" @click="detalleimp(props.row)"/>-->
+          <q-btn icon="print" @click="printFactura(props.row)"/>
+          <q-btn icon="remove" @click="deleteFactura(props.row)"/>
           <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
         </q-td>
       </template>
@@ -75,6 +75,7 @@
       </q-form>
     </q-card>
   </q-dialog>
+  <div id="myelement" class="hidden"></div>
 
 </div>
 </q-page>
@@ -82,6 +83,9 @@
 
 <script>
 import {date} from "quasar";
+import conversor from "conversor-numero-a-letras-es-ar";
+import QRCode from "qrcode";
+import {Printd} from "printd";
 
 export default {
   name: `Prevalorada`,
@@ -126,7 +130,20 @@ export default {
         // {label:'client_id',name:'client_id',field:row=>row.client.nombreRazonSocial,sortable:true},
         {label:'siatAnulado',name:'siatAnulado',field:'siatAnulado',sortable:true},
         {label:'id',name:'id',field:'id',sortable:true},
-      ]
+      ],
+      cine:{},
+      leyendas:[],
+      opts : {
+        errorCorrectionLevel: 'M',
+        type: 'png',
+        quality: 0.95,
+        width: 60,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFF',
+        },
+      }
 
     }
   },
@@ -191,6 +208,110 @@ export default {
         })
       })
     },
+    async printFactura(factura) {
+      let max=this.leyendas.length - 1;
+      this.facturadetalle = factura
+      let ClaseConversor = conversor.conversorNumerosALetras;
+      let miConversor = new ClaseConversor();
+      let a = miConversor.convertToText( parseInt(factura.montoTotal));
+      this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
+      let cadena = "<style>\
+      .titulo{\
+      font-size: 9px;\
+      text-align: center;\
+      font-weight: bold;\
+      }\
+      .titulo2{\
+      font-size: 8px;\
+      text-align: center;\
+      }\
+            .titulo3{\
+      font-size: 10px;\
+      text-align: center;\
+      width:70%;\
+      }\
+            .contenido{\
+      font-size: 10px;\
+      text-align: left;\
+      }\
+      .conte2{\
+      font-size: 6px;\
+      text-align: right;\
+      }\
+      .titder{\
+      font-size: 6px;\
+      text-align: right;\
+      font-weight: bold;\
+      }\
+      .titizq{\
+      font-size: 12px;\
+      text-align: left;\
+      font-weight: bold;\
+    }\
+      hr{\
+  border-top: 1px dashed   ;\
+}\
+  table{\
+    width:100%\
+  }\
+  h1 {\
+    color: black;\
+    font-family: sans-serif;\
+  }</style>\
+    <div id='myelement'>\
+    <table>\
+    <tr>\
+    <td style='width:50%'>      \
+    <div class='titulo2'>"+this.cine.razon+"<br>\
+        Casa Matriz<br>\
+        No. Punto de Venta "+factura.codigoPuntoVenta+"<br>\
+        "+this.cine.direccion.substring(0,38)+"<br>"+this.cine.direccion.substring(38)+"<br>\
+        Tel. "+this.cine.telefono+"<br>\
+        Oruro\
+      </div></td>\
+    <td style='width: 50%'>\
+      <div class='titulo'>NIT</div>\
+      <div class='titulo2'>"+this.cine.nit+"</div>\
+      <div class='titulo'>FACTURA N°</div>\
+      <div class='titulo2'>"+factura.numeroFactura+"</div>\
+      <div class='titulo'>CÓD. AUTORIZACIÓN</div>\
+      <div class='titulo2' style='text-align: left;' >"+factura.cuf.substring(0,17)+"<br>"+factura.cuf.substring(17,34)+"<br>"+factura.cuf.substring(34,51)+"<br>"+factura.cuf.substring(51)+"</div> </td>\
+    </tr>\
+    </table>\
+    <div class='titder'>OTRAS ACTIVIDADES DE TRANSPORTE COMPLEMENTARIA <br>(TERMINAL DE BUSES, PLAYAS DE ESTACIONAMIENTO, ETC)</div>"
+      cadena += "<table>\
+      <tr><td class='titizq'>FACTURA</td><td style='text-align: right'><span style='font-size: 12px'>Bs. " + parseFloat(factura.montoTotal).toFixed(2) + "</span><br><span style='font-size: 6px'>Son " + a + " " + (parseFloat(factura.montoTotal).toFixed(2) - Math.floor(parseFloat(factura.montoTotal).toFixed(2))) * 100 + "/100 Bolivianos</span></td></tr>\
+      </table>\
+            <div style='font-size: 10px; text-align: center'>Oruro, " + factura.fechaEmision.substring(0,10) +"</div><br>\
+      <div style='font-size: 6px'>'ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS,EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY'<br>\
+      "+factura.leyenda+" \
+      </div><br>\
+     </div>\
+       <img src="+this.qrImage+" >\
+      "
+      //
+      //const cuf = document.createElement('cuf')
+      //cuf.setAttribute('html', factura.cuf)
+      //const options = {
+      //  parent: document.getElementById('myelement'),
+      //  headElements: [ cuf ]
+      //}
+      // const d = new Printd()
+      // d.print( options)
+
+      // let myWindow = window.open("", "Imprimir", "width=1000,height=1000");
+      // myWindow.document.write(cadena);
+      // // myWindow.document.close();
+      // setTimeout(() => {
+      //   myWindow.print();
+      //   myWindow.close();
+      // }, 10);
+      document.getElementById('myelement').innerHTML = cadena
+      const d = new Printd()
+      d.print( document.getElementById('myelement') )
+
+    },
+
     searchClient(){
       // console.log(this.client)
       this.document=this.documents[0]
