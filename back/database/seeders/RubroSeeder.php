@@ -19,31 +19,31 @@ class RubroSeeder extends Seeder
             [
                 'id'=>1,
                 'nombre'=>"COMBOS",
-                'imagen'=>"rubro.jpg",
+                'imagen'=>"combo.png",
                 'color'=>"#770050",
             ],
             [
                 'id'=>2,
                 'nombre'=>"BEBIDAS",
-                'imagen'=>"rubro.jpg",
+                'imagen'=>"VASO COCA.png",
                 'color'=>"#770050",
             ],
             [
                 'id'=>3,
                 'nombre'=>"GRANIZADO",
-                'imagen'=>"rubro.jpg",
+                'imagen'=>"ice.jpg",
                 'color'=>"#770050",
             ],
             [
                 'id'=>4,
                 'nombre'=>"PIPOCAS",
-                'imagen'=>"rubro.jpg",
+                'imagen'=>"pipoca.png",
                 'color'=>"#770050",
             ],
             [
                 'id'=>5,
                 'nombre'=>"HOT DOG",
-                'imagen'=>"rubro.jpg",
+                'imagen'=>"hotdog2.png",
                 'color'=>"#770050",
             ],
             [
@@ -55,7 +55,7 @@ class RubroSeeder extends Seeder
             [
                 'id'=>7,
                 'nombre'=>"ENERGIZANTE",
-                'imagen'=>"rubro.jpg",
+                'imagen'=>"red2.jpg",
                 'color'=>"#770050",
             ],
         ]);
