@@ -170,7 +170,7 @@ export default {
   },
   methods:{
     prevaloradaInsert(){
-      if(this.cantidad==0 || this.cantidad==undefined || this.cantidad==''){
+      if(this.cantidad<=0 || this.cantidad==undefined || this.cantidad==''){
           return false
       }
       this.loading=true
@@ -182,15 +182,11 @@ export default {
         // periodoFacturado:this.prevalorada.mes+' '+this.prevalorada.gestion,
       }).then(res=>{
         console.log(res.data)
-        // this.printFactura(res.data.sale)
-        // res.data.tickets.forEach(r=>{
-        //   this.boletoprint(r)
-        // })
-        // this.momentaneoDeleteAll()
-        // this.tventa()
-        // this.client={complemento:''}
-        // this.saleDialog=false
-        // this.myMovies(this.fecha)
+        res.data.forEach(r=>{
+          this.printFactura(r);
+        })
+        this.prevaloradaConsulta()
+        this.cantidad=1;
         this.loading=false
         // this.eventSearch()
       }).finally(()=>{
