@@ -383,6 +383,8 @@ export default {
       this.error=''
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
+      this.client.email=this.client.email==undefined?'':this.client.email
+
       this.$api.post('sale',{
         client:this.client,
         montoTotal:this.total,

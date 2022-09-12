@@ -341,6 +341,7 @@ export default {
     saleInsert(){
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
+      this.client.email=this.client.email==undefined?'':this.client.email
       this.$api.post('salecandy',{
         client:this.client,
         montoTotal:this.total,
