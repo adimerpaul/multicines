@@ -116,12 +116,7 @@ class SaleController extends Controller
             $client->email=$request->client['email'];
             $client->save();
         }
-        if($client->numeroDocumento==0){
-            $client->codigoTipoDocumentoIdentidad=5;
-            $client->nombreRazonSocia='S/N';
-            $client->id='N/A';
-            $client->numeroDocumento='';
-        }
+
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
@@ -585,10 +580,10 @@ class SaleController extends Controller
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
         $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
-        $codigoPuntoVenta=0;
+        $codigoPuntoVenta=$request->sale['codigoPuntoVenta'];
         $codigoSistema=env('CODIGO_SISTEMA');
         $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
-        $codigoSucursal=0;
+        $codigoSucursal=$request->sale['codigoSucursal'];
         $nit=ENV('NIT');
 
         $user=(object)["name"=>"admin","id"=>1];

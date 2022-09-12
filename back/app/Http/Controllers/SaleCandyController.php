@@ -305,12 +305,7 @@ class SaleCandyController extends Controller
             $client->email=$request->client['email'];
             $client->save();
         }
-        if($client->numeroDocumento==0){
-            $client->codigoTipoDocumentoIdentidad=5;
-            $client->nombreRazonSocia='S/N';
-            $client->id='N/A';
-            $client->numeroDocumento='';
-        }
+
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
