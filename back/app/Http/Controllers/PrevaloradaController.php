@@ -140,7 +140,6 @@ class PrevaloradaController extends Controller
             $sale->user_id = $user->id;
             $sale->cufd_id = $cufd->id;
             $sale->leyenda = $leyenda;
-//        $sale->client_id=$client->id;
             $sale->save();
 
 
