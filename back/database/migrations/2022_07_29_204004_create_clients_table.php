@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string("codigoTipoDocumentoIdentidad")->nullable()->default("1");
             $table->string("numeroDocumento")->nullable();
             $table->string("complemento")->nullable();
+            $table->string("email")->nullable();
             $table->timestamps();
             $table->softDeletes();
 

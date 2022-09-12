@@ -286,23 +286,31 @@ class SaleCandyController extends Controller
 
         if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
             $client=Client::find($request->client['id']);
-            $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
+            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
+            $client->email=$request->client['email'];
             $client->save();
         }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->count()==1){
             $client=Client::find($request->client['id']);
-            $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
+            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
+            $client->email=$request->client['email'];
             $client->save();
         }else{
             $client=new Client();
-            $client->nombreRazonSocial=$request->client['nombreRazonSocial'];
+            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->numeroDocumento=$request->client['numeroDocumento'];
-            $client->complemento=$request->client['complemento'];
+            $client->complemento=strtoupper($request->client['complemento']);
+            $client->email=$request->client['email'];
             $client->save();
         }
-
+        if($client->numeroDocumento==0){
+            $client->codigoTipoDocumentoIdentidad=5;
+            $client->nombreRazonSocia='S/N';
+            $client->id='N/A';
+            $client->numeroDocumento='';
+        }
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo

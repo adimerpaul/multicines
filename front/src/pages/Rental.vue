@@ -30,10 +30,10 @@
       <q-form @submit.prevent="rentalInsert">
         <q-card-section>
           <div class="row">
-            <div class="col-3">
+            <div class="col-2">
               <q-input outlined label="NIT/CARNET" @keyup="searchClient" required v-model="client.numeroDocumento" />
             </div>
-            <div class="col-3">
+            <div class="col-2">
               <q-input outlined label="Complemento"  @keyup="searchClient" v-model="client.complemento" />
             </div>
             <div class="col-3">
@@ -41,6 +41,9 @@
             </div>
             <div class="col-3">
               <q-select v-model="document" outlined :options="documents"/>
+            </div>
+            <div class="col-2">
+              <q-input outlined label="Email"  v-model="client.email" type="email"/>
             </div>
           </div>
         </q-card-section>

@@ -131,7 +131,7 @@
                 class="q-gutter-md"
               >
                 <div class="row">
-                  <div class="col-3">
+                  <div class="col-2">
                     <q-input
                       required
                       @keyup="searchClient"
@@ -143,7 +143,7 @@
                       :rules="[ val => val && val.length > 0 || 'Dato obligatorio']"
                     />
                   </div>
-                  <div class="col-3">
+                  <div class="col-2">
                     <q-input
                       @keyup="searchClient"
                       outlined
@@ -163,8 +163,17 @@
                       :rules="[ val => val && val.length > 0 || 'Dato obligatorio']"
                     />
                   </div>
+
                   <div class="col-3">
                     <q-select v-model="document" outlined :options="documents"/>
+                  </div>
+                  <div class="col-2">
+                    <q-input
+                      outlined
+                      v-model="client.email"
+                      label="Email"
+                      type="email"
+                    />
                   </div>
                   <div class="col-3 q-pa-xs">
                     <q-input

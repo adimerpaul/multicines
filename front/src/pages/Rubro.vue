@@ -27,7 +27,7 @@
 
           <template v-slot:body-cell-opciones="props">
             <q-td auto-width :props="props">
-              <q-btn-dropdown color="info" label="Opciones" dropdown-icon="change_history">
+              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert">
                 <q-list>
                   <q-item clickable v-close-popup @click="rubroUpdateDialog=true;rubro2=props.row;this.store.rubro=props.row.rubro">
                     <q-item-section>

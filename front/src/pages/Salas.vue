@@ -17,7 +17,7 @@
           </template>
           <template v-slot:body-cell-opciones="props">
             <q-td auto-width :props="props">
-              <q-btn-dropdown color="info" label="Opciones" dropdown-icon="more_vert">
+              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert">
                 <q-list>
                   <q-item clickable v-close-popup @click="salaUpdateDialog=true;sala2=props.row;columnas=props.row.columnas;filas=props.row.filas;asientos=props.row.seats;">
                     <q-item-section>
