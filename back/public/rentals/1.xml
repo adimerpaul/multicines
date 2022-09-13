@@ -6,12 +6,12 @@
     <municipio>Oruro</municipio>
     <telefono>5281290</telefono>
     <numeroFactura>1</numeroFactura>
-    <cuf>168AB0075CF1116E238E1D7192E4DAE65494AD06A98BBBE83C4FC6D74</cuf>
-    <cufd>BQUFlQ3deZ0FBNzDRCMTBDQkZBREU=QkvCv2RTUktKV1VIxRDQ0NDQwMEFFM</cufd>
+    <cuf>168AB0075CF11201F8A21D667338BB79D4F4AD06A3912AC6FEFFC6D74</cuf>
+    <cufd>BQUFlQ3deZ0FBNzDRCMTBDQkZBREU=QsKhbFJHUk5KV1VIxRDQ0NDQwMEFFM</cufd>
     <codigoSucursal>0</codigoSucursal>
     <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN N&#xAA;2337 ZONA ESTE</direccion>
     <codigoPuntoVenta>0</codigoPuntoVenta>
-    <fechaEmision>2022-09-09T17:34:59.000</fechaEmision>
+    <fechaEmision>2022-09-12T17:18:55.000</fechaEmision>
     <nombreRazonSocial>S/N</nombreRazonSocial>
     <codigoTipoDocumentoIdentidad>5</codigoTipoDocumentoIdentidad>
     <numeroDocumento>0</numeroDocumento>
@@ -23,7 +23,7 @@
     <codigoMoneda>1</codigoMoneda>
     <tipoCambio>1</tipoCambio>
     <montoTotalMoneda>5</montoTotalMoneda>
-    <leyenda>Ley N&#xB0; 453: Tienes derecho a un trato equitativo sin discriminaci&#xF3;n en la oferta de servicios.</leyenda>
+    <leyenda>Ley N&#xB0; 453: Tienes derecho a recibir informaci&#xF3;n sobre las caracter&#xED;sticas y contenidos de los servicios que utilices.</leyenda>
     <usuario>admin</usuario>
     <codigoDocumentoSector>23</codigoDocumentoSector>
   </cabecera>
@@ -41,5 +41,5 @@
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>uHP6mPuYKov2UBMIiuwTEs7d54/xEOa50AGlpIcMoHw=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>C8JNB4Vn/Vz0E2v6CzIlR/PeCM23KEGs27PRFZXa0RDLlxNQKpjfDtsu7wQU22HCY6Kba/nCsOtAZoUIsnlvsmo4TQ8K2cyvVPDZVYSaBdgjoBJAOi2w0hUFnyP0pN6VLZgLEXMKWlX9xjw/57uoc+JzrGcGaQMiRBzj/EY6zsiwHWrRlQKM92a3QrV3I/CLMHbNJ6XAaXJIqhYnBfScQvcziTeWVbuybVKbZIEEPcsnWF+Q8kdCHaWoHtqG/fKkHlKRKiXo0/qYotzlj41jxR0sRxj4sJpX3oFE7gQJPdfcwXPux5QYiaKVesqTvzqSq47QpWNY+BNCm4vbIQ8duw==</ds:SignatureValue>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>AZlRCajCqt3OilSuzPDoCSj30TfWXIO3dIiXQIJFHZI=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>dI/HijL6GEIErcvLfKFefdDt0cpmmg+IWoxs2v8v9DXU9/aLQ922zKhRiJ1ilpsM71ihmMd4xKoJd59wCFMOjFBcTQFHODjX1nRE46KMeADHPxvh9lUQ6pxahdGVTIftJirC9N/XTymofwmHcFxN8D4U6tcps0CiTIbTSPvajAEawOSTAARm1d9CIW6HaF27k5oW9AMV6wLYpnZGmRMyNRKwIic4oUx5OBMir0EANOmuSfXTIT42nJ7uGnQHoDk58R9EEQwPm0eUxSyX71FRZUDxlCxj+TznaSVSEvL0DuceSAFGX+ekTkf6V1coT7zu0h58XnK31b+5PpqSHskHtw==</ds:SignatureValue>
 <ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIOc/4MUQUyAAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDkwOTE2MDcwMloXDTIyMTAwOTE2MDcwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEArOcosoCvecjEOX9UMz6e4uv2CXtQeCneUE2k9qxXDSY4Qd52zGsvgkselnS2LpTpbDIAWkB9QohNfOBb/SXdzJSx9XOPzNXF8TygJgMxwWLPbM7o+JmMXrlrlcNfMKPgTwBeTTqdBx5SDxam0Og1bHRVZVtj9N/LA0iCDUT/uZiPYEbQOkzZNcvFgkvQXhbTx0Mg7spbMsBtt8Xgz4YVEmXCTjcopTHpapikxh+DvinNfwiQrmttX2sRwNvCF0JncitvAlyCmSVDeUWWYr/XS9fP/vPJt0aXB3dANtkSWgPeZGpymUCLbuwb2tsKO+0Q3rSMA0uTkTDF9HtU4yhRQw==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaPrevalorada>

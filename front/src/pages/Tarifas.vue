@@ -145,6 +145,11 @@ export default {
       this.$q.loading.show()
       this.store.priceSingleTon=true
       this.$api.get('price').then(res=>{
+        res.data.forEach(p=>{
+          p.label=p.serie+' '+p.precio+' Bs.'
+        })
+        this.store.prices2=res.data
+        this.store.prices3=res.data
         this.store.prices=res.data
         this.$q.loading.hide()
       })

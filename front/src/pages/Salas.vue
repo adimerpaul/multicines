@@ -207,14 +207,19 @@ export default {
     }
   },
   created() {
-     if(!this.store.salaSingleTon) {
-       this.$q.loading.show()
-       this.store.salaSingleTon=true
-       this.$api.get('sala').then(res=>{
-         this.store.salas=res.data
-         this.$q.loading.hide()
-       })
-     }
+    if(!this.store.salaSingleTon) {
+      this.$q.loading.show()
+      this.store.salaSingleTon=true
+      this.$api.get('sala').then(res=>{
+        res.data.forEach(p=>{
+          p.label=p.nombre
+        })
+        this.store.salas2=res.data
+        this.store.salas3=res.data
+        this.store.salas=res.data
+        this.$q.loading.hide()
+      })
+    }
     this.tablacine()
   },
   methods: {

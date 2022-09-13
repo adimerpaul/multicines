@@ -186,7 +186,7 @@ export default {
       },
     }
   },
-  created() {
+  mounted() {
     this.cambioFecha(this.programa.fechaini)
 
     if(!this.store.salaSingleTon) {
@@ -275,6 +275,13 @@ export default {
         this.programaDialog=false
       }).catch(err=>{
         console.error(err)
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          icon: 'report_problem',
+          message: err.response.data.message,
+          position: 'top'
+        })
         this.loading=false
       })
 

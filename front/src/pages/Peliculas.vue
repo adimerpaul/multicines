@@ -235,6 +235,11 @@ export default {
       this.$q.loading.show()
       this.store.movieSingleTon=true
       this.$api.get('movie').then(res=>{
+        res.data.forEach(p=>{
+          p.label=p.nombre+' ' + p.formato
+        })
+        this.store.movies2=res.data
+        this.store.movies3=res.data
         this.store.movies=res.data
         this.$q.loading.hide()
       })
