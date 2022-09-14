@@ -13,9 +13,25 @@
     <q-table label="FACTURA DE ALQUILER DE AMBIENTES" :rows="prevaloradas" :columns="columns">
       <template v-slot:body-cell-Opciones="props">
         <q-td :props="props" auto-width>
-          <q-btn icon="print" @click="printFactura(props.row)"/>
-          <q-btn icon="remove" @click="deleteFactura(props.row)"/>
-          <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+          <q-btn-dropdown color="primary" label="Opciones">
+            <q-list>
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-btn icon="print" color="primary" class="full-width" label="Imprimir" no-caps @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-btn icon="cancel_presentation" color="red" class="full-width" label="Anular" no-caps @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-btn type="a" label="Imp Impuestos " class="full-width" color="info" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
         </q-td>
       </template>
     </q-table>
@@ -187,6 +203,7 @@ export default {
         })
         this.prevaloradaConsulta()
         this.cantidad=1;
+        this.saleDialog=false
         this.loading=false
         // this.eventSearch()
       }).finally(()=>{
@@ -213,12 +230,12 @@ export default {
       this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
       let cadena = "<style>\
       .titulo{\
-      font-size: 9px;\
+      font-size: 8px;\
       text-align: center;\
       font-weight: bold;\
       }\
       .titulo2{\
-      font-size: 8px;\
+      font-size: 7px;\
       text-align: center;\
       }\
             .titulo3{\
@@ -240,7 +257,7 @@ export default {
       font-weight: bold;\
       }\
       .titizq{\
-      font-size: 12px;\
+      font-size: 14px;\
       text-align: left;\
       font-weight: bold;\
     }\

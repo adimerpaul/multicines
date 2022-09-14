@@ -13,11 +13,29 @@
     <q-table label="FACTURA DE ALQUILER DE AMBIENTES" :rows="rentals" :columns="columns">
       <template v-slot:body-cell-Opciones="props">
         <q-td :props="props" auto-width>
-<!--          <q-btn icon="print" @click="printFactura(props.row)"/>-->
-          <q-btn icon="list" @click="printFactura(props.row)"/>
-          <q-btn type="a" label="CLick" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+          <q-btn-dropdown color="primary" label="Opciones">
+            <q-list>
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-btn icon="print" color="primary" class="full-width" label="Imprimir" no-caps @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-btn icon="cancel_presentation" color="red" class="full-width" label="Anular" no-caps @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-btn type="a" label="Imp Impuestos " class="full-width" color="info" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
         </q-td>
       </template>
+
     </q-table>
   </div>
   <q-dialog full-width v-model="saleDialog">
@@ -79,6 +97,22 @@
     </q-card>
   </q-dialog>
 
+  <q-dialog v-model="dialogAnular" >
+    <q-card style="min-width: 350px">
+      <q-card-section>
+        <div class="text-h6">ANULAR FACTURA</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <q-select label="motivo" :options="motivos" v-model="motivo"/>
+      </q-card-section>
+
+      <q-card-actions align="right" class="text-primary">
+        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn flat label="ANULAR" @click="enviarAnular" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </div>
   <div id="myelement" class="hidden"></div>
 
@@ -96,6 +130,7 @@ export default {
 
   data(){
     return{
+      dialogAnular:false,
       loading:false,
       fechaInicio:date.formatDate(new Date(),'YYYY-MM-DD'),
       fechaFin:date.formatDate(new Date(),'YYYY-MM-DD'),
@@ -135,6 +170,8 @@ export default {
         {label:'siatAnulado',name:'siatAnulado',field:'siatAnulado',sortable:true},
         {label:'id',name:'id',field:'id',sortable:true},
       ],
+      motivos:[],
+      motivo:{},
       opts : {
         errorCorrectionLevel: 'M',
         type: 'png',
@@ -163,8 +200,32 @@ export default {
       this.documents=res.data
       this.document=this.documents[0]
     })
+    this.cargarMotivo()
   },
   methods:{
+    anularSale(factura){
+      //console.log(factura)
+      this.factura=factura
+      this.dialogAnular=true
+    },
+    enviarAnular(){
+      this.$api.post('anularRental',{rental:this.factura,motivo:this.motivo}).then(res => {
+        console.log(res.data)
+        this.rentalConsulta()
+        this.dialogAnular=false
+      })
+    },
+    cargarMotivo(){
+      this.$api.get('motivoanular').then(res => {
+        res.data.forEach(r=>{
+          r.label=r.descripcion
+        })
+        this.motivos=res.data;
+
+        this.motivo=this.motivos[0]
+      })
+
+    },
     encabezado(){
       this.$api.get('datocine').then(res => {
         this.cine = res.data;
@@ -280,7 +341,7 @@ export default {
   }</style>\
     <div id='myelement'>\
     <table>\
-    <tr><td>\
+    <tr><td style='width: 50%'>\
           <div class='titulo2'>"+this.cine.razon+"<br>\
         Casa Matriz<br>\
         No. Punto de Venta "+factura.codigoPuntoVenta+"<br>\
@@ -288,10 +349,10 @@ export default {
         Tel. "+this.cine.telefono+"<br>\
         Oruro\
       </div>\
-        </td><td colspan='2' style='width: 40%; vertical-align:top'></td><td style='vertical-align:top;'>\
-        <div class='titulo' style='text-align: left'>NIT</div>\
-        <div class='titulo' style='text-align: left'>FACTURA N°</div>\
-        <div class='titulo' style='text-align: left'>CÓD. AUTORIZACIÓN</div>\
+        </td><td style='vertical-align:top; text-align: right;width: 50%;'>\
+        <div class='titulo' style='text-align: right'>NIT</div>\
+        <div class='titulo' style='text-align: right'>FACTURA N°</div>\
+        <div class='titulo' style='text-align: right'>CÓD. AUTORIZACIÓN</div>\
         </td><td style='vertical-align:top; '>\
         <div class='titulo2' style='text-align: left;'>"+this.cine.nit+"</div>\
         <div class='titulo2' style='text-align: left;'>"+factura.numeroFactura+"</div>\

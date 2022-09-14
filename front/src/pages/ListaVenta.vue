@@ -51,10 +51,6 @@
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-
-
-
-
             </q-td>
           </template>
           <template v-slot:body-cell-siatEnviado="props">

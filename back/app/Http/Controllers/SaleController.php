@@ -603,8 +603,8 @@ class SaleController extends Controller
 
         //codigomotivo
         //cuf
-
-        DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
+        if($request->sale['tipo']=='BOLETERIA')
+            DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
         try {
             $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
