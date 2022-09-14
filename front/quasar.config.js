@@ -81,7 +81,7 @@ module.exports = configure(function (ctx) {
       env: {
         API: ctx.dev
           ? 'http://localhost:8000/api/'
-          : 'https://back.miganancia.cf/api/'
+          : 'https://bplaza.miganancia.cf/api/'
       }
 
     },
@@ -169,7 +169,7 @@ module.exports = configure(function (ctx) {
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
-        theme_color: '#027be3',
+        theme_color: '#770050',
         icons: [
           {
             src: 'icons/icon-128x128.png',
