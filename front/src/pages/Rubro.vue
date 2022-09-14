@@ -17,8 +17,7 @@
           </template>
           <template v-slot:body-cell-imagen="props">
             <q-td auto-width :props="props">
-              <div :style="'background: '+props.row.color" >
-
+              <div :style="'background: '+props.row.color" class="flex flex-center">
               <q-img :src="url+'../imagen/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
               </div>
             </q-td>

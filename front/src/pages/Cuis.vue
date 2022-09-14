@@ -8,6 +8,7 @@
               color="green"
               icon="add_circle"
               label="Agregar"
+              :loading="loading"
               @click="cuiDialog=true"/>
             <q-input outlined dense debounce="300" v-model="cuiFilter" placeholder="Buscar">
               <template v-slot:append>
@@ -71,7 +72,9 @@ export default {
   },
   methods: {
     getCuis() {
+      this.loading=true;
       this.$api.get('cui').then(res => {
+        this.loading=false;
         this.cuis = res.data
       })
     },

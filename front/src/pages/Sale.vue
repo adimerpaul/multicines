@@ -594,11 +594,13 @@ facturación en línea”</div><br>\
       // console.log(this.client)
       this.document=this.documents[0]
       this.client.nombreRazonSocial=''
+      this.client.email=''
       this.client.id=undefined
       this.$api.post('searchClient',this.client).then(res=>{
         // console.log(res.data)
         if (res.data.nombreRazonSocial!=undefined) {
           this.client.nombreRazonSocial=res.data.nombreRazonSocial
+          this.client.email=res.data.email
           this.client.id=res.data.id
           let documento=this.documents.find(r=>r.codigoClasificador==res.data.codigoTipoDocumentoIdentidad)
           documento.label=documento.descripcion

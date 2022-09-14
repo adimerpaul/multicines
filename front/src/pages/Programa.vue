@@ -110,8 +110,8 @@
           </q-card-section>
 
           <q-card-actions align="right" class="text-primary">
-            <q-btn color="red-10" label="Atras" icon="arrow_back" v-close-popup />
-            <q-btn color="red" label="Eliminar" @click="eliminarFuncion" icon="delete" />
+            <q-btn color="red-10" label="Atras" :loading="loading" icon="arrow_back" v-close-popup />
+            <q-btn color="red" label="Eliminar" :loading="loading" @click="eliminarFuncion" icon="delete" />
             <q-btn  label="Modificar" :loading="loading" @click="modificarFuncion" icon="edit" color="yellow"/>
           </q-card-actions>
         </q-card>
@@ -300,10 +300,28 @@ export default {
 
     },
     eliminarFuncion(){
-      this.$api.delete('programa/'+this.programa2.id).then(res=>{
-        // console.log(res.data)
-        this.listado(0)
+      this.$q.dialog({
+        title: 'Eliminar',
+        message: '¿Está seguro de eliminar la función?',
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.loading=true
+        this.$api.delete('programa/'+this.programa2.id).then(res=>{
+          // console.log(res.data)
+          this.listado(0);
+          this.loading=false
+          this.programaUpdateDialog=false
+          })
+      }).onCancel(() => {
+        console.log('Cancel')
+      }).onDismiss(() => {
+        console.log('Dismissed')
       })
+      // this.$api.delete('programa/'+this.programa2.id).then(res=>{
+      //   // console.log(res.data)
+      //   this.listado(0)
+      // })
     },
     cargar(){
       this.listtarifa=[]

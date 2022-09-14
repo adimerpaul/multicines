@@ -101,12 +101,14 @@ class SaleController extends Controller
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
+//            return "actualizado con complento";
         }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->count()==1){
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
+//            return "actualizado";
         }else{
             $client=new Client();
             $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
@@ -115,7 +117,9 @@ class SaleController extends Controller
             $client->complemento=strtoupper($request->client['complemento']);
             $client->email=$request->client['email'];
             $client->save();
+//            return "nuevo";
         }
+
 
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas

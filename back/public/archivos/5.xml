@@ -5,48 +5,48 @@
     <razonSocialEmisor>MULTISALAS S.R.L.</razonSocialEmisor>
     <municipio>Oruro</municipio>
     <telefono>5281290</telefono>
-    <numeroFactura>5</numeroFactura>
-    <cuf>168AB0075CF102075DB45A1C6AE40A2963FBA421222D01EABDACB6D74</cuf>
-    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qnl+NmhVZUlXVUFIxRDQ0NDQwMEFFM</cufd>
+    <numeroFactura>2</numeroFactura>
+    <cuf>168AB0075CF11234B78E89541C9E995A49E39F8D514825190C30D6D74</cuf>
+    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qj5vYTFUT0pXVUJIxRDQ0NDQwMEFFM</cufd>
     <codigoSucursal>0</codigoSucursal>
     <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN Nª2337 ZONA ESTE</direccion>
-    <codigoPuntoVenta>0</codigoPuntoVenta>
-    <fechaEmision>2022-08-29T20:45:25.000</fechaEmision>
-    <nombreRazonSocial>CHICA</nombreRazonSocial>
-    <codigoTipoDocumentoIdentidad>2</codigoTipoDocumentoIdentidad>
-    <numeroDocumento>123456</numeroDocumento>
-    <complemento>E</complemento>
+    <codigoPuntoVenta>1</codigoPuntoVenta>
+    <fechaEmision>2022-09-13T20:11:02.000</fechaEmision>
+    <nombreRazonSocial>CHAMBI</nombreRazonSocial>
+    <codigoTipoDocumentoIdentidad>1</codigoTipoDocumentoIdentidad>
+    <numeroDocumento>E-123456</numeroDocumento>
+    <complemento/>
     <codigoCliente>5</codigoCliente>
     <codigoMetodoPago>1</codigoMetodoPago>
     <numeroTarjeta xsi:nil="true"/>
-    <montoTotal>17.50</montoTotal>
-    <montoTotalSujetoIva>17.50</montoTotalSujetoIva>
+    <montoTotal>9.00</montoTotal>
+    <montoTotalSujetoIva>9.00</montoTotalSujetoIva>
     <codigoMoneda>1</codigoMoneda>
     <tipoCambio>1</tipoCambio>
-    <montoTotalMoneda>17.50</montoTotalMoneda>
+    <montoTotalMoneda>9.00</montoTotalMoneda>
     <montoGiftCard xsi:nil="true"/>
     <descuentoAdicional>0</descuentoAdicional>
     <codigoExcepcion xsi:nil="true"/>
     <cafc xsi:nil="true"/>
-    <leyenda>Ley N° 453: Tienes derecho a un trato equitativo sin discriminación en la oferta de servicios.</leyenda>
+    <leyenda>Ley N° 453: El proveedor de servicios debe habilitar medios e instrumentos para efectuar consultas y reclamaciones.</leyenda>
     <usuario>admin</usuario>
     <codigoDocumentoSector>1</codigoDocumentoSector>
   </cabecera>
   <detalle>
     <actividadEconomica>590000</actividadEconomica>
     <codigoProductoSin>99100</codigoProductoSin>
-    <codigoProducto>5</codigoProducto>
-    <descripcion>minions 2: nace un villano 2D</descripcion>
+    <codigoProducto>18</codigoProducto>
+    <descripcion>HOT DOG (PROMO)</descripcion>
     <cantidad>1</cantidad>
     <unidadMedida>62</unidadMedida>
-    <precioUnitario>17.5</precioUnitario>
+    <precioUnitario>9</precioUnitario>
     <montoDescuento>0</montoDescuento>
-    <subTotal>17.5</subTotal>
+    <subTotal>9</subTotal>
     <numeroSerie xsi:nil="true"/>
     <numeroImei xsi:nil="true"/>
   </detalle>
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>+yXp6lVYBlpgb8LNU+HVl4nyr07z/pz7ELcrwnxfmfU=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>nrbCWnfV2J4jZQE8eClMTzw7nUq9onuW7Z5XhwqjFLfpmY5nsCihMRkbHLO/OTb5PbVu9octkYtfICd1wvOihJXdCA0+ldDhGlJN2OM28zOBEmDOPVGqKmnm5UvA6LnuuF8mOcSoFgb/dkyMQG2KRZPJ9AFltNgqRiNyY4Eu1sojT04QrS0+S6pJoZ9ABXnKwMQiaSRf+kDDaclQOaya8XMV8uzD/pLnbWFY24PBiBdV/38sEEVz1DsXwJFzJ2KVxjKcMlNhftctAi33trCPx2Y8/v4LywI1JU6Bbosc6W1OnT9KiF7UNNAj+FG6quANmFW860yxPtDkA4yRoy1Dmw==</ds:SignatureValue>
-<ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIYfiNI5DC9AAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDgwOTE1MjYwMloXDTIyMDkwODE1MjYwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEAS0HlsyZxtN7YEGl4skZ3WU07oZZ6yrPRkzGBD7EDnlFnEizBDymFJK+mUFMTMg6bhWhszETFtzCZxt2nQ2Ang7iAiFDz+W3Zjtra08z87Hf+t4XwviEO24K+CJetCE70UZ3tg8uTkShPEUcj3o6Jijir8ViBnJ/e0xC1rpFe66ZFjZ1F38bc39Uh4FFdQEDyhdjiN69mvTFDMdTKXxldbkgKFU3YAvWbNLaUxKWpBlQcMNOimUMtn+AcICuP2zwe/QsVGgw0a5Eix3YCTgougUdj+sq+uI7NlRjig/K0nNxsE1H+EcgfwJmoB/UwgU7othZN35nKyUy3Kxb9JCsGZg==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaCompraVenta>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>XA5jcIg4FtgvMGlaj9SL3Hz9QuBvPeRVVOdO0nhNA6w=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>i9VY/wx37CVNkdG4grvhT6+4NDXJGhNDuePZ5uOoyUpwHqJJowteyy8+Ho52bIZfsrPHVhETmLTz3hhlOGgDeMS8MmWQSwQYGiGXiAD715iZ3vmcznqWd0bXfdrhgLnSvNljH9EDVuwpZCVz5L/7skZpR3X7j1KLW8+eb/v9cTsmbCXnPq+Eli63UvsjPQAXaegf13iZJDU+VnpepsmW5lGd0HtrK+AEAANCDCUsELSOuhILLvZJUAhef60T/yGmrpeZOyJptbdqZAvODVHj47IxLWi23m2lJVr82zLxPYAbMZzMUSAYF5fGy0cBvQbUOG8RjDEIuGQcZ4al0qXHCg==</ds:SignatureValue>
+<ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIOc/4MUQUyAAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDkwOTE2MDcwMloXDTIyMTAwOTE2MDcwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEArOcosoCvecjEOX9UMz6e4uv2CXtQeCneUE2k9qxXDSY4Qd52zGsvgkselnS2LpTpbDIAWkB9QohNfOBb/SXdzJSx9XOPzNXF8TygJgMxwWLPbM7o+JmMXrlrlcNfMKPgTwBeTTqdBx5SDxam0Og1bHRVZVtj9N/LA0iCDUT/uZiPYEbQOkzZNcvFgkvQXhbTx0Mg7spbMsBtt8Xgz4YVEmXCTjcopTHpapikxh+DvinNfwiQrmttX2sRwNvCF0JncitvAlyCmSVDeUWWYr/XS9fP/vPJt0aXB3dANtkSWgPeZGpymUCLbuwb2tsKO+0Q3rSMA0uTkTDF9HtU4yhRQw==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaCompraVenta>

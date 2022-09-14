@@ -18,7 +18,7 @@
 <div class="col-12 col-md-8">
       <q-card-section>
         <div class="row">
-          <div v-for="r in rubros" :key="r.id" class="col-2 col-md-3">
+          <div v-for="r in rubros" :key="r.id" class="col-2 col-md-2">
               <q-card @click="productos=r.productos" class="q-pa-xs">
                 <q-img
                   :style="'background: '+r.color"
@@ -42,7 +42,7 @@
           <div class="col-6"><div class="text-h6"><q-icon name="shopping_cart"/> PRODUCTOS</div></div>
         </div>
         <div class="row">
-          <div class="col-2 col-md-3" v-for="p in productos" :key="p.id">
+          <div class="col-2 col-md-2" v-for="p in productos" :key="p.id">
             <q-card @click="miventa(p)"  class="q-ma-xs" :style="'background: '+p.color">
               <q-img
                 :style="'background: '+p.color"
@@ -361,8 +361,8 @@ export default {
             this.printFactura(res.data.sale)
           }
         this.printComanda(res.data.sale)
-
-        console.log(res.data)
+        this.icon=false
+        // console.log(res.data)
         this.loading=false
       }).catch(err=>{
         console.log(err)
@@ -380,11 +380,13 @@ export default {
       // console.log(this.client)
       this.document=this.documents[0]
       this.client.nombreRazonSocial=''
+      this.client.email=''
       this.client.id=undefined
       this.$api.post('searchClient',this.client).then(res=>{
         // console.log(res.data)
         if (res.data.nombreRazonSocial!=undefined) {
           this.client.nombreRazonSocial=res.data.nombreRazonSocial
+          this.client.email=res.data.email
           this.client.id=res.data.id
           let documento=this.documents.find(r=>r.codigoClasificador==res.data.codigoTipoDocumentoIdentidad)
           documento.label=documento.descripcion
