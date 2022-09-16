@@ -380,6 +380,7 @@ class SaleController extends Controller
                         "title"=>"Factura",
                         "body"=>"Gracias por su compra",
                         "sale_id"=>$sale->id,
+                        "carpeta"=>"archivos",
                     ];
                     Mail::to($request->client['email'])->send(new TestMail($details));
                 }
@@ -478,6 +479,7 @@ class SaleController extends Controller
                     "title"=>"Factura",
                     "body"=>"Gracias por su compra",
                     "sale_id"=>$sale->id,
+                    "carpeta"=>"archivos",
                 ];
                 Mail::to($request->client['email'])->send(new TestMail($details));
             }

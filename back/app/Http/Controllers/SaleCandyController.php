@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TestMail;
 use App\Models\Client;
 use App\Models\Cufd;
 use App\Models\Cui;
@@ -15,6 +16,7 @@ use App\Http\Requests\StoreSaleCandyRequest;
 use App\Http\Requests\UpdateSaleCandyRequest;
 use App\Models\Ticket;
 use DOMDocument;
+use Illuminate\Support\Facades\Mail;
 use SimpleXMLElement;
 
 class SaleCandyController extends Controller
@@ -497,6 +499,15 @@ class SaleCandyController extends Controller
                 $sale->tipo="CANDY";
                 $sale->leyenda=$leyenda;
                 $sale->save();
+                if ($request->client['email']!==''){
+                    $details=[
+                        "title"=>"Factura",
+                        "body"=>"Gracias por su compra",
+                        "sale_id"=>$sale->id,
+                        "carpeta"=>"archivos",
+                    ];
+                    Mail::to($request->client['email'])->send(new TestMail($details));
+                }
                 $dataDetail=[];
                 foreach ($request->detalleVenta as $detalle){
                     $d=[
@@ -546,6 +557,15 @@ class SaleCandyController extends Controller
             $sale->tipo="CANDY";
             $sale->leyenda=$leyenda;
             $sale->save();
+            if ($request->client['email']!==''){
+                $details=[
+                    "title"=>"Factura",
+                    "body"=>"Gracias por su compra",
+                    "sale_id"=>$sale->id,
+                    "carpeta"=>"archivos",
+                ];
+                Mail::to($request->client['email'])->send(new TestMail($details));
+            }
             $dataDetail=[];
             foreach ($request->detalleVenta as $detalle){
                 $d=[

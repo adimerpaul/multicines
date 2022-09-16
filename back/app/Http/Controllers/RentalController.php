@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSaleRequest;
+use App\Mail\TestMail;
 use App\Models\Client;
 use App\Models\Cufd;
 use App\Models\Cui;
@@ -17,6 +18,7 @@ use App\Models\Sale;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use SimpleXMLElement;
 use DOMDocument;
 class RentalController extends Controller
@@ -157,7 +159,15 @@ class RentalController extends Controller
         $sale->cufd_id=$cufd->id;
         $sale->client_id=$client->id;
         $sale->save();
-
+        if ($request->client['email']!==''){
+            $details=[
+                "title"=>"Factura",
+                "body"=>"Gracias por su compra",
+                "sale_id"=>$sale->id,
+                "carpeta"=>"rentals",
+            ];
+            Mail::to($request->client['email'])->send(new TestMail($details));
+        }
 
 
 
