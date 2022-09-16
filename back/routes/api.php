@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 Route::post('/upload', [\App\Http\Controllers\UploadController::class,'upload']);
-
+Route::get("sendEmail",[\App\Http\Controllers\MailController::class,'sendEmail']);
 Route::resource('movie', \App\Http\Controllers\MovieController::class);
 Route::resource('distributor', \App\Http\Controllers\DistributorController::class);
 Route::resource('sala', \App\Http\Controllers\SalaController::class);
