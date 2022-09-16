@@ -16,6 +16,7 @@ import ListaVentaCandy from "pages/ListaVentaCandy";
 import EventoSignificativo from "pages/EventoSignificativo";
 import Rental from "pages/Rental";
 import Prevalorada from "pages/Prevalorada";
+import Cliente from "pages/Cliente";
 
 
 const routes = [
@@ -41,6 +42,7 @@ const routes = [
       { path: 'eventoSignificativo', component: EventoSignificativo },
       { path: 'rental', component: Rental },
       { path: 'prevalorada', component: Prevalorada },
+      { path: 'cliente', component: Cliente },
     ]
   },
 
