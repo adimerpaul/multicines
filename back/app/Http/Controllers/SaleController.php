@@ -375,12 +375,15 @@ class SaleController extends Controller
                 $sale->leyenda=$leyenda;
                 $sale->save();
 
-                $details=[
-                    "title"=>"Factura",
-                    "body"=>"Gracias por su compra",
-                    "sale_id"=>$sale->id,
-                ];
-                Mail::to($client->email)->send(new TestMail($details));
+                if ($request->client['email']!==''){
+                    $details=[
+                        "title"=>"Factura",
+                        "body"=>"Gracias por su compra",
+                        "sale_id"=>$sale->id,
+                    ];
+                    Mail::to($request->client['email'])->send(new TestMail($details));
+                }
+
 
 
 
@@ -470,12 +473,14 @@ class SaleController extends Controller
             $sale->leyenda=$leyenda;
             $sale->save();
 
-            $details=[
-                "title"=>"Factura",
-                "body"=>"Gracias por su compra",
-                "sale_id"=>$sale->id,
-            ];
-            Mail::to($client->email)->send(new TestMail($details));
+            if ($request->client['email']!==''){
+                $details=[
+                    "title"=>"Factura",
+                    "body"=>"Gracias por su compra",
+                    "sale_id"=>$sale->id,
+                ];
+                Mail::to($request->client['email'])->send(new TestMail($details));
+            }
 
 
             $momentaneos=Momentaneo::where('user_id',$user->id)->get();
