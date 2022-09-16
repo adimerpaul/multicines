@@ -65,11 +65,11 @@ class TestMail extends Mailable
         $hora = substr($xml->cabecera->fechaEmision, 11, 8);
         $fecha = substr($xml->cabecera->fechaEmision, 0, 10);
         foreach ($xml->detalle as $d) {
-            if ($d->unidadMedida == Env::unidadMedida) {
-                $d->unidadMedida = Env::unidadMedidaDescripcion;
-            } else {
-                $d->unidadMedida = Env::unidadMedidaOtroDescripcion;
-            }
+//            if ($d->unidadMedida == Env::unidadMedida) {
+                $d->unidadMedida = 'OTROS';
+//            } else {
+//                $d->unidadMedida = Env::unidadMedidaOtroDescripcion;
+//            }
             $detalles .= '
                 <tr>
                     <td class="border">' . $d->codigoProducto . '</td>
