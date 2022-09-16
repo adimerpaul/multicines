@@ -82,7 +82,7 @@ class TestMail extends Mailable
                 </tr>
             ';
         }
-        $url = Env::urlQr . "QR?nit=1010413026&cuf=" . $xml->cabecera->cuf . "&numero=" . $xml->cabecera->numeroFactura;
+        $url = env('URL_SIAT2') . "QR?nit=1010413026&cuf=" . $xml->cabecera->cuf . "&numero=" . $xml->cabecera->numeroFactura;
         $qrcode = base64_encode(QrCode::format('svg')->size(200)->errorCorrection('H')->generate($url));
         return ('
         <!doctype html>
