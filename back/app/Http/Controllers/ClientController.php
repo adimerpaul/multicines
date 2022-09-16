@@ -30,7 +30,7 @@ class ClientController extends Controller
         if ($request->has('complemento') && $request->complemento != '') {
             $clients = Client::where('numeroDocumento',  $request->numeroDocumento)->where('complemento',  $request->complemento)->first();
         } else {
-            $clients = Client::where('numeroDocumento',  $request->numeroDocumento)->first();
+            $clients = Client::where('numeroDocumento',  $request->numeroDocumento)->where('complemento','')->first();
         }
         return $clients;
     }
@@ -82,6 +82,11 @@ class ClientController extends Controller
     public function update(UpdateClientRequest $request, Client $client)
     {
         //
+        $client=Client::find($request->id);
+        $client->nombreRazonSocial=strtoupper($request->nombreRazonSocial);
+        $client->codigoTipoDocumentoIdentidad=$request->codigoTipoDocumentoIdentidad;
+        $client->email=$request->email;
+        $client->save();
     }
 
     /**
