@@ -380,7 +380,7 @@ class SaleController extends Controller
                     "body"=>"Gracias por su compra",
                     "sale_id"=>$sale->id,
                 ];
-                Mail::to("adimer101@gmail.com")->send(new TestMail($details));
+                Mail::to($client->email)->send(new TestMail($details));
 
 
 
@@ -475,7 +475,7 @@ class SaleController extends Controller
                 "body"=>"Gracias por su compra",
                 "sale_id"=>$sale->id,
             ];
-            Mail::to("adimer101@gmail.com")->send(new TestMail($details));
+            Mail::to($client->email)->send(new TestMail($details));
 
 
             $momentaneos=Momentaneo::where('user_id',$user->id)->get();
