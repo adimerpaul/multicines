@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TestMail;
 use App\Models\Client;
 use App\Models\Cufd;
 use App\Models\Cui;
@@ -15,8 +16,12 @@ use App\Http\Requests\UpdateSaleRequest;
 use App\Models\Ticket;
 //require 'CUF.php';
 //use CUF;
+use App\Patrones\Env;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Luecano\NumeroALetras\NumeroALetras;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use SimpleXMLElement;
 use DOMDocument;
 
@@ -348,8 +353,12 @@ class SaleController extends Controller
                     "hashArchivo"=>$hashArchivo,
                 ]
             ]);
+
+
+
             if ($result->RespuestaServicioFacturacion->transaccion) {
                 $sale=new Sale();
+
                 $sale->numeroFactura=$numeroFactura;
                 $sale->cuf="";
                 $sale->cufd=$cufd->codigo;
@@ -365,6 +374,16 @@ class SaleController extends Controller
                 $sale->client_id=$client->id;
                 $sale->leyenda=$leyenda;
                 $sale->save();
+
+                $details=[
+                    "title"=>"Factura",
+                    "body"=>"Gracias por su compra",
+                    "sale_id"=>$sale->id,
+                ];
+                Mail::to("adimer101@gmail.com")->send(new TestMail($details));
+
+
+
                 $momentaneos=Momentaneo::where('user_id',$user->id)->get();
                 $data=[];
                 $dataDetail=[];
@@ -450,6 +469,15 @@ class SaleController extends Controller
             $sale->client_id=$client->id;
             $sale->leyenda=$leyenda;
             $sale->save();
+
+            $details=[
+                "title"=>"Factura",
+                "body"=>"Gracias por su compra",
+                "sale_id"=>$sale->id,
+            ];
+            Mail::to("adimer101@gmail.com")->send(new TestMail($details));
+
+
             $momentaneos=Momentaneo::where('user_id',$user->id)->get();
             $data=[];
             $dataDetail=[];
@@ -533,6 +561,7 @@ class SaleController extends Controller
     {
         //
     }
+
 
     public function totalventa(Request $request){
         return Ticket::whereDate('fechaFuncion',$request->fecha)->where('devuelto','0')->count();

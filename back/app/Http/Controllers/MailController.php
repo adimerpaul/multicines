@@ -17,6 +17,7 @@ class MailController extends Controller
         $details=[
             "title"=>"Factura",
             "body"=>"body",
+            "sale_id"=>"1"
         ];
         Mail::to("adimer101@gmail.com")->send(new TestMail($details));
         return "enviado";
