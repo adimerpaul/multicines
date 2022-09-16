@@ -30,25 +30,25 @@ class TestMail extends Mailable
      */
     public function build()
     {
-        $pathXmlFile='/archivos/'.$this->details['sale_id'].'.xml';
-        if (!file_exists($pathXmlFile)) return false;
-        $nameFile = substr($pathXmlFile, 0, strlen($pathXmlFile) - 4);
-        $content = file_get_contents($pathXmlFile);
-        $xml = simplexml_load_string($content);
-        $cuf = '';
-        for ($i = 0; $i < strlen($xml->cabecera->cuf); $i++) {
-            if (($i + 1) % 20 == 0) {
-                $cuf .= substr($xml->cabecera->cuf, $i, 1) . "<br>";
-            } else {
-                $cuf .= substr($xml->cabecera->cuf, $i, 1);
-            }
-        }
-        $html = self::generateHTML($xml,$cuf);
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('letter');
-        $dompdf->render();
-        file_put_contents($nameFile.'.pdf', $dompdf->output());
+//        $pathXmlFile='/archivos/'.$this->details['sale_id'].'.xml';
+//        if (!file_exists($pathXmlFile)) return false;
+//        $nameFile = substr($pathXmlFile, 0, strlen($pathXmlFile) - 4);
+//        $content = file_get_contents($pathXmlFile);
+//        $xml = simplexml_load_string($content);
+//        $cuf = '';
+//        for ($i = 0; $i < strlen($xml->cabecera->cuf); $i++) {
+//            if (($i + 1) % 20 == 0) {
+//                $cuf .= substr($xml->cabecera->cuf, $i, 1) . "<br>";
+//            } else {
+//                $cuf .= substr($xml->cabecera->cuf, $i, 1);
+//            }
+//        }
+//        $html = self::generateHTML($xml,$cuf);
+//        $dompdf = new Dompdf();
+//        $dompdf->loadHtml($html);
+//        $dompdf->setPaper('letter');
+//        $dompdf->render();
+//        file_put_contents($nameFile.'.pdf', $dompdf->output());
 
         return $this->from(env('MAIL_FROM_ADDRESS'),env('MAIL_FROM_NAME'))
             ->view('vista')
