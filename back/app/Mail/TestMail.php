@@ -44,11 +44,11 @@ class TestMail extends Mailable
             }
         }
         $html = self::generateHTML($xml,$cuf);
-//        $dompdf = new Dompdf();
-//        $dompdf->loadHtml($html);
-//        $dompdf->setPaper('letter');
-//        $dompdf->render();
-//        file_put_contents($nameFile.'.pdf', $dompdf->output());
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('letter');
+        $dompdf->render();
+        file_put_contents($nameFile.'.pdf', $dompdf->output());
 
         return $this->from(env('MAIL_FROM_ADDRESS'),env('MAIL_FROM_NAME'))
             ->view('vista')
