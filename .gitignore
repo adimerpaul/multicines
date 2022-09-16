@@ -14,3 +14,7 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+/back/public/archivos/
+/back/public/imagen/
+/back/public/imagenes/
+/back/public/rentals/

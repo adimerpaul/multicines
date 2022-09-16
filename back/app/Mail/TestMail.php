@@ -52,7 +52,7 @@ class TestMail extends Mailable
 
         return $this->from(env('MAIL_FROM_ADDRESS'),env('MAIL_FROM_NAME'))
             ->view('vista')
-//            ->attach('archivos/'.$nameFile.'.pdf')
+            ->attach('archivos/'.$this->details['sale_id'].'.pdf')
             ->attach('archivos/'.$this->details['sale_id'].'.xml')
             ->subject('MULTICINEZ PLAZA')
             ->with($this->details);
