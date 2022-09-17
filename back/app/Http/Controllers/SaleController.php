@@ -672,6 +672,7 @@ class SaleController extends Controller
                 ]
             ]);
             if($result->RespuestaServicioFacturacion->transaccion){
+
                 $sale=Sale::find($request->sale['id']);
                 $sale->siatAnulado=1;
                 $sale->save();

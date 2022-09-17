@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use SimpleXMLElement;
 use DOMDocument;
+
 class RentalController extends Controller
 {
     /**
@@ -159,15 +160,7 @@ class RentalController extends Controller
         $sale->cufd_id=$cufd->id;
         $sale->client_id=$client->id;
         $sale->save();
-        if ($request->client['email']!==''){
-            $details=[
-                "title"=>"Factura",
-                "body"=>"Gracias por su compra",
-                "sale_id"=>$sale->id,
-                "carpeta"=>"rentals",
-            ];
-            Mail::to($request->client['email'])->send(new TestMail($details));
-        }
+
 
 
 
@@ -323,6 +316,15 @@ class RentalController extends Controller
 
 //
         $sale->save();
+        if ($request->client['email']!==''){
+            $details=[
+                "title"=>"Factura",
+                "body"=>"Gracias por su compra",
+                "sale_id"=>$sale->id,
+                "carpeta"=>"rentals",
+            ];
+            Mail::to($request->client['email'])->send(new TestMail($details));
+        }
         return response()->json(['rental' => Rental::where('id',$sale->id)->with('client')->first()]);
 
     }

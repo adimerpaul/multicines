@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Medida;
 use Dompdf\Dompdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,7 +31,7 @@ class TestMail extends Mailable
      */
     public function build()
     {
-        $pathXmlFile='archivos/'.$this->details['sale_id'].'.xml';
+        $pathXmlFile=$this->details['carpeta'].'/'.$this->details['sale_id'].'.xml';
         if (!file_exists($pathXmlFile)) return false;
         $nameFile = substr($pathXmlFile, 0, strlen($pathXmlFile) - 4);
         $content = file_get_contents($pathXmlFile);
@@ -52,11 +53,12 @@ class TestMail extends Mailable
 
         return $this->from(env('MAIL_FROM_ADDRESS'),env('MAIL_FROM_NAME'))
             ->view('vista')
-            ->attach('archivos/'.$this->details['sale_id'].'.pdf')
-            ->attach('archivos/'.$this->details['sale_id'].'.xml')
+            ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.pdf')
+            ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.xml')
             ->subject('MULTICINEZ PLAZA')
             ->with($this->details);
     }
+
     public function generateHTML($xml,$cuf): string
     {
         $formatter = new NumeroALetras();
@@ -66,8 +68,10 @@ class TestMail extends Mailable
         $fecha = substr($xml->cabecera->fechaEmision, 0, 10);
         foreach ($xml->detalle as $d) {
 //            if ($d->unidadMedida == Env::unidadMedida) {
-                $d->unidadMedida = 'OTROS';
 //            } else {
+            $med=Medida::where('codigoClasificador',$d->unidadMedida)->first();
+            $d->unidadMedida = $med->descripcion;
+
 //                $d->unidadMedida = Env::unidadMedidaOtroDescripcion;
 //            }
             $detalles .= '
@@ -288,4 +292,5 @@ class TestMail extends Mailable
 </html>
 ');
     }
+    
 }
