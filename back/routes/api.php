@@ -55,6 +55,7 @@ Route::post('searchClient', [\App\Http\Controllers\ClientController::class,'sear
 Route::get('datocine', [\App\Http\Controllers\SaleController::class,'datocine']);
 Route::post('totalventa', [\App\Http\Controllers\SaleController::class,'totalventa']);
 Route::post('anularSale', [\App\Http\Controllers\SaleController::class,'anularSale']);
+Route::post('enviarCorreo', [\App\Http\Controllers\SaleController::class,'enviarCorreo']);
 Route::post('anularRental', [\App\Http\Controllers\RentalController::class,'anularRental']);
 
 Route::post('momentaneoDelete', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDelete']);

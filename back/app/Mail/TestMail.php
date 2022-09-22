@@ -10,6 +10,8 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Luecano\NumeroALetras\NumeroALetras;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+
 class TestMail extends Mailable
 {
     use Queueable, SerializesModels;
@@ -86,7 +88,7 @@ class TestMail extends Mailable
                 </tr>
             ';
         }
-        $url = env('URL_SIAT2') . "QR?nit=1010413026&cuf=" . $xml->cabecera->cuf . "&numero=" . $xml->cabecera->numeroFactura;
+        $url = env('URL_SIAT2') . "consulta/QR?nit=" . env('NIT') . "&cuf=" . $xml->cabecera->cuf . "&numero=" . $xml->cabecera->numeroFactura . "&t=2";
         $qrcode = base64_encode(QrCode::format('svg')->size(200)->errorCorrection('H')->generate($url));
         return ('
         <!doctype html>
@@ -205,7 +207,7 @@ class TestMail extends Mailable
                         <div class="bold">NIT/CI/CEX:</div>
                     </td>
                     <td>
-                        <div>' . $xml->cabecera->numeroDocumento . '</div>
+                        <div>' . $xml->cabecera->numeroDocumento .  '</div>
                     </td>
                 </tr>
                 <tr>
@@ -292,5 +294,5 @@ class TestMail extends Mailable
 </html>
 ');
     }
-    
+
 }
