@@ -353,35 +353,46 @@ export default {
       this.saleDialog=true
       this.client={complemento:''}
     },
-    printButton() {
+    async printButton() {
       //progress.hidden = false;
-      let printCharacteristic
-      if (printCharacteristic == null) {
-        navigator.bluetooth.requestDevice({
-          filters: [{
-            name: 'BlueTooth Printer',
-            services: ['000018f0-0000-1000-8000-00805f9b34fb']
-          }]
-        },
-          {
-            optionalServices: ['00002af1-0000-1000-8000-00805f9b34fb']
-          })
-          .then(device => {
-            console.log('> Found ' + device.name);
-            console.log('Connecting to GATT Server...');
-            return device.gatt.connect();
-          })
-          .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
-          .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
-          .then(characteristic => {
-            // Cache the characteristic
-            printCharacteristic = characteristic;
-            //sendPrinterData();
-          })
-          .catch();
-      } else {
-        //sendPrinterData();
-      }
+      let device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: [
+          '000018f0-0000-1000-8000-00805f9b34fb'
+        ]
+      });
+
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb");
+      const characteristic = await service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb");
+
+      /*      let printCharacteristic
+            if (printCharacteristic == null) {
+              navigator.bluetooth.requestDevice({
+                filters: [{
+                  name: 'BlueTooth Printer',
+                  services: ['000018f0-0000-1000-8000-00805f9b34fb']
+                }]
+              },
+                {
+                  optionalServices: ['00002af1-0000-1000-8000-00805f9b34fb']
+                })
+                .then(device => {
+                  console.log('> Found ' + device.name);
+                  console.log('Connecting to GATT Server...');
+                  return device.gatt.connect();
+                })
+                .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
+                .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
+                .then(characteristic => {
+                  // Cache the characteristic
+                  printCharacteristic = characteristic;
+                  //sendPrinterData();
+                })
+                .catch();
+            } else {
+              //sendPrinterData();
+            }*/
     },
     prevaloradaConsulta(){
       this.loading=true
