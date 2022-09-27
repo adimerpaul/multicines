@@ -392,10 +392,81 @@ export default {
         .then(characteristic => {
           console.log('characteristic', characteristic)
           self.printCharacteristic = characteristic
-          //self.sendTextData(device)
+          self.sendTextData(device)
         })
         .catch(error => {
           //this.handleError(error, device)
+        })
+    },
+    handleError (error, device) {
+      console.error('handleError => error', error)
+      if (device != null) {
+        device.gatt.disconnect()
+      }
+      let erro = JSON.stringify({
+        code: error.code,
+        message: error.message,
+        name: error.name
+      })
+      console.log('handleError => erro', error)
+      if (error.code !== 8) {
+        this.$q.notify('Could not connect with the printer. Try it again')
+      }
+    },
+    getBytes (text) {
+      console.log('text', text)
+      let br = '\u000A\u000D'
+      text = text === undefined ? br : text
+      let replaced = this.$languages.replace(text)
+      console.log('replaced', replaced)
+      let bytes = new TextEncoder('utf-8').encode(replaced + br)
+      console.log('bytes', bytes)
+      return bytes
+    },
+    addText (arrayText) {
+      let text = 'cadena de prueba'
+      arrayText.push(text)
+      if (this.isMobile) {
+        while (text.length >= 20) {
+          let text2 = text.substring(20)
+          arrayText.push(text2)
+          text = text2
+        }
+      }
+    },
+    sendTextData (device) {
+      let arrayText = []
+      this.addText(arrayText)
+      console.log('sendTextData => arrayText', arrayText)
+      this.loop(0, arrayText, device)
+    },
+    loop (i, arrayText, device) {
+      let arrayBytes = this.getBytes(arrayText[i])
+      this.write(device, arrayBytes, () => {
+        i++
+        if (i < arrayText.length) {
+          this.loop(i, arrayText, device)
+        } else {
+          let arrayBytes = this.getBytes()
+          this.write(device, arrayBytes, () => {
+            device.gatt.disconnect()
+          })
+        }
+      })
+    },
+    write (device, array, callback) {
+      this.printCharacteristic
+        .writeValue(array)
+        .then(() => {
+          console.log('Printed Array: ' + array.length)
+          setTimeout(() => {
+            if (callback) {
+              callback()
+            }
+          }, 250)
+        })
+        .catch(error => {
+          this.handleError(error, device)
         })
     },
     prevaloradaConsulta(){
