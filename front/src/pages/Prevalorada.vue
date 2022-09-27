@@ -409,7 +409,7 @@ export default {
         name: error.name
       })
       console.log('handleError => erro', error)
-      if (error.code !== 8) {
+      if (erro.code !== 8) {
         this.$q.notify('Could not connect with the printer. Try it again')
       }
     },
