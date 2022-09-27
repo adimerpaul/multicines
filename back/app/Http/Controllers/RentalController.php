@@ -320,6 +320,7 @@ class RentalController extends Controller
             $details=[
                 "title"=>"Factura",
                 "body"=>"Gracias por su compra",
+                "online"=>$sale->siatEnviado,
                 "sale_id"=>$sale->id,
                 "carpeta"=>"rentals",
             ];

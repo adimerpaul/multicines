@@ -22,6 +22,11 @@
               </q-item>
               <q-item clickable v-close-popup>
                 <q-item-section>
+                  <q-btn icon="print" color="primary" class="full-width" label="blue" no-caps @click="printButton" />
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup>
+                <q-item-section>
                   <q-btn icon="cancel_presentation" color="red" class="full-width" label="Anular" no-caps @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
                 </q-item-section>
               </q-item>
@@ -347,6 +352,31 @@ export default {
       this.cantidad=1
       this.saleDialog=true
       this.client={complemento:''}
+    },
+    printButton() {
+      progress.hidden = false;
+      if (printCharacteristic == null) {
+        navigator.bluetooth.requestDevice({
+          filters: [{
+            services: ['000018f0-0000-1000-8000-00805f9b34fb']
+          }]
+        })
+          .then(device => {
+            console.log('> Found ' + device.name);
+            console.log('Connecting to GATT Server...');
+            return device.gatt.connect();
+          })
+          .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
+          .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
+          .then(characteristic => {
+            // Cache the characteristic
+            printCharacteristic = characteristic;
+            sendPrinterData();
+          })
+          .catch(handleError);
+      } else {
+        sendPrinterData();
+      }
     },
     prevaloradaConsulta(){
       this.loading=true

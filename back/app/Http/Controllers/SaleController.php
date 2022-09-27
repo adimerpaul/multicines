@@ -379,6 +379,7 @@ class SaleController extends Controller
                     $details=[
                         "title"=>"Factura",
                         "body"=>"Gracias por su compra",
+                        "online"=>true,
                         "sale_id"=>$sale->id,
                         "carpeta"=>"archivos",
                     ];
@@ -474,6 +475,7 @@ class SaleController extends Controller
                 $details=[
                     "title"=>"Factura",
                     "body"=>"Gracias por su compra",
+                    "online"=>false,
                     "sale_id"=>$sale->id,
                     "carpeta"=>"archivos",
                 ];
@@ -558,7 +560,7 @@ class SaleController extends Controller
                 "body"=>"Gracias por su compra",
                 "sale_id"=>$request->sale['id'],
                 "carpeta"=>"archivos",
-                "enviado"=>$request->sale['siatEnviado']
+                "online"=>$request->sale['siatEnviado']
             ];
             Mail::to($request->client['email'])->send(new TestMail($details));
             return true;

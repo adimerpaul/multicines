@@ -503,6 +503,7 @@ class SaleCandyController extends Controller
                     $details=[
                         "title"=>"Factura",
                         "body"=>"Gracias por su compra",
+                        "online"=>true,
                         "sale_id"=>$sale->id,
                         "carpeta"=>"archivos",
                     ];
@@ -561,6 +562,7 @@ class SaleCandyController extends Controller
                 $details=[
                     "title"=>"Factura",
                     "body"=>"Gracias por su compra",
+                    "online"=>false,
                     "sale_id"=>$sale->id,
                     "carpeta"=>"archivos",
                 ];

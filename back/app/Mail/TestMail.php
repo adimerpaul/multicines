@@ -46,7 +46,7 @@ class TestMail extends Mailable
                 $cuf .= substr($xml->cabecera->cuf, $i, 1);
             }
         }
-        $html = self::generateHTML($xml,$cuf);
+        $html = self::generateHTML($xml,$cuf,$this->details['online']);
         $dompdf = new Dompdf();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('letter');
@@ -57,11 +57,11 @@ class TestMail extends Mailable
             ->view('vista')
             ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.pdf')
             ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.xml')
-            ->subject('MULTICINEZ PLAZA')
+            ->subject('MULTICINES PLAZA')
             ->with($this->details);
     }
 
-    public function generateHTML($xml,$cuf): string
+    public function generateHTML($xml,$cuf,$online): string
     {
         $formatter = new NumeroALetras();
         $literal = $formatter->toInvoice((float)$xml->cabecera->montoTotal, 2, 'Bolivianos');
@@ -90,6 +90,8 @@ class TestMail extends Mailable
         }
         $url = env('URL_SIAT2') . "consulta/QR?nit=" . env('NIT') . "&cuf=" . $xml->cabecera->cuf . "&numero=" . $xml->cabecera->numeroFactura . "&t=2";
         $qrcode = base64_encode(QrCode::format('svg')->size(200)->errorCorrection('H')->generate($url));
+        $doc = $xml->cabecera->complemento!=""? $xml->cabecera->numeroDocumento."-".$xml->cabecera->complemento: $xml->cabecera->numeroDocumento;
+        $pieleyenda= $online?"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en linea":"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación fuera de linea";
         return ('
         <!doctype html>
 <html lang="es">
@@ -207,7 +209,7 @@ class TestMail extends Mailable
                         <div class="bold">NIT/CI/CEX:</div>
                     </td>
                     <td>
-                        <div>' . $xml->cabecera->numeroDocumento .  '</div>
+                        <div>'. $doc .  '</div>
                     </td>
                 </tr>
                 <tr>
@@ -280,7 +282,7 @@ class TestMail extends Mailable
                         <div class="text-h5">ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS, EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY
                             </div>
                         <div class="text-h5">' . $xml->cabecera->leyenda . '</div>
-                        <div class="text-h5">“Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en línea”</div>
+                        <div class="text-h5">“'.$pieleyenda.'”</div>
                     </td>
                     <td>
                         <img width="95px" src="data:image/png;base64,' . $qrcode . '">
