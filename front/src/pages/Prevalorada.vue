@@ -359,9 +359,13 @@ export default {
       if (printCharacteristic == null) {
         navigator.bluetooth.requestDevice({
           filters: [{
+            name: 'BlueTooth Printer',
             services: ['000018f0-0000-1000-8000-00805f9b34fb']
           }]
-        })
+        },
+          {
+            optionalServices: ['00002af1-0000-1000-8000-00805f9b34fb']
+          })
           .then(device => {
             console.log('> Found ' + device.name);
             console.log('Connecting to GATT Server...');
