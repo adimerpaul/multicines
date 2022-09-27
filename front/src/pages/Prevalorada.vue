@@ -355,6 +355,7 @@ export default {
     },
     printButton() {
       progress.hidden = false;
+      let printCharacteristic
       if (printCharacteristic == null) {
         navigator.bluetooth.requestDevice({
           filters: [{
