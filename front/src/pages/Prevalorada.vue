@@ -354,7 +354,7 @@ export default {
       this.client={complemento:''}
     },
     printButton() {
-      progress.hidden = false;
+      //progress.hidden = false;
       let printCharacteristic
       if (printCharacteristic == null) {
         navigator.bluetooth.requestDevice({
@@ -372,11 +372,11 @@ export default {
           .then(characteristic => {
             // Cache the characteristic
             printCharacteristic = characteristic;
-            sendPrinterData();
+            //sendPrinterData();
           })
-          .catch(handleError);
+          .catch();
       } else {
-        sendPrinterData();
+        //sendPrinterData();
       }
     },
     prevaloradaConsulta(){
