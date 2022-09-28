@@ -180,7 +180,7 @@ class SaleCandyController extends Controller
         <montoTotalMoneda>".$request->montoTotal."</montoTotalMoneda>
         <montoGiftCard xsi:nil='true'/>
         <descuentoAdicional>0</descuentoAdicional>
-        <codigoExcepcion>1</codigoExcepcion>
+        <codigoExcepcion>".($client->codigoTipoDocumentoIdentidad==5?1:0)."</codigoExcepcion>
         <cafc xsi:nil='true'/>
         <leyenda>$leyenda</leyenda>
         <usuario>".explode(" ", $user->name)[0]."</usuario>
@@ -222,7 +222,7 @@ class SaleCandyController extends Controller
         $hashArchivo=hash('sha256', $archivo);
         unlink($gzfile);
         try {
-            $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
+            $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVentas?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi " . env('TOKEN'),

@@ -6,29 +6,29 @@
     <municipio>Oruro</municipio>
     <telefono>5281290</telefono>
     <numeroFactura>1</numeroFactura>
-    <cuf>168AB0075CF114E7FDB20E1CAD78121FA5B86486A75EEA92FE73D6D74</cuf>
-    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qjk/Y2JVY0pXVUFIxRDQ0NDQwMEFFM</cufd>
+    <cuf>168AB0075CF115158288C494C8F46CA2A9A06486A10B4F2907B3D6D74</cuf>
+    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qnk0Z2xPZEpXVUFIxRDQ0NDQwMEFFM</cufd>
     <codigoSucursal>0</codigoSucursal>
     <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN Nª2337 ZONA ESTE</direccion>
     <codigoPuntoVenta>0</codigoPuntoVenta>
-    <fechaEmision>2022-09-27T22:18:04.000</fechaEmision>
-    <nombreRazonSocial>ADIMER PAUL</nombreRazonSocial>
+    <fechaEmision>2022-09-28T14:50:37.000</fechaEmision>
+    <nombreRazonSocial>LOPEZ</nombreRazonSocial>
     <codigoTipoDocumentoIdentidad>1</codigoTipoDocumentoIdentidad>
-    <numeroDocumento>7336199</numeroDocumento>
+    <numeroDocumento>5769706</numeroDocumento>
     <complemento/>
-    <codigoCliente>2</codigoCliente>
+    <codigoCliente>4</codigoCliente>
     <periodoFacturado>SEPTIEMBRE 2022</periodoFacturado>
     <codigoMetodoPago>1</codigoMetodoPago>
     <numeroTarjeta xsi:nil="true"/>
-    <montoTotal>150</montoTotal>
-    <montoTotalSujetoIva>150</montoTotalSujetoIva>
+    <montoTotal>1200</montoTotal>
+    <montoTotalSujetoIva>1200</montoTotalSujetoIva>
     <codigoMoneda>1</codigoMoneda>
     <tipoCambio>1</tipoCambio>
-    <montoTotalMoneda>150</montoTotalMoneda>
+    <montoTotalMoneda>1200</montoTotalMoneda>
     <descuentoAdicional xsi:nil="true"/>
     <codigoExcepcion>0</codigoExcepcion>
     <cafc xsi:nil="true"/>
-    <leyenda>Ley N° 453: El proveedor debe exhibir certificaciones de habilitación o documentos que acrediten las capacidades u ofertas de servicios especializados.</leyenda>
+    <leyenda>Ley N° 453: Tienes derecho a recibir información sobre las características y contenidos de los servicios que utilices.</leyenda>
     <usuario>admin</usuario>
     <codigoDocumentoSector>2</codigoDocumentoSector>
   </cabecera>
@@ -36,15 +36,15 @@
     <actividadEconomica>681011</actividadEconomica>
     <codigoProductoSin>72111</codigoProductoSin>
     <codigoProducto>10101</codigoProducto>
-    <descripcion>asdsa</descripcion>
+    <descripcion>Adelanto Mes</descripcion>
     <cantidad>1</cantidad>
     <unidadMedida>68</unidadMedida>
-    <precioUnitario>150</precioUnitario>
+    <precioUnitario>1200</precioUnitario>
     <montoDescuento>0</montoDescuento>
-    <subTotal>150</subTotal>
+    <subTotal>1200</subTotal>
   </detalle>
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>ak7E14mLSrxRpU8CQpW8jOox1j5rbDTv+eCyChVMG4g=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>FOnUGpBVlYa/JS5eDdrf3NYQBwgM+tsY+2IdWS02sUhqfXd0pJc70KRs4pzWLM1EmvM123J4JIskihWTQv8H5/qGbPedpgnyUwQ9aGzSwmiSnSIANMDdgQVXQFGIYda7//g/ducfvIwMxTDlNTCzBDQ8NPqLWvw0mgJNlShIIt8oC2dOWWjJZkXMSGrGPYz8xIhECTdj1h7n5q5aVBiWRYh1B/Q8s2hXzrYLmhhLkbcJ8vXhMONN/v1LYUJtzxSRI0aq/1I6NV5DXXqQvzAQKY8BNopDhzR8wKO84Pquwn79IV6KM8Y4egoJ80U3KlpY2+VW4Z7s3mEgqxekQog++g==</ds:SignatureValue>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>A2iGA4a9tOZjmMjSs0xXddt/ME9rPNUlaVlhABxkgpQ=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>FI3VWfi/+PONtaS1eT77GEkvH43fUiQOoeOReECV0VnRgruZiqsxvhkEdeMyPHd5cBbYFZpngHxOw9JGdXr/Y7c0l1eq+Ie1Ktkj24fwWItQpb4RWqYK5Q2FbbJz+BzudmbBxYNXLKqDxVTscv01S5m9YKwWTbkJMdbARmzHYckGrl2l5pgC1Ly9at6pzdXZeCpq0trOfrlfPxw/Gq0TOZ3igAPkFQZUNpYUQfEV+P+nyfM4/uoTj1+thSjjcwIjNa8x0a1DqBPenuPfdRriMwnvaFQkRH/xYO2SqUupDf3vyINTplDOKx7BqGFI2hoeRMZUAycCBm1mVlQ19fjmYw==</ds:SignatureValue>
 <ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIOc/4MUQUyAAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDkwOTE2MDcwMloXDTIyMTAwOTE2MDcwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEArOcosoCvecjEOX9UMz6e4uv2CXtQeCneUE2k9qxXDSY4Qd52zGsvgkselnS2LpTpbDIAWkB9QohNfOBb/SXdzJSx9XOPzNXF8TygJgMxwWLPbM7o+JmMXrlrlcNfMKPgTwBeTTqdBx5SDxam0Og1bHRVZVtj9N/LA0iCDUT/uZiPYEbQOkzZNcvFgkvQXhbTx0Mg7spbMsBtt8Xgz4YVEmXCTjcopTHpapikxh+DvinNfwiQrmttX2sRwNvCF0JncitvAlyCmSVDeUWWYr/XS9fP/vPJt0aXB3dANtkSWgPeZGpymUCLbuwb2tsKO+0Q3rSMA0uTkTDF9HtU4yhRQw==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaAlquilerBienInmueble>

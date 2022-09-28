@@ -5,48 +5,48 @@
     <razonSocialEmisor>MULTISALAS S.R.L.</razonSocialEmisor>
     <municipio>Oruro</municipio>
     <telefono>5281290</telefono>
-    <numeroFactura>16</numeroFactura>
-    <cuf>168AB0075CF114E7A96845FB3C8F1D5D5B23B4EA015EEA92FE73D6D74</cuf>
-    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qjk/Y2JVY0pXVUFIxRDQ0NDQwMEFFM</cufd>
+    <numeroFactura>13</numeroFactura>
+    <cuf>168AB0075CF1151651C8A63D438DCA57BB9BB056210B4F2907B3D6D74</cuf>
+    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qnk0Z2xPZEpXVUFIxRDQ0NDQwMEFFM</cufd>
     <codigoSucursal>0</codigoSucursal>
     <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN Nª2337 ZONA ESTE</direccion>
     <codigoPuntoVenta>0</codigoPuntoVenta>
-    <fechaEmision>2022-09-27T21:51:26.000</fechaEmision>
-    <nombreRazonSocial>ADIMER PAUL</nombreRazonSocial>
-    <codigoTipoDocumentoIdentidad>1</codigoTipoDocumentoIdentidad>
-    <numeroDocumento>7336199</numeroDocumento>
+    <fechaEmision>2022-09-28T16:14:57.000</fechaEmision>
+    <nombreRazonSocial>CONTROL TRIBUTARIO</nombreRazonSocial>
+    <codigoTipoDocumentoIdentidad>5</codigoTipoDocumentoIdentidad>
+    <numeroDocumento>99002</numeroDocumento>
     <complemento/>
-    <codigoCliente>2</codigoCliente>
+    <codigoCliente>9</codigoCliente>
     <codigoMetodoPago>1</codigoMetodoPago>
     <numeroTarjeta xsi:nil="true"/>
-    <montoTotal>20.00</montoTotal>
-    <montoTotalSujetoIva>20.00</montoTotalSujetoIva>
+    <montoTotal>25.00</montoTotal>
+    <montoTotalSujetoIva>25.00</montoTotalSujetoIva>
     <codigoMoneda>1</codigoMoneda>
     <tipoCambio>1</tipoCambio>
-    <montoTotalMoneda>20.00</montoTotalMoneda>
+    <montoTotalMoneda>25.00</montoTotalMoneda>
     <montoGiftCard xsi:nil="true"/>
     <descuentoAdicional>0</descuentoAdicional>
     <codigoExcepcion>1</codigoExcepcion>
     <cafc xsi:nil="true"/>
-    <leyenda>Ley N° 453: Los servicios deben suministrarse en condiciones de inocuidad, calidad y seguridad.</leyenda>
+    <leyenda>Ley N° 453: En caso de incumplimiento a lo ofertado o convenido, el proveedor debe reparar o sustituir el servicio.</leyenda>
     <usuario>admin</usuario>
     <codigoDocumentoSector>1</codigoDocumentoSector>
   </cabecera>
   <detalle>
     <actividadEconomica>590000</actividadEconomica>
     <codigoProductoSin>99100</codigoProductoSin>
-    <codigoProducto>5</codigoProducto>
-    <descripcion>LA HUERFANA 2D</descripcion>
+    <codigoProducto>4</codigoProducto>
+    <descripcion>COMBO NACHO</descripcion>
     <cantidad>1</cantidad>
     <unidadMedida>62</unidadMedida>
-    <precioUnitario>20</precioUnitario>
+    <precioUnitario>25</precioUnitario>
     <montoDescuento>0</montoDescuento>
-    <subTotal>20</subTotal>
+    <subTotal>25</subTotal>
     <numeroSerie xsi:nil="true"/>
     <numeroImei xsi:nil="true"/>
   </detalle>
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>1ybmH8GvEnQuf5ov6+MIcb5/rRPlb5ExLj6wzssD+DA=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>NSrHgP+ic7k5i8nWXamxorMh1AK++45urCsudI3UA9D7P2EJo6c0ugPaib4DX2BHfGNvIRhoAxoPMGd7sFfGrCfPCO+5thWOCAhyWy1Dkfr6bIEpVwExoM93oPyWWYs+VYFPQv4VFXSog4C2yGXU0by5FFVS25dyxB6s6kuCKGUUnrrWbynl3W/RxpkrwPUP5aiJC7L/6dmoxaQJWAQtvErjzce7me6mzvoEb1BFi3AnVq47xgJhfcTfOkk8UpafVlSa1wUvmvX7l6rNVhg4Ka1ECCOi4FtJBWUF41SQlmU/y7/2GMVC4pdUMHPPI2OWzklZ+wV0y6yh1LjfnOLDjw==</ds:SignatureValue>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>dJU+Moy8PDxFk7E8W/WUDbkRqQhOao5zl6gzu84m+zY=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>nQf3p1v8U/PfbFLz/AIacQa1RoVv+IbEf+6GofcYou7Vp7Q6uc5S+yJMDKmIlPdZz4K/sn3yKEN4WTUbOZfL1Wvha0ypdAgFpN4UPptiACqekHx65syIobIL10vxnFHGY5vwjs6qK21skHS0KtnMeQAdoo6D7AFu3u1YgKwcTq/mUI0c+1t3XtjGXcxb66oAFxivaPFZOzEuJFqNus9Vb8rS8J0hB5TteEij+i8ZsH+RxkXDXeZHZ88vfWGaIltfG9rdeSR0eKoRCMFHPVBL/1N2hM+JCCp//kTa3HFUNfKp/Mfz9eoTBDndIgK4f9N++7BSq9IKwjza5jtVKhl7Ew==</ds:SignatureValue>
 <ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIOc/4MUQUyAAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDkwOTE2MDcwMloXDTIyMTAwOTE2MDcwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEArOcosoCvecjEOX9UMz6e4uv2CXtQeCneUE2k9qxXDSY4Qd52zGsvgkselnS2LpTpbDIAWkB9QohNfOBb/SXdzJSx9XOPzNXF8TygJgMxwWLPbM7o+JmMXrlrlcNfMKPgTwBeTTqdBx5SDxam0Og1bHRVZVtj9N/LA0iCDUT/uZiPYEbQOkzZNcvFgkvQXhbTx0Mg7spbMsBtt8Xgz4YVEmXCTjcopTHpapikxh+DvinNfwiQrmttX2sRwNvCF0JncitvAlyCmSVDeUWWYr/XS9fP/vPJt0aXB3dANtkSWgPeZGpymUCLbuwb2tsKO+0Q3rSMA0uTkTDF9HtU4yhRQw==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaCompraVenta>

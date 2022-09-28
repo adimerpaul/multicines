@@ -285,7 +285,7 @@ class SaleController extends Controller
         <montoTotalMoneda>".$request->montoTotal."</montoTotalMoneda>
         <montoGiftCard xsi:nil='true'/>
         <descuentoAdicional>0</descuentoAdicional>
-        <codigoExcepcion>1</codigoExcepcion>
+        <codigoExcepcion>".($client->codigoTipoDocumentoIdentidad==5?1:0)."</codigoExcepcion>
         <cafc xsi:nil='true'/>
         <leyenda>$leyenda</leyenda>
         <usuario>".explode(" ", $user->name)[0]."</usuario>
@@ -327,7 +327,7 @@ class SaleController extends Controller
         $hashArchivo=hash('sha256', $archivo);
         unlink($gzfile);
         try {
-            $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVentas?WSDL",  [
+            $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi " . env('TOKEN'),
@@ -705,7 +705,7 @@ class SaleController extends Controller
                 $sale->siatAnulado=1;
                 $sale->save();
                 $client=Client::find($sale->client_id);
-                error_log(json_encode($client));
+//                error_log(json_encode($client));
                 if ($client->email!=''){
                     $details=[
                         "title"=>"Factura",

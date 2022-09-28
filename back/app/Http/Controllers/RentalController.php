@@ -232,7 +232,7 @@ class RentalController extends Controller
         <subTotal>".$request->montoTotal."</subTotal>
     </detalle>
 </facturaElectronicaAlquilerBienInmueble>";
-
+//TODO falta colocar el 0 o 1 en excepcion
         $xml = new SimpleXMLElement($text);
         $dom = new DOMDocument('1.0');
         $dom->preserveWhiteSpace = false;
@@ -393,6 +393,20 @@ class RentalController extends Controller
                 $rental=Rental::find($request->rental['id']);
                 $rental->siatAnulado=1;
                 $rental->save();
+                $client=Client::find($rental->client_id);
+                if ($client->email!=''){
+                    $details=[
+                        "title"=>"Factura",
+                        "body"=>"Factura anulada",
+                        "online"=>true,
+                        "anulado"=>true,
+                        "cuf"=>$rental->cuf,
+                        "numeroFactura"=>$rental->numeroFactura,
+                        "sale_id"=>$rental->id,
+                        "carpeta"=>"rentals",
+                    ];
+                    Mail::to($client->email)->send(new TestMail($details));
+                }
             }
         }catch (\Exception $e) {
 //            return response()->json(['error' => $e->getMessage()]);

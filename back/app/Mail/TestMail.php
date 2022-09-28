@@ -113,7 +113,12 @@ class TestMail extends Mailable
         $url = env('URL_SIAT2') . "consulta/QR?nit=" . env('NIT') . "&cuf=" . $xml->cabecera->cuf . "&numero=" . $xml->cabecera->numeroFactura . "&t=2";
         $qrcode = base64_encode(QrCode::format('svg')->size(200)->errorCorrection('H')->generate($url));
         $doc = $xml->cabecera->complemento!=""? $xml->cabecera->numeroDocumento."-".$xml->cabecera->complemento: $xml->cabecera->numeroDocumento;
-        $pieleyenda= $online?"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en linea":"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación fuera de linea";
+        $pieleyenda= $online?"Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en linea":"“Este documento es la
+Representación Gráfica de un
+Documento Fiscal Digital emitido
+fuera de línea, verifique su envío
+con su proveedor o en la página
+web www.impuestos.gob.bo”.";
         return ('
         <!doctype html>
 <html lang="es">

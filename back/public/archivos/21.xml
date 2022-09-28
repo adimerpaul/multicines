@@ -5,28 +5,28 @@
     <razonSocialEmisor>MULTISALAS S.R.L.</razonSocialEmisor>
     <municipio>Oruro</municipio>
     <telefono>5281290</telefono>
-    <numeroFactura>21</numeroFactura>
-    <cuf>168AB0075CF10207AA64F7834BFCADCEF65BBC8B272D01EABDACB6D74</cuf>
-    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qnl+NmhVZUlXVUFIxRDQ0NDQwMEFFM</cufd>
+    <numeroFactura>16</numeroFactura>
+    <cuf>168AB0075CF11516623468375BBC660D42A3B4EA040B4F2907B3D6D74</cuf>
+    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qnk0Z2xPZEpXVUFIxRDQ0NDQwMEFFM</cufd>
     <codigoSucursal>0</codigoSucursal>
     <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN Nª2337 ZONA ESTE</direccion>
     <codigoPuntoVenta>0</codigoPuntoVenta>
-    <fechaEmision>2022-08-29T21:06:01.000</fechaEmision>
-    <nombreRazonSocial>CHICA</nombreRazonSocial>
-    <codigoTipoDocumentoIdentidad>2</codigoTipoDocumentoIdentidad>
-    <numeroDocumento>123456</numeroDocumento>
-    <complemento>E</complemento>
+    <fechaEmision>2022-09-28T16:27:58.000</fechaEmision>
+    <nombreRazonSocial>LOPEZ</nombreRazonSocial>
+    <codigoTipoDocumentoIdentidad>1</codigoTipoDocumentoIdentidad>
+    <numeroDocumento>5769706</numeroDocumento>
+    <complemento>1A</complemento>
     <codigoCliente>5</codigoCliente>
     <codigoMetodoPago>1</codigoMetodoPago>
     <numeroTarjeta xsi:nil="true"/>
-    <montoTotal>17.50</montoTotal>
-    <montoTotalSujetoIva>17.50</montoTotalSujetoIva>
+    <montoTotal>25.00</montoTotal>
+    <montoTotalSujetoIva>25.00</montoTotalSujetoIva>
     <codigoMoneda>1</codigoMoneda>
     <tipoCambio>1</tipoCambio>
-    <montoTotalMoneda>17.50</montoTotalMoneda>
+    <montoTotalMoneda>25.00</montoTotalMoneda>
     <montoGiftCard xsi:nil="true"/>
     <descuentoAdicional>0</descuentoAdicional>
-    <codigoExcepcion xsi:nil="true"/>
+    <codigoExcepcion>0</codigoExcepcion>
     <cafc xsi:nil="true"/>
     <leyenda>Ley N° 453: El proveedor deberá suministrar el servicio en las modalidades y términos ofertados o convenidos.</leyenda>
     <usuario>admin</usuario>
@@ -35,18 +35,18 @@
   <detalle>
     <actividadEconomica>590000</actividadEconomica>
     <codigoProductoSin>99100</codigoProductoSin>
-    <codigoProducto>5</codigoProducto>
-    <descripcion>minions 2: nace un villano 2D</descripcion>
+    <codigoProducto>4</codigoProducto>
+    <descripcion>COMBO NACHO</descripcion>
     <cantidad>1</cantidad>
     <unidadMedida>62</unidadMedida>
-    <precioUnitario>17.5</precioUnitario>
+    <precioUnitario>25</precioUnitario>
     <montoDescuento>0</montoDescuento>
-    <subTotal>17.5</subTotal>
+    <subTotal>25</subTotal>
     <numeroSerie xsi:nil="true"/>
     <numeroImei xsi:nil="true"/>
   </detalle>
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>RnXzXzGCaA3zjayppAN09N9737rl8pRwkDKHBy9kI0c=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>gVlRpCUuRd7MzRyF1x3QjbOSljil3xrv2l7SKnD/6KJ04w3Zunf0BX5ojWHOIJWI2FE/kzvMEOfFGyPAcijGx1+ZiJ9a3QvyjhnjLMqUUzsUMo8bFt9CTuov3IJEAwX0RP96NWHLOAy/zV8uVLPPYxOVp0no6nr1TJP0vNrDaFDzGC/HluaY6hrVccaEGx8rxM0wfyasrnl3SMt/w+OTUjHEajyNRKglsbSjaptTz86SpzZBuGMdMLPoBCHklHwKUwnyGpz1/U+4/o8/HVCxW1gcJhC971UsYJ8eUGKdPC7N7BVGXwfbc+6EipuTy/dMxBqaSlYoxmE7voAbWRi6GQ==</ds:SignatureValue>
-<ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIYfiNI5DC9AAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDgwOTE1MjYwMloXDTIyMDkwODE1MjYwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEAS0HlsyZxtN7YEGl4skZ3WU07oZZ6yrPRkzGBD7EDnlFnEizBDymFJK+mUFMTMg6bhWhszETFtzCZxt2nQ2Ang7iAiFDz+W3Zjtra08z87Hf+t4XwviEO24K+CJetCE70UZ3tg8uTkShPEUcj3o6Jijir8ViBnJ/e0xC1rpFe66ZFjZ1F38bc39Uh4FFdQEDyhdjiN69mvTFDMdTKXxldbkgKFU3YAvWbNLaUxKWpBlQcMNOimUMtn+AcICuP2zwe/QsVGgw0a5Eix3YCTgougUdj+sq+uI7NlRjig/K0nNxsE1H+EcgfwJmoB/UwgU7othZN35nKyUy3Kxb9JCsGZg==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaCompraVenta>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>58vV8AQdkAawh1jwrj+F5V0EMwLJtEy49AjB3+x9OB4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>OIqkoBLqxsoUHi/eIX8rCZrvAkSbbZhha/QL0ibJC8T9PuNm/iz4nTW58slznUu6WPeqRuYOj/WJU0VyMnEUQBdKrGNsWvJlMzbA2cbADcD0sexTSM0fiNU/74Spjrax3kJjhCcR+fy3qq5JGusnVytglD/bRSU5us4XES2nLNaVfbG8EUrxScamDYF0LQGT7Mt+N7h35ZtdOWYFQmo8d7TIAiMPaiiu4YAQ8ua6trtCMe/xMu66L3RzFyjrnc1m1+/F2drqO7zlTMRp7XI07mIImViw7nsG/Pw+tIgzbEmPaHI9Az7SoSTMQWbDEb03oh451m0OVTJaQnKVHmYyFQ==</ds:SignatureValue>
+<ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIOc/4MUQUyAAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDkwOTE2MDcwMloXDTIyMTAwOTE2MDcwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEArOcosoCvecjEOX9UMz6e4uv2CXtQeCneUE2k9qxXDSY4Qd52zGsvgkselnS2LpTpbDIAWkB9QohNfOBb/SXdzJSx9XOPzNXF8TygJgMxwWLPbM7o+JmMXrlrlcNfMKPgTwBeTTqdBx5SDxam0Og1bHRVZVtj9N/LA0iCDUT/uZiPYEbQOkzZNcvFgkvQXhbTx0Mg7spbMsBtt8Xgz4YVEmXCTjcopTHpapikxh+DvinNfwiQrmttX2sRwNvCF0JncitvAlyCmSVDeUWWYr/XS9fP/vPJt0aXB3dANtkSWgPeZGpymUCLbuwb2tsKO+0Q3rSMA0uTkTDF9HtU4yhRQw==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaCompraVenta>
