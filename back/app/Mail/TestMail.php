@@ -33,6 +33,15 @@ class TestMail extends Mailable
      */
     public function build()
     {
+        if ($this->details['anulado']){
+            $datos['cuf']=$this->details['cuf'];
+            $datos['numeroFactura']=$this->details['numeroFactura'];
+            return $this->from(env('MAIL_FROM_ADDRESS'),env('MAIL_FROM_NAME'))
+                ->view('anulado',$datos)
+                ->subject('MULTICINES PLAZA')
+                ->with($this->details);
+            exit;
+        }
         $pathXmlFile=$this->details['carpeta'].'/'.$this->details['sale_id'].'.xml';
         if (!file_exists($pathXmlFile)) return false;
         $nameFile = substr($pathXmlFile, 0, strlen($pathXmlFile) - 4);
@@ -63,6 +72,19 @@ class TestMail extends Mailable
 
     public function generateHTML($xml,$cuf,$online): string
     {
+        if ($this->details['carpeta']=='rentals'){
+            $rental='<tr>
+                    <td class="right">
+                        <div class="bold">Periodo Facturado:</div>
+                    </td>
+                    <td>
+                        <div>' . $xml->cabecera->periodoFacturado . '</div>
+                    </td>
+                </tr>';
+        }else{
+            $rental='';
+        }
+
         $formatter = new NumeroALetras();
         $literal = $formatter->toInvoice((float)$xml->cabecera->montoTotal, 2, 'Bolivianos');
         $detalles = "";
@@ -109,6 +131,9 @@ class TestMail extends Mailable
         }
         .text-h1{
             font-size: 20px;
+        }
+        .text-h2{
+            font-size: 10px;
         }
         .text-h5{
             font-size: 8px;
@@ -220,6 +245,7 @@ class TestMail extends Mailable
                         <div>' . $xml->cabecera->codigoCliente . '</div>
                     </td>
                 </tr>
+                '.$rental.'
             </table>
         </td>
     </tr>
@@ -282,7 +308,7 @@ class TestMail extends Mailable
                         <div class="text-h5">ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS, EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY
                             </div>
                         <div class="text-h5">' . $xml->cabecera->leyenda . '</div>
-                        <div class="text-h5">“'.$pieleyenda.'”</div>
+                        <div class="text-h2 bold">“'.$pieleyenda.'”</div>
                     </td>
                     <td>
                         <img width="95px" src="data:image/png;base64,' . $qrcode . '">

@@ -6,29 +6,29 @@
     <municipio>Oruro</municipio>
     <telefono>5281290</telefono>
     <numeroFactura>2</numeroFactura>
-    <cuf>168AB0075CF11234700778CC16DA1296062B9F8D492C72090C30D6D74</cuf>
-    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qj4hVjFUT0pXVUFIxRDQ0NDQwMEFFM</cufd>
+    <cuf>168AB0075CF114E72CBABBE3FDF7E92F3B339F8D465EEA92FE73D6D74</cuf>
+    <cufd>BQWVDd15nQUE=NzDRCMTBDQkZBREU=Qjk/Y2JVY0pXVUFIxRDQ0NDQwMEFFM</cufd>
     <codigoSucursal>0</codigoSucursal>
     <direccion>AVENIDA TACNA ENTRE TOMAS FRIAS Y JAEN Nª2337 ZONA ESTE</direccion>
     <codigoPuntoVenta>0</codigoPuntoVenta>
-    <fechaEmision>2022-09-13T19:54:35.000</fechaEmision>
-    <nombreRazonSocial>CHAMBI</nombreRazonSocial>
+    <fechaEmision>2022-09-27T20:52:48.000</fechaEmision>
+    <nombreRazonSocial>ADIMER PAUL</nombreRazonSocial>
     <codigoTipoDocumentoIdentidad>1</codigoTipoDocumentoIdentidad>
-    <numeroDocumento>E-123456</numeroDocumento>
+    <numeroDocumento>7336199</numeroDocumento>
     <complemento/>
-    <codigoCliente>5</codigoCliente>
+    <codigoCliente>2</codigoCliente>
     <codigoMetodoPago>1</codigoMetodoPago>
     <numeroTarjeta xsi:nil="true"/>
-    <montoTotal>17.50</montoTotal>
-    <montoTotalSujetoIva>17.50</montoTotalSujetoIva>
+    <montoTotal>20.00</montoTotal>
+    <montoTotalSujetoIva>20.00</montoTotalSujetoIva>
     <codigoMoneda>1</codigoMoneda>
     <tipoCambio>1</tipoCambio>
-    <montoTotalMoneda>17.50</montoTotalMoneda>
+    <montoTotalMoneda>20.00</montoTotalMoneda>
     <montoGiftCard xsi:nil="true"/>
     <descuentoAdicional>0</descuentoAdicional>
     <codigoExcepcion xsi:nil="true"/>
     <cafc xsi:nil="true"/>
-    <leyenda>Ley N° 453: El proveedor debe exhibir certificaciones de habilitación o documentos que acrediten las capacidades u ofertas de servicios especializados.</leyenda>
+    <leyenda>Ley N° 453: Tienes derecho a un trato equitativo sin discriminación en la oferta de servicios.</leyenda>
     <usuario>admin</usuario>
     <codigoDocumentoSector>1</codigoDocumentoSector>
   </cabecera>
@@ -36,17 +36,17 @@
     <actividadEconomica>590000</actividadEconomica>
     <codigoProductoSin>99100</codigoProductoSin>
     <codigoProducto>5</codigoProducto>
-    <descripcion>DRAGON BALL SUPER 2D</descripcion>
+    <descripcion>LA HUERFANA 2D</descripcion>
     <cantidad>1</cantidad>
     <unidadMedida>62</unidadMedida>
-    <precioUnitario>17.5</precioUnitario>
+    <precioUnitario>20</precioUnitario>
     <montoDescuento>0</montoDescuento>
-    <subTotal>17.5</subTotal>
+    <subTotal>20</subTotal>
     <numeroSerie xsi:nil="true"/>
     <numeroImei xsi:nil="true"/>
   </detalle>
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>jEfJY6WnaeAP+vjNexjdewFpNxDwR3gltWGvxPJbXvc=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>Lj5YqK6HQIY8kxRaDpUFMzgUElMqy79JdrYpK7y+yndUZWOkrVi7mcn6t9cKpxkF67n+blvX3JS3jbspkKSFrMFQluIR9iPCiGOkqZ9pJB+Fzl7DeLH3HLRElJxgUIdTo8N5NjQVpdrk2jgTmTNKyoiGD/lVt0YCXJxleL4FoPP5Rib96JbYQ48G48G05Tz7s3yrucnctEGQiEoorvgHiRLm0qUri6sG2vXwl8Padue1gDgoW1RQl6MN+x72UaJrLXg8U6CDjXNk+chhOvbzj21taCWGVtxKqSLTVpms91q80iq3AvAp3Edi5lI7DP4uKPBZU/pbowwgyP6RnUEekg==</ds:SignatureValue>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>AGFZOp5NYhHFVxAFIKvUyoHht3rGNHGezNaasf7bvUc=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>hUW+5yIKiTn53uhpBjwIHoN5VJrhJKw0xb4ScdeTDhkg019GoNngjRo3HkDYSlwHYS6RO5fBFxHUhqVGxA/s6h3b1Xjtds/irXhtTwuIayvXdiz/PhOvEFNtI4Sr7rIF6zPcQnsUCg1HT+n8SM7VlR5Wjrhqt/MNP1o0F4tnlYETi97RL9zxHjwp9BldjWi5eNKNtmFJBJQvc9rv7bPw1SspKkx4Pqif7eAsUOG1nV1Xu+SrULEYearJc7n6E8W7CRZe67QrnP0mteOlm2w9+wcGG7cHqEXnSpe5kt4gg+zk+iC8+aRT57+Ilo7wWhZpp2XqCB0iLyQeInB7Lx8XJw==</ds:SignatureValue>
 <ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEuTCCA6GgAwIBAgIIOc/4MUQUyAAwDQYJKoZIhvcNAQEFBQAwgbUxCzAJBgNVBAYTAkJPMQ8wDQYDVQQIDAZMQSBQQVoxDzANBgNVBAcMBkxBIFBBWjEeMBwGA1UECgwVRW50aWRhZCBDZXJ0aWZpY2Fkb3JhMQwwCgYDVQQLDANVSUQxEzARBgNVBAMMCkFEU0lCIEZBS0UxJDAiBgkqhkiG9w0BCQEWFW5jb2FyaXRlQGFkc2liLmdvYi5ibzEbMBkGA1UEBRMSNzM1MjQyNDI0NDY0NjM0MjM0MB4XDTIyMDkwOTE2MDcwMloXDTIyMTAwOTE2MDcwMlowgegxITAfBgNVBAMTGEVERFkgQ0FSTE9TIFBMQVpBIEdBUkNJQTETMBEGA1UEChMKTVVMVElTQUxBUzEXMBUGA1UECxMOTVVMVElTQUxBUyBTUkwxEzARBgNVBAwTCk1VTFRJU0FMQVMxCzAJBgNVBAYTAkJPMQswCQYDVQQuEwJDSTEUMBIGBysGAQEBAQATBzM1MjAyMjYxEjAQBgoJkiaJk/IsZAEBEwIyMDESMBAGA1UEBRMJMzI5NDQ4MDIzMSgwJgYJKoZIhvcNAQkBFhllZGR5cGxhemFnYXJjaWFAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnu3CM5+2VYnSmpYKGsEyrSGYos9k8Vo7a3BUq7D/6xInM67QFvFPWYHutvdfgtyySSAsMgBnFFlX6e83QSreYvBeKcdTl+tSHC0XQqRYR3NOqsVtNUIPVDD99inJ45zo9c0fefSW8BMLi/16UCWTaSDR0H5BGE1t+6CS/1wnSpE/V01KtmiNJFiiwoKgnKs1ck4lCROdCz7yIXtKRn0P7aaeaBQMYZE+nI+6MoEUuLi5ksk5dulEiKGLankmvmtyW0PE0rxyuzDtlQtzyU844xQKa78Sp0VIufBVMFfhQJYFHZtdn4W820XnJl2Oam+PVLCZg2IXGikVO/W2xbyD0QIDAQABo4GXMIGUMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgTwMCQGA1UdEQQdMBuGGWVkZHlwbGF6YWdhcmNpYUBnbWFpbC5jb20wUQYDVR0fBEowSDBGoESgQoZAaHR0cHM6Ly9kZXNhcnJvbGxvLmFkc2liLmdvYi5iby9kZXNhX2FnZW5jaWEvbGlzdF9yZXZvY2FjaW9uLmNybDANBgkqhkiG9w0BAQUFAAOCAQEArOcosoCvecjEOX9UMz6e4uv2CXtQeCneUE2k9qxXDSY4Qd52zGsvgkselnS2LpTpbDIAWkB9QohNfOBb/SXdzJSx9XOPzNXF8TygJgMxwWLPbM7o+JmMXrlrlcNfMKPgTwBeTTqdBx5SDxam0Og1bHRVZVtj9N/LA0iCDUT/uZiPYEbQOkzZNcvFgkvQXhbTx0Mg7spbMsBtt8Xgz4YVEmXCTjcopTHpapikxh+DvinNfwiQrmttX2sRwNvCF0JncitvAlyCmSVDeUWWYr/XS9fP/vPJt0aXB3dANtkSWgPeZGpymUCLbuwb2tsKO+0Q3rSMA0uTkTDF9HtU4yhRQw==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></facturaElectronicaCompraVenta>

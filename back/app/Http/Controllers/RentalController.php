@@ -60,18 +60,25 @@ class RentalController extends Controller
      */
     public function store(StoreSaleRequest $request)
     {
-        if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
+        if ($request->client['complemento']==null){
+            $complemento="";
+        }else{
+            $complemento=$request->client['complemento'];
+        }
+        if ( $complemento!= "" && Client::whereComplemento($complemento)->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
-        }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->count()==1){
+//            return "actualizado con complento";
+        }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->whereComplemento($complemento)->count()){
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
+//            return "actualizado";
         }else{
             $client=new Client();
             $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
@@ -80,6 +87,7 @@ class RentalController extends Controller
             $client->complemento=strtoupper($request->client['complemento']);
             $client->email=$request->client['email'];
             $client->save();
+//            return "nuevo";
         }
 
         $codigoAmbiente=env('AMBIENTE');
@@ -305,13 +313,6 @@ class RentalController extends Controller
             $sale->siatEnviado=false;
         }
 
-//        return $result;
-//        if (isset($result->RespuestaServicioFacturacion)){
-//
-//        }else{
-//
-//        }
-
         $sale->cuf=$cuf;
 
 //
@@ -322,6 +323,9 @@ class RentalController extends Controller
                 "body"=>"Gracias por su compra",
                 "online"=>$sale->siatEnviado,
                 "sale_id"=>$sale->id,
+                "anulado"=>false,
+                "cuf"=>"",
+                "numeroFactura"=>"",
                 "carpeta"=>"rentals",
             ];
             Mail::to($request->client['email'])->send(new TestMail($details));

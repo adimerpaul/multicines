@@ -265,11 +265,14 @@ export default {
     },
 
     enviarAnular(){
+      this.$q.loading.show()
       this.$api.post('anularSale',{sale:this.factura,motivo:this.motivo}).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
+        this.$q.loading.hide()
+        this.listaVentaCandyGet();
+        this.dialogAnular = false
       })
-
-        },
+    },
     cargarMotivo(){
       this.$api.get('motivoanular').then(res => {
         res.data.forEach(r=>{

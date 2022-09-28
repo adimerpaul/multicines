@@ -99,15 +99,19 @@ class SaleController extends Controller
 
     public function store(StoreSaleRequest $request)
     {
-
-        if (Client::where('complemento',$request->client['complemento'])->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
+        if ($request->client['complemento']==null){
+            $complemento="";
+        }else{
+            $complemento=$request->client['complemento'];
+        }
+        if ( $complemento!= "" && Client::whereComplemento($complemento)->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
 //            return "actualizado con complento";
-        }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->count()==1){
+        }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->whereComplemento($complemento)->count()){
             $client=Client::find($request->client['id']);
             $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
@@ -267,7 +271,7 @@ class SaleController extends Controller
         <direccion>".env('DIRECCION')."</direccion>
         <codigoPuntoVenta>$codigoPuntoVenta</codigoPuntoVenta>
         <fechaEmision>$fechaEnvio</fechaEmision>
-        <nombreRazonSocial>".$client->nombreRazonSocial."</nombreRazonSocial>
+        <nombreRazonSocial>".utf8_encode(str_replace("&","&amp;",$client->nombreRazonSocial))."</nombreRazonSocial>
         <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
         <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
         <complemento>".$client->complemento."</complemento>
@@ -281,7 +285,7 @@ class SaleController extends Controller
         <montoTotalMoneda>".$request->montoTotal."</montoTotalMoneda>
         <montoGiftCard xsi:nil='true'/>
         <descuentoAdicional>0</descuentoAdicional>
-        <codigoExcepcion xsi:nil='true'/>
+        <codigoExcepcion>1</codigoExcepcion>
         <cafc xsi:nil='true'/>
         <leyenda>$leyenda</leyenda>
         <usuario>".explode(" ", $user->name)[0]."</usuario>
@@ -323,7 +327,7 @@ class SaleController extends Controller
         $hashArchivo=hash('sha256', $archivo);
         unlink($gzfile);
         try {
-            $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
+            $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVentas?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi " . env('TOKEN'),
@@ -358,7 +362,6 @@ class SaleController extends Controller
 
             if ($result->RespuestaServicioFacturacion->transaccion) {
                 $sale=new Sale();
-
                 $sale->numeroFactura=$numeroFactura;
                 $sale->cuf="";
                 $sale->cufd=$cufd->codigo;
@@ -380,6 +383,9 @@ class SaleController extends Controller
                         "title"=>"Factura",
                         "body"=>"Gracias por su compra",
                         "online"=>true,
+                        "anulado"=>false,
+                        "cuf"=>"",
+                        "numeroFactura"=>"",
                         "sale_id"=>$sale->id,
                         "carpeta"=>"archivos",
                     ];
@@ -393,6 +399,7 @@ class SaleController extends Controller
                     $numBoleto=Ticket::where('programa_id',$m->programa_id)->count()+1;
                     if(Ticket::where('programa_id',$m->programa_id)
                             ->where("fila",$m->fila)
+                            ->where("devuelto",0)
                             ->where("columna",$m->columna)
                             ->where("letra",$m->letra)->where("sala_id",$programa->sala->id)->count()==0){
                         $d=[
@@ -476,6 +483,9 @@ class SaleController extends Controller
                     "title"=>"Factura",
                     "body"=>"Gracias por su compra",
                     "online"=>false,
+                    "anulado"=>false,
+                    "cuf"=>"",
+                    "numeroFactura"=>"",
                     "sale_id"=>$sale->id,
                     "carpeta"=>"archivos",
                 ];
@@ -491,6 +501,7 @@ class SaleController extends Controller
                 $numBoleto=Ticket::where('programa_id',$m->programa_id)->count()+1;
                 if(Ticket::where('programa_id',$m->programa_id)
                         ->where("fila",$m->fila)
+                        ->where("devuelto",0)
                         ->where("columna",$m->columna)
                         ->where("letra",$m->letra)->where("sala_id",$programa->sala->id)->count()==0){
                     $d=[
@@ -686,10 +697,25 @@ class SaleController extends Controller
                 ]
             ]);
             if($result->RespuestaServicioFacturacion->transaccion){
-
                 $sale=Sale::find($request->sale['id']);
                 $sale->siatAnulado=1;
                 $sale->save();
+                $client=Client::find($sale->client_id);
+                error_log(json_encode($client));
+                if ($client->email!=''){
+                    $details=[
+                        "title"=>"Factura",
+                        "body"=>"Factura anulada",
+                        "online"=>true,
+                        "anulado"=>true,
+                        "cuf"=>$sale->cuf,
+                        "numeroFactura"=>$sale->numeroFactura,
+                        "sale_id"=>$sale->id,
+                        "carpeta"=>"archivos",
+                    ];
+                    Mail::to($client->email)->send(new TestMail($details));
+                }
+
             }
         }catch (\Exception $e) {
 //            return response()->json(['error' => $e->getMessage()]);

@@ -206,8 +206,8 @@
 
                 </div>
                 <div>
-                  <q-btn  label="venta" icon="send" type="submit" color="positive" :disable="btn"/>
-                  <q-btn label="Cerrar" type="button" size="md" icon="delete" color="negative" class="q-ml-sm" @click="icon=false" />
+                  <q-btn  label="venta" :loading="loading" icon="send" type="submit" color="positive" :disable="btn"/>
+                  <q-btn label="Cerrar" :loading="loading" type="button" size="md" icon="delete" color="negative" class="q-ml-sm" @click="icon=false" />
                 </div>
               </q-form>
 
@@ -305,6 +305,7 @@ export default {
       }
     },
     reset(){
+      this.client={complemento:''}
       this.store.detallecandy=[]
     },
     quitar(index){
