@@ -354,8 +354,7 @@ export default {
       this.client={complemento:''}
     },
     printButton () {
-      navigator.bluetooth
-        .requestDevice(
+      navigator.bluetooth.requestDevice(
           {
             filters: [
               {
@@ -395,7 +394,7 @@ export default {
           self.sendTextData(device)
         })
         .catch(error => {
-          //this.handleError(error, device)
+          this.handleError(error, device)
         })
     },
     handleError (error, device) {

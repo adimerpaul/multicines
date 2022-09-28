@@ -127,12 +127,13 @@ export default {
     },
     recepcionPaqueteFacturaClick(evento){
       this.eventoSignificativo=evento
-      this.eventoSignificativoDialog = true;
       this.$api.post('cantidadFacturas',{
         fechaInicio:evento.fechaHoraInicioEvento,
         fechaFin:evento.fechaHoraFinEvento,
       }).then(res=>{
         this.eventoSignificativosDatos = res.data;
+        this.eventoSignificativoDialog = true;
+
       })
     },
     eventoSignificativoGet(){
