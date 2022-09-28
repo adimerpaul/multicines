@@ -118,7 +118,7 @@ class EventoSignificativoController extends Controller
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=2; // 1 online 2 offline 3 masivo
         $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
-        $codigoPuntoVenta=0;// 
+        $codigoPuntoVenta=0;//
         $codigoSistema=env('CODIGO_SISTEMA');
         $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
 
