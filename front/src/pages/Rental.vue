@@ -13,15 +13,15 @@
     <q-table label="FACTURA DE ALQUILER DE AMBIENTES" :rows="rentals" :columns="columns">
       <template v-slot:body-cell-Opciones="props">
         <q-td :props="props" auto-width>
-          <q-btn-dropdown color="primary" label="Opciones">
+          <q-btn-dropdown color="primary" label="Opciones" >
             <q-list>
-              <q-item clickable v-close-popup>
+              <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
                 <q-item-section>
                   <q-btn icon="print" color="primary" class="full-width" label="Imprimir" no-caps @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
                 </q-item-section>
               </q-item>
 
-              <q-item clickable v-close-popup>
+              <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
                 <q-item-section>
                   <q-btn icon="cancel_presentation" color="red" class="full-width" label="Anular" no-caps @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
                 </q-item-section>
@@ -109,7 +109,7 @@
 
       <q-card-actions align="right" class="text-primary">
         <q-btn flat label="Cancel" v-close-popup />
-        <q-btn flat label="ANULAR" @click="enviarAnular" />
+        <q-btn flat label="ANULAR" @click="enviarAnular" :loading="loading"/>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -209,10 +209,14 @@ export default {
       this.dialogAnular=true
     },
     enviarAnular(){
+      this.loading=true
+
       this.$api.post('anularRental',{rental:this.factura,motivo:this.motivo}).then(res => {
         console.log(res.data)
         this.rentalConsulta()
         this.dialogAnular=false
+        this.loading=false
+
       })
     },
     cargarMotivo(){

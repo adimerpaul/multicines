@@ -166,7 +166,7 @@ class SaleCandyController extends Controller
         <direccion>".env('DIRECCION')."</direccion>
         <codigoPuntoVenta>$codigoPuntoVenta</codigoPuntoVenta>
         <fechaEmision>$fechaEnvio</fechaEmision>
-        <nombreRazonSocial>".$client->nombreRazonSocial."</nombreRazonSocial>
+        <nombreRazonSocial>".utf8_encode(str_replace("&","&amp;",$client->nombreRazonSocial))."</nombreRazonSocial>
         <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
         <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
         <complemento>".$client->complemento."</complemento>
@@ -180,7 +180,7 @@ class SaleCandyController extends Controller
         <montoTotalMoneda>".$request->montoTotal."</montoTotalMoneda>
         <montoGiftCard xsi:nil='true'/>
         <descuentoAdicional>0</descuentoAdicional>
-        <codigoExcepcion xsi:nil='true'/>
+        <codigoExcepcion>1</codigoExcepcion>
         <cafc xsi:nil='true'/>
         <leyenda>$leyenda</leyenda>
         <usuario>".explode(" ", $user->name)[0]."</usuario>

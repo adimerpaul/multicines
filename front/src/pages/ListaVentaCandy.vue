@@ -27,19 +27,19 @@
             <q-td :props="props" auto-width>
               <q-btn-dropdown color="primary" label="Opciones">
                 <q-list>
-                  <q-item clickable v-close-popup>
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
                     <q-item-section>
                       <q-btn icon="print" color="primary" class="full-width" label="Imprimir" no-caps @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
                     </q-item-section>
                   </q-item>
 
-                  <q-item clickable v-close-popup>
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
                     <q-item-section>
                       <q-btn icon="list" color="green" class="full-width" label="Comanda" no-caps @click="printComanda(props.row)" v-if="props.row.siatAnulado==0"/>
                     </q-item-section>
                   </q-item>
 
-                  <q-item clickable v-close-popup>
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
                     <q-item-section>
                       <q-btn icon="cancel_presentation" color="red" class="full-width" label="Anular" no-caps @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
                     </q-item-section>
@@ -47,6 +47,11 @@
                   <q-item clickable v-close-popup>
                     <q-item-section>
                       <q-btn type="a" label="Imp Impuestos " class="full-width" color="info" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
+                    <q-item-section>
+                      <q-btn label="Enviar Correo " class="full-width" color="teal" @click="correo(props.row)"/>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -186,6 +191,18 @@ export default {
     this.cargarMotivo()
   },
   methods: {
+    correo(venta){
+      console.log(venta)
+      this.$api.post('enviarCorreo',{client:venta.client,sale:venta}).then(res => {
+        if(res.data){
+          this.$q.notify({
+            color: 'green',
+            textColor: 'white',
+            message: 'enviado al correo',
+          })}
+      })
+
+    },
     async printComanda(factura) {
       this.facturadetalle = factura
       let ClaseConversor = conversor.conversorNumerosALetras;

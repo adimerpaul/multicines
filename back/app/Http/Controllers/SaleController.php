@@ -565,10 +565,14 @@ class SaleController extends Controller
     }
 
     public function enviarCorreo(Request $request){
+
         if ($request->client['email']!==''){
             $details=[
                 "title"=>"Factura",
                 "body"=>"Gracias por su compra",
+                "anulado"=>false,
+                "cuf"=>"",
+                "numeroFactura"=>"",
                 "sale_id"=>$request->sale['id'],
                 "carpeta"=>"archivos",
                 "online"=>$request->sale['siatEnviado']
