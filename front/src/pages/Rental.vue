@@ -365,7 +365,7 @@ export default {
     </table>\
       <div class='titulo'><span style='font-size: 12px'>FACTURA DE ALQUILER</span><br>\(Con Derecho a Crédito Fiscal) </div>\
       <table >\
-        <tr><td class='titizq'>FECHA DE EMISIÓN:</td><td class='contenido'>" + factura.fechaEmision + "</td><td style='width: 20%'></td></tc><td class='titder'>NIT/CI/CEX:</td><td class='contenido'>" + factura.client.numeroDocumento + "</td></tr>\
+        <tr><td class='titizq'>FECHA DE EMISIÓN:</td><td class='contenido'>" + factura.fechaEmision + "</td><td style='width: 20%'></td></tc><td class='titder'>NIT/CI/CEX:</td><td class='contenido'>" + factura.client.numeroDocumento + "-" + factura.client.complemento + "</td></tr>\
         <tr><td class='titizq'>NOMBRE/RAZÓN SOCIAL:</td><td class='contenido'>" + factura.client.nombreRazonSocial + "</td><td style='width: 20%'></td><td class='titder'>Cod. Cliente:</td ><td class='contenido'>" + factura.client.id + "</td></tr>\
         <tr><td class='titizq'></td><td class='contenido'></td><td style='width: 20%'></td><td class='titder'>Periodo Facturado:</td><td class='contenido'>" + factura.periodoFacturado + "</td></tr>\
       </table><br>\
