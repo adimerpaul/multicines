@@ -193,12 +193,12 @@
   </q-card-section>
 </q-card>
 </q-dialog>
-  <q-dialog full-width v-model="saleDialog">
+  <q-dialog full-width v-model="saleDialog" persistent>
     <q-card>
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">Realizar venta</div>
         <q-space />
-        <q-btn icon="close" flat round dense v-close-popup />
+
       </q-card-section>
       <q-form @submit.prevent="saleInsert">
       <q-card-section>
@@ -234,21 +234,35 @@
             <q-input outlined label="CAMBIO:" disable v-model="cambio" />
           </div>
           <div class="col-2 flex flex-center">
-            <q-checkbox outlined label="T CREDITO" v-model="credito" color="primary"/>
+            <q-toggle  outlined :label="`${client.credito} T CREDITO`" v-model="client.credito" color="green" false-value="NO" true-value="SI"/>
           </div>
           <div class="col-2 flex flex-center">
             <q-checkbox outlined label="N CORTESIA" v-model="cortesia" color="primary"/>
           </div>
+          <div class="col-2 flex flex-center">
+            <q-toggle  outlined :label="`${client.vip} VIP`" v-model="client.vip" color="green" false-value="NO" true-value="SI" />
+
+          </div>
+        </div>
+        <div class="coll-12">
+        <template v-if="client.vip=='SI'">
+            <q-form @submit.prevent="consultartarjeta">
+              <div class="row">
+                <div class="col-6 "><q-input outlined label="Codigo" v-model="codigo"  @keyup="consultartarjeta"/></div>
+                <div class="col-6 "><q-banner >Saldo :{{nombresaldo.saldo}} -- {{nombresaldo.nombre}}</q-banner></div>
+              </div>
+            </q-form>
+          </template>
+        </div>
           <div class="col-12 text-red text-bold" v-if="error!=''">
             {{error}}
           </div>
-        </div>
       </q-card-section>
       <q-separator/>
       <q-card-section>
         <div class="row">
           <div class="col-6">
-            <q-btn type="submit" class="full-width" icon="o_add_circle" label="Realizar venta" :loading="loading" no-caps color="green" />
+            <q-btn type="submit" class="full-width" icon="o_add_circle" label="Realizar venta" :loading="loading" no-caps color="green" :disable="btn" />
           </div>
           <div class="col-6">
             <q-btn class="full-width" icon="undo" @click="saleDialog=false" label="Atras" no-caps color="red" />
@@ -284,13 +298,14 @@ export default {
       movies:[],
       movie:{},
       hours:[],
+      nombresaldo:{},
       efectivo:'',
       hour:{},
       momentaneos:[],
       momentaneo:{},
       seats:[],
       seat:{},
-      client:{complemento:''},
+      client:{complemento:'',vip:'NO',credito:'NO'},
       temporal:[],
       numeroboleto:0,
       loading:false,
@@ -307,6 +322,9 @@ export default {
       leyendas:[],
       totventa:[],
       error:'',
+      btn:false,
+      tienerebaja:false,
+      codigo:'',
       opts : {
         errorCorrectionLevel: 'M',
         type: 'png',
@@ -338,6 +356,43 @@ export default {
     })
   },
   methods: {
+    consultartarjeta(){
+      if (this.codigo!='' || this.codigo!=undefined){
+        //this.$q.loading.show()
+        this.nombresaldo={}
+        this.codigo=this.codigo.replaceAll(' ','');
+        if (this.tienerebaja){
+          this.detalleVenta.forEach(r=>{
+            r.precio=(1.25*r.precio).toFixed(2)
+            r.subtotal=(1.25*r.subtotal).toFixed(2)
+          })
+          this.btn=false
+          this.tienerebaja=false
+        }
+        this.$api.get('validarTarjeta/'+this.codigo).then(res=>{
+          console.log(res.data)
+          this.$q.loading.hide()
+          if (res.data=='0' || res.data==''){
+
+          }else{
+            this.nombresaldo=res.data
+            // console.log(res.data)
+            if (!this.tienerebaja){
+              this.detalleVenta.forEach(r=>{
+                r.precio=(0.8*r.precio).toFixed(2)
+                r.subtotal=(0.8*r.subtotal).toFixed(2)
+              })
+              this.tienerebaja=true
+              if ( parseFloat(this.total) <= parseFloat(this.nombresaldo.saldo)){
+                this.btn=false
+              }else {
+                this.btn=true
+              }
+            }
+          }
+        })
+      }
+    },
     movieVenta(fecha){
       this.$api.post('movietotal',{'fecha':fecha}).then(res => {
           this.totventa=res.data
@@ -408,7 +463,7 @@ export default {
         })
         this.momentaneoDeleteAll()
         this.tventa()
-        this.client={complemento:''}
+        this.client={complemento:'',vip:'NO',credito:'NO'}
         this.saleDialog=false
         this.myMovies(this.fecha)
         this.loading=false
@@ -609,8 +664,11 @@ facturación en línea”</div><br>\
       })
     },
     saleCreate(){
+      this.tienerebaja=false
+      this.codigo=''
+      this.nombresaldo={}
       this.saleDialog=true
-      this.client={complemento:''}
+      this.client={complemento:'',vip:'NO',credito:'NO'}
     },
     momentaneoDeleteAll(){
       this.loading=true
@@ -744,12 +802,12 @@ facturación en línea”</div><br>\
       })
       return array
     },
-    total(){
+    total (){
       let t=0
       this.detalleVenta.forEach(d=>{
         t+= parseFloat(d.subtotal)
       })
-      return t.toFixed(2)
+      return t.toFixed(2);
     }
   }
 }

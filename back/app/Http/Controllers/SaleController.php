@@ -563,6 +563,23 @@ class SaleController extends Controller
         }
 
     }
+    public function  validarTarjeta($codigo){
+        //$codigo=$this->hexToStr($codigo);
+        $res= DB::connection('tarjeta')->table('cliente')->where('codigo',$codigo)->get();
+        if(sizeof($res)>0){
+            return $res[0];
+        }
+        else return 0;
+
+    }
+
+    public function hexToStr($hex){
+        $string='';
+        for ($i=0; $i < strlen($hex)-1; $i+=2){
+            $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+        }
+        return $string;
+    }
 
     public function enviarCorreo(Request $request){
 

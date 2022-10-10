@@ -71,3 +71,4 @@ Route::post('upimagenrubro', [\App\Http\Controllers\RubroController::class, 'upi
 Route::post('upimagenmovie', [\App\Http\Controllers\MovieController::class, 'upimagenmovie']);
 Route::post('upimagenproducto', [\App\Http\Controllers\ProductoController::class, 'upimagenproducto']);
 Route::post('listadoprod', [\App\Http\Controllers\RubroController::class, 'listadoprod']);
+Route::get('validarTarjeta/{cod}', [\App\Http\Controllers\SaleController::class, 'validarTarjeta']);
