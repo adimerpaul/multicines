@@ -80,7 +80,7 @@ module.exports = configure(function (ctx) {
       },
       env: {
         API: ctx.dev
-          ? 'http://192.168.220.20:8000/api/'
+          ? 'http://localhost:8000/api/'
           : 'https://bplaza.miganancia.cf/api/'
       }
 

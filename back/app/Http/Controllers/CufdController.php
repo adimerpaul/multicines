@@ -72,7 +72,8 @@ class CufdController extends Controller
             $cufd = new Cufd();
             $cufd->codigo = $result->RespuestaCufd->codigo;
             $cufd->codigoControl = $result->RespuestaCufd->codigoControl;
-            $cufd->fechaVigencia =  date('Y-m-d H:i:s', strtotime($result->RespuestaCufd->fechaVigencia));
+//            $cufd->fechaVigencia =  date('Y-m-d H:i:s', strtotime($result->RespuestaCufd->fechaVigencia));
+            $cufd->fechaVigencia =  date('Y-m-d H:i:s', strtotime('+20 hour' , strtotime (date('Y-m-d H:i:s'))));
             $cufd->fechaCreacion =  date('Y-m-d H:i:s');
             $cufd->codigoPuntoVenta = $request->codigoPuntoVenta;
             $cufd->codigoSucursal = $request->codigoSucursal;
