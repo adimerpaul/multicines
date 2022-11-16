@@ -17,7 +17,15 @@
 
         <div>
           <q-chip  color="red" v-if="store.eventNumber!=0" text-color="white" icon="warning_amber" :label="store.eventNumber+' Facturas no enviadas'" />
-          Usuario:
+          <b>Usuario:</b>{{store.user.name}}
+          <q-btn
+            flat
+            dense
+            round
+
+            icon="exit_to_app"
+            aria-label="Menu"
+            @click="logout"></q-btn>
         </div>
       </q-toolbar>
     </q-header>
@@ -84,6 +92,25 @@ export default {
       this.eventSearch()
   },
   methods: {
+    logout(){
+      this.$q.dialog({
+        title: 'Cerrar sesión',
+        message: '¿Está seguro que desea cerrar sesión?',
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.$q.loading.show()
+        this.$api.post('logout').then(() => {
+          globalStore().user={}
+          localStorage.removeItem('tokenMulti')
+          globalStore().isLoggedIn=false
+          this.$router.push('/login')
+          this.$q.loading.hide()
+        })
+
+      }).onCancel(() => {
+      })
+    },
       eventSearch(){
         this.$api.post('eventSearch').then(res=>{
           // console.log(res.data)

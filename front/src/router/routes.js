@@ -17,6 +17,7 @@ import EventoSignificativo from "pages/EventoSignificativo";
 import Rental from "pages/Rental";
 import Prevalorada from "pages/Prevalorada";
 import Cliente from "pages/Cliente";
+import Login from "pages/Login";
 
 
 const routes = [
@@ -25,25 +26,29 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: IndexPage,meta: { requiresAuth: true } },
-      { path: 'peliculas', component: Peliculas },
-      { path: 'distribuidores', component: Distribuidores },
-      { path: 'cuis', component: Cuis },
-      { path: 'cufd', component: Cufd },
-      { path: 'sincronizacion', component: Sincronizacion },
-      { path: 'salas', component: Salas },
-      { path: 'tarifas', component: Tarifas },
-      { path: 'sale', component: Sale },
-      { path: 'programa', component: Programa },
-      { path: 'rubro', component: Rubro },
-      { path: 'productos', component: Productos },
-      { path: 'candy', component: Candy },
-      { path: 'listaVenta', component: ListaVenta },
-      { path: 'listaVentaCandy', component: ListaVentaCandy },
-      { path: 'eventoSignificativo', component: EventoSignificativo },
-      { path: 'rental', component: Rental },
-      { path: 'prevalorada', component: Prevalorada },
-      { path: 'cliente', component: Cliente },
+      { path: 'peliculas', component: Peliculas ,meta: { requiresAuth: true } },
+      { path: 'distribuidores', component: Distribuidores ,meta: { requiresAuth: true } },
+      { path: 'cuis', component: Cuis ,meta: { requiresAuth: true } },
+      { path: 'cufd', component: Cufd ,meta: { requiresAuth: true } },
+      { path: 'sincronizacion', component: Sincronizacion ,meta: { requiresAuth: true } },
+      { path: 'salas', component: Salas ,meta: { requiresAuth: true } },
+      { path: 'tarifas', component: Tarifas ,meta: { requiresAuth: true } },
+      { path: 'sale', component: Sale ,meta: { requiresAuth: true } },
+      { path: 'programa', component: Programa ,meta: { requiresAuth: true } },
+      { path: 'rubro', component: Rubro ,meta: { requiresAuth: true } },
+      { path: 'productos', component: Productos ,meta: { requiresAuth: true } },
+      { path: 'candy', component: Candy ,meta: { requiresAuth: true } },
+      { path: 'listaVenta', component: ListaVenta ,meta: { requiresAuth: true } },
+      { path: 'listaVentaCandy', component: ListaVentaCandy ,meta: { requiresAuth: true } },
+      { path: 'eventoSignificativo', component: EventoSignificativo ,meta: { requiresAuth: true } },
+      { path: 'rental', component: Rental ,meta: { requiresAuth: true } },
+      { path: 'prevalorada', component: Prevalorada ,meta: { requiresAuth: true } },
+      { path: 'cliente', component: Cliente ,meta: { requiresAuth: true } },
     ]
+  },
+  {
+    path: '/login',
+    component: Login,
   },
 
   // Always leave this as last one,
