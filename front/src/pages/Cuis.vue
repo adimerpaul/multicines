@@ -30,7 +30,7 @@
           <q-form @submit.prevent="cuiCreate">
             <div class="row">
               <div class="col-12">
-                <q-select :options="[0,1]" dense outlined label="codigoPuntoVenta" v-model="cui.codigoPuntoVenta" />
+                <q-select :options="[0]" dense outlined label="codigoPuntoVenta" v-model="cui.codigoPuntoVenta" />
               </div>
 <!--              <div class="col-12">-->
 <!--                <q-select :options="[0,1,2]" dense outlined label="codigoSucursal" v-model="cui.codigoSucursal" />-->

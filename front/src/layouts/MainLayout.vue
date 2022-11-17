@@ -22,7 +22,6 @@
             flat
             dense
             round
-
             icon="exit_to_app"
             aria-label="Menu"
             @click="logout"></q-btn>

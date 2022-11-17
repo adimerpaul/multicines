@@ -28,7 +28,7 @@ class UserController extends Controller
     }
     public function me(Request $request)
     {
-        return response(['user' => $request->user()]);
+        return  $request->user();
     }
     public function logout(Request $request)
     {
