@@ -21,6 +21,7 @@ return new class extends Migration
             $table->dateTime('fecha')->nullable();
             $table->double('precio',11,2)->nullable();
             $table->string('pelicula')->nullable();
+            $table->string('pelicula_id')->nullable();
             $table->unsignedBigInteger("user_id")->nullable();
             $table->foreign("user_id")->references("id")->on("users");
             $table->unsignedBigInteger("programa_id")->nullable();

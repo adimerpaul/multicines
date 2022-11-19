@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('titulo')->nullable();
             $table->string('devuelto')->nullable()->default(0);
             $table->string('idCupon')->nullable();
+            $table->string('pelicula_id')->nullable();
             $table->string('tarjeta')->nullable()->default('NO');
             $table->string('credito')->nullable()->default('NO');
             $table->unsignedBigInteger("client_id")->nullable();

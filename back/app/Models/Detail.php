@@ -16,6 +16,7 @@ class Detail extends Model
         'subTotal',
         'sale_id',
         'programa_id',
+        'pelicula_id',
         'descripcion',
     ];
 }

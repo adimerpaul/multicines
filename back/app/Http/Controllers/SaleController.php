@@ -747,6 +747,10 @@ class SaleController extends Controller
         }
     }
 
+    public function reporteCajaB(Request $request){
+        return DB::SELECT();
+    }
+
     public function destroy(Sale $sale)
     {
         //

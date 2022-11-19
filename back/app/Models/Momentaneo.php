@@ -16,6 +16,7 @@ class Momentaneo extends Model
         "fecha",
         "precio",
         "pelicula",
+        "pelicula_id",
         "user_id",
         "programa_id",
     ];

@@ -765,6 +765,7 @@ facturación en línea”</div><br>\
           letra:seat.letra,
           fecha:funcion.horaInicio,
           pelicula:funcion.movie.nombre+' '+funcion.movie.formato,
+          pelicula_id:funcion.movie.id,
           precio:funcion.price.precio,
         }).then(res=>{
           this.loading=false
@@ -806,7 +807,7 @@ facturación en línea”</div><br>\
       this.momentaneos.forEach(m=>{
         find=array.find(mo=>mo.programa_id===m.programa_id)
         if (find==undefined){
-          array.push({fecha:m.fecha,precio:m.precio,cantidad:1,pelicula:m.pelicula,subtotal:m.precio,programa_id:m.programa_id})
+          array.push({fecha:m.fecha,precio:m.precio,cantidad:1,pelicula:m.pelicula,subtotal:m.precio,programa_id:m.programa_id,pelicula_id:m.pelicula_id})
         }else{
           find.cantidad=find.cantidad+1
           find.subtotal=find.cantidad*m.precio

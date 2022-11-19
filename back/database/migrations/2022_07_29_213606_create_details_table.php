@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string("precioUnitario")->nullable();
             $table->string("subTotal")->nullable();
             $table->string("programa_id")->nullable();
+            $table->string("pelicula_id")->nullable();
             $table->string("product_id")->nullable();
             $table->string("descripcion")->nullable();
             $table->unsignedBigInteger("sale_id")->nullable();
