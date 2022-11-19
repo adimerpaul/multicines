@@ -418,6 +418,7 @@ class SaleController extends Controller
                             "letra"=>$m->letra,
                             "costo"=>$programa->price->precio,
                             "titulo"=>$m->pelicula,
+                            "pelicula_id"=>$m->pelicula_id,
                             "devuelto"=>"0",
                             "idCupon"=>"",
                             "tarjeta"=>"",
@@ -440,6 +441,7 @@ class SaleController extends Controller
                         'subTotal'=>$detalle['subtotal'],
                         'sale_id'=>$sale->id,
                         'programa_id'=>$detalle['programa_id'],
+                        'pelicula_id'=>$detalle['pelicula_id'],
                         'descripcion'=>$detalle['pelicula'],
                     ];
                     array_push($dataDetail, $d);
@@ -528,6 +530,7 @@ class SaleController extends Controller
                         "credito"=>"",
                         "client_id"=>$client->id,
                         "programa_id"=>$programa->id,
+                        "pelicula_id"=>$pelicula->id,
                         "sale_id"=>$sale->id,
                         "price_id"=>$programa->price->id,
                         "sala_id"=>$programa->sala->id,
@@ -544,6 +547,7 @@ class SaleController extends Controller
                     'subTotal'=>$detalle['subtotal'],
                     'sale_id'=>$sale->id,
                     'programa_id'=>$detalle['programa_id'],
+                    'pelicula_id'=>$detalle['pelicula_id'],
                     'descripcion'=>$detalle['pelicula'],
                 ];
                 array_push($dataDetail, $d);
