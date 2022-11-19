@@ -18,7 +18,7 @@
           </template>
           <template v-slot:body-cell-Opciones="props">
             <q-td :props="props" auto-width>
-              <q-btn size="10px" icon="add_circle_outline" @click="eventoSignificativoClick(props.row)" color="primary" label="Evento significativo" no-caps/>
+              <q-btn v-if="props.pageIndex==0" size="10px" icon="add_circle_outline" @click="eventoSignificativoClick(props.row)" color="primary" label="Evento significativo" no-caps/>
             </q-td>
           </template>
           <template v-slot:body-cell-sales="props">
