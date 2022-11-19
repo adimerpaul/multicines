@@ -74,7 +74,7 @@
             <div class="row">
               <div class="col-4 flex flex-center" ><q-icon name="point_of_sale"></q-icon> VENTA </div>
               <div class="col-4 text-center" ><q-btn @click="reset"  color="negative" size="14px" icon="restart_alt" label="cancelar"/></div>
-              <div class="col-4 text-center" ><q-btn @click="icon = true;tienerebaja=false;"  color="positive" label="Venta" size="14px" icon="add_circle"/></div>
+              <div class="col-4 text-center" ><q-btn @click="icon = true;tienerebaja=false; booltarjeta=false; tarjeta=false;"  color="positive" label="Venta" size="14px" icon="add_circle"/></div>
             </div>
 
           </q-card-section>
@@ -116,7 +116,7 @@
       </div>
 </div>
     </q-card>
-    <q-dialog v-model="icon" full-width>
+    <q-dialog v-model="icon" full-width persistent>
       <q-card style="width: 700px; max-width: 80vw;">
         <q-card-section class="row items-center q-pa-xs bg-green-14 text-white">
           <div class="text-h6"> <q-icon name="send"></q-icon> Realizar venta</div>
@@ -201,13 +201,24 @@
                       v-model="cambio"
                     />
                   </div>
-                  <div class="col-2"><q-checkbox v-model="credito"  label="T Credito"/></div>
-                  <div class="col-2"><q-checkbox @input="verificar" v-model="tarjeta"  label="Tarjeta"/></div>
-
+                  <div class="row col-3">
+                    <q-checkbox v-model="credito"  label="T Credito" dense/>
+                    <q-checkbox  v-model="booltarjeta"  label="T VIP" dense @click="verificar"/>
+                  </div>
+                  <div class="col-12">
+                  <template v-if="booltarjeta">
+                      <q-form @submit.prevent="consultartarjeta">
+                      <div class="row">
+                      <div class="col-6"><q-input label="Codigo" v-model="codigo"  @keyup="consultartarjeta"/></div>
+                      <div class="col-6"><q-banner >Saldo :{{nombresaldo.saldo}} -- {{nombresaldo.nombre}}</q-banner></div>
+                    </div>
+                    </q-form>
+                  </template>
                 </div>
+              </div>
                 <div>
                   <q-btn  label="venta" :loading="loading" icon="send" type="submit" color="positive" :disable="btn"/>
-                  <q-btn label="Cerrar" :loading="loading" type="button" size="md" icon="delete" color="negative" class="q-ml-sm" @click="icon=false" />
+                  <q-btn label="Cerrar" :loading="loading" type="button" size="md" icon="delete" color="negative" class="q-ml-sm" @click="cancelarVenta" />
                 </div>
               </q-form>
 
@@ -242,6 +253,7 @@ export default {
       efectivo:'',
       btn:false,
       rubros:[],
+      codigo:'',
       productos:[],
       client:{complemento:''},
       temporal:[],
@@ -254,6 +266,9 @@ export default {
       tarjeta:false,
       cine:{},
       leyendas:[],
+      nombresaldo:{},
+      tienerebaja:false,
+      booltarjeta:false,
       opts : {
         errorCorrectionLevel: 'M',
         type: 'png',
@@ -288,14 +303,53 @@ export default {
       })
   },
   methods: {
-
+    cancelarVenta(){
+      this.codigo=''
+      this.booltarjeta=false
+      this.nombresaldo={}
+      this.icon=false
+      this.verificar()
+    },
+    consultartarjeta(){
+      if (this.codigo!='' || this.codigo!=undefined){
+        this.nombresaldo=''
+        this.codigo=this.codigo.replaceAll(' ','');
+        if (this.tienerebaja){
+          this.store.detallecandy.forEach(r=>{
+            r.precio=(1.25*r.precio).toFixed(2)
+            r.subtotal=(1.25*r.subtotal).toFixed(2)
+          })
+          this.btn=false
+          this.tienerebaja=false
+        }
+        this.$api.get('validarTarjeta/'+this.codigo).then(res=>{
+          console.log(res.data)
+          this.$q.loading.hide()
+          if (res.data=='0' || res.data==''){
+          }else{
+            this.nombresaldo=res.data
+            if (!this.tienerebaja){
+              this.store.detallecandy.forEach(r=>{
+                r.precio=(0.8*r.precio).toFixed(2)
+                r.subtotal=(0.8*r.subtotal).toFixed(2)
+              })
+              this.tienerebaja=true
+              if ( parseFloat(this.total) <= parseFloat(this.nombresaldo.saldo)){
+                this.btn=false
+              }else {
+                this.btn=true
+              }
+            }
+          }
+        })
+      }
+    },
     verificar(){
-      // console.log(this.booltargeta)
       this.codigo=''
       this.nombresaldo=''
-      if (!this.booltargeta){
+      if (!this.booltarjeta){
         if (this.tienerebaja){
-          this.$store.state.products.forEach(r=>{
+          this.store.detallecandy.forEach(r=>{
             r.precio=(1.25*r.precio).toFixed(2)
             r.subtotal=(1.25*r.subtotal).toFixed(2)
           })
@@ -356,6 +410,8 @@ export default {
         client:this.client,
         montoTotal:this.total,
         detalleVenta:this.store.detallecandy,
+        tarjeta:this.credito,
+        vip:this.booltarjeta
       }).then(res=>{
         this.reset()
           if(res.data.sale.siatEnviado==1){

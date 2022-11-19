@@ -234,18 +234,18 @@
             <q-input outlined label="CAMBIO:" disable v-model="cambio" />
           </div>
           <div class="col-2 flex flex-center">
-            <q-toggle  outlined :label="`${client.credito} T CREDITO`" v-model="client.credito" color="green" false-value="NO" true-value="SI"/>
+            <q-toggle  outlined :label="`${credito} T CREDITO`" v-model="credito" color="green" false-value="NO" true-value="SI"/>
           </div>
           <div class="col-2 flex flex-center">
             <q-checkbox outlined label="N CORTESIA" v-model="cortesia" color="primary"/>
           </div>
           <div class="col-2 flex flex-center">
-            <q-toggle  outlined :label="`${client.vip} VIP`" v-model="client.vip" color="green" false-value="NO" true-value="SI" />
+            <q-toggle  outlined :label="`${tarjeta} VIP`" v-model="tarjeta" color="green" false-value="NO" true-value="SI" />
 
           </div>
         </div>
         <div class="coll-12">
-        <template v-if="client.vip=='SI'">
+        <template v-if="tarjeta == 'SI'">
             <q-form @submit.prevent="consultartarjeta">
               <div class="row">
                 <div class="col-6 "><q-input outlined label="Codigo" v-model="codigo"  @keyup="consultartarjeta"/></div>
@@ -265,7 +265,7 @@
             <q-btn type="submit" class="full-width" icon="o_add_circle" label="Realizar venta" :loading="loading" no-caps color="green" :disable="btn" />
           </div>
           <div class="col-6">
-            <q-btn class="full-width" icon="undo" @click="saleDialog=false" label="Atras" no-caps color="red" />
+            <q-btn class="full-width" icon="undo" @click="saleDialog=false, consultartarjeta" label="Atras" no-caps color="red" />
           </div>
         </div>
       </q-card-section>
@@ -311,7 +311,8 @@ export default {
       loading:false,
       documents:[],
       document:{},
-      credito:false,
+      credito:'NO',
+      tarjeta:'NO',
       cortesia:false,
       disponible:0,
       vendido:0,
@@ -324,6 +325,7 @@ export default {
       error:'',
       btn:false,
       tienerebaja:false,
+      booltarjeta:false,
       codigo:'',
       opts : {
         errorCorrectionLevel: 'M',
@@ -362,7 +364,7 @@ export default {
         this.nombresaldo={}
         this.codigo=this.codigo.replaceAll(' ','');
         if (this.tienerebaja){
-          this.detalleVenta.forEach(r=>{
+          this.momentaneos.forEach(r=>{
             r.precio=(1.25*r.precio).toFixed(2)
             r.subtotal=(1.25*r.subtotal).toFixed(2)
           })
@@ -378,7 +380,7 @@ export default {
             this.nombresaldo=res.data
             // console.log(res.data)
             if (!this.tienerebaja){
-              this.detalleVenta.forEach(r=>{
+              this.momentaneos.forEach(r=>{
                 r.precio=(0.8*r.precio).toFixed(2)
                 r.subtotal=(0.8*r.subtotal).toFixed(2)
               })
@@ -444,6 +446,9 @@ export default {
         client:this.client,
         montoTotal:this.total,
         detalleVenta:this.detalleVenta,
+        vip:this.tarjeta,
+        tarjeta:this.credito
+
       }).then(res=>{
         console.log(res.data)
         if (res.data.error!=''){
@@ -775,6 +780,13 @@ facturación en línea”</div><br>\
     }
   },
   computed:{
+    total (){
+      let t=0
+      this.detalleVenta.forEach(d=>{
+        t+= parseFloat(d.subtotal)
+      })
+      return t.toFixed(2);
+    },
     cambio(){
       let cambio=parseFloat(this.efectivo==''?0:this.efectivo)- parseFloat(this.total)
       return  Math.round(cambio*100)/100
@@ -802,13 +814,7 @@ facturación en línea”</div><br>\
       })
       return array
     },
-    total (){
-      let t=0
-      this.detalleVenta.forEach(d=>{
-        t+= parseFloat(d.subtotal)
-      })
-      return t.toFixed(2);
-    }
+
   }
 }
 </script>

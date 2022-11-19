@@ -269,6 +269,8 @@ class SaleCandyController extends Controller
                 $sale->client_id=$client->id;
                 $sale->tipo="CANDY";
                 $sale->leyenda=$leyenda;
+                $sale->vip=$request->vip?'SI':'NO';
+                $sale->credito=$request->tarjeta?'SI':'NO';
                 $sale->save();
                 if ($request->client['email']!==''){
                     $details=[
@@ -331,7 +333,10 @@ class SaleCandyController extends Controller
             $sale->client_id=$client->id;
             $sale->tipo="CANDY";
             $sale->leyenda=$leyenda;
+            $sale->vip=$request->vip?'SI':'NO';
+            $sale->credito=$request->tarjeta?'SI':'NO';
             $sale->save();
+
             if ($request->client['email']!==''){
                 $details=[
                     "title"=>"Factura",

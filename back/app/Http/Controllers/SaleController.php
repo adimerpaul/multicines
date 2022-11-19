@@ -376,6 +376,8 @@ class SaleController extends Controller
                 $sale->cufd_id=$cufd->id;
                 $sale->client_id=$client->id;
                 $sale->leyenda=$leyenda;
+                $sale->vip=$request->vip;
+                $sale->credito=$request->tarjeta;
                 $sale->save();
 
                 if ($request->client['email']!==''){
@@ -476,6 +478,8 @@ class SaleController extends Controller
             $sale->cufd_id=$cufd->id;
             $sale->client_id=$client->id;
             $sale->leyenda=$leyenda;
+            $sale->vip=$request->vip;
+            $sale->credito=$request->tarjeta;
             $sale->save();
 
             if ($request->client['email']!==''){
@@ -564,8 +568,8 @@ class SaleController extends Controller
 
     }
     public function  validarTarjeta($codigo){
-        //$codigo=$this->hexToStr($codigo);
-        $res= DB::connection('tarjeta')->table('cliente')->where('codigo',$codigo)->get();
+       // $codigo=$this->hexToStr($codigo);
+        $res= DB::connection('tarjeta')->table('cliente')->where('codigo',$codigo)->where('estado','ACTIVO')->get();
         if(sizeof($res)>0){
             return $res[0];
         }
