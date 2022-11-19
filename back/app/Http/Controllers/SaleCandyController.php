@@ -222,7 +222,7 @@ class SaleCandyController extends Controller
         $hashArchivo=hash('sha256', $archivo);
         unlink($gzfile);
         try {
-            $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVentas?WSDL",  [
+            $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
                         'header' => "apikey: TokenApi " . env('TOKEN'),
@@ -252,6 +252,7 @@ class SaleCandyController extends Controller
                     "hashArchivo"=>$hashArchivo,
                 ]
             ]);
+            error_log(json_encode($result));
             if ($result->RespuestaServicioFacturacion->transaccion) {
                 $sale=new Sale();
                 $sale->numeroFactura=$numeroFactura;

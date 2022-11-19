@@ -226,7 +226,7 @@ class EventoSignificativoController extends Controller
                 'use' => SOAP_LITERAL,
                 'style' => SOAP_DOCUMENT,
             ]);
-
+        try {
             $result= $client->registroEventoSignificativo([
                 "SolicitudEventoSignificativo"=>[
                     "codigoAmbiente"=>env('AMBIENTE'),
@@ -251,23 +251,27 @@ class EventoSignificativoController extends Controller
 //            $cufd->codigoPuntoVenta = $request->codigoPuntoVenta;
 //            $cufd->codigoSucursal = $request->codigoSucursal;
 //            $cufd->save();
-if ($result->RespuestaListaEventos->transaccion){
-    $eventoSignificativo = new EventoSignificativo();
-    $eventoSignificativo->codigoPuntoVenta=$codigoPuntoVenta;
-    $eventoSignificativo->codigoSucursal=$codigoSucursal;
-    $eventoSignificativo->fechaHoraFinEvento=$request->fechaHoraFinEvento;
-    $eventoSignificativo->fechaHoraInicioEvento=$request->fechaHoraInicioEvento;
-    $eventoSignificativo->codigoMotivoEvento=$request->codigoMotivoEvento;
-    $eventoSignificativo->descripcion=$request->descripcion;
-    $eventoSignificativo->cufd=$cufd->codigo;
-    $eventoSignificativo->cufdEvento=$request->cufdEvento;
-    $eventoSignificativo->cufd_id=$request->cufdEventoId;
-    $eventoSignificativo->codigoRecepcionEventoSignificativo=$result->RespuestaListaEventos->codigoRecepcionEventoSignificativo;
-    $eventoSignificativo->save();
-    return response()->json(['message' => 'Evento Significativo registrado correctamente!!'], 200);
-}else{
-    return response()->json(['message' => 'Error al registrar el evento Significativo!!'], 400);
-}
+            if ($result->RespuestaListaEventos->transaccion){
+                $eventoSignificativo = new EventoSignificativo();
+                $eventoSignificativo->codigoPuntoVenta=$codigoPuntoVenta;
+                $eventoSignificativo->codigoSucursal=$codigoSucursal;
+                $eventoSignificativo->fechaHoraFinEvento=$request->fechaHoraFinEvento;
+                $eventoSignificativo->fechaHoraInicioEvento=$request->fechaHoraInicioEvento;
+                $eventoSignificativo->codigoMotivoEvento=$request->codigoMotivoEvento;
+                $eventoSignificativo->descripcion=$request->descripcion;
+                $eventoSignificativo->cufd=$cufd->codigo;
+                $eventoSignificativo->cufdEvento=$request->cufdEvento;
+                $eventoSignificativo->cufd_id=$request->cufdEventoId;
+                $eventoSignificativo->codigoRecepcionEventoSignificativo=$result->RespuestaListaEventos->codigoRecepcionEventoSignificativo;
+                $eventoSignificativo->save();
+                return response()->json(['message' => 'Evento Significativo registrado correctamente!!'], 200);
+            }else{
+                return response()->json(['message' => json_encode($result->RespuestaListaEventos->mensajesList) ], 500);
+            }
+        }catch (\Exception $e){
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+
 
 //            var_dump($result);
 //            return $result->RespuestaListaEventos->transaccion;

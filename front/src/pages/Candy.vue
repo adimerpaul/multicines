@@ -209,7 +209,7 @@
                   <template v-if="booltarjeta">
                       <q-form @submit.prevent="consultartarjeta">
                       <div class="row">
-                      <div class="col-6"><q-input label="Codigo" v-model="codigo"  @keyup="consultartarjeta"/></div>
+                      <div class="col-6"><q-input outlined label="Codigo" v-model="codigo"  @keyup="consultartarjeta"/></div>
                       <div class="col-6"><q-banner >Saldo :{{nombresaldo.saldo}} -- {{nombresaldo.nombre}}</q-banner></div>
                     </div>
                     </q-form>
