@@ -21,7 +21,7 @@ Route::post('login', [App\Http\Controllers\UserController::class, 'login']);
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('me', [App\Http\Controllers\UserController::class, 'me']);
     Route::post('logout', [App\Http\Controllers\UserController::class, 'logout']);
-    Route::apiResource('users', App\Http\Controllers\UserController::class);
+    Route::apiResource('user', App\Http\Controllers\UserController::class);
     Route::post('/upload', [\App\Http\Controllers\UploadController::class,'upload']);
     Route::get("sendEmail",[\App\Http\Controllers\MailController::class,'sendEmail']);
     Route::resource('movie', \App\Http\Controllers\MovieController::class);
@@ -77,6 +77,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('upimagenproducto', [\App\Http\Controllers\ProductoController::class, 'upimagenproducto']);
     Route::post('listadoprod', [\App\Http\Controllers\RubroController::class, 'listadoprod']);
     Route::get('validarTarjeta/{cod}', [\App\Http\Controllers\SaleController::class, 'validarTarjeta']);
+    Route::post('cajaBol', [\App\Http\Controllers\SaleController::class, 'cajaBol']);
+    Route::post('resumenBol', [\App\Http\Controllers\SaleController::class, 'resumenBol']);
+    Route::post('cajaCandy', [\App\Http\Controllers\SaleController::class, 'cajaCandy']);
 
 });
 

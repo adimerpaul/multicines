@@ -54,7 +54,7 @@ class UserSeeder extends Seeder
             [ "name" => "OLIVER CHAMBI GOMEZ","nick"=>'OCHAMBI',"email" => "OCHAMBI@test.com","fechaLimite" => "2030-07-29","password" => bcrypt("123456"),],
             [ "name" => "NATALY MARTINEZ JIMENEZ","nick"=>'NMARTINEZ',"email" => "NMARTINEZ@test.com","fechaLimite" => "2030-07-29","password" => bcrypt("123456"),],
             [ "name" => "LUIS ANGEL GONZALES REYES","nick"=>'LGONZALES',"email" => "LGONZALES@test.com","fechaLimite" => "2030-07-29","password" => bcrypt("123456"),],
-            [ "name" => "MARCELO QUIROGA', 'MQUIROGA","nick"=>'MQUIROGA',"email" => "MQUIROGA@test.com","fechaLimite" => "2030-07-29","password" => bcrypt("123456"),],
+            [ "name" => "MARCELO QUIROGA","nick"=>'MQUIROGA',"email" => "MQUIROGA@test.com","fechaLimite" => "2030-07-29","password" => bcrypt("123456"),],
             [ "name" => "ESTEFANY DAYANA VELASQUEZ LOPEZ","nick"=>'EVELASQUEZ',"email" => "EVELASQUEZ@test.com","fechaLimite" => "2030-07-29","password" => bcrypt("123456"),],
             [ "name" => "KEVIN JONATHAN COPA RICALDI","nick"=>'KCOPA',"email" => "KCOPA@test.com","fechaLimite" => "2030-07-29","password" => bcrypt("123456"),],
             [ "name" => "STEINLER CALDERON","nick"=>'SCALDERON',"email" => "SCALDERON@test.com","fechaLimite" => "2030-07-29","password" => bcrypt("123456"),],

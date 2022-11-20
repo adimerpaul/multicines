@@ -17,6 +17,7 @@ import EventoSignificativo from "pages/EventoSignificativo";
 import Rental from "pages/Rental";
 import Prevalorada from "pages/Prevalorada";
 import Cliente from "pages/Cliente";
+import CajaBoleteria from "pages/CajaBoleteria";
 import Login from "pages/Login";
 
 
@@ -44,6 +45,7 @@ const routes = [
       { path: 'rental', component: Rental ,meta: { requiresAuth: true } },
       { path: 'prevalorada', component: Prevalorada ,meta: { requiresAuth: true } },
       { path: 'cliente', component: Cliente ,meta: { requiresAuth: true } },
+      { path: 'cajaboleteria', component: CajaBoleteria ,meta: { requiresAuth: true } },
     ]
   },
   {

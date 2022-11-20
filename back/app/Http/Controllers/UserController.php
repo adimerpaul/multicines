@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+
+
     public function login(Request $request)
     {
         $validated = $request->validate([
@@ -36,6 +38,7 @@ class UserController extends Controller
         return response(['message' => 'Sesión cerrada']);
     }
     public function index(){return User::all();}
+
     public function show(User $user){return $user;}
     public function store(Request $request)
     {

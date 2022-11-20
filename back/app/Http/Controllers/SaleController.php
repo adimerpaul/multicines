@@ -751,8 +751,102 @@ class SaleController extends Controller
         }
     }
 
-    public function reporteCajaB(Request $request){
-        return DB::SELECT();
+    public function cajaBol(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+
+        return DB::SELECT("SELECT d.descripcion,d.pelicula_id, sum(d.subTotal), sum(d.cantidad)
+        from sales s inner join details d on s.id=d.sale_id
+        where 
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        GROUP by d.descripcion, d.pelicula_id;");
+    }
+
+    public function resumenBol(){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+        return DB::SELECT("
+        select
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where 
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.credito='SI') as tarjeta,
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where 
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.vip='SI') as vip,
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where 
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO') as efectivo   ");
+    }
+
+    public function cajaCandy(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+
+        return DB::SELECT("SELECT d.descripcion,d.product_id, sum(d.subTotal),sum(d.cantidad)
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision) ='$request->fecha'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        GROUP by d.descripcion, d.product_id;");
+    }
+
+    public function resumenCandy(){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+        return DB::SELECT("
+        select
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where 
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.credito='SI') as tarjeta,
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where 
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.vip='SI') as vip,
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where 
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO') as efectivo   ");
     }
 
     public function destroy(Sale $sale)
