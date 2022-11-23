@@ -530,7 +530,7 @@ class SaleController extends Controller
                         "credito"=>"",
                         "client_id"=>$client->id,
                         "programa_id"=>$programa->id,
-                        "pelicula_id"=>$pelicula->id,
+                        "pelicula_id"=>$m->pelicula_id,
                         "sale_id"=>$sale->id,
                         "price_id"=>$programa->price->id,
                         "sala_id"=>$programa->sala->id,
@@ -755,9 +755,9 @@ class SaleController extends Controller
         $cadena='';
         if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
 
-        return DB::SELECT("SELECT d.descripcion,d.pelicula_id, sum(d.subTotal), sum(d.cantidad)
+        return DB::SELECT("SELECT d.descripcion,d.pelicula_id, sum(d.subTotal) total, sum(d.cantidad) cantidad
         from sales s inner join details d on s.id=d.sale_id
-        where 
+        where
         date(s.fechaEmision) >='$request->ini'
         and date(s.fechaEmision) <='$request->fin'
         ".$cadena."
@@ -766,14 +766,14 @@ class SaleController extends Controller
         GROUP by d.descripcion, d.pelicula_id;");
     }
 
-    public function resumenBol(){
+    public function resumenBol(Request $request){
         $cadena='';
         if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
         return DB::SELECT("
         select
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
-        where 
+        where
         date(s.fechaEmision) >='$request->ini'
         and date(s.fechaEmision) <='$request->fin'
         ".$cadena."
@@ -782,7 +782,7 @@ class SaleController extends Controller
         and s.credito='SI') as tarjeta,
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
-        where 
+        where
         date(s.fechaEmision) >='$request->ini'
         and date(s.fechaEmision) <='$request->fin'
         ".$cadena."
@@ -791,7 +791,7 @@ class SaleController extends Controller
         and s.vip='SI') as vip,
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
-        where 
+        where
         date(s.fechaEmision) >='$request->ini'
         and date(s.fechaEmision) <='$request->fin'
         ".$cadena."
@@ -805,7 +805,7 @@ class SaleController extends Controller
         $cadena='';
         if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
 
-        return DB::SELECT("SELECT d.descripcion,d.product_id, sum(d.subTotal),sum(d.cantidad)
+        return DB::SELECT("SELECT d.descripcion,d.product_id, sum(d.subTotal) total,sum(d.cantidad) cantidad
         from sales s inner join details d on s.id=d.sale_id
         where date(s.fechaEmision) ='$request->fecha'
         ".$cadena."
@@ -814,14 +814,14 @@ class SaleController extends Controller
         GROUP by d.descripcion, d.product_id;");
     }
 
-    public function resumenCandy(){
+    public function resumenCandy(Request $request){
         $cadena='';
         if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
         return DB::SELECT("
         select
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
-        where 
+        where
         date(s.fechaEmision) >='$request->ini'
         and date(s.fechaEmision) <='$request->fin'
         ".$cadena."
@@ -830,7 +830,7 @@ class SaleController extends Controller
         and s.credito='SI') as tarjeta,
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
-        where 
+        where
         date(s.fechaEmision) >='$request->ini'
         and date(s.fechaEmision) <='$request->fin'
         ".$cadena."
@@ -839,7 +839,7 @@ class SaleController extends Controller
         and s.vip='SI') as vip,
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
-        where 
+        where
         date(s.fechaEmision) >='$request->ini'
         and date(s.fechaEmision) <='$request->fin'
         ".$cadena."
