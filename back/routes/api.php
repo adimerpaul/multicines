@@ -1,6 +1,8 @@
 <?php
 
+use App\Mail\TestMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -80,7 +82,20 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('cajaBol', [\App\Http\Controllers\SaleController::class, 'cajaBol']);
     Route::post('resumenBol', [\App\Http\Controllers\SaleController::class, 'resumenBol']);
     Route::post('cajaCandy', [\App\Http\Controllers\SaleController::class, 'cajaCandy']);
+});
 
+Route::get('test',function (){
+    $details=[
+        "title"=>"Factura",
+        "body"=>"Gracias por su compra",
+        "online"=>true,
+        "anulado"=>false,
+        "cuf"=>"",
+        "numeroFactura"=>"",
+        "sale_id"=>1,
+        "carpeta"=>"archivos",
+    ];
+    Mail::to('adimer101@gmail.com')->send(new TestMail($details));
 });
 
 

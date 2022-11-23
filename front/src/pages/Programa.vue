@@ -216,7 +216,7 @@ export default {
       })
 
     }
-    if(!this.store.movieSingleTon) {
+    // if(!this.store.movieSingleTon) {
       this.$q.loading.show()
       this.store.movieSingleTon=true
       this.$api.get('movie').then(res=>{
@@ -228,7 +228,7 @@ export default {
         this.store.movies=res.data
         this.$q.loading.hide()
       })
-    }
+    // }
     //if(!this.store.movieSingleTon) {
      // this.$q.loading.show()
       //this.store.movieSingleTon=true
