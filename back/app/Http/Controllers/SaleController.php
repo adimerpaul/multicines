@@ -531,7 +531,7 @@ class SaleController extends Controller
 
     public function  validarTarjeta($codigo){
         $codigo=$this->hexToStr($codigo);
-        return $codigo;
+        //return $codigo;
         $res= DB::connection('tarjeta')->table('cliente')->where('codigo',$codigo)->where('estado','ACTIVO')->get();
         if(sizeof($res)>0){
             return $res[0];
