@@ -971,6 +971,7 @@ class SaleController extends Controller
                     "idCupon"=>"",
                     "tarjeta"=>"",
                     "credito"=>"",
+                    //"cortesia"=>"SI",
                     "client_id"=>$client->id,
                     "programa_id"=>$programa->id,
                     "pelicula_id"=>$m->id,
