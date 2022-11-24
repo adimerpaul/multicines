@@ -16,7 +16,7 @@ class MomentaneoController extends Controller
      */
     public function index(Request $request)
     {
-        return Momentaneo::where('user_id',1)->get();
+        return Momentaneo::where('user_id',$request->user()->id)->get();
     }
 
     /**
@@ -37,7 +37,7 @@ class MomentaneoController extends Controller
      */
     public function store(StoreMomentaneoRequest $request)
     {
-        if (Momentaneo::where("user_id",$request->user_id)
+        if (Momentaneo::where("user_id",$request->user()->id)
             ->where("programa_id",$request->programa_id)
             ->where("fila",$request->fila)
             ->where("columna",$request->columna)
@@ -48,7 +48,7 @@ class MomentaneoController extends Controller
     }
     public function momentaneoDelete(Request $request)
     {
-        Momentaneo::where("user_id",$request->user_id)
+        Momentaneo::where("user_id",$request->user()->id)
             ->where("programa_id",$request->programa_id)
             ->where("fila",$request->fila)
             ->where("columna",$request->columna)
@@ -57,13 +57,13 @@ class MomentaneoController extends Controller
     }
     public function momentaneoDeleteUser(Request $request)
     {
-        Momentaneo::where("user_id",1)
+        Momentaneo::where("user_id",$request->user()->id)
             ->where("programa_id",$request->programa_id)
             ->delete();
     }
     public function momentaneoDeleteAll(Request $request)
     {
-        Momentaneo::where("user_id",1)
+        Momentaneo::where("user_id",$request->user()->id)
             ->delete();
     }
 
