@@ -80,11 +80,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('upimagenmovie', [\App\Http\Controllers\MovieController::class, 'upimagenmovie']);
     Route::post('upimagenproducto', [\App\Http\Controllers\ProductoController::class, 'upimagenproducto']);
     Route::post('listadoprod', [\App\Http\Controllers\RubroController::class, 'listadoprod']);
-    Route::get('validarTarjeta/{cod}', [\App\Http\Controllers\SaleController::class, 'validarTarjeta']);
+
     Route::post('cajaBol', [\App\Http\Controllers\SaleController::class, 'cajaBol']);
     Route::post('resumenBol', [\App\Http\Controllers\SaleController::class, 'resumenBol']);
     Route::post('cajaCandy', [\App\Http\Controllers\SaleController::class, 'cajaCandy']);
 });
+Route::get('validarTarjeta/{cod}', [\App\Http\Controllers\SaleController::class, 'validarTarjeta']);
 
 //Route::get('test',function (){
 //    $details=[
