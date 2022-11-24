@@ -793,7 +793,7 @@ facturación en línea”</div><br>\
       }else{
         seat.activo='SELECCIONADO'
         this.$api.post('momentaneo',{
-          user_id:1,
+          user_id:this.store.user.id,
           programa_id:funcion.id,
           fila:seat.fila,
           columna:seat.columna,
