@@ -15,7 +15,10 @@ use App\Models\SaleCandy;
 use App\Http\Requests\StoreSaleCandyRequest;
 use App\Http\Requests\UpdateSaleCandyRequest;
 use App\Models\Ticket;
+use App\Models\User;
 use DOMDocument;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use SimpleXMLElement;
 
@@ -79,6 +82,10 @@ class SaleCandyController extends Controller
 //            return "nuevo";
         }
 
+        if ($request->vip=="SI"){
+            return $this->insertarVip($request,$client);
+        }
+
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
@@ -89,7 +96,7 @@ class SaleCandyController extends Controller
 
         $codigoSucursal=0;
 
-        $user=(object)["name"=>"admin","id"=>1];
+        $user=$request->user();
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
@@ -104,8 +111,9 @@ class SaleCandyController extends Controller
         if (Sale::where('cufd', $cufd->codigo)->where('tipo','CANDY')->count()==0){
             $numeroFactura=1;
         }else{
-            $sale=Sale::where('cufd',$cufd->codigo)->where('tipo','CANDY')->orderBy('numeroFactura', 'desc')->first();
-            $numeroFactura=intval($sale->numeroFactura)+1;
+//            $sale=Sale::where('cufd',$cufd->codigo)->where('tipo','CANDY')->orderBy('numeroFactura', 'desc')->first();
+            $max=Sale::where('cufd',$cufd->codigo)->where('tipo','CANDY')->max('numeroFactura');
+            $numeroFactura=intval($max)+1;
         }
         if (count(Sale::all())==0) {
             $saleId=1;
@@ -270,8 +278,8 @@ class SaleCandyController extends Controller
                 $sale->client_id=$client->id;
                 $sale->tipo="CANDY";
                 $sale->leyenda=$leyenda;
-                $sale->vip=$request->vip?'SI':'NO';
-                $sale->credito=$request->tarjeta?'SI':'NO';
+                $sale->vip=$request->vip;
+                $sale->credito=$request->tarjeta;
                 $sale->save();
                 if ($request->client['email']!==''){
                     $details=[
@@ -334,8 +342,8 @@ class SaleCandyController extends Controller
             $sale->client_id=$client->id;
             $sale->tipo="CANDY";
             $sale->leyenda=$leyenda;
-            $sale->vip=$request->vip?'SI':'NO';
-            $sale->credito=$request->tarjeta?'SI':'NO';
+            $sale->vip=$request->vip;
+            $sale->credito=$request->tarjeta;
             $sale->save();
 
             if ($request->client['email']!==''){
@@ -426,5 +434,73 @@ class SaleCandyController extends Controller
     public function destroy(SaleCandy $saleCandy)
     {
         //
+    }
+    private function insertarVip(Request $request, Client $client)
+    {
+        $numeroFactura=0;
+        $codigoSucursal=0;
+        $codigoPuntoVenta=0;
+        $codigoDocumentoSector=0;
+        $user=$request->user();
+            $sale=new Sale();
+            $sale->numeroFactura=$numeroFactura;
+            $sale->cuf="";
+            $sale->cufd="";
+            $sale->cui="";
+            $sale->codigoSucursal=$codigoSucursal;
+            $sale->codigoPuntoVenta=$codigoPuntoVenta;
+            $sale->fechaEmision=now();
+            $sale->montoTotal=$request->montoTotal;
+            $sale->usuario=$user->name;
+            $sale->codigoDocumentoSector=$codigoDocumentoSector;
+            $sale->user_id=$user->id;
+            $sale->cufd_id=null;
+            $sale->client_id=$client->id;
+            $sale->tipo="CANDY";
+            $sale->leyenda="";
+            $sale->vip=$request->vip;
+            $sale->credito=$request->tarjeta;
+            $sale->save();
+            $dataDetail=[];
+            foreach ($request->detalleVenta as $detalle){
+                $d=[
+                    'actividadEconomica'=>"590000",
+                    'codigoProductoSin'=>"99100",
+                    'cantidad'=>$detalle['cantidad'],
+                    'precioUnitario'=>$detalle['precio'],
+                    'subTotal'=>$detalle['subtotal'],
+                    'sale_id'=>$sale->id,
+//                        'programa_id'=>$detalle['programa_id'],
+                    'product_id'=>$detalle['product_id'],
+                    'descripcion'=>$detalle['nombre'],
+                ];
+                array_push($dataDetail, $d);
+            }
+
+            Detail::insert($dataDetail);
+
+            $sale->siatEnviado=true;
+            $sale->codigoRecepcion="";
+            $sale->cuf="";
+            $sale->save();
+            // $tickets=Ticket::where('sale_id',$sale->id)->get();
+        $sale=Sale::where('id',$sale->id)->with('client')->with('details')->with('user')->first();
+        $sale->siatEnviado=false;
+        $codigo=$this->hexToStr($request->codigoTarjeta);
+        DB::connection('tarjeta')->select("
+            UPDATE cliente SET saldo=saldo-$sale->montoTotal WHERE codigo='$codigo'
+        ");
+            return response()->json([
+                'sale' => $sale,
+                // "tickets"=>$tickets,
+                "error"=>"",
+            ]);
+    }
+    public function hexToStr($hex){
+        $string='';
+        for ($i=0; $i < strlen($hex)-1; $i+=2){
+            $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+        }
+        return $string;
     }
 }

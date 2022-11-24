@@ -19,6 +19,7 @@ import Prevalorada from "pages/Prevalorada";
 import Cliente from "pages/Cliente";
 import CajaBoleteria from "pages/CajaBoleteria";
 import Login from "pages/Login";
+import Cortesia from "pages/Cortesia";
 
 
 const routes = [
@@ -46,6 +47,7 @@ const routes = [
       { path: 'prevalorada', component: Prevalorada ,meta: { requiresAuth: true } },
       { path: 'cliente', component: Cliente ,meta: { requiresAuth: true } },
       { path: 'cajaboleteria', component: CajaBoleteria ,meta: { requiresAuth: true } },
+      { path: 'cortesia', component: Cortesia ,meta: { requiresAuth: true } },
     ]
   },
   {

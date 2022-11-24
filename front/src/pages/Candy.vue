@@ -410,8 +410,9 @@ export default {
         client:this.client,
         montoTotal:this.total,
         detalleVenta:this.store.detallecandy,
-        tarjeta:this.credito,
-        vip:this.booltarjeta
+        tarjeta:this.credito?'SI':'NO',
+        codigoTarjeta:this.codigo,
+        vip:this.booltarjeta?'SI':'NO',
       }).then(res=>{
         this.reset()
           if(res.data.sale.siatEnviado==1){

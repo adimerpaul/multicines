@@ -237,11 +237,10 @@
             <q-toggle  outlined :label="`${credito} T CREDITO`" v-model="credito" color="green" false-value="NO" true-value="SI"/>
           </div>
           <div class="col-2 flex flex-center">
-            <q-checkbox outlined label="N CORTESIA" v-model="cortesia" color="primary"/>
+            <q-checkbox outlined label="N CORTESIA" @update:model-value="habilitarCortesia" v-model="cortesia" color="primary"/>
           </div>
           <div class="col-2 flex flex-center">
             <q-toggle  outlined :label="`${tarjeta} VIP`" v-model="tarjeta" color="green" false-value="NO" true-value="SI" />
-
           </div>
         </div>
         <div class="coll-12">
@@ -252,6 +251,16 @@
                 <div class="col-6 "><q-banner >Saldo :{{nombresaldo.saldo}} -- {{nombresaldo.nombre}}</q-banner></div>
               </div>
             </q-form>
+          </template>
+          <template v-if="cortesia">
+            <div class="row">
+              <div class="col-12">
+                <q-checkbox @click="verificarCortesia" v-for="c in frees" :key="c.id" v-model="c.status" :label="c.id+''" color="teal" />
+              </div>
+              <div class="col-12">
+                <div class="text-bold text-center text-h5"> {{marcados}} - {{cantidades}} </div>
+              </div>
+            </div>
           </template>
         </div>
           <div class="col-12 text-red text-bold" v-if="error!=''">
@@ -327,6 +336,7 @@ export default {
       tienerebaja:false,
       booltarjeta:false,
       codigo:'',
+      frees:[],
       opts : {
         errorCorrectionLevel: 'M',
         type: 'png',
@@ -338,10 +348,10 @@ export default {
           light: '#FFF',
         },
       }
-
     }
   },
   created() {
+    this.freeGet();
     this.encabezado()
     this.cargarLeyenda()
     this.myMovies(this.fecha)
@@ -358,6 +368,26 @@ export default {
     })
   },
   methods: {
+    freeGet(){
+      this.$api.get('free').then(res=>{
+        this.frees=[]
+        res.data.forEach(r=>{
+          r.status=false
+          this.frees=res.data
+        })
+
+      })
+    },
+    habilitarCortesia(){
+      this.btn=!this.cortesia
+    },
+    verificarCortesia(){
+      if (this.marcados==this.cantidades){
+        this.btn=false
+      }else{
+        this.btn=true
+      }
+    },
     consultartarjeta(){
       if (this.codigo!='' || this.codigo!=undefined){
         //this.$q.loading.show()
@@ -386,6 +416,7 @@ export default {
               })
               this.tienerebaja=true
               if ( parseFloat(this.total) <= parseFloat(this.nombresaldo.saldo)){
+
                 this.btn=false
               }else {
                 this.btn=true
@@ -447,10 +478,14 @@ export default {
         montoTotal:this.total,
         detalleVenta:this.detalleVenta,
         vip:this.tarjeta,
-        tarjeta:this.credito
-
+        tarjeta:this.credito,
+        codigoTarjeta:this.codigo,
+        cortesia:this.cortesia?'SI':'NO',
+        frees:this.frees
       }).then(res=>{
-        console.log(res.data)
+        this.freeGet()
+        this.tarjeta='NO'
+        // console.log(res.data)
         if (res.data.error!=''){
           this.$q.notify({
             color: 'negative',
@@ -781,6 +816,30 @@ facturación en línea”</div><br>\
     }
   },
   computed:{
+
+    btnCortesia(){
+      if (this.cortesia) {
+        return true
+      }else{
+        return false
+      }
+    },
+    marcados(){
+      let cantidad=0
+      this.frees.forEach(m=>{
+        if (m.status) {
+          cantidad++
+        }
+      })
+      return cantidad
+    },
+    cantidades(){
+      let cantidad=0
+      this.detalleVenta.forEach(m=>{
+        cantidad+=m.cantidad
+      })
+      return cantidad
+    },
     total (){
       let t=0
       this.detalleVenta.forEach(d=>{

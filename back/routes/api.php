@@ -27,6 +27,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/upload', [\App\Http\Controllers\UploadController::class,'upload']);
     Route::get("sendEmail",[\App\Http\Controllers\MailController::class,'sendEmail']);
     Route::resource('movie', \App\Http\Controllers\MovieController::class);
+    Route::resource('cortesia', \App\Http\Controllers\CortesiaController::class);
+    Route::get('free', [\App\Http\Controllers\CortesiaController::class,'free']);
     Route::resource('distributor', \App\Http\Controllers\DistributorController::class);
     Route::resource('sala', \App\Http\Controllers\SalaController::class);
     Route::resource('cui', \App\Http\Controllers\CuiController::class);
@@ -84,18 +86,18 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('cajaCandy', [\App\Http\Controllers\SaleController::class, 'cajaCandy']);
 });
 
-Route::get('test',function (){
-    $details=[
-        "title"=>"Factura",
-        "body"=>"Gracias por su compra",
-        "online"=>true,
-        "anulado"=>false,
-        "cuf"=>"",
-        "numeroFactura"=>"",
-        "sale_id"=>1,
-        "carpeta"=>"archivos",
-    ];
-    Mail::to('adimer101@gmail.com')->send(new TestMail($details));
-});
+//Route::get('test',function (){
+//    $details=[
+//        "title"=>"Factura",
+//        "body"=>"Gracias por su compra",
+//        "online"=>true,
+//        "anulado"=>false,
+//        "cuf"=>"",
+//        "numeroFactura"=>"",
+//        "sale_id"=>1,
+//        "carpeta"=>"archivos",
+//    ];
+//    Mail::to('adimer101@gmail.com')->send(new TestMail($details));
+//});
 
 
