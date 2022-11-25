@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             LeyendaSeeder::class,
             DocumentSeeder::class,
             VehiculoSeeder::class,
+            PermisoSeeder::class,
         ]);
     }
 }

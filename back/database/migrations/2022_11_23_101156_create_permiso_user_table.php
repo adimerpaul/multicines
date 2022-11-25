@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('permiso_user', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
             $table->unsignedBigInteger("permiso_id")->nullable();
             $table->foreign("permiso_id")->references("id")->on("permisos");
+            $table->unsignedBigInteger("user_id")->nullable();
+            $table->foreign("user_id")->references("id")->on("users");
             $table->timestamps();
         });
     }

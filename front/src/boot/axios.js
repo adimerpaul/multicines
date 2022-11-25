@@ -24,16 +24,82 @@ export default boot(({ app,router }) => {
       console.log(response.data)
       globalStore().user = response.data
       globalStore().isLoggedIn = true
+      response.data.permisos.forEach(r => {
+          if(r.id==1) globalStore().booluser=true
+          if(r.id==3) globalStore().boolcuis=true
+          if(r.id==4) globalStore().boolsincr=true
+          if(r.id==5) globalStore().boolcufd=true
+          if(r.id==6) globalStore().boolevento=true
+          if(r.id==7) globalStore().boolmovie=true
+          if(r.id==8) globalStore().booldistrib=true
+          if(r.id==9) globalStore().boolsala=true
+          if(r.id==10) globalStore().booltarifa=true
+          if(r.id==11) globalStore().boolrubro=true
+          if(r.id==12) globalStore().boolproducto=true
+          if(r.id==13) globalStore().boolprogram=true
+          if(r.id==14) globalStore().boolboleteria=true
+          if(r.id==15) globalStore().boollistbol=true
+          if(r.id==16) globalStore().boolcandy=true
+          if(r.id==17) globalStore().boollistcandy=true
+          if(r.id==18) globalStore().boolcajabol=true
+          if(r.id==19) globalStore().boolcajacandy=true
+          if(r.id==20) globalStore().boolalquiler=true
+          if(r.id==21) globalStore().boolcliente=true
+          if(r.id==22) globalStore().boolcortesia=true
+      });
     }).catch((error) => {
       app.config.globalProperties.$api.defaults.headers.common['Authorization']=''
       globalStore().user={}
       localStorage.removeItem('tokenMulti')
       globalStore().isLoggedIn=false
+      globalStore().booluser=false
+      globalStore().boolcuis=false
+      globalStore().boolsincr=false
+      globalStore().boolcufd=false
+      globalStore().boolevento=false
+      globalStore().boolmovie=false
+      globalStore().booldistrib=false
+      globalStore().boolsala=false
+      globalStore().booltarifa=false
+      globalStore().boolrubro=false
+      globalStore().boolproducto=false
+      globalStore().boolprogram=false
+      globalStore().boolboleteria=false
+      globalStore().boollistbol=false
+      globalStore().boolcandy=false
+      globalStore().boollistcandy=false
+      globalStore().boolcajabol=false
+      globalStore().boolcajacandy=false
+      globalStore().boolalquiler=false
+      globalStore().boolcliente=false
+      globalStore().boolcortesia=false
       router.push('/login')
     })
   }else {
     router.push('/login')
     globalStore().user={}
+    globalStore().isLoggedIn=false
+    globalStore().booluser=false
+    globalStore().boolcuis=false
+    globalStore().boolsincr=false
+    globalStore().boolcufd=false
+    globalStore().boolevento=false
+    globalStore().boolmovie=false
+    globalStore().booldistrib=false
+    globalStore().boolsala=false
+    globalStore().booltarifa=false
+    globalStore().boolrubro=false
+    globalStore().boolproducto=false
+    globalStore().boolprogram=false
+    globalStore().boolboleteria=false
+    globalStore().boollistbol=false
+    globalStore().boolcandy=false
+    globalStore().boollistcandy=false
+    globalStore().boolcajabol=false
+    globalStore().boolcajacandy=false
+    globalStore().boolalquiler=false
+    globalStore().boolcliente=false
+    globalStore().boolcortesia=false
     localStorage.removeItem('tokenMulti')
     globalStore().isLoggedIn=false
   }

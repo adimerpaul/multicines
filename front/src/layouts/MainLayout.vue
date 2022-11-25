@@ -39,6 +39,7 @@
           <q-img src="logo.png" width="150px" />
         </q-item-label>
         <q-expansion-item dense exact expand-separator icon="o_home" label="Principal" default-opened to="/" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="o_people" label="Usuarios" to="usuarios" expand-icon="null"/>
         <q-expansion-item expand-separator dense exact icon="o_engineering" label="Siat">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_psychology" label="Cuis" default-opened to="cuis" expand-icon="null"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_countertops" label="sincronizacion" default-opened to="sincronizacion" expand-icon="null"/>

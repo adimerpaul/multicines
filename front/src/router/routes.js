@@ -20,6 +20,7 @@ import Cliente from "pages/Cliente";
 import CajaBoleteria from "pages/CajaBoleteria";
 import Login from "pages/Login";
 import Cortesia from "pages/Cortesia";
+import User from "pages/User";
 
 
 const routes = [
@@ -48,6 +49,7 @@ const routes = [
       { path: 'cliente', component: Cliente ,meta: { requiresAuth: true } },
       { path: 'cajaboleteria', component: CajaBoleteria ,meta: { requiresAuth: true } },
       { path: 'cortesia', component: Cortesia ,meta: { requiresAuth: true } },
+      { path: 'usuarios', component: User ,meta: { requiresAuth: true } },
     ]
   },
   {

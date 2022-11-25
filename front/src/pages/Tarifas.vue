@@ -120,7 +120,7 @@ import {globalStore} from "stores/globalStore";
 import {date} from "quasar";
 
 export default {
-  name: `Distribuidores`,
+  name: `Tarifas`,
   data() {
     return {
       loading: false,
