@@ -39,40 +39,40 @@
           <q-img src="logo.png" width="150px" />
         </q-item-label>
         <q-expansion-item dense exact expand-separator icon="o_home" label="Principal" default-opened to="/" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="o_people" label="Usuarios" to="usuarios" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="o_people" label="Usuarios" to="usuarios" expand-icon="null" v-if="store.booluser"/>
         <q-expansion-item expand-separator dense exact icon="o_engineering" label="Siat">
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_psychology" label="Cuis" default-opened to="cuis" expand-icon="null"/>
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_countertops" label="sincronizacion" default-opened to="sincronizacion" expand-icon="null"/>
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="link" label="Cufd" default-opened to="cufd" expand-icon="null"/>
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="list" label="Evento significativo" default-opened to="eventoSignificativo" expand-icon="null"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_psychology" label="Cuis" default-opened to="cuis" expand-icon="null" v-if="store.boolcuis"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_countertops" label="sincronizacion" default-opened to="sincronizacion" expand-icon="null" v-if="store.boolsincr"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="link" label="Cufd" default-opened to="cufd" expand-icon="null" v-if="store.boolcufd"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="list" label="Evento significativo" default-opened to="eventoSignificativo" expand-icon="null" v-if="store.boolevento"/>
         </q-expansion-item>
         <q-expansion-item expand-separator dense exact icon="o_movie_filter" label="Peliculas">
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_movie" label="Peliculas" default-opened to="peliculas" expand-icon="null"/>
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Distribuidores" default-opened to="distribuidores" expand-icon="null"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_movie" label="Peliculas" default-opened to="peliculas" expand-icon="null" v-if="store.boolmovie"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Distribuidores" default-opened to="distribuidores" expand-icon="null" v-if="store.booldistrib"/>
         </q-expansion-item>
-        <q-expansion-item dense exact expand-separator icon="o_living" label="Salas" to="salas" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="o_price_change" label="Tarifas" to="tarifas" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="format_list_bulleted" label="Rubro" to="rubro" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="receipt_long" label="Producto" to="productos" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="calendar_month" label="Programación" to="programa" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="o_living" label="Salas" to="salas" expand-icon="null" v-if="store.boolsala"/>
+        <q-expansion-item dense exact expand-separator icon="o_price_change" label="Tarifas" to="tarifas" expand-icon="null" v-if="store.booltarifa"/>
+        <q-expansion-item dense exact expand-separator icon="format_list_bulleted" label="Rubro" to="rubro" expand-icon="null" v-if="store.boolrubro"/>
+        <q-expansion-item dense exact expand-separator icon="receipt_long" label="Producto" to="productos" expand-icon="null" v-if="store.boolproducto"/>
+        <q-expansion-item dense exact expand-separator icon="calendar_month" label="Programación" to="programa" expand-icon="null" v-if="store.boolprogram"/>
 <!--        <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Venta de boletos" to="sale" expand-icon="null"/>-->
         <q-expansion-item expand-separator dense exact icon="o_local_activity" label="Venta Boleteria">
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_local_activity" label="Venta de boletos" default-opened to="sale" expand-icon="null"/>
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVenta" expand-icon="null"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_local_activity" label="Venta de boletos" default-opened to="sale" expand-icon="null" v-if="store.boolboleteria"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVenta" expand-icon="null" v-if="store.boollistbol"/>
         </q-expansion-item>
         <q-expansion-item expand-separator dense exact icon="o_store" label="Candy Bar">
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Venta Candy Bar" default-opened to="candy" expand-icon="null"/>
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVentaCandy" expand-icon="null"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Venta Candy Bar" default-opened to="candy" expand-icon="null" v-if="store.boolcandy"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVentaCandy" expand-icon="null" v-if="store.boollistcandy"/>
         </q-expansion-item>
         <q-expansion-item expand-separator dense exact icon="o_store" label="Reporte Caja">
-          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Caja Boleteria" default-opened to="cajaboleteria" expand-icon="null"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Caja Boleteria" default-opened to="cajaboleteria" expand-icon="null" v-if="store.boolcajabol"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Caja Candy" default-opened to="cajacandy" expand-icon="null" v-if="store.boolcajacandy"/>
 
         </q-expansion-item>
 
-        <q-expansion-item dense exact expand-separator icon="o_home_work" label="Factura de Alquiler " to="rental" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Prevalorada " to="prevalorada" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="o_people" label="Clientes" to="cliente" expand-icon="null"/>
-        <q-expansion-item dense exact expand-separator icon="o_book_online" label="Cortesia" to="cortesia" expand-icon="null"/>
+        <q-expansion-item dense exact expand-separator icon="o_home_work" label="Factura de Alquiler " to="rental" expand-icon="null" v-if="store.boolalquiler"/>
+        <q-expansion-item dense exact expand-separator icon="o_people" label="Clientes" to="cliente" expand-icon="null" v-if="store.boolcliente"/>
+        <q-expansion-item dense exact expand-separator icon="o_book_online" label="Cortesia" to="cortesia" expand-icon="null" v-if="store.boolcortesia"/>
       </q-list>
     </q-drawer>
 

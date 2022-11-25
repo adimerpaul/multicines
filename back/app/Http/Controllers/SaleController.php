@@ -380,6 +380,7 @@ class SaleController extends Controller
                             "idCupon"=>"",
                             "tarjeta"=>"",
                             "credito"=>"",
+                            "promo"=>$m->promo,
                             "client_id"=>$client->id,
                             "programa_id"=>$programa->id,
                             "sale_id"=>$sale->id,
@@ -485,6 +486,7 @@ class SaleController extends Controller
                         "idCupon"=>"",
                         "tarjeta"=>"",
                         "credito"=>"",
+                        "promo"=>$m->promo,
                         "client_id"=>$client->id,
                         "programa_id"=>$programa->id,
                         "pelicula_id"=>$m->id,
@@ -1029,6 +1031,33 @@ class SaleController extends Controller
 //        return response()->json(['message' => $e->getMessage()], 500);
     }
 
+    public function validanit($nit){
+        $cui=Cui::where('codigoPuntoVenta', 0)->where('codigoSucursal', 0)->where('fechaVigencia','>=', now());
+        $client = new \SoapClient(env("URL_SIAT")."FacturacionCodigos?WSDL",  [
+            'stream_context' => stream_context_create([
+                'http' => [
+                    'header' => "apikey: TokenApi ".env('TOKEN'),
+                ]
+            ]),
+            'cache_wsdl' => WSDL_CACHE_NONE,
+            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+            'trace' => 1,
+            'use' => SOAP_LITERAL,
+            'style' => SOAP_DOCUMENT,
+        ]);
+        $result= $client->verificarNit ([
+            "SolicitudVerificarNit"=>[
+                "codigoAmbiente"=>env('AMBIENTE'),
+                "codigoSistema"=>env('CODIGO_SISTEMA'),
+                "nit"=>env('NIT'),
+                "cuis"=> $cui->first()->codigo,
+                "codigoModalidad"=>env('MODALIDAD'),
+                "codigoSucursal"=>0,
+                "nitParaVerificacion"=>$nit
+            ]
+        ]);
+        return $result;
+    }
 
 
 }

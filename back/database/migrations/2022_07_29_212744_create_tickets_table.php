@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('letra')->nullable();
             $table->string('costo')->nullable();
             $table->string('titulo')->nullable();
+            $table->boolean('promo')->default(false);
             $table->string('devuelto')->nullable()->default(0);
             $table->string('idCupon')->nullable();
             $table->string('pelicula_id')->nullable();

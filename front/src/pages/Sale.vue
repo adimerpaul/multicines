@@ -213,7 +213,7 @@
             <q-input outlined label="nombreRazonSocial" required v-model="client.nombreRazonSocial" style="text-transform: uppercase" />
           </div>
           <div class="col-3">
-            <q-select v-model="document" outlined :options="documents"/>
+            <q-select v-model="document" outlined :options="documents" @update:model-value="validarnit"/>
           </div>
           <div class="col-2">
             <q-input outlined label="Email"  v-model="client.email" type="email"/>
@@ -684,7 +684,14 @@ facturación en línea”</div><br>\
       d.print( document.getElementById('myelement') )
 
     },
+    validarnit(){
+      if(this.document==this.documents[4]){
+        this.$api.get('validanit/'+this.client.numeroDocumento).then(res=>{
+          console.log(res.data)
+        })
 
+      }
+    },
     searchClient(){
       // console.log(this.client)
       this.document=this.documents[0]
@@ -693,6 +700,7 @@ facturación en línea”</div><br>\
       this.client.id=undefined
       this.$api.post('searchClient',this.client).then(res=>{
         // console.log(res.data)
+        this.validarnit()
         if (res.data.nombreRazonSocial!=undefined) {
           this.client.nombreRazonSocial=res.data.nombreRazonSocial
           this.client.email=res.data.email
@@ -802,6 +810,7 @@ facturación en línea”</div><br>\
           pelicula:funcion.movie.nombre+' '+funcion.movie.formato,
           pelicula_id:funcion.movie.id,
           precio:funcion.price.precio,
+          promo:funcion.price.promo=='SI'?true:false
         }).then(res=>{
           this.loading=false
           this.myMomentaneo()
@@ -866,7 +875,7 @@ facturación en línea”</div><br>\
       this.momentaneos.forEach(m=>{
         find=array.find(mo=>mo.programa_id===m.programa_id)
         if (find==undefined){
-          array.push({fecha:m.fecha,precio:m.precio,cantidad:1,pelicula:m.pelicula,subtotal:m.precio,programa_id:m.programa_id,pelicula_id:m.pelicula_id})
+          array.push({promo:m.promo,fecha:m.fecha,precio:m.precio,cantidad:1,pelicula:m.pelicula,subtotal:m.precio,programa_id:m.programa_id,pelicula_id:m.pelicula_id})
         }else{
           find.cantidad=find.cantidad+1
           find.subtotal=find.cantidad*m.precio
