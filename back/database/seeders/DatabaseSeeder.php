@@ -22,14 +22,14 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             UserSeeder::class,
-            DistributorSeeder::class,
-            MovieSeeder::class,
+//            DistributorSeeder::class,
+//            MovieSeeder::class,
 //            CuiSeeder::class,
             SalaSeeder::class,
             SeatSeeder::class,
             PriceSeeder::class,
-            ProgramaSeeder::class,
-            ClientSeeder::class,
+//            ProgramaSeeder::class,
+//            ClientSeeder::class,
 //            SaleSeeder::class,
 //            TicketSeeder::class,
             RubroSeeder::class,
@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             DocumentSeeder::class,
             VehiculoSeeder::class,
             PermisoSeeder::class,
+            Permiso_user::class
         ]);
     }
 }

@@ -216,8 +216,7 @@
             <q-select v-model="document" outlined :options="documents" @update:model-value="validarnit"/>
           </div>
           <div class="col-2">
-            <q-input outlined label="Email"  v-model="client.email" type="email"/>
-
+            <q-input outlined label="Email"  v-model="client.email" type="email" required/>
           </div>
         </div>
       </q-card-section>

@@ -26,26 +26,26 @@ export default boot(({ app,router }) => {
       globalStore().isLoggedIn = true
       response.data.permisos.forEach(r => {
           if(r.id==1) globalStore().booluser=true
-          if(r.id==3) globalStore().boolcuis=true
-          if(r.id==4) globalStore().boolsincr=true
-          if(r.id==5) globalStore().boolcufd=true
-          if(r.id==6) globalStore().boolevento=true
-          if(r.id==7) globalStore().boolmovie=true
-          if(r.id==8) globalStore().booldistrib=true
-          if(r.id==9) globalStore().boolsala=true
-          if(r.id==10) globalStore().booltarifa=true
-          if(r.id==11) globalStore().boolrubro=true
-          if(r.id==12) globalStore().boolproducto=true
-          if(r.id==13) globalStore().boolprogram=true
-          if(r.id==14) globalStore().boolboleteria=true
-          if(r.id==15) globalStore().boollistbol=true
-          if(r.id==16) globalStore().boolcandy=true
-          if(r.id==17) globalStore().boollistcandy=true
-          if(r.id==18) globalStore().boolcajabol=true
-          if(r.id==19) globalStore().boolcajacandy=true
-          if(r.id==20) globalStore().boolalquiler=true
-          if(r.id==21) globalStore().boolcliente=true
-          if(r.id==22) globalStore().boolcortesia=true
+          if(r.id==2) globalStore().boolcuis=true
+          if(r.id==3) globalStore().boolsincr=true
+          if(r.id==4) globalStore().boolcufd=true
+          if(r.id==5) globalStore().boolevento=true
+          if(r.id==6) globalStore().boolmovie=true
+          if(r.id==7) globalStore().booldistrib=true
+          if(r.id==8) globalStore().boolsala=true
+          if(r.id==9) globalStore().booltarifa=true
+          if(r.id==10) globalStore().boolrubro=true
+          if(r.id==11) globalStore().boolproducto=true
+          if(r.id==12) globalStore().boolprogram=true
+          if(r.id==13) globalStore().boolboleteria=true
+          if(r.id==14) globalStore().boollistbol=true
+          if(r.id==15) globalStore().boolcandy=true
+          if(r.id==16) globalStore().boollistcandy=true
+          if(r.id==17) globalStore().boolcajabol=true
+          if(r.id==18) globalStore().boolcajacandy=true
+          if(r.id==19) globalStore().boolalquiler=true
+          if(r.id==20) globalStore().boolcliente=true
+          if(r.id==21) globalStore().boolcortesia=true
       });
     }).catch((error) => {
       app.config.globalProperties.$api.defaults.headers.common['Authorization']=''

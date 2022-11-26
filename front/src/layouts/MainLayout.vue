@@ -40,13 +40,13 @@
         </q-item-label>
         <q-expansion-item dense exact expand-separator icon="o_home" label="Principal" default-opened to="/" expand-icon="null"/>
         <q-expansion-item dense exact expand-separator icon="o_people" label="Usuarios" to="usuarios" expand-icon="null" v-if="store.booluser"/>
-        <q-expansion-item expand-separator dense exact icon="o_engineering" label="Siat">
+        <q-expansion-item expand-separator dense exact icon="o_engineering" label="Siat" v-if="store.boolcuis||store.boolsincr||store.boolcufd||store.boolevento">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_psychology" label="Cuis" default-opened to="cuis" expand-icon="null" v-if="store.boolcuis"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_countertops" label="sincronizacion" default-opened to="sincronizacion" expand-icon="null" v-if="store.boolsincr"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="link" label="Cufd" default-opened to="cufd" expand-icon="null" v-if="store.boolcufd"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="list" label="Evento significativo" default-opened to="eventoSignificativo" expand-icon="null" v-if="store.boolevento"/>
         </q-expansion-item>
-        <q-expansion-item expand-separator dense exact icon="o_movie_filter" label="Peliculas">
+        <q-expansion-item expand-separator dense exact icon="o_movie_filter" label="Peliculas" v-if="store.boolmovie||store.booldistrib">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_movie" label="Peliculas" default-opened to="peliculas" expand-icon="null" v-if="store.boolmovie"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Distribuidores" default-opened to="distribuidores" expand-icon="null" v-if="store.booldistrib"/>
         </q-expansion-item>
@@ -56,15 +56,15 @@
         <q-expansion-item dense exact expand-separator icon="receipt_long" label="Producto" to="productos" expand-icon="null" v-if="store.boolproducto"/>
         <q-expansion-item dense exact expand-separator icon="calendar_month" label="Programación" to="programa" expand-icon="null" v-if="store.boolprogram"/>
 <!--        <q-expansion-item dense exact expand-separator icon="o_local_activity" label="Venta de boletos" to="sale" expand-icon="null"/>-->
-        <q-expansion-item expand-separator dense exact icon="o_local_activity" label="Venta Boleteria">
+        <q-expansion-item expand-separator dense exact icon="o_local_activity" label="Venta Boleteria" v-if="store.boolboleteria||store.boollistbol">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_local_activity" label="Venta de boletos" default-opened to="sale" expand-icon="null" v-if="store.boolboleteria"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVenta" expand-icon="null" v-if="store.boollistbol"/>
         </q-expansion-item>
-        <q-expansion-item expand-separator dense exact icon="o_store" label="Candy Bar">
+        <q-expansion-item expand-separator dense exact icon="o_store" label="Candy Bar" v-if="store.boolcandy||store.boollistcandy">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Venta Candy Bar" default-opened to="candy" expand-icon="null" v-if="store.boolcandy"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Listado de ventas" default-opened to="listaVentaCandy" expand-icon="null" v-if="store.boollistcandy"/>
         </q-expansion-item>
-        <q-expansion-item expand-separator dense exact icon="o_store" label="Reporte Caja">
+        <q-expansion-item expand-separator dense exact icon="o_store" label="Reporte Caja" v-if="store.boolcajabol||store.boolcajacandy">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Caja Boleteria" default-opened to="cajaboleteria" expand-icon="null" v-if="store.boolcajabol"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Caja Candy" default-opened to="cajacandy" expand-icon="null" v-if="store.boolcajacandy"/>
 
