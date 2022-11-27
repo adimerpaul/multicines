@@ -687,6 +687,11 @@ facturación en línea”</div><br>\
       if(this.document==this.documents[4]){
         this.$api.get('validanit/'+this.client.numeroDocumento).then(res=>{
           console.log(res.data)
+          this.$q.notify({
+            message: res.data.RespuestaVerificarNit.mensajesList.descripcion,
+            color: 'teal',
+            icon: 'info'
+          })
         })
 
       }
@@ -699,7 +704,7 @@ facturación en línea”</div><br>\
       this.client.id=undefined
       this.$api.post('searchClient',this.client).then(res=>{
         // console.log(res.data)
-        this.validarnit()
+        //console.log(res.data.codigoTipoDocumentoIdentidad)
         if (res.data.nombreRazonSocial!=undefined) {
           this.client.nombreRazonSocial=res.data.nombreRazonSocial
           this.client.email=res.data.email
@@ -708,6 +713,7 @@ facturación en línea”</div><br>\
           documento.label=documento.descripcion
           this.document=documento
         }
+        if(this.document.codigoClasificador==5) this.validarnit()
       })
     },
     saleCreate(){
