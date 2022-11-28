@@ -936,7 +936,7 @@ class SaleController extends Controller
         $numero=$sale->id;
         $cliente=$client->id;
         DB::connection('tarjeta')->select("
-INSERT INTO historial (fecha, lugar, monto, numero, cliente) VALUES ('$fecha', 'BOLETERIA', $monto, $numero, $cliente)
+INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha', 'BOLETERIA', $monto, $numero, $cliente)
         ");
         $sale=Sale::where('id',$sale->id)->with('client')->with('details')->first();
         $sale->siatEnviado=false;

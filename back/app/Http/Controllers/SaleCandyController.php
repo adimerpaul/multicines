@@ -495,7 +495,7 @@ class SaleCandyController extends Controller
         $numero=$sale->id;
         $cliente=$client->id;
         DB::connection('tarjeta')->select("
-INSERT INTO historial (fecha, lugar, monto, numero, cliente) VALUES ('$fecha', 'CANDY BAR', $monto, $numero, $cliente)
+INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha', 'CANDY BAR', $monto, $numero, $cliente)
         ");
             return response()->json([
                 'sale' => $sale,
