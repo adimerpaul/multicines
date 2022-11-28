@@ -795,7 +795,7 @@ class SaleController extends Controller
         ".$cadena."
         and s.tipo='CANDY'
         and s.siatAnulado=false
-        GROUP by d.descripcion, d.product_id;");
+        GROUP by  d.product_id");
     }
 
     public function resumenCandy(Request $request){
