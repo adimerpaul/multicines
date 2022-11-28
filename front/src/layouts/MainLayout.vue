@@ -111,6 +111,28 @@ export default {
           globalStore().isLoggedIn=false
           this.$router.push('/login')
           this.$q.loading.hide()
+          globalStore().isLoggedIn=false
+          globalStore().booluser=false
+          globalStore().boolcuis=false
+          globalStore().boolsincr=false
+          globalStore().boolcufd=false
+          globalStore().boolevento=false
+          globalStore().boolmovie=false
+          globalStore().booldistrib=false
+          globalStore().boolsala=false
+          globalStore().booltarifa=false
+          globalStore().boolrubro=false
+          globalStore().boolproducto=false
+          globalStore().boolprogram=false
+          globalStore().boolboleteria=false
+          globalStore().boollistbol=false
+          globalStore().boolcandy=false
+          globalStore().boollistcandy=false
+          globalStore().boolcajabol=false
+          globalStore().boolcajacandy=false
+          globalStore().boolalquiler=false
+          globalStore().boolcliente=false
+          globalStore().boolcortesia=false
         })
 
       }).onCancel(() => {
