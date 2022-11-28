@@ -59,7 +59,7 @@
         columna:[
           {label:'NOMBRE',field:'descripcion',name:'descripcion',sortable:true},
           {label:'cantidad',field:'cantidad',name:'cantidad',sortable:true},
-          {label:'SUBTOTAL',field:'subtotal',name:'subtotal',sortable:true},
+          {label:'SUBTOTAL',field:'total',name:'subtotal',sortable:true},
         ]
       }
     },

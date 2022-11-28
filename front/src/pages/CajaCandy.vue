@@ -7,7 +7,7 @@
         <div class="col-3"> <q-btn color="green"  label="Consultar" @click="consultar"/></div>
         <div class="col-3"> <q-btn color="info"  label="Imprimir" @click="impresion"/></div>
         <div class="col-12">
-          <q-table dense title="Listado Venta Boleteria" :rows-per-page-options="[20,50,100,0]" :rows="reporte" :columns="columna" :filter="productoFilter">
+          <q-table dense title="Listado Venta Candy" :rows-per-page-options="[20,50,100,0]" :rows="reporte" :columns="columna" :filter="productoFilter">
             <template v-slot:top-right>
 
               <q-input outlined dense debounce="300" v-model="productoFilter" placeholder="Buscar">
@@ -59,7 +59,7 @@
         columna:[
           {label:'NOMBRE',field:'descripcion',name:'descripcion',sortable:true},
           {label:'cantidad',field:'cantidad',name:'cantidad',sortable:true},
-          {label:'SUBTOTAL',field:'subtotal',name:'subtotal',sortable:true},
+          {label:'SUBTOTAL',field:'total',name:'subtotal',sortable:true},
         ]
       }
     },
