@@ -93,9 +93,6 @@
           this.loading=true
         this.$api.post('resumenCandy',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
             console.log(res.data)
-            if(res.data.credito==null) res.data.credito=0
-            if(res.data.vip==null) res.data.vip=0
-            if(res.data.efectivo==null) res.data.efectivo=0
             this.tcredito=res.data.credito
             this.tvip=res.data.vip
             this.tefectivo=res.data.efectivo

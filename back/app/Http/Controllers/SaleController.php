@@ -830,7 +830,7 @@ class SaleController extends Controller
         and s.tipo='CANDY'
         and s.siatAnulado=false
         and s.vip='NO'
-		and s.credito='NO') as efectivo   ");
+		and s.credito='NO') as efectivo ");
     }
 
     public function destroy(Sale $sale)
