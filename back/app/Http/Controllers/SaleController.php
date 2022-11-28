@@ -781,7 +781,8 @@ class SaleController extends Controller
         and s.tipo='BOLETERIA'
         and s.siatAnulado=false
         and s.vip='NO'
-		and s.credito='NO') as efectivo   ");
+		and s.credito='NO'
+        and s.cortesia='NO') as efectivo   ");
     }
 
     public function cajaCandy(Request $request){
