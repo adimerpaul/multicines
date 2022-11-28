@@ -60,7 +60,8 @@
           </template>
           <template v-slot:body-cell-siatEnviado="props">
             <q-td :props="props" auto-width>
-              <q-badge :color="props.row.siatEnviado?'green':'red'" :label="props.row.siatEnviado?'V':'E'"/>
+              <q-badge v-if="props.row.vip=='NO'" :color="props.row.siatEnviado?'green':'red'" :label="props.row.siatEnviado?'V':'E'"/>
+              <q-badge v-else color="orange">VIP</q-badge>
             </q-td>
           </template>
         </q-table>
@@ -258,6 +259,7 @@ export default {
         font-weight: bold;\
       }\
         </style>"
+      ticket+="<div style='padding-right: 0.5cm;padding-left: 0.5cm'>"
       ticket+="<div class='titulo'>"+this.cine.razon+"</div>"
       ticket+="<div class='titnit'>NIT:"+this.cine.nit+"</div>";
       ticket+="<hr>";
@@ -267,6 +269,7 @@ export default {
       ticket+="<hr>";
       ticket+="<div style='font-size: 12px' >Cod: "+bol.numboc + "<br>"
       ticket+="Trans: "+bol.id+"</div>";
+      ticket+="</div >"
       document.getElementById('myelement').innerHTML = ticket
       const d = new Printd()
       d.print( document.getElementById('myelement') )

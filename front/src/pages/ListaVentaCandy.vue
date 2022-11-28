@@ -339,6 +339,7 @@ export default {
         font-weight: bold;\
       }\
         </style>"
+      ticket+="<div style='padding-right: 0.5cm;padding-left: 0.5cm'>"
       ticket+="<div class='titulo'>"+this.cine.razon+"</div>"
       ticket+="<div class='titnit'>NIT:"+this.cine.nit+"</div>";
       ticket+="<hr>";
@@ -348,6 +349,7 @@ export default {
       ticket+="<hr>";
       ticket+="<div style='font-size: 12px' >Cod: "+bol.numboc + "<br>"
       ticket+="Trans: "+bol.id+"</div>";
+      ticket+="</div >"
       document.getElementById('myelement').innerHTML = ticket
       const d = new Printd()
       d.print( document.getElementById('myelement') )
