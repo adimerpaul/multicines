@@ -739,7 +739,7 @@ class SaleController extends Controller
         if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
         return DB::SELECT("
         SELECT u.name usuario,SUM(S.montoTotal) total
-        from users u INNER JOIN sales s on u.id=s.user_id 
+        from users u INNER JOIN sales s on u.id=s.user_id
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='BOLETERIA'
@@ -930,6 +930,13 @@ class SaleController extends Controller
         $codigo=$this->hexToStr($request->codigoTarjeta);
         DB::connection('tarjeta')->select("
             UPDATE cliente SET saldo=saldo-$sale->montoTotal WHERE codigo='$codigo'
+        ");
+        $fecha=date('Y-m-d');
+        $monto=$sale->montoTotal;
+        $numero=$sale->id;
+        $cliente=$client->id;
+        DB::connection('tarjeta')->select("
+INSERT INTO historial (fecha, lugar, monto, numero, cliente) VALUES ('$fecha', 'BOLETERIA', $monto, $numero, $cliente)
         ");
         $sale=Sale::where('id',$sale->id)->with('client')->with('details')->first();
         $sale->siatEnviado=false;

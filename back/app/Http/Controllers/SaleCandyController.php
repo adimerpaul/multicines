@@ -490,6 +490,13 @@ class SaleCandyController extends Controller
         DB::connection('tarjeta')->select("
             UPDATE cliente SET saldo=saldo-$sale->montoTotal WHERE codigo='$codigo'
         ");
+        $fecha=date('Y-m-d');
+        $monto=$sale->montoTotal;
+        $numero=$sale->id;
+        $cliente=$client->id;
+        DB::connection('tarjeta')->select("
+INSERT INTO historial (fecha, lugar, monto, numero, cliente) VALUES ('$fecha', 'CANDY BAR', $monto, $numero, $cliente)
+        ");
             return response()->json([
                 'sale' => $sale,
                 // "tickets"=>$tickets,
