@@ -740,8 +740,8 @@ class SaleController extends Controller
         return DB::SELECT("
         SELECT u.name usuario,SUM(S.montoTotal) total
         from users u INNER JOIN sales s on u.id=s.user_id 
-        where s.fechaEmision>='$request->ini'
-        and s.fechaEmision<='$request->fin'
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
         and s.tipo='BOLETERIA'
         ".$cadena."
         and s.credito='NO'
@@ -790,8 +790,8 @@ class SaleController extends Controller
 
         return DB::SELECT("SELECT d.descripcion,d.product_id, sum(d.subTotal) total,sum(d.cantidad) cantidad
         from sales s inner join details d on s.id=d.sale_id
-        where s.fechaEmision>='$request->ini'
-        and s.fechaEmision<='$request->fin'
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
         ".$cadena."
         and s.tipo='CANDY'
         and s.siatAnulado=false
