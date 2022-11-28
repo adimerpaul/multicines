@@ -93,12 +93,10 @@
           this.loading=true
         this.$api.post('resumenBol',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
             console.log(res.data)
-            if(res.data.credito==undefined) res.data.credito=0
-            if(res.data.vip==undefined) res.data.vip=0
-            if(res.data.efectivo==undefined) res.data.efectivo=0
-            this.tcredito=res.data.credito
-            this.tvip=res.data.vip
-            this.tefectivo=res.data.efectivo
+
+            this.tcredito=res.data[0].credito
+            this.tvip=res.data[0].vip
+            this.tefectivo=res.data[0].efectivo
 
           this.loading=false
         })
