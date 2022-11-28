@@ -790,7 +790,8 @@ class SaleController extends Controller
 
         return DB::SELECT("SELECT d.descripcion,d.product_id, sum(d.subTotal) total,sum(d.cantidad) cantidad
         from sales s inner join details d on s.id=d.sale_id
-        where date(s.fechaEmision) ='$request->fecha'
+        where s.fechaEmision>='$request->ini'
+        and s.fechaEmision<='$request->fin'
         ".$cadena."
         and s.tipo='CANDY'
         and s.siatAnulado=false
