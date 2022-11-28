@@ -150,7 +150,7 @@
             this.reporte.forEach(r=>{
                 suma+=r.total
             })
-            return suma
+            return suma.toFixed(2)
         },
 
     }
