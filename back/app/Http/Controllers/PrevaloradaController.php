@@ -84,7 +84,7 @@ class PrevaloradaController extends Controller
 
         $codigoSucursal=0;
 
-        $user=(object)["name"=>"admin","id"=>1];
+        $user=User::find($request->user()->id);
         $retorno=[];
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
@@ -350,7 +350,7 @@ class PrevaloradaController extends Controller
         $codigoSucursal=0;
         $nit=ENV('NIT');
 
-        $user=(object)["name"=>"admin","id"=>1];
+        $user=User::find($request->user()->id);
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);

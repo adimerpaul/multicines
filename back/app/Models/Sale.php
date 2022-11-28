@@ -26,6 +26,7 @@ class Sale extends Model
         'codigoDocumentoSector',
         'leyenda',
         'vip',
+        'cortesia',
         'credito',
         'user_id',
         'cufd_id',

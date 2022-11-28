@@ -100,7 +100,7 @@ class RentalController extends Controller
 
         $codigoSucursal=0;
 
-        $user=(object)["name"=>"admin","id"=>1];
+        $user=User::find($request->user()->id);
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 500);
@@ -345,7 +345,7 @@ class RentalController extends Controller
         $codigoSucursal=$request->rental['codigoSucursal'];
         $nit=ENV('NIT');
 
-        $user=(object)["name"=>"admin","id"=>1];
+        $user=User::find($request->user()->id);
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);

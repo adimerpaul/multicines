@@ -149,7 +149,7 @@ class SaleController extends Controller
 
         $codigoSucursal=0;
 
-        $user=$request->user();
+        $user=User::find($request->user()->id);
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
@@ -631,6 +631,13 @@ class SaleController extends Controller
 
     public function anularSale(Request $request){
         //return $request->sale['id'];
+        if($request->sale['cortesia']=='SI' && $request->sale['tipo']=='BOLETERIA'){
+            $sale=Sale::find($request->sale['id']);
+            $sale->siatAnulado=1;
+            $sale->save();
+            DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
+            return true;
+        }
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
@@ -641,7 +648,7 @@ class SaleController extends Controller
         $codigoSucursal=$request->sale['codigoSucursal'];
         $nit=ENV('NIT');
 
-        $user=(object)["name"=>"admin","id"=>1];
+        $user=User::find($request->user()->id);
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
@@ -725,6 +732,21 @@ class SaleController extends Controller
         and s.tipo='BOLETERIA'
         and s.siatAnulado=false
         GROUP by d.descripcion, d.pelicula_id;");
+    }
+
+    public function userbol(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+        return DB::SELECT("
+        SELECT u.name usuario,SUM(S.montoTotal) total
+        from users u INNER JOIN sales s on u.id=s.user_id 
+        where s.fechaEmision>='$request->ini'
+        and s.fechaEmision<='$request->fin'
+        and s.tipo='BOLETERIA'
+        ".$cadena."
+        and s.credito='NO'
+        and s.vip='NO';
+            ");
     }
 
     public function resumenBol(Request $request){
@@ -941,6 +963,7 @@ class SaleController extends Controller
         $sale->leyenda="";
         $sale->vip=$request->vip;
         $sale->credito=$request->tarjeta;
+        $sale->cortesia='SI';
         $sale->save();
 
         $user=User::find($request->user()->id);

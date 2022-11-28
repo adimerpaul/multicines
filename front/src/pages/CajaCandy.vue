@@ -34,7 +34,7 @@
   import {Printd} from "printd";
 
   export default {
-    name: `CajaBoleteria`,
+    name: `CajaCandy`,
     data() {
       return {
         ini:date.formatDate(new Date(), "YYYY-MM-DD"),
@@ -82,7 +82,7 @@
 
       consultar(){
           this.loading=true
-        this.$api.post('cajaBol',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
+        this.$api.post('cajaCandy',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
             console.log(res.data)
           this.loading=false
           this.reporte=res.data
@@ -91,7 +91,7 @@
       },
       resumen(){
           this.loading=true
-        this.$api.post('resumenBol',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
+        this.$api.post('resumenCandy',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
             console.log(res.data)
             if(res.data.credito==null) res.data.credito=0
             if(res.data.vip==null) res.data.vip=0
@@ -106,7 +106,7 @@
 
       impresion(){
         if(this.reporte.length==0){
-         return false;
+          return false;
         }
 
         let cadena="<style>\
@@ -119,7 +119,7 @@
         </style>\
         <div class='titulo'>MULTISALAS S.R.L.</div>\
         <div class='titulo'>ORURO - BOLIVIA</div>\
-        <div class='titulo'>VENTAS DE BOLETERIA</div>\
+        <div class='titulo'>VENTAS DE CANDY</div>\
         <hr>\
         <div><span class='titulo2'>Fecha: </span> "+date.formatDate(new Date(), 'DD/MM/YYYY HH:mm:ss')+"</div>\
         <div><span class='titulo2'>Fecha Caja: </span> "+this.ini+" al "+this.fin+"</div>\

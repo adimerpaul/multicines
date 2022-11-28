@@ -96,7 +96,7 @@ class SaleCandyController extends Controller
 
         $codigoSucursal=0;
 
-        $user=$request->user();
+        $user=User::find($request->user()->id);
 
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
@@ -441,7 +441,7 @@ class SaleCandyController extends Controller
         $codigoSucursal=0;
         $codigoPuntoVenta=0;
         $codigoDocumentoSector=0;
-        $user=$request->user();
+        $user=User::find($request->user()->id);
             $sale=new Sale();
             $sale->numeroFactura=$numeroFactura;
             $sale->cuf="";
