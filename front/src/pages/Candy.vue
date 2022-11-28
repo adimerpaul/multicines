@@ -165,7 +165,7 @@
                   </div>
 
                   <div class="col-3">
-                    <q-select v-model="document" outlined :options="documents"/>
+                    <q-select v-model="document" outlined :options="documents" @update:model-value="validarnit"/>
                   </div>
                   <div class="col-2">
                     <q-input
@@ -310,6 +310,19 @@ export default {
       this.icon=false
       this.verificar()
     },
+    validarnit(){
+      if(this.document==this.documents[4]){
+        this.$api.get('validanit/'+this.client.numeroDocumento).then(res=>{
+          console.log(res.data)
+          this.$q.notify({
+            message: res.data.RespuestaVerificarNit.mensajesList.descripcion,
+            color: 'teal',
+            icon: 'info'
+          })
+        })
+
+      }
+    },
     consultartarjeta(){
       if (this.codigo!='' || this.codigo!=undefined){
         this.nombresaldo=''
@@ -442,6 +455,7 @@ export default {
       this.client.id=undefined
       this.$api.post('searchClient',this.client).then(res=>{
         // console.log(res.data)
+        this.validarnit
         if (res.data.nombreRazonSocial!=undefined) {
           this.client.nombreRazonSocial=res.data.nombreRazonSocial
           this.client.email=res.data.email
