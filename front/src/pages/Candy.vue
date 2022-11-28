@@ -455,7 +455,6 @@ export default {
       this.client.id=undefined
       this.$api.post('searchClient',this.client).then(res=>{
         // console.log(res.data)
-        this.validarnit
         if (res.data.nombreRazonSocial!=undefined) {
           this.client.nombreRazonSocial=res.data.nombreRazonSocial
           this.client.email=res.data.email
@@ -464,6 +463,7 @@ export default {
           documento.label=documento.descripcion
           this.document=documento
         }
+        if(this.document.codigoClasificador==5) this.validarnit()
       })
     },
     async printFactura(factura) {
