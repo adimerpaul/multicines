@@ -151,7 +151,7 @@
         ventatotal(){
             let suma=0
             this.reporte.forEach(r=>{
-                suma+=r.subotal
+                suma+=r.total
             })
             return suma
         },
