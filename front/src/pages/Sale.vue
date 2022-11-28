@@ -610,7 +610,7 @@ export default {
     color: black;\
     font-family: sans-serif;\
   }</style>\
-    <div id='myelement'>\
+    <div id='myelement' style='padding-left: 0.5cm;padding-right: 0.5cm'>\
       <div class='titulo'>FACTURA <br>CON DERECHO A CREDITO FISCAL</div>\
       <div class='titulo2'>"+this.cine.razon+"<br>\
         Casa Matriz<br>\
