@@ -130,6 +130,10 @@ class SaleController extends Controller
             $client->save();
 //            return "nuevo";
         }
+
+        if ($request->client['numeroDocumento']=="0"){
+            return $this->insertarRecibo($request,$client);
+        }
         if ($request->vip=="SI"){
             return $this->insertarVip($request,$client);
         }
@@ -1091,6 +1095,121 @@ INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha'
         return $result;
     }
 
+    private function insertarRecibo(Request $request, $client)
+    {
+        $numeroFactura=0;
+        $codigoSucursal=0;
+        $codigoPuntoVenta=0;
+        $codigoDocumentoSector=0;
+        $sale=new Sale();
+        $sale->numeroFactura=$numeroFactura;
+        $sale->cuf="";
+        $sale->cufd="";
+        $sale->cui="";
+        $sale->codigoSucursal=$codigoSucursal;
+        $sale->codigoPuntoVenta=$codigoPuntoVenta;
+        $sale->fechaEmision=now();
+        $sale->montoTotal=$request->montoTotal;
+        $sale->usuario=$request->user()->name;
+        $sale->codigoDocumentoSector=$codigoDocumentoSector;
+        $sale->user_id=$request->user()->id;
+        $sale->cufd_id=null;
+        $sale->client_id=$client->id;
 
+        $sale->leyenda="";
+        $sale->venta="R";
+        $sale->vip=$request->vip;
+        $sale->credito=$request->tarjeta;
+        $sale->cortesia='SI';
+        $sale->save();
+
+
+        $user=User::find($request->user()->id);
+
+        $momentaneos=Momentaneo::where('user_id',$user->id)->get();
+        $data=[];
+        $dataDetail=[];
+        foreach ($momentaneos as $m){
+            $programa=Programa::find($m->programa_id);
+            $numBoleto=Ticket::where('programa_id',$m->programa_id)->count()+1;
+            if(Ticket::where('programa_id',$m->programa_id)
+                    ->where("fila",$m->fila)
+                    ->where("devuelto",0)
+                    ->where("columna",$m->columna)
+                    ->where("letra",$m->letra)->where("sala_id",$programa->sala->id)->count()==0){
+                $d=[
+                    "numboc"=>$programa->sala->nro.$programa->sala->id.date('Ymd', strtotime($programa->fecha)).$programa->nroFuncion.$programa->price->serie.'-'.$numBoleto,
+                    "numero"=>$numBoleto,
+                    "fecha"=>now(),
+                    "numeroFuncion"=>$programa->nroFuncion,
+                    "nombreSala"=>$programa->sala->nombre,
+                    "serieTarifa"=>$programa->price->serie,
+                    "fechaFuncion"=>$programa->fecha,
+                    "horaFuncion"=>$programa->horaInicio,
+                    "fila"=>$m->fila,
+                    "columna"=>$m->columna,
+                    "letra"=>$m->letra,
+                    "costo"=>$programa->price->precio,
+                    "titulo"=>$m->pelicula,
+                    "devuelto"=>"0",
+                    "idCupon"=>"",
+                    "tarjeta"=>"",
+                    "credito"=>"",
+                    //"cortesia"=>"SI",
+                    "client_id"=>$client->id,
+                    "programa_id"=>$programa->id,
+                    "pelicula_id"=>$m->id,
+                    "sale_id"=>$sale->id,
+                    "price_id"=>$programa->price->id,
+                    "sala_id"=>$programa->sala->id,
+                    "user_id"=>$user->id,
+                ];
+                array_push($data, $d);
+            }}
+        foreach ($request->detalleVenta as $detalle){
+            $d=[
+                'actividadEconomica'=>"590000",
+                'codigoProductoSin'=>"99100",
+                'cantidad'=>$detalle['cantidad'],
+                'precioUnitario'=>$detalle['subtotal'],
+                'subTotal'=>$detalle['subtotal'],
+                'sale_id'=>$sale->id,
+                'programa_id'=>$detalle['programa_id'],
+                'pelicula_id'=>$detalle['pelicula_id'],
+                'descripcion'=>$detalle['pelicula'],
+            ];
+            array_push($dataDetail, $d);
+        }
+
+        Ticket::insert($data);
+
+        Detail::insert($dataDetail);
+
+        $sale->siatEnviado=true;
+        $sale->codigoRecepcion="";
+        $sale->cuf="";
+        $sale->save();
+        $tickets=Ticket::where('sale_id',$sale->id)->get();
+
+        foreach ($request->frees as $f){
+            if ($f['status']==1){
+                $cortesia=Cortesia::find($f['id']);
+                $cortesia->date=now();
+                $cortesia->time=now();
+                $cortesia->user_id=$request->user()->id;
+                $cortesia->sale_id=$sale->id;
+                $cortesia->save();
+            }
+
+        }
+        $sale=Sale::where('id',$sale->id)->with('client')->with('details')->first();
+        $sale->siatEnviado=false;
+        return response()->json([
+            'sale' => $sale,
+            "tickets"=>$tickets,
+            "error"=>"Se creo la venta!!!",
+        ]);
+//        return response()->json(['message' => $e->getMessage()], 500);
+    }
 }
 
