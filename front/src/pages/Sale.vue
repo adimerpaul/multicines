@@ -497,9 +497,19 @@ export default {
         if(res.data.sale.siatEnviado==1){
           this.printFactura(res.data.sale)
         }
+        let valpromo=0
         res.data.tickets.forEach(r=>{
+          if(r.promo) valpromo++
           this.boletoprint(r)
         })
+        //console.log(valpromo)
+        if(valpromo>1){
+        let promototal=Math.trunc(valpromo/2)
+        //console.log(promototal)
+        for (let index = 0; index < promototal; index++) {
+          console.log(res.data.sale)
+          this.printPromo(res.data.sale)          
+        }}
         this.momentaneoDeleteAll()
         this.tventa()
         this.client={complemento:'',vip:'NO',credito:'NO'}
@@ -520,6 +530,70 @@ export default {
           timeout: 5000,
         })
       })
+    },
+
+    printPromo(info){
+      let cadena = "<style>\
+      .titulo{\
+      font-size: 12px;\
+      text-align: center;\
+      font-weight: bold;\
+      }\
+      .titulo2{\
+      font-size: 10px;\
+      text-align: center;\
+      }\
+            .titulo3{\
+      font-size: 10px;\
+      text-align: center;\
+      width:70%;\
+      }\
+            .contenido{\
+      font-size: 10px;\
+      text-align: left;\
+      }\
+      .conte2{\
+      font-size: 10px;\
+      text-align: right;\
+      }\
+      .campotd{\
+      text-align: center;\
+      }\
+      .titder{\
+      font-size: 12px;\
+      text-align: right;\
+      font-weight: bold;\
+      }\
+      hr{\
+  border-top: 1px dashed   ;\
+}\
+  table{\
+    width:100%\
+  }\
+  .textpeq{ font-size: small; text-align: left;}\
+  h1 {\
+    color: black;\
+    font-family: sans-serif;\
+  }hr{border: 1px dashed ;}</style>\
+    <div id='myelement'>\
+      <div class='titulo2'>"+this.cine.razon+"<br>\
+        NIT"+this.cine.nit+"\
+        Casa Matriz<br>\
+        Oruro\
+      </div>\
+      <hr>\
+      <div class='titulo'>COMBO DUO</div>\
+      <hr>\
+      <div class='titulo'>Reclame su Combo Duo <br> 1 PIPOCA + 2 REFRESCOS</div>\
+       <hr>\
+        <div class='textpeq'>FECHA DE EMISIÓN" + info.fechaEmision + "</div>\
+      <div class='textpeq'>Usuario: "+info.usuario+"</div>\
+      <div class='textpeq'>Venta: "+info.id+"</div>\
+      ";
+      document.getElementById('myelement').innerHTML = cadena
+      const d = new Printd()
+      d.print( document.getElementById('myelement') )
+
     },
     boletoprint(bol){
       // console.log(bol)

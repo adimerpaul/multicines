@@ -58,6 +58,7 @@ class SaleController extends Controller
         from programas p
         INNER JOIN movies m ON p.movie_id=m.id
         where p.fecha='$request->fecha'
+        and p.activo='ACTIVO'
         GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen;");
     }
 
@@ -898,6 +899,7 @@ class SaleController extends Controller
                     "idCupon"=>"",
                     "tarjeta"=>"",
                     "credito"=>"",
+                    "promo"=>$m->promo,
                     "client_id"=>$client->id,
                     "programa_id"=>$programa->id,
                     "pelicula_id"=>$m->id,
@@ -1011,6 +1013,7 @@ INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha'
                     "tarjeta"=>"",
                     "credito"=>"",
                     //"cortesia"=>"SI",
+                    "promo"=>$m->promo,
                     "client_id"=>$client->id,
                     "programa_id"=>$programa->id,
                     "pelicula_id"=>$m->id,
@@ -1156,6 +1159,7 @@ INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha'
                     "tarjeta"=>"",
                     "credito"=>"",
                     //"cortesia"=>"SI",
+                    "promo"=>$m->promo,
                     "client_id"=>$client->id,
                     "programa_id"=>$programa->id,
                     "pelicula_id"=>$m->id,
