@@ -39,6 +39,7 @@
       return {
         ini:date.formatDate(new Date(), "YYYY-MM-DD"),
         fin:date.formatDate(new Date(), "YYYY-MM-DD"),
+        infouser:[],
         loading: false,
         productoFilter:'',
         url:process.env.API,
@@ -87,6 +88,15 @@
           this.loading=false
           this.reporte=res.data
           this.resumen()
+          this.datosuser()
+        })
+      },
+      datosuser(){
+          this.loading=true
+        this.$api.post('userbol',{ini:this.ini,fin:this.fin}).then(res=>{
+            console.log(res.data)
+          this.loading=false
+          this.infouser=res.data
         })
       },
       resumen(){
@@ -106,7 +116,7 @@
         if(this.reporte.length==0){
          return false;
         }
-
+        
         let cadena="<style>\
         *{font-size:10px;}\
         .titulo{text-align:center;\
@@ -131,6 +141,11 @@
           });
         cadena+="</tbody>\
         </table>\
+        <table><tr><th>USUARIO</th><th>TOTAL</th></tr>"
+          this.infouser.forEach(r => {
+          cadena+="<tr><td>"+r.usuario+"</td> <td>"+r.total+"</td><\tr>"
+          })
+        cadena+="</table>\
         <div style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventatotal+" Bs</div>\
         <div style='text-align:right;'><span class='titulo3'>Total VIP: </span> "+this.tvip+" Bs</div>\
         <div style='text-align:right;'><span class='titulo3'>Total Credito: </span> "+this.tcredito+" Bs</div>\

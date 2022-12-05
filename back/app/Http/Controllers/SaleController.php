@@ -741,17 +741,34 @@ class SaleController extends Controller
 
     public function userbol(Request $request){
         $cadena='';
-        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
         return DB::SELECT("
         SELECT u.name usuario,SUM(S.montoTotal) total
         from users u INNER JOIN sales s on u.id=s.user_id
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='BOLETERIA'
-        ".$cadena."
+        and s.siatAnulado=false
+        and s.siatEnviado=true
         and s.credito='NO'
+        and s.cortesia='NO'
         and s.vip='NO';
-            ");
+        ");
+    }
+
+    public function usercandy(Request $request){
+        $cadena='';
+        return DB::SELECT("
+        SELECT u.name usuario,SUM(S.montoTotal) total
+        from users u INNER JOIN sales s on u.id=s.user_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.siatEnviado=true
+        and s.credito='NO'
+        and s.cortesia='NO'
+        and s.vip='NO';
+        ");
     }
 
     public function resumenBol(Request $request){

@@ -86,6 +86,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('cajaBol', [\App\Http\Controllers\SaleController::class, 'cajaBol']);
     Route::post('resumenBol', [\App\Http\Controllers\SaleController::class, 'resumenBol']);
+    Route::post('userbol', [\App\Http\Controllers\SaleController::class, 'userbol']);
+    Route::post('usercandy', [\App\Http\Controllers\SaleController::class, 'usercandy']);
     Route::post('resumenCandy', [\App\Http\Controllers\SaleController::class, 'resumenCandy']);
     Route::post('cajaCandy', [\App\Http\Controllers\SaleController::class, 'cajaCandy']);
     Route::get('validarTarjeta/{cod}', [\App\Http\Controllers\SaleController::class, 'validarTarjeta']);
