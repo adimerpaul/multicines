@@ -140,13 +140,15 @@
             cadena+="<tr><td>"+r.descripcion+"</td><td>"+r.cantidad+"</td><td>"+r.total+"</td></tr>"
           });
         cadena+="</tbody>\
-        </table>\
-        <table><tr><th>USUARIO</th><th>TOTAL</th></tr>"
+        </table>"
+        if(this.user.id==0){
+        cadena+="<table><tr><th>USUARIO</th><th>TOTAL</th></tr>"
           this.infouser.forEach(r => {
           cadena+="<tr><td>"+r.usuario+"</td> <td>"+r.total+"</td><\tr>"
           })
-        cadena+="</table>\
-        <div style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventatotal+" Bs</div>\
+        cadena+="</table>"}
+
+        cadena+="<div style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventatotal+" Bs</div>\
         <div style='text-align:right;'><span class='titulo3'>Total VIP: </span> "+this.tvip+" Bs</div>\
         <div style='text-align:right;'><span class='titulo3'>Total Credito: </span> "+this.tcredito+" Bs</div>\
         <div style='text-align:right;'><span class='titulo3'>Total Efectivo: </span> "+this.tefectivo+" Bs</div>\
