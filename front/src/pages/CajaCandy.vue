@@ -94,7 +94,7 @@
 
       datosuser(){
           this.loading=true
-        this.$api.post('userbol',{ini:this.ini,fin:this.fin}).then(res=>{
+        this.$api.post('usercandy',{ini:this.ini,fin:this.fin}).then(res=>{
             console.log(res.data)
           this.loading=false
           this.infouser=res.data

@@ -766,7 +766,6 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.siatEnviado=true
         and s.credito='NO'
-        and s.cortesia='NO'
         and s.vip='NO';
         ");
     }

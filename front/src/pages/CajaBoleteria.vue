@@ -116,7 +116,7 @@
         if(this.reporte.length==0){
          return false;
         }
-        
+
         let cadena="<style>\
         *{font-size:10px;}\
         .titulo{text-align:center;\
@@ -144,7 +144,7 @@
         if(this.user.id==0){
         cadena+="<table><tr><th>USUARIO</th><th>TOTAL</th></tr>"
           this.infouser.forEach(r => {
-          cadena+="<tr><td>"+r.usuario+"</td> <td>"+r.total+"</td><\tr>"
+          cadena+="<tr><td>"+r.usuario+"</td> <td>"+r.total+"</td></tr>"
           })
         cadena+="</table>"}
 
