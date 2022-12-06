@@ -67,7 +67,7 @@
         <q-expansion-item expand-separator dense exact icon="o_store" label="Reporte Caja" v-if="store.boolcajabol||store.boolcajacandy">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Caja Boleteria" default-opened to="cajaboleteria" expand-icon="null" v-if="store.boolcajabol"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_store" label="Caja Candy" default-opened to="cajacandy" expand-icon="null" v-if="store.boolcajacandy"/>
-
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_movie" label="Reporte Funcion" default-opened to="reportefuncion" expand-icon="null" v-if="store.boolcajabol"/>
         </q-expansion-item>
 
         <q-expansion-item dense exact expand-separator icon="o_home_work" label="Factura de Alquiler " to="rental" expand-icon="null" v-if="store.boolalquiler"/>

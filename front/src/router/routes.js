@@ -22,6 +22,7 @@ import CajaCandy from "pages/CajaCandy";
 import Login from "pages/Login";
 import Cortesia from "pages/Cortesia";
 import User from "pages/User";
+import Reportefuncion from "pages/Reportefuncion";
 
 
 const routes = [
@@ -52,6 +53,7 @@ const routes = [
       { path: 'cajacandy', component: CajaCandy ,meta: { requiresAuth: true } },
       { path: 'cortesia', component: Cortesia ,meta: { requiresAuth: true } },
       { path: 'usuarios', component: User ,meta: { requiresAuth: true } },
+      { path: 'reportefuncion', component: Reportefuncion ,meta: { requiresAuth: true } },
     ]
   },
   {
