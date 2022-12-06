@@ -742,7 +742,7 @@ class SaleController extends Controller
     public function userbol(Request $request){
         $cadena='';
         return DB::SELECT("
-        SELECT u.name usuario,SUM(S.montoTotal) total
+        SELECT u.name usuario,SUM(s.montoTotal) total
         from users u INNER JOIN sales s on u.id=s.user_id
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
@@ -758,7 +758,7 @@ class SaleController extends Controller
     public function usercandy(Request $request){
         $cadena='';
         return DB::SELECT("
-        SELECT u.name usuario,SUM(S.montoTotal) total
+        SELECT u.name usuario,SUM(s.montoTotal) total
         from users u INNER JOIN sales s on u.id=s.user_id
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
@@ -1235,10 +1235,10 @@ INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha'
     public function reporteFuncion(Request $request){
         return DB::SELECT("
         SELECT f.id,date(b.fechaFuncion) as fec, concat(p.nombre,' ',p.formato) as titulo, concat('SALA ',s.nro) as sala, f.horaInicio,f.fecha as ff, t.serie, t.precio,
-       (select count(*) from tickets b1, sales s1 where b1.programa_id=f.id  and s1.id=b1.sale_id and s1.cortesia='NO' and s1.vip='NO' and s1.siatAnulado=false and s1.venta='F') as cantf,       
-       (select sum(b1.costo) from tickets b1, sales s1 where b1.programa_id=f.id and s1.id=b1.sale_id and s1.cortesia='NO' and s1.vip='NO' and s1.siatAnulado=false and s1.venta='F') as total,       
-       (select count(*) from tickets b1, sales s1 where b1.programa_id=f.id and s1.id=b1.sale_id and s1.cortesia='NO' and s1.vip='NO' and s1.siatAnulado=false and s1.venta='R') as cantr,       
-       (select count(*) from tickets b1, sales s1 where b1.programa_id=f.id and s1.id=b1.sale_id and s1.cortesia='SI' and s1.siatAnulado=false) as cantc,       
+       (select count(*) from tickets b1, sales s1 where b1.programa_id=f.id  and s1.id=b1.sale_id and s1.cortesia='NO' and s1.vip='NO' and s1.siatAnulado=false and s1.venta='F') as cantf,
+       (select sum(b1.costo) from tickets b1, sales s1 where b1.programa_id=f.id and s1.id=b1.sale_id and s1.cortesia='NO' and s1.vip='NO' and s1.siatAnulado=false and s1.venta='F') as total,
+       (select count(*) from tickets b1, sales s1 where b1.programa_id=f.id and s1.id=b1.sale_id and s1.cortesia='NO' and s1.vip='NO' and s1.siatAnulado=false and s1.venta='R') as cantr,
+       (select count(*) from tickets b1, sales s1 where b1.programa_id=f.id and s1.id=b1.sale_id and s1.cortesia='SI' and s1.siatAnulado=false) as cantc,
        (select count(*) from tickets b1 , sales s1 where b1.programa_id=f.id and s1.id=b1.sale_id and s1.siatAnulado=false ) as canttotal
                 FROM programas f, movies p, prices t, tickets b, salas s, sales sa
                 WHERE f.movie_id=p.id
@@ -1246,7 +1246,7 @@ INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha'
                 and f.sala_id=s.id
                 and b.price_id=t.id
                 and sa.id=b.sale_id
-                and sa.siatAnulado = false 
+                and sa.siatAnulado = false
                 and date(b.fechaFuncion)>='$request->ini' and date(b.fechaFuncion)<='$request->fin'
                 group by f.id order by fec asc,sala asc,horaInicio asc;
         ");
