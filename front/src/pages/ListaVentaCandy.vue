@@ -2,6 +2,9 @@
   <q-page>
     <div class="row">
       <div class="col-12">
+        <div class="bg-primary text-white text-bold text-center text-h4">CANDY BAR</div>
+      </div>
+      <div class="col-12">
         <q-form @submit.prevent="listaVentaCandyGet">
           <div class="row">
             <div class="col-4 q-pa-xs">
@@ -17,7 +20,15 @@
         </q-form>
       </div>
       <div class="col-12">
-        <q-table :rows="listaVentaCandy" :columns="listaColums">
+        <q-table :rows="listaVentaCandy" :columns="listaColums" :filter="filter">
+          <template v-slot:top-right>
+            <q-input outlined dense debounce="300" v-model="filter" placeholder="Buscar">
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </template>
+
           <template v-slot:body-cell-siatAnulado="props">
             <q-td :props="props" auto-width>
               <q-badge :color="props.row.siatAnulado?'red':'green'" :label="props.row.siatAnulado?'A':'V'"/>
@@ -126,6 +137,7 @@ export default {
   name: `LisaVenta`,
   data() {
     return {
+      filter: '',
       lorem: 'lorem impus',
       ticketsDialog:false,
       loading:false,
@@ -138,7 +150,7 @@ export default {
       dialogAnular:false,
       listaColums:[
         {name:'Opciones',label:'Opciones',field:'Opciones'},
-        {name:'numeroFactura',label:'numeroFactura',field:'numeroFactura',sortable:true},
+        {name:'numeroFactura',label:'numeroFactura',field : row => 'N'+row.numeroFactura,sortable:true},
         {name:'siatEnviado',label:'siatEnviado',field:'siatEnviado',sortable:true},
         {name:'fechaEmision',label:'fechaEmision',field:'fechaEmision',sortable:true},
         {name:'client_id',label:'client_id',field:row=>row.client.nombreRazonSocial,sortable:true},
@@ -146,6 +158,7 @@ export default {
         {name:'montoTotal',label:'montoTotal',field:'montoTotal',sortable:true},
         {name:'siatAnulado',label:'siatAnulado',field:'siatAnulado',sortable:true},
         {name:'id',label:'id',field:'id',sortable:true},
+        {name:'cuf',label:'cuf',field:'cuf',sortable:true},
       ],
       boletoColums:[
         {name:'opcion',label:'Opcion',field:'opcion'},

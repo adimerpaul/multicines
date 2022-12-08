@@ -407,14 +407,6 @@ export default {
 
         },
     saleInsert(){
-      if (this.client.numeroDocumento==0) {
-        this.$q.notify({
-          color: 'red',
-          textColor: 'white',
-          message: 'Debe ingresar un numero de documento'
-        })
-        return false
-      }
       this.error=''
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador

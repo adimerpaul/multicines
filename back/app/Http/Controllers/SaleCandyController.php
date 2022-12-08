@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\TestMail;
 use App\Models\Client;
+use App\Models\Cortesia;
 use App\Models\Cufd;
 use App\Models\Cui;
 use App\Models\Detail;
@@ -80,6 +81,10 @@ class SaleCandyController extends Controller
             $client->email=$request->client['email'];
             $client->save();
 //            return "nuevo";
+        }
+
+        if ($request->client['numeroDocumento']=="0"){
+            return $this->insertarRecibo($request,$client);
         }
 
         if ($request->vip=="SI"){
@@ -434,6 +439,66 @@ class SaleCandyController extends Controller
     public function destroy(SaleCandy $saleCandy)
     {
         //
+    }
+
+    private function insertarRecibo(Request $request, $client)
+    {
+        $numeroFactura=0;
+        $codigoSucursal=0;
+        $codigoPuntoVenta=0;
+        $codigoDocumentoSector=0;
+        $sale=new Sale();
+        $sale->numeroFactura=$numeroFactura;
+        $sale->cuf="";
+        $sale->cufd="";
+        $sale->cui="";
+        $sale->codigoSucursal=$codigoSucursal;
+        $sale->codigoPuntoVenta=$codigoPuntoVenta;
+        $sale->fechaEmision=now();
+        $sale->montoTotal=$request->montoTotal;
+        $sale->usuario=$request->user()->name;
+        $sale->codigoDocumentoSector=$codigoDocumentoSector;
+        $sale->user_id=$request->user()->id;
+        $sale->cufd_id=null;
+        $sale->client_id=$client->id;
+        $sale->tipo="CANDY";
+        $sale->leyenda="";
+        $sale->venta="R";
+        $sale->vip=$request->vip;
+        $sale->credito=$request->tarjeta;
+        $sale->save();
+
+
+        $dataDetail=[];
+        foreach ($request->detalleVenta as $detalle){
+            $d=[
+                'actividadEconomica'=>"590000",
+                'codigoProductoSin'=>"99100",
+                'cantidad'=>$detalle['cantidad'],
+                'precioUnitario'=>$detalle['subtotal'],
+                'subTotal'=>$detalle['subtotal'],
+                'sale_id'=>$sale->id,
+//                'programa_id'=>$detalle['programa_id'],
+//                'pelicula_id'=>$detalle['pelicula_id'],
+//                'descripcion'=>$detalle['pelicula'],
+            ];
+            array_push($dataDetail, $d);
+        }
+
+        Detail::insert($dataDetail);
+
+        $sale->siatEnviado=true;
+        $sale->codigoRecepcion="";
+        $sale->cuf="";
+        $sale->save();
+
+        $sale=Sale::where('id',$sale->id)->with('client')->with('details')->first();
+        $sale->siatEnviado=false;
+        return response()->json([
+            'sale' => $sale,
+            "error"=>"Se creo la venta!!!",
+        ]);
+//        return response()->json(['message' => $e->getMessage()], 500);
     }
     private function insertarVip(Request $request, Client $client)
     {

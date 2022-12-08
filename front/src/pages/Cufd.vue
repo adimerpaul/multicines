@@ -66,9 +66,9 @@
         <q-card-section>
           <q-form @submit.prevent="eventoSignificativoCreate">
             <div class="row">
-<!--              <div class="col-12">-->
-<!--                <q-select :options="cufds" dense outlined label="CufdEvento" v-model="cufdEvento" />-->
-<!--              </div>-->
+              <div class="col-12">
+                <q-select :options="cufds" dense outlined label="CufdEvento" v-model="cufdEvento" />
+              </div>
               <div class="col-12">
                 <q-select :options="events" dense outlined label="codigoMotivoEvento" v-model="event" />
               </div>
@@ -145,7 +145,7 @@ export default {
       this.loading=true
       this.$api.get('cufd').then(res => {
         res.data.forEach(r=>{
-          r.label='Punto venta'+r.codigoPuntoVenta+' ID:'+r.id+' Fecha:'+r.fechaCreacion+'-'+r.fechaVigencia;
+          r.label=' Fecha:'+r.fechaCreacion.substring(0,10)
         })
         this.loading=false
         this.cufds = res.data
