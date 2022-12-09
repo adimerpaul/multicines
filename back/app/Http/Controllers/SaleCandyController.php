@@ -475,9 +475,12 @@ class SaleCandyController extends Controller
                 'actividadEconomica'=>"590000",
                 'codigoProductoSin'=>"99100",
                 'cantidad'=>$detalle['cantidad'],
-                'precioUnitario'=>$detalle['subtotal'],
+                'precioUnitario'=>$detalle['precio'],
                 'subTotal'=>$detalle['subtotal'],
                 'sale_id'=>$sale->id,
+                'product_id'=>$detalle['product_id'],
+                'descripcion'=>$detalle['nombre'],
+
 //                'programa_id'=>$detalle['programa_id'],
 //                'pelicula_id'=>$detalle['pelicula_id'],
 //                'descripcion'=>$detalle['pelicula'],
