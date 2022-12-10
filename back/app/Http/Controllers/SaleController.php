@@ -748,7 +748,7 @@ class SaleController extends Controller
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='BOLETERIA'
         and s.siatAnulado=false
-        and s.siatEnviado=true
+        
         and s.credito='NO'
         and s.cortesia='NO'
         and s.vip='NO';
