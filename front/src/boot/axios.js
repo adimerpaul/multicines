@@ -46,6 +46,7 @@ export default boot(({ app,router }) => {
           if(r.id==19) globalStore().boolalquiler=true
           if(r.id==20) globalStore().boolcliente=true
           if(r.id==21) globalStore().boolcortesia=true
+          if(r.id==22) globalStore().boolreporte=true
       });
     }).catch((error) => {
       app.config.globalProperties.$api.defaults.headers.common['Authorization']=''
@@ -73,6 +74,7 @@ export default boot(({ app,router }) => {
       globalStore().boolalquiler=false
       globalStore().boolcliente=false
       globalStore().boolcortesia=false
+      globalStore().boolreporte=false
       router.push('/login')
     })
   }else {
@@ -100,6 +102,7 @@ export default boot(({ app,router }) => {
     globalStore().boolalquiler=false
     globalStore().boolcliente=false
     globalStore().boolcortesia=false
+    globalStore().boolreporte=false
     localStorage.removeItem('tokenMulti')
     globalStore().isLoggedIn=false
   }
