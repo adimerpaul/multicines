@@ -1,28 +1,24 @@
 <template>
     <q-page padding>
       <div class="row">
-        <div class="col-3"><q-input square outlined v-model="ini" label="fecha ini" type="date" /></div>
-        <div class="col-3"><q-input square outlined v-model="fin" label="fecha fin" type="date" /></div>
-        <div class="col-3"> <q-btn color="green"  label="Consultar" @click="consultar"/></div>
+        <div class="col-4"><q-input dense outlined v-model="ini" label="fecha ini" type="date" /></div>
+        <div class="col-4"><q-input dense outlined v-model="fin" label="fecha fin" type="date" /></div>
+        <div class="col-4 flex flex-center"> <q-btn icon="check" color="green"  label="Consultar" @click="consultar"/></div>
         <div class="col-12">
           <q-table dense title="Listado Venta Funcion" :rows-per-page-options="[20,50,100,0]" :rows="reporte"  :filter="productoFilter">
             <template v-slot:top-right>
-
+              <q-btn icon="download" color="green"  label="Excel"  @click="exportar" />
               <q-input outlined dense debounce="300" v-model="productoFilter" placeholder="Buscar">
                 <template v-slot:append>
                   <q-icon name="search" />
                 </template>
               </q-input>
             </template>
-
->
           </q-table>
+<!--          <pre>{{reporte}}</pre>-->
         </div>
       </div>
-
-
-  <div id="myelement" class="hidden"></div>
-
+      <div id="myelement" class="hidden"></div>
     </q-page>
   </template>
 
@@ -30,6 +26,7 @@
   import {globalStore} from "stores/globalStore";
   import {date} from "quasar";
   import {Printd} from "printd";
+  import xlsx from "json-as-xlsx"
 
   export default {
     name: `CajaBoleteria`,
@@ -49,6 +46,7 @@
         reporte:[],
         user:{},
         users:[],
+        columns:[],
         store: globalStore(),
         foto:'',
         tvip:0,
@@ -65,7 +63,41 @@
     created() {
     },
     methods: {
+      exportar(){
 
+        let data = [
+          {
+            sheet: "Adults",
+            columns: [
+              { label: "id", value: "id" },
+              { label: "fec", value: "fec" },
+              { label: "titulo", value: "titulo" },
+              { label: "sala", value: "sala" },
+              { label: "horaInicio", value: "horaInicio" },
+              { label: "ff", value: "ff" },
+              { label: "serie", value: "serie" },
+              { label: "precio", value: "precio" },
+              { label: "cantf", value: "cantf" },
+              { label: "total", value: "total" },
+              { label: "cantr", value: "cantr" },
+              { label: "cantc", value: "cantc" },
+              { label: "canttotal", value: "canttotal" },
+              // { label: "Age", value: (row) => row.age + " years" }, // Custom format
+              // { label: "Phone", value: (row) => (row.more ? row.more.phone || "" : "") }, // Run functions
+            ],
+            content: this.reporte,
+          },
+        ]
+
+        let settings = {
+          fileName: "ventasfuncion" + date.formatDate(new Date(), "YYYY-MM-DD"),
+          // extraLength: 3, // A bigger number means that columns will be wider
+          // writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
+          writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
+          // RTL: true, // Display the columns from right-to-left (the default value is false)
+        }
+        xlsx(data, settings) // Will download the excel file
+      },
       consultar(){
           this.loading=true
         this.$api.post('reporteFuncion',{ini:this.ini,fin:this.fin}).then(res=>{

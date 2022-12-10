@@ -11,8 +11,9 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
-          MultiCines PLAZA
+        <q-toolbar-title class=" text-h4 text-bold">
+          {{ store.user.name }}
+          <span class=" text-subtitle2 text-red">{{ store.user.email }}</span>
         </q-toolbar-title>
 
         <div>

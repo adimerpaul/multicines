@@ -21,12 +21,12 @@
   <q-card-section>
     <div class="row">
       <div class="col-2" v-for="m in movies" :key="m.id">
-        <q-card @click="myHours(m)" style="height: 100px" class="q-ma-xs">
-          <q-img :src="url+'../imagen/'+m.imagen" height="100px">
+        <q-card @click="myHours(m)" style="height: 150px" class="q-ma-xs">
+          <q-img :src="url+'../imagen/'+m.imagen" height="150px">
             <div class="absolute-bottom text-subtitle2 text-center" style="padding: 0px;margin:0px;border: 0px">
               <div class="row">
-                <div class="col-6 q-pa-none q-ma-none">
-                  {{m.nombre}} {{m.formato}}
+                <div class="col-6 q-pa-none q-ma-none" >
+                  <div class="subtitule-text">{{m.nombre}} {{m.formato}}</div>
                 </div>
                 <div class="col-6 text-right flex flex-center"> {{ m.cantidad }} </div>
               </div>
@@ -508,7 +508,7 @@ export default {
         //console.log(promototal)
         for (let index = 0; index < promototal; index++) {
           console.log(res.data.sale)
-          this.printPromo(res.data.sale)          
+          this.printPromo(res.data.sale)
         }}
         this.momentaneoDeleteAll()
         this.tventa()
@@ -980,5 +980,10 @@ table, .tdx, th {
 }
 input{
   border: 1px solid #ddd;
+}
+.subtitule-text{
+  font-size: 12px;
+  line-height: 1;
+  color: #fff;
 }
 </style>

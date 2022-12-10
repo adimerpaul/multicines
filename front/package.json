@@ -18,6 +18,7 @@
     "axios": "^0.21.1",
     "conversor-numero-a-letras-es-ar": "^1.0.3",
     "core-js": "^3.6.5",
+    "json-as-xlsx": "^2.5.0",
     "moment": "^2.29.4",
     "numero-a-letras": "^1.0.6",
     "pinia": "^2.0.11",
