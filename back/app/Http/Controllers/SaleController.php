@@ -751,7 +751,8 @@ class SaleController extends Controller
         
         and s.credito='NO'
         and s.cortesia='NO'
-        and s.vip='NO';
+        and s.vip='NO'
+        group by usuario;
         ");
     }
 
@@ -766,7 +767,8 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.siatEnviado=true
         and s.credito='NO'
-        and s.vip='NO';
+        and s.vip='NO'
+        group by usuario;
         ");
     }
 

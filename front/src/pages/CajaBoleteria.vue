@@ -17,6 +17,10 @@
             </template>
           </q-table>
         </div>
+        <div class="col-12">
+          <q-table title="Ventas" :rows="infouser" :columns="columna2" row-key="name" />
+          
+        </div>
       </div>
       <div id="myelement" class="hidden"></div>
     </q-page>
@@ -55,6 +59,10 @@
           {label:'NOMBRE',field:'descripcion',name:'descripcion',sortable:true},
           {label:'cantidad',field:'cantidad',name:'cantidad',sortable:true},
           {label:'SUBTOTAL',field:'total',name:'subtotal',sortable:true},
+        ],
+        columna2:[
+          {label:'USUARIO',field:'usuario',name:'usuario',sortable:true},
+          {label:'TOTAL',field:'total',name:'total',sortable:true},
         ]
       }
     },
@@ -136,7 +144,7 @@
         cadena+="</tbody>\
         </table>"
         if(this.user.id==0){
-        cadena+="<table><tr><th class='f-10'>USUARIO</th><th class='f-10'>TOTAL</th></tr>"
+        cadena+="<table class='table'><tr><th class='f-10'>USUARIO</th><th class='f-10'>TOTAL</th></tr>"
           this.infouser.forEach(r => {
           cadena+="<tr><td class='f-10'>"+r.usuario+"</td> <td class='f-10'>"+r.total+"</td></tr>"
           })
