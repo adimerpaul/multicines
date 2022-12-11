@@ -83,12 +83,12 @@ class SaleCandyController extends Controller
 //            return "nuevo";
         }
 
-        if ($request->client['numeroDocumento']=="0"){
-            return $this->insertarRecibo($request,$client);
-        }
-
         if ($request->vip=="SI"){
             return $this->insertarVip($request,$client);
+        }
+
+        if ($request->client['numeroDocumento']=="0"){
+            return $this->insertarRecibo($request,$client);
         }
 
         $codigoAmbiente=env('AMBIENTE');
@@ -555,6 +555,7 @@ class SaleCandyController extends Controller
         $sale=Sale::where('id',$sale->id)->with('client')->with('details')->with('user')->first();
         $sale->siatEnviado=false;
         $codigo=$this->hexToStr($request->codigoTarjeta);
+
         DB::connection('tarjeta')->select("
             UPDATE cliente SET saldo=saldo-$sale->montoTotal WHERE codigo='$codigo'
         ");
