@@ -555,6 +555,8 @@ class SaleCandyController extends Controller
         $sale=Sale::where('id',$sale->id)->with('client')->with('details')->with('user')->first();
         $sale->siatEnviado=false;
         $codigo=$this->hexToStr($request->codigoTarjeta);
+        
+        $result=DB::connection('tarjeta')->select("SELECT * from cliente  WHERE codigo='$codigo'")[0];
 
         DB::connection('tarjeta')->select("
             UPDATE cliente SET saldo=saldo-$sale->montoTotal WHERE codigo='$codigo'
@@ -562,9 +564,10 @@ class SaleCandyController extends Controller
         $fecha=date('Y-m-d');
         $monto=$sale->montoTotal;
         $numero=$sale->id;
-        $cliente=$client->id;
+        $cliente=$result->id;
+        //$cliente=$client->id;
         DB::connection('tarjeta')->select("
-INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha', 'CANDY BAR', $monto, $numero, $cliente)
+        INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha', 'CANDY BAR', $monto, $numero, $cliente)
         ");
             return response()->json([
                 'sale' => $sale,

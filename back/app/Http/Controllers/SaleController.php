@@ -540,7 +540,7 @@ class SaleController extends Controller
 
     public function  validarTarjeta($codigo){
         $codigo=$this->hexToStr($codigo);
-        //return $codigo;
+       // return $codigo;
         $res= DB::connection('tarjeta')->table('cliente')->where('codigo',$codigo)->where('estado','ACTIVO')->get();
         if(sizeof($res)>0){
             return $res[0];
@@ -955,15 +955,16 @@ class SaleController extends Controller
         $sale->save();
         $tickets=Ticket::where('sale_id',$sale->id)->get();
         $codigo=$this->hexToStr($request->codigoTarjeta);
+        $result=DB::connection('tarjeta')->select("SELECT * from cliente  WHERE codigo='$codigo'")[0];
         DB::connection('tarjeta')->select("
             UPDATE cliente SET saldo=saldo-$sale->montoTotal WHERE codigo='$codigo'
         ");
         $fecha=date('Y-m-d');
         $monto=$sale->montoTotal;
         $numero=$sale->id;
-        $cliente=$client->id;
+        $cliente=$result->id;
         DB::connection('tarjeta')->select("
-INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha', 'BOLETERIA', $monto, $numero, $cliente)
+            INSERT INTO historial (fecha, lugar, monto, numero, cliente_id) VALUES ('$fecha', 'BOLETERIA', $monto, $numero, $cliente)
         ");
         $sale=Sale::where('id',$sale->id)->with('client')->with('details')->first();
         $sale->siatEnviado=false;
