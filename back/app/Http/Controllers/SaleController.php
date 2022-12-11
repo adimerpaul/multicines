@@ -886,6 +886,7 @@ class SaleController extends Controller
         $sale->leyenda="";
         $sale->vip=$request->vip;
         $sale->credito=$request->tarjeta;
+        $sale->venta="R";
         $sale->save();
 
         $user=User::find($request->user()->id);
@@ -960,7 +961,7 @@ class SaleController extends Controller
             UPDATE cliente SET saldo=saldo-$sale->montoTotal WHERE codigo='$codigo'
         ");
         $fecha=date('Y-m-d');
-        $monto=$sale->montoTotal;
+        $monto=$sale->montoTotal; 
         $numero=$sale->id;
         $cliente=$result->id;
         DB::connection('tarjeta')->select("
@@ -1000,6 +1001,7 @@ class SaleController extends Controller
         $sale->vip=$request->vip;
         $sale->credito=$request->tarjeta;
         $sale->cortesia='SI';
+        $sale->venta="R";
         $sale->save();
 
         $user=User::find($request->user()->id);

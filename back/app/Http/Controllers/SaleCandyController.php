@@ -528,7 +528,9 @@ class SaleCandyController extends Controller
             $sale->leyenda="";
             $sale->vip=$request->vip;
             $sale->credito=$request->tarjeta;
+            $sale->venta="R";
             $sale->save();
+
             $dataDetail=[];
             foreach ($request->detalleVenta as $detalle){
                 $d=[
