@@ -741,6 +741,45 @@ class SaleController extends Controller
         GROUP by d.descripcion, d.pelicula_id;");
     }
 
+    public function cajaBolF(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+
+        return DB::SELECT("SELECT d.descripcion,d.pelicula_id, sum(d.subTotal) total, sum(d.cantidad) cantidad
+        from sales s inner join details d on s.id=d.sale_id
+        where
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.credito='NO'
+        and s.cortesia='NO'
+        and s.vip='NO' 
+        and s.venta='F' 
+        GROUP by d.descripcion, d.pelicula_id;");
+    }
+
+    
+    public function cajaBolR(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+
+        return DB::SELECT("SELECT d.descripcion,d.pelicula_id, sum(d.subTotal) total, sum(d.cantidad) cantidad
+        from sales s inner join details d on s.id=d.sale_id
+        where
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.credito='NO'
+        and s.cortesia='NO'
+        and s.vip='NO' 
+        and s.venta='R' 
+        GROUP by d.descripcion, d.pelicula_id;");
+    }
+
     public function userbol(Request $request){
         $cadena='';
         return DB::SELECT("
@@ -821,6 +860,42 @@ class SaleController extends Controller
         ".$cadena."
         and s.tipo='CANDY'
         and s.siatAnulado=false
+        GROUP by  d.product_id");
+    }
+
+    public function cajaCandyF(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+
+        return DB::SELECT("SELECT d.descripcion,d.product_id, sum(d.subTotal) total,sum(d.cantidad) cantidad
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO'
+        and s.cortesia='NO'
+        and s.venta='F' 
+        GROUP by  d.product_id");
+    }
+
+    public function cajaCandyR(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+
+        return DB::SELECT("SELECT d.descripcion,d.product_id, sum(d.subTotal) total,sum(d.cantidad) cantidad
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO'
+        and s.cortesia='NO'
+        and s.venta='R' 
         GROUP by  d.product_id");
     }
 
