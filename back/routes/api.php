@@ -85,12 +85,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('listadoprod', [\App\Http\Controllers\RubroController::class, 'listadoprod']);
 
     Route::post('cajaBol', [\App\Http\Controllers\SaleController::class, 'cajaBol']);
+    Route::post('cajaBolF', [\App\Http\Controllers\SaleController::class, 'cajaBolF']);
+    Route::post('cajaBolR', [\App\Http\Controllers\SaleController::class, 'cajaBolR']);
     Route::post('resumenBol', [\App\Http\Controllers\SaleController::class, 'resumenBol']);
     Route::post('userbol', [\App\Http\Controllers\SaleController::class, 'userbol']);
     Route::post('usercandy', [\App\Http\Controllers\SaleController::class, 'usercandy']);
     Route::post('resumenCandy', [\App\Http\Controllers\SaleController::class, 'resumenCandy']);
     Route::post('reporteFuncion', [\App\Http\Controllers\SaleController::class, 'reporteFuncion']);
     Route::post('cajaCandy', [\App\Http\Controllers\SaleController::class, 'cajaCandy']);
+    Route::post('cajaCandyF', [\App\Http\Controllers\SaleController::class, 'cajaCandyF']);
+    Route::post('cajaCandyR', [\App\Http\Controllers\SaleController::class, 'cajaCandyR']);
     Route::get('validarTarjeta/{cod}', [\App\Http\Controllers\SaleController::class, 'validarTarjeta']);
     Route::get('validanit/{nit}', [\App\Http\Controllers\SaleController::class, 'validanit']);
 });

@@ -55,6 +55,8 @@
         tcredito:0,
         tefectivo:0,
         total:0,
+        reportef:[],
+        reporter:[],
         columna:[
           {label:'NOMBRE',field:'descripcion',name:'descripcion',sortable:true},
           {label:'cantidad',field:'cantidad',name:'cantidad',sortable:true},
@@ -87,18 +89,36 @@
           this.loading=true
         this.$api.post('cajaBol',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
             console.log(res.data)
-          this.loading=false
           this.reporte=res.data
           this.resumen()
           this.datosuser()
+          this.datosfactura()
+          this.datosrecibo()
+          this.loading=false
         })
       },
       datosuser(){
           this.loading=true
         this.$api.post('userbol',{ini:this.ini,fin:this.fin}).then(res=>{
             console.log(res.data)
-          this.loading=false
           this.infouser=res.data
+          this.loading=false
+        })
+      },
+      datosfactura(){
+          this.loading=true
+        this.$api.post('cajaBolF',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
+            console.log(res.data)
+          this.reportef=res.data
+          this.loading=false
+        })
+      },
+      datosrecibo(){
+          this.loading=true
+        this.$api.post('cajaBolR',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
+            console.log(res.data)
+          this.reporter=res.data
+          this.loading=false
         })
       },
       resumen(){
@@ -129,7 +149,7 @@
         </style>\
         <div class='f-10 titulo' >MULTISALAS S.R.L.</div>\
         <div class='f-10 titulo' >ORURO - BOLIVIA</div>\
-        <div class='f-10 titulo' >VENTAS DE BOLETERIA</div>\
+        <div class='f-10 titulo' >VENTAS DE BOLETERIA TOTAL</div>\
         <hr>\
         <div class='f-10'><span class='titulo2'>Fecha: </span> "+date.formatDate(new Date(), 'DD/MM/YYYY HH:mm:ss')+"</div>\
         <div class='f-10'><span class='titulo2'>Fecha Caja: </span> "+this.ini+" al "+this.fin+"</div>\
@@ -159,6 +179,69 @@
         const d = new Printd()
         d.print( document.getElementById('myelement') )
 
+        let cadena2="<style>\
+        .f-10{font-size:10px;}\
+        .titulo{text-align:center;\
+          font-weight:bold;}\
+        .titulo2{font-weight:bold;}\
+        .titulo3{font-weight:bold; text-align:right;}\
+        .table{width:100%; border:0.2px solid;}\
+        </style>\
+        <div class='f-10 titulo' >MULTISALAS S.R.L.</div>\
+        <div class='f-10 titulo' >ORURO - BOLIVIA</div>\
+        <div class='f-10 titulo' >VENTAS DE BOLETERIA FACTURA</div>\
+        <hr>\
+        <div class='f-10'><span class='titulo2'>Fecha: </span> "+date.formatDate(new Date(), 'DD/MM/YYYY HH:mm:ss')+"</div>\
+        <div class='f-10'><span class='titulo2'>Fecha Caja: </span> "+this.ini+" al "+this.fin+"</div>\
+        <div class='f-10'><span  class='titulo2'>Usuario: </span> "+this.user.label+"</div>\
+        <hr>\
+        <table class='table'>\
+        <thead><tr><th class='f-10'>DESCRIPCION</th><th class='f-10'>CANTIDAD</th><th class='f-10'>TOTAL</th></tr></thead>\
+        <tbody>"
+          this.reportef.forEach(r => {
+            cadena2+="<tr><td class='f-10'>"+r.descripcion+"</td><td class='f-10'>"+r.cantidad+"</td><td class='f-10'>"+r.total+"</td></tr>"
+          });
+        cadena2+="</tbody>\
+        </table>"
+
+        cadena2+="<div class='f-10' style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventafact+" Bs</div>\
+        "
+        document.getElementById('myelement').innerHTML = cadena2
+        const d2 = new Printd()
+
+        d2.print( document.getElementById('myelement') )
+
+        let cadena3="<style>\
+        .f-10{font-size:10px;}\
+        .titulo{text-align:center;\
+          font-weight:bold;}\
+        .titulo2{font-weight:bold;}\
+        .titulo3{font-weight:bold; text-align:right;}\
+        .table{width:100%; border:0.2px solid;}\
+        </style>\
+        <div class='f-10 titulo' >MULTISALAS S.R.L.</div>\
+        <div class='f-10 titulo' >ORURO - BOLIVIA</div>\
+        <div class='f-10 titulo' >VENTAS DE BOLETERIA RECIBO</div>\
+        <hr>\
+        <div class='f-10'><span class='titulo2'>Fecha: </span> "+date.formatDate(new Date(), 'DD/MM/YYYY HH:mm:ss')+"</div>\
+        <div class='f-10'><span class='titulo2'>Fecha Caja: </span> "+this.ini+" al "+this.fin+"</div>\
+        <div class='f-10'><span  class='titulo2'>Usuario: </span> "+this.user.label+"</div>\
+        <hr>\
+        <table class='table'>\
+        <thead><tr><th class='f-10'>DESCRIPCION</th><th class='f-10'>CANTIDAD</th><th class='f-10'>TOTAL</th></tr></thead>\
+        <tbody>"
+          this.reporter.forEach(r => {
+            cadena3+="<tr><td class='f-10'>"+r.descripcion+"</td><td class='f-10'>"+r.cantidad+"</td><td class='f-10'>"+r.total+"</td></tr>"
+          });
+        cadena3+="</tbody>\
+        </table>"
+
+        cadena3+="<div class='f-10' style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventarecibo+" Bs</div>\
+        "
+        document.getElementById('myelement').innerHTML = cadena3
+        const d3 = new Printd()
+
+        d3.print( document.getElementById('myelement') )
       }
 
 
@@ -168,6 +251,20 @@
         ventatotal(){
             let suma=0
             this.reporte.forEach(r=>{
+                suma+=r.total
+            })
+            return suma.toFixed(2)
+        },
+        ventarecibo(){
+            let suma=0
+            this.reporter.forEach(r=>{
+                suma+=r.total
+            })
+            return suma.toFixed(2)
+        },
+        ventafact(){
+            let suma=0
+            this.reportef.forEach(r=>{
                 suma+=r.total
             })
             return suma.toFixed(2)
