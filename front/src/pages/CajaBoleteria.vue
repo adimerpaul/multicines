@@ -53,6 +53,10 @@
         foto:'',
         tvip:0,
         tcredito:0,
+        tbolR:0,
+        tbolF:0,
+        tcandyF:0,
+        tcandyR:0,
         tefectivo:0,
         total:0,
         reportef:[],
@@ -129,8 +133,10 @@
             this.tcredito=res.data[0].tarjeta==null?0:res.data[0].tarjeta
             this.tvip=res.data[0].vip==null?0:res.data[0].vip
             this.tefectivo=res.data[0].efectivo==null?0:res.data[0].efectivo
-
-          this.loading=false
+          this.$api.post('resumenBolRF',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
+            this.tbolF=res.data[0].tarjetaF
+            this.tbolR=res.data[0].tarjetaR
+            this.loading=false})
         })
       },
 
@@ -203,8 +209,9 @@
           });
         cadena2+="</tbody>\
         </table>"
-
+        if(this.tbolF==null) this.tbolF=0
         cadena2+="<div class='f-10' style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventafact+" Bs</div>\
+                  <div class='f-10' style='text-align:right;'><span class='titulo3'>Total Tarjeta: </span> "+this.tbolF+" Bs</div>\
         "
         document.getElementById('myelement').innerHTML = cadena2
         const d2 = new Printd()
@@ -235,8 +242,10 @@
           });
         cadena3+="</tbody>\
         </table>"
+        if(this.tbolR==null) this.tbolR=0
 
         cadena3+="<div class='f-10' style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventarecibo+" Bs</div>\
+                <div class='f-10' style='text-align:right;'><span class='titulo3'>Total Tarjeta: </span> "+this.tbolR+" Bs</div>\
         "
         document.getElementById('myelement').innerHTML = cadena3
         const d3 = new Printd()

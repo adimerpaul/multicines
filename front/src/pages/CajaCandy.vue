@@ -54,6 +54,8 @@
         user:{},
         users:[],
         infouser:[],
+        tcandyR:0,
+        tcandyF:0,
         store: globalStore(),
         foto:'',
         tvip:0,
@@ -132,8 +134,10 @@
             this.tcredito=res.data[0].tarjeta==null?0:res.data[0].tarjeta
             this.tvip=res.data[0].vip==null?0:res.data[0].vip
             this.tefectivo=res.data[0].efectivo==null?0:res.data[0].efectivo
-
-          this.loading=false
+            this.$api.post('resumenCandyRF',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
+              this.tcandyF=res.data[0].tarjetaF
+              this.tcandyR=res.data[0].tarjetaR
+            this.loading=false})
         })
       },
 
@@ -206,8 +210,9 @@
           });
         cadena2+="</tbody>\
         </table>"
-
+        if(this.tcandyF==null) this.tcandyF=0
         cadena2+="<div style='text-align:right;'><span class='f-10 titulo3'>Total: </span> "+this.ventafactura+" Bs</div>\
+                 <div style='text-align:right;'><span class='f-10 titulo3'>Total Tarjeta: </span> "+this.tcandyF+" Bs</div>\
         "
         document.getElementById('myelement').innerHTML = cadena2
         const d2 = new Printd()
@@ -237,8 +242,10 @@
           });
         cadena3+="</tbody>\
         </table>"
+        if(this.tcandyR==null) this.tcandyR=0
 
         cadena3+="<div style='text-align:right;'><span class='f-10 titulo3'>Total: </span> "+this.ventarecibo+" Bs</div>\
+        <div style='text-align:right;'><span class='f-10 titulo3'>Total Tarjeta: </span> "+this.tcandyR+" Bs</div>\
         "
         document.getElementById('myelement').innerHTML = cadena3
         const d3 = new Printd()

@@ -670,6 +670,7 @@ class SaleController extends Controller
         //cuf
         if($request->sale['tipo']=='BOLETERIA')
             DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
+        
         try {
             $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
@@ -846,7 +847,35 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.vip='NO'
 		and s.credito='NO'
-        and s.cortesia='NO') as efectivo   ");
+        and s.cortesia='NO') as efectivo ");
+    }
+
+    public function resumenBolRF(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+        return DB::SELECT("
+        select
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.credito='SI'
+        and s.venta='R') as tarjetaR,
+
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.credito='SI'
+        and s.venta='F') as tarjetaF");
     }
 
     public function cajaCandy(Request $request){
@@ -932,6 +961,34 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.vip='NO'
 		and s.credito='NO') as efectivo ");
+    }
+
+    public function resumenCandyRF(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+        return DB::SELECT("
+        select
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.credito='SI'
+        and s.venta='R') as tarjetaR,
+        
+        (SELECT  sum(d.subTotal)
+        from sales s inner join details d on s.id=d.sale_id
+        where
+        date(s.fechaEmision) >='$request->ini'
+        and date(s.fechaEmision) <='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.credito='SI'
+        and s.venta='F') as tarjetaF ");
     }
 
     public function destroy(Sale $sale)
