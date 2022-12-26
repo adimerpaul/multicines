@@ -152,6 +152,15 @@
               :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']"
             />
             <q-input
+            filled
+            v-model="dato2.nick"
+            type="text"
+            label="Nick name "
+            hint="Ingresar Nombre"
+            lazy-rules
+            :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']"
+          />
+            <q-input
               filled
               v-model="dato2.email"
               type="email"
@@ -160,6 +169,14 @@
               lazy-rules
               :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']"
             />
+            <q-input
+            filled
+            v-model="dato2.fechaLimite"
+            type="date"
+            label="Fecah Limite"
+            lazy-rules
+            :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']"
+          />
             <div>
               <q-btn label="Modificar" type="submit" color="positive" icon="add_circle" />
               <q-btn label="Cancelar" icon="delete" color="negative" v-close-popup />
@@ -308,8 +325,11 @@ export default {
       this.$q.loading.show();
       this.$api.post( "user", {
         name:this.dato.name,
+        nick:this.dato.nick,
         password:this.dato.password,
+        state:'active',
         email:this.dato.email,
+        fechaLimite:this.dato.fechaLimite,
         permisos:this.permisos
       }).then((res) => {
         // console.log(res.data)
@@ -337,6 +357,8 @@ export default {
       this.$api.put("user/" + this.dato2.id, {
         name:this.dato2.name,
         email:this.dato2.email,
+        nick:this.dato2.nick,
+        fechaLimite:this.dato2.fechaLimite,
       }).then((res) => {
         this.$q.notify({
           color: "green-4",

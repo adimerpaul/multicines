@@ -190,6 +190,7 @@ class EventoSignificativoController extends Controller
 
             ]
         ]);
+        //echo $result;
         $eventoSignificativo=EventoSignificativo::find($request->id);
         $eventoSignificativo->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
         $eventoSignificativo->save();

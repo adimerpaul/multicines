@@ -77,8 +77,6 @@ class UserController extends Controller
             'name' => 'required',
             'nick' => 'required',
             'email' => 'required|email',
-            'password' => 'required',
-            'state' => 'required',
             'fechaLimite' => 'required',
         ]);
         $user->update($validated);
