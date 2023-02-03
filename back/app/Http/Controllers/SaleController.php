@@ -188,7 +188,7 @@ class SaleController extends Controller
                 <actividadEconomica>590000</actividadEconomica>
                 <codigoProductoSin>99100</codigoProductoSin>
                 <codigoProducto>".$detalle['programa_id']."</codigoProducto>
-                <descripcion>".$detalle['pelicula']."</descripcion>
+                <descripcion>".utf8_encode(str_replace("&","&amp;",$detalle['pelicula']))."</descripcion>
                 <cantidad>".$detalle['cantidad']."</cantidad>
                 <unidadMedida>62</unidadMedida>
                 <precioUnitario>".$detalle['precio']."</precioUnitario>
@@ -223,7 +223,8 @@ class SaleController extends Controller
         $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
         $cuf=$cuf.$cufd->codigoControl;
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>    <cabecera>
+<facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
+        <cabecera>
         <nitEmisor>".env('NIT')."</nitEmisor>
         <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
         <municipio>Oruro</municipio>
