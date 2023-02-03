@@ -235,7 +235,7 @@ class SaleController extends Controller
         <direccion>".env('DIRECCION')."</direccion>
         <codigoPuntoVenta>$codigoPuntoVenta</codigoPuntoVenta>
         <fechaEmision>$fechaEnvio</fechaEmision>
-        <nombreRazonSocial>".str_replace("&","&amp;",$client->nombreRazonSocial)."</nombreRazonSocial>
+        <nombreRazonSocial>".utf8_encode(str_replace("&","&amp;",$client->nombreRazonSocial))."</nombreRazonSocial>
         <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
         <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
         <complemento>".$client->complemento."</complemento>
@@ -685,7 +685,7 @@ class SaleController extends Controller
         //cuf
         if($request->sale['tipo']=='BOLETERIA')
             DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
-        
+
         try {
             $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
@@ -771,12 +771,12 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='NO'
         and s.cortesia='NO'
-        and s.vip='NO' 
-        and s.venta='F' 
+        and s.vip='NO'
+        and s.venta='F'
         GROUP by d.descripcion, d.pelicula_id;");
     }
 
-    
+
     public function cajaBolR(Request $request){
         $cadena='';
         if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
@@ -791,8 +791,8 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='NO'
         and s.cortesia='NO'
-        and s.vip='NO' 
-        and s.venta='R' 
+        and s.vip='NO'
+        and s.venta='R'
         GROUP by d.descripcion, d.pelicula_id;");
     }
 
@@ -805,7 +805,7 @@ class SaleController extends Controller
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='BOLETERIA'
         and s.siatAnulado=false
-        
+
         and s.credito='NO'
         and s.cortesia='NO'
         and s.vip='NO'
@@ -921,7 +921,7 @@ class SaleController extends Controller
         and s.vip='NO'
 		and s.credito='NO'
         and s.cortesia='NO'
-        and s.venta='F' 
+        and s.venta='F'
         GROUP by  d.product_id");
     }
 
@@ -939,7 +939,7 @@ class SaleController extends Controller
         and s.vip='NO'
 		and s.credito='NO'
         and s.cortesia='NO'
-        and s.venta='R' 
+        and s.venta='R'
         GROUP by  d.product_id");
     }
 
@@ -993,7 +993,7 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='SI'
         and s.venta='R') as tarjetaR,
-        
+
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
         where
@@ -1108,7 +1108,7 @@ class SaleController extends Controller
             UPDATE cliente SET saldo=saldo-$sale->montoTotal WHERE codigo='$codigo'
         ");
         $fecha=date('Y-m-d');
-        $monto=$sale->montoTotal; 
+        $monto=$sale->montoTotal;
         $numero=$sale->id;
         $cliente=$result->id;
         DB::connection('tarjeta')->select("
