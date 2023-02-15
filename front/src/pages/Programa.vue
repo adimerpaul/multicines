@@ -399,7 +399,7 @@ export default {
       this.events=[]
       this.funcion=[]
         this.$api.get('programa').then(res=>{
-            // console.log(res.data)
+             console.log(res.data)
           let col=0
           res.data.forEach(r=>{
             this.funcion.push(r)
