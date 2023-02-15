@@ -19,6 +19,11 @@ class ProgramaController extends Controller
         return Programa::whereDate('fecha','>=',now())->with('movie')->with('sala')->with('price')->get();
     }
 
+    public function listProgramacion(){
+        return Programa::whereDate('fecha','>=',now())->with('movie')->with('sala')->with('price')->get();
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *

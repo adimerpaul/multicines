@@ -398,7 +398,7 @@ export default {
     listado(num){
       this.events=[]
       this.funcion=[]
-        this.$api.get('programa').then(res=>{
+        this.$api.get('listProgramacion').then(res=>{
              console.log(res.data)
           let col=0
           res.data.forEach(r=>{
