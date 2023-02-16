@@ -638,7 +638,7 @@ class SaleController extends Controller
      */
 
     public function anularSale(Request $request){
-        return $request;
+       // return $request;
         if($request->sale['cortesia']=='SI' && $request->sale['tipo']=='BOLETERIA'){
             $sale=Sale::find($request->sale['id']);
             $sale->siatAnulado=1;
@@ -688,6 +688,7 @@ class SaleController extends Controller
             DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
 
         try {
+            return 'llega';
             $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
