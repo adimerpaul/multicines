@@ -710,7 +710,7 @@ class SaleController extends Controller
                     "codigoPuntoVenta"=>$codigoPuntoVenta,
                     "codigoSistema"=>$codigoSistema,
                     "codigoSucursal"=>$codigoSucursal,
-                    "cufd"=>$request->sale['cufd'],
+                    "cufd"=>$cufd->codigo,
                     "cuis"=>$request->sale['cui'],
                     "nit"=>env('NIT'),
                     "tipoFacturaDocumento"=>$tipoFacturaDocumento,
