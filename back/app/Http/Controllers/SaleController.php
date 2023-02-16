@@ -638,7 +638,7 @@ class SaleController extends Controller
      */
 
     public function anularSale(Request $request){
-        //return $request->sale['id'];
+        return $request;
         if($request->sale['cortesia']=='SI' && $request->sale['tipo']=='BOLETERIA'){
             $sale=Sale::find($request->sale['id']);
             $sale->siatAnulado=1;
