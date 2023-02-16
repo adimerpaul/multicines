@@ -688,7 +688,7 @@ class SaleController extends Controller
             DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
 
         try {
-            return 'llega';
+            //return 'llega';
             $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
@@ -718,6 +718,7 @@ class SaleController extends Controller
                     "cuf"=>$request->sale['cuf']
                 ]
             ]);
+            return $result;
             if($result->RespuestaServicioFacturacion->transaccion){
                 $sale=Sale::find($request->sale['id']);
                 $sale->siatAnulado=1;
