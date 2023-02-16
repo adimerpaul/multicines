@@ -740,6 +740,8 @@ class SaleController extends Controller
                 }
 
             }
+            return $result;
+
         }catch (\Exception $e) {
             //return response()->json(['error' => $e->getMessage()]);
             return response()->json(['message' => 'anulado error'], 400);
