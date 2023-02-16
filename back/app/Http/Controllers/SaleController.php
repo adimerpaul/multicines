@@ -710,15 +710,15 @@ class SaleController extends Controller
                     "codigoPuntoVenta"=>$codigoPuntoVenta,
                     "codigoSistema"=>$codigoSistema,
                     "codigoSucursal"=>$codigoSucursal,
-                    "cufd"=>$cufd,
-                    "cuis"=>$cui,
+                    "cufd"=>$request->sale['cufd'],
+                    "cuis"=>$request->sale['cui'],
                     "nit"=>env('NIT'),
                     "tipoFacturaDocumento"=>$tipoFacturaDocumento,
                     "codigoMotivo"=>$request->motivo['codigoClasificador'],
                     "cuf"=>$request->sale['cuf']
                 ]
             ]);
-            return $result;
+            //return $result;
             if($result->RespuestaServicioFacturacion->transaccion){
                 $sale=Sale::find($request->sale['id']);
                 $sale->siatAnulado=1;
