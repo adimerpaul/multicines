@@ -718,7 +718,7 @@ class SaleController extends Controller
                     "cuf"=>$request->sale['cuf']
                 ]
             ]);
-            //return $result;
+            return $result;
             if($result->RespuestaServicioFacturacion->transaccion){
                 $sale=Sale::find($request->sale['id']);
                 $sale->siatAnulado=1;
