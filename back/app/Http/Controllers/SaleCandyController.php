@@ -91,6 +91,9 @@ class SaleCandyController extends Controller
             return $this->insertarRecibo($request,$client);
         }
 
+        if (sizeof($request->detalleVenta)>0){
+
+
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
@@ -393,7 +396,7 @@ class SaleCandyController extends Controller
             ]);
             return response()->json(['message' => $e->getMessage()], 500);
         }
-
+      }
     }
 
     /**
@@ -557,7 +560,7 @@ class SaleCandyController extends Controller
         $sale=Sale::where('id',$sale->id)->with('client')->with('details')->with('user')->first();
         $sale->siatEnviado=false;
         $codigo=$this->hexToStr($request->codigoTarjeta);
-        
+
         $result=DB::connection('tarjeta')->select("SELECT * from cliente  WHERE codigo='$codigo'")[0];
 
         DB::connection('tarjeta')->select("
