@@ -91,7 +91,7 @@ class SaleCandyController extends Controller
             return $this->insertarRecibo($request,$client);
         }
 
-        if (sizeof($request->detalleVenta)>0){
+        if (sizeof($request->detalleVenta) > 0){
 
 
         $codigoAmbiente=env('AMBIENTE');
