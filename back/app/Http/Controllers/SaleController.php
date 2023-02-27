@@ -638,7 +638,7 @@ class SaleController extends Controller
      */
 
     public function anularSale(Request $request){
-        //return $request->sale['id'];
+       // return $request;
         if($request->sale['cortesia']=='SI' && $request->sale['tipo']=='BOLETERIA'){
             $sale=Sale::find($request->sale['id']);
             $sale->siatAnulado=1;
@@ -688,6 +688,7 @@ class SaleController extends Controller
             DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
 
         try {
+            //return 'llega';
             $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
@@ -709,7 +710,7 @@ class SaleController extends Controller
                     "codigoPuntoVenta"=>$codigoPuntoVenta,
                     "codigoSistema"=>$codigoSistema,
                     "codigoSucursal"=>$codigoSucursal,
-                    "cufd"=>$request->sale['cufd'],
+                    "cufd"=>$cufd->codigo,
                     "cuis"=>$request->sale['cui'],
                     "nit"=>env('NIT'),
                     "tipoFacturaDocumento"=>$tipoFacturaDocumento,
@@ -717,6 +718,7 @@ class SaleController extends Controller
                     "cuf"=>$request->sale['cuf']
                 ]
             ]);
+            //return $result;
             if($result->RespuestaServicioFacturacion->transaccion){
                 $sale=Sale::find($request->sale['id']);
                 $sale->siatAnulado=1;
@@ -738,8 +740,11 @@ class SaleController extends Controller
                 }
 
             }
+            return $result;
+
         }catch (\Exception $e) {
-//            return response()->json(['error' => $e->getMessage()]);
+            //return response()->json(['error' => $e->getMessage()]);
+            return response()->json(['message' => 'anulado error'], 400);
         }
     }
 

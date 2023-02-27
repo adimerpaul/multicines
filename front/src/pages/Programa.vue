@@ -398,8 +398,8 @@ export default {
     listado(num){
       this.events=[]
       this.funcion=[]
-        this.$api.get('programa').then(res=>{
-            // console.log(res.data)
+        this.$api.get('listProgramacion').then(res=>{
+             console.log(res.data)
           let col=0
           res.data.forEach(r=>{
             this.funcion.push(r)

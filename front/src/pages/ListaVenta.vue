@@ -216,7 +216,7 @@ export default {
     enviarAnular(){
       this.$q.loading.show()
       this.$api.post('anularSale',{sale:this.factura,motivo:this.motivo}).then(res => {
-        // console.log(res.data)
+         console.log(res.data)
         this.dialogAnular=false
         this.listaVentaBoleteriaGet();
         this.$q.loading.hide()
