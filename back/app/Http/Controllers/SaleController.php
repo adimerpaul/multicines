@@ -145,7 +145,7 @@ class SaleController extends Controller
             return $this->insertarRecibo($request,$client);
         }
 
-        if (sizeof($request->detalleVenta) > 0){
+       // if (sizeof($request->detalleVenta) > 0){
 
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
@@ -537,7 +537,7 @@ class SaleController extends Controller
             ]);
             return response()->json(['message' => $e->getMessage()], 500);
         }
-      }
+//      }
 
     }
 
