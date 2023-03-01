@@ -146,6 +146,8 @@ class SaleController extends Controller
             return $this->insertarRecibo($request,$client);
         }
 
+        error_log("cerificado todo bien");
+
        // if (sizeof($request->detalleVenta) > 0){
 
         $codigoAmbiente=env('AMBIENTE');
@@ -183,7 +185,7 @@ class SaleController extends Controller
             $sale=Sale::orderBy('id', 'desc')->first();
             $saleId=intval($sale->id)+1;
         }
-
+        error_log("antes del detalle");
         $detalleFactura="";
         foreach ($request->detalleVenta as $detalle){
             $detalleFactura.="<detalle>
@@ -283,6 +285,7 @@ class SaleController extends Controller
         }
 //        exit;
 
+        error_log("FIRMA: ");
 
         $file = "archivos/".$nameFile.'.xml';
         $gzfile = "archivos/".$nameFile.'.xml'.'.gz';
