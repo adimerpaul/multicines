@@ -325,6 +325,7 @@ class SaleController extends Controller
                 ]
             ]);
 
+            error_log("result: ".json_encode($result));
 
 
             if ($result->RespuestaServicioFacturacion->transaccion) {
