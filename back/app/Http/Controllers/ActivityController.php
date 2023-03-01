@@ -679,6 +679,24 @@ class ActivityController extends Controller
 
     }
 
+    public function verificarComunicacion(){
+        $client = new \SoapClient(env("URL_SIAT")."ServicioRecepcionCompras?wsdl",  [
+            'stream_context' => stream_context_create([
+                'http' => [
+                    
+                ]
+            ]),
+            'cache_wsdl' => WSDL_CACHE_NONE,
+            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+            'trace' => 1,
+            'use' => SOAP_LITERAL,
+            'style' => SOAP_DOCUMENT,
+        ]);
+
+            $result = $client->verificarComunicacion();
+            return $result->return->transaccion;
+    }
+
      /**
      * Display the specified resource.
      *
