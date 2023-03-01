@@ -433,7 +433,7 @@ export default {
         this.$q.notify({
           color: 'negative',
           textColor: 'white',
-          message: err.response.data.message,
+          message: err.message,
           position: 'top',
           timeout: 5000,
         })

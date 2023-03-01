@@ -102,6 +102,7 @@ class SaleController extends Controller
 
     public function store(StoreSaleRequest $request)
     {
+        return $request;
         if ($request->client['complemento']==null){
             $complemento="";
         }else{
