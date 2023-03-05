@@ -227,7 +227,7 @@ class SaleController extends Controller
         $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
         $cuf=$cuf.$cufd->codigoControl;
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
-<facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
+        <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
         <cabecera>
         <nitEmisor>".env('NIT')."</nitEmisor>
         <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
@@ -351,7 +351,7 @@ class SaleController extends Controller
                 $sale->credito=$request->tarjeta;
                 $sale->save();
 
-                if ($request->client['email']!==''){
+                if ($request->client['email']!='' && $request->client['email']!=null && sizeof($detalleFactura) > 0){
                     $details=[
                         "title"=>"Factura",
                         "body"=>"Gracias por su compra",
@@ -437,6 +437,7 @@ class SaleController extends Controller
                 return response()->json(['message' => $result->RespuestaServicioFacturacion->mensajesList->descripcion], 400);
             }
         }catch (\Exception $e){
+            if(sizeof($request->detalleVenta)>0){
             $sale=new Sale();
             $sale->numeroFactura=$numeroFactura;
             $sale->cuf="";
@@ -456,7 +457,7 @@ class SaleController extends Controller
             $sale->credito=$request->tarjeta;
             $sale->save();
 
-            if ($request->client['email']!='' && $request->client['email']!=null ){
+            if ($request->client['email']!='' && $request->client['email']!=null  && sizeof($detalleFactura) > 0 ){
                 $details=[
                     "title"=>"Factura",
                     "body"=>"Gracias por su compra",
@@ -541,9 +542,9 @@ class SaleController extends Controller
                 "error"=>"Se creo la venta pero no se pudo enviar a siat!!!",
             ]);
             return response()->json(['message' => $e->getMessage()], 500);
+          }
         }
       }
-
     }
 
     public function  validarTarjeta($codigo){

@@ -289,7 +289,7 @@ class SaleCandyController extends Controller
                 $sale->vip=$request->vip;
                 $sale->credito=$request->tarjeta;
                 $sale->save();
-                if ($request->client['email']!='' && $request->client['email']!=null){
+                if ($request->client['email']!='' && $request->client['email']!=null  && sizeof($detalleFactura) > 0){
                     $details=[
                         "title"=>"Factura",
                         "body"=>"Gracias por su compra",
@@ -334,6 +334,7 @@ class SaleCandyController extends Controller
                 return response()->json(['message' => $result->RespuestaServicioFacturacion->mensajesList->descripcion], 400);
             }
         }catch (\Exception $e){
+            if(sizeof($request->detalleVenta) > 0){
             $sale=new Sale();
             $sale->numeroFactura=$numeroFactura;
             $sale->cuf="";
@@ -354,7 +355,7 @@ class SaleCandyController extends Controller
             $sale->credito=$request->tarjeta;
             $sale->save();
 
-            if ($request->client['email']!='' && $request->client['email']!= null){
+            if ($request->client['email']!='' && $request->client['email']!= null  && sizeof($detalleFactura) > 0){
                 $details=[
                     "title"=>"Factura",
                     "body"=>"Gracias por su compra",
@@ -395,6 +396,7 @@ class SaleCandyController extends Controller
                 "error"=>"Se creo la venta pero no se pudo enviar a siat!!!",
             ]);
             return response()->json(['message' => $e->getMessage()], 500);
+            }
         }
       }
     }
