@@ -456,7 +456,7 @@ class SaleController extends Controller
             $sale->credito=$request->tarjeta;
             $sale->save();
 
-            if ($request->client['email']!==''){
+            if ($request->client['email']!='' && $request->client['email']!=null ){
                 $details=[
                     "title"=>"Factura",
                     "body"=>"Gracias por su compra",
@@ -567,7 +567,7 @@ class SaleController extends Controller
 
     public function enviarCorreo(Request $request){
 
-        if ($request->client['email']!==''){
+        if ($request->client['email']!='' && $request->client['email']!=null ){
             $details=[
                 "title"=>"Factura",
                 "body"=>"Gracias por su compra",
