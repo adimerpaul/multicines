@@ -334,7 +334,7 @@ class SaleCandyController extends Controller
                 return response()->json(['message' => $result->RespuestaServicioFacturacion->mensajesList->descripcion], 400);
             }
         }catch (\Exception $e){
-            if(sizeof($request->detalleVenta) > 0){
+            //if(sizeof($request->detalleVenta) > 0){
             $sale=new Sale();
             $sale->numeroFactura=$numeroFactura;
             $sale->cuf="";
@@ -398,7 +398,7 @@ class SaleCandyController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
             }
         }
-      }
+     // }
     }
 
     /**
