@@ -351,7 +351,7 @@ class SaleController extends Controller
                 $sale->credito=$request->tarjeta;
                 $sale->save();
 
-                if ($request->client['email']!='' && $request->client['email']!=null && sizeof($detalleFactura) > 0){
+                if ($request->client['email']!='' && $request->client['email']!=null){
                     $details=[
                         "title"=>"Factura",
                         "body"=>"Gracias por su compra",
@@ -457,7 +457,7 @@ class SaleController extends Controller
             $sale->credito=$request->tarjeta;
             $sale->save();
 
-            if ($request->client['email']!='' && $request->client['email']!=null  && sizeof($detalleFactura) > 0 ){
+            if ($request->client['email']!='' && $request->client['email']!=null   ){
                 $details=[
                     "title"=>"Factura",
                     "body"=>"Gracias por su compra",
