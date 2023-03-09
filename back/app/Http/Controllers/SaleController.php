@@ -67,7 +67,7 @@ class SaleController extends Controller
     }
     public function eventSearch(Request $request)
     {
-        return Sale::where('siatEnviado',false)->count();
+        return Sale::where('siatEnviado',false)->where('siatAnulado',false)->count();
     }
     public function hours(Request $request)
     {
