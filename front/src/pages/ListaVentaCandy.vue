@@ -22,7 +22,8 @@
       <div class="col-12">
         <q-table :rows="listaVentaCandy" :columns="listaColums" :filter="filter">
           <template v-slot:top-right>
-            <q-input outlined dense debounce="300" v-model="filter" placeholder="Buscar">
+             <q-btn color="green"  label="Export EXCEL" @click="exportar" />
+             <q-input outlined dense debounce="300" v-model="filter" placeholder="Buscar">
               <template v-slot:append>
                 <q-icon name="search" />
               </template>
@@ -131,6 +132,8 @@
 <script>
 import {date} from "quasar";
 import { Printd } from 'printd'
+import xlsx from "json-as-xlsx"
+
 const conversor = require('conversor-numero-a-letras-es-ar');
 const QRCode = require('qrcode')
 export default {
@@ -204,6 +207,37 @@ export default {
     this.cargarMotivo()
   },
   methods: {
+    exportar(){
+
+let data = [
+  {
+    sheet: "Candy",
+    columns: [
+      { label: "id", value: "id" },
+      {label:'numeroFactura',value:row => row.numeroFactura},
+      {label:'siatEnviado',value:'siatEnviado'},
+      {label:'fechaEmision',value:'fechaEmision'},
+      {label:'client_id',value:row=>row.client.nombreRazonSocial},
+      {label:'user_id',value:row=>row.user.name},
+      {label:'montoTotal',value:'montoTotal'},
+      {label:'siatAnulado',value:'siatAnulado'},
+      {label:'cuf',value:'cuf'},
+      // { label: "Age", value: (row) => row.age + " years" }, // Custom format
+      // { label: "Phone", value: (row) => (row.more ? row.more.phone || "" : "") }, // Run functions
+    ],
+    content: this.listaVentaCandy,
+  },
+]
+
+let settings = {
+  fileName: "VentaCandy" + date.formatDate(new Date(), "YYYY-MM-DD"),
+  // extraLength: 3, // A bigger number means that columns will be wider
+  // writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
+  writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
+  // RTL: true, // Display the columns from right-to-left (the default value is false)
+}
+xlsx(data, settings) // Will download the excel file
+},
     correo(venta){
       console.log(venta)
       this.$api.post('enviarCorreo',{client:venta.client,sale:venta}).then(res => {
