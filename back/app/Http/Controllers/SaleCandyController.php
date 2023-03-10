@@ -236,7 +236,7 @@ class SaleCandyController extends Controller
 
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
         $hashArchivo=hash('sha256', $archivo);
-        unlink($gzfile);
+//        unlink($gzfile);
         try {
             $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
@@ -268,7 +268,7 @@ class SaleCandyController extends Controller
                     "hashArchivo"=>$hashArchivo,
                 ]
             ]);
-            error_log(json_encode($result));
+            error_log("resultcandy ".json_encode($result));
             if ($result->RespuestaServicioFacturacion->transaccion) {
                 $sale=new Sale();
                 $sale->numeroFactura=$numeroFactura;
@@ -289,19 +289,27 @@ class SaleCandyController extends Controller
                 $sale->vip=$request->vip;
                 $sale->credito=$request->tarjeta;
                 $sale->save();
-                if ($request->client['email']!='' && $request->client['email']!=null ){
-                    $details=[
-                        "title"=>"Factura",
-                        "body"=>"Gracias por su compra",
-                        "online"=>true,
-                        "anulado"=>false,
-                        "cuf"=>"",
-                        "numeroFactura"=>"",
-                        "sale_id"=>$sale->id,
-                        "carpeta"=>"archivos",
-                    ];
-                    Mail::to($request->client['email'])->send(new TestMail($details));
+
+                error_log("sale candy: ".json_encode($sale));
+
+                try {
+                    if ($request->client['email']!='' && $request->client['email']!=null ){
+                        $details=[
+                            "title"=>"Factura",
+                            "body"=>"Gracias por su compra",
+                            "online"=>true,
+                            "anulado"=>false,
+                            "cuf"=>"",
+                            "numeroFactura"=>"",
+                            "sale_id"=>$sale->id,
+                            "carpeta"=>"archivos",
+                        ];
+                        Mail::to($request->client['email'])->send(new TestMail($details));
+                    }
+                }catch (\Exception $e){
+                    error_log("error mail candy: ".$e->getMessage());
                 }
+
                 $dataDetail=[];
                 foreach ($request->detalleVenta as $detalle){
                     $d=[

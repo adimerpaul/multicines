@@ -295,7 +295,7 @@ class SaleController extends Controller
 
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
         $hashArchivo=hash('sha256', $archivo);
-        unlink($gzfile);
+//        unlink($gzfile);
         try {
             $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
@@ -350,20 +350,26 @@ class SaleController extends Controller
                 $sale->vip=$request->vip;
                 $sale->credito=$request->tarjeta;
                 $sale->save();
+                error_log("sale: ".json_encode($sale));
 
-                if ($request->client['email']!='' && $request->client['email']!=null){
-                    $details=[
-                        "title"=>"Factura",
-                        "body"=>"Gracias por su compra",
-                        "online"=>true,
-                        "anulado"=>false,
-                        "cuf"=>"",
-                        "numeroFactura"=>"",
-                        "sale_id"=>$sale->id,
-                        "carpeta"=>"archivos",
-                    ];
-                    Mail::to($request->client['email'])->send(new TestMail($details));
+                try {
+                    if ($request->client['email']!='' && $request->client['email']!=null){
+                        $details=[
+                            "title"=>"Factura",
+                            "body"=>"Gracias por su compra",
+                            "online"=>true,
+                            "anulado"=>false,
+                            "cuf"=>"",
+                            "numeroFactura"=>"",
+                            "sale_id"=>$sale->id,
+                            "carpeta"=>"archivos",
+                        ];
+                        Mail::to($request->client['email'])->send(new TestMail($details));
+                    }
+                }catch (\Exception $e){
+                    error_log("error mail: ".$e->getMessage());
                 }
+
                 $momentaneos=Momentaneo::where('user_id',$user->id)->get();
                 $data=[];
                 $dataDetail=[];
