@@ -93,7 +93,7 @@ class EventoSignificativoController extends Controller
         }
     }
     public function cantidadFacturas(Request $request){
-        return Sale::where('siatEnviado',false)->where('fechaEmision','>=',$request->fechaInicio)->where('fechaEmision','<=',$request->fechaFin)->get();
+        return Sale::where('siatEnviado',false)->where('siatAnulado',false)->where('fechaEmision','>=',$request->fechaInicio)->where('fechaEmision','<=',$request->fechaFin)->get();
     }
 
     /**
