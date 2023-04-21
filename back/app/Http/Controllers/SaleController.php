@@ -833,7 +833,7 @@ class SaleController extends Controller
         ");
     }
 
-    public function usercandy(Request $request){
+    public function usercandy(Request $request){  //and s.siatEnviado=true
         $cadena='';
         return DB::SELECT("
         SELECT u.name usuario,SUM(s.montoTotal) total
@@ -842,7 +842,7 @@ class SaleController extends Controller
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='CANDY'
         and s.siatAnulado=false
-        and s.siatEnviado=true
+       
         and s.credito='NO'
         and s.vip='NO'
         group by usuario;
