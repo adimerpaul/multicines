@@ -386,6 +386,7 @@ class SaleCandyController extends Controller
                     'subTotal'=>$detalle['subtotal'],
                     'sale_id'=>$sale->id,
 //                    'programa_id'=>$detalle['programa_id'],
+                    'product_id'=>$detalle['product_id'],
                     'descripcion'=>$detalle['nombre'],
                 ];
                 array_push($dataDetail, $d);
