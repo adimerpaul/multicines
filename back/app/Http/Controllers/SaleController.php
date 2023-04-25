@@ -672,7 +672,7 @@ class SaleController extends Controller
             $sale=Sale::find($request->sale['id']);
             $sale->siatAnulado=1;
             $sale->save();
-            DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
+            //DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
             return true;
         }
         $codigoAmbiente=env('AMBIENTE');
@@ -938,11 +938,12 @@ class SaleController extends Controller
         ".$cadena."
         and s.tipo='CANDY'
         and s.siatAnulado=false
-        and s.vip='NO'
-		and s.credito='NO'
+
         and s.cortesia='NO'
         and s.venta='F'
         GROUP by  d.product_id");
+        //and s.vip='NO'
+		//and s.credito='NO'
     }
 
     public function cajaCandyR(Request $request){
@@ -956,12 +957,14 @@ class SaleController extends Controller
         ".$cadena."
         and s.tipo='CANDY'
         and s.siatAnulado=false
-        and s.vip='NO'
-		and s.credito='NO'
+
         and s.cortesia='NO'
         and s.venta='R'
         GROUP by  d.product_id");
+        //and s.vip='NO'
+		//and s.credito='NO'
     }
+
 
     public function resumenCandy(Request $request){
         $cadena='';
