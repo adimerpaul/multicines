@@ -789,11 +789,12 @@ class SaleController extends Controller
         ".$cadena."
         and s.tipo='BOLETERIA'
         and s.siatAnulado=false
-        and s.credito='NO'
         and s.cortesia='NO'
-        and s.vip='NO'
+
         and s.venta='F'
         GROUP by d.descripcion, d.pelicula_id;");
+        //and s.credito='NO'
+        //and s.vip='NO'
     }
 
 
@@ -809,11 +810,12 @@ class SaleController extends Controller
         ".$cadena."
         and s.tipo='BOLETERIA'
         and s.siatAnulado=false
-        and s.credito='NO'
         and s.cortesia='NO'
-        and s.vip='NO'
+
         and s.venta='R'
         GROUP by d.descripcion, d.pelicula_id;");
+        //and s.credito='NO'
+        //and s.vip='NO'
     }
 
     public function userbol(Request $request){
