@@ -266,6 +266,7 @@
         ventafactura(){
             let suma=0
             this.reportef.forEach(r=>{
+            if(r.credito=='NO' && r.vip=='NO')
                 suma+=r.total
             })
             return suma.toFixed(2)
@@ -273,6 +274,7 @@
         ventarecibo(){
             let suma=0
             this.reporter.forEach(r=>{
+            if(r.credito=='NO' && r.vip=='NO')
                 suma+=r.total
             })
             return suma.toFixed(2)
