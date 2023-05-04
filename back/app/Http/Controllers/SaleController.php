@@ -902,7 +902,17 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='SI'
         and s.venta='R') as tarjetaR,
-
+        (SELECT sum(d.subTotal) 
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO'
+        and s.cortesia='NO'
+        and s.venta='R') as efectivoR,
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
         where
@@ -912,7 +922,18 @@ class SaleController extends Controller
         and s.tipo='BOLETERIA'
         and s.siatAnulado=false
         and s.credito='SI'
-        and s.venta='F') as tarjetaF");
+        and s.venta='F') as tarjetaF,
+        (SELECT sum(d.subTotal) 
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        ".$cadena."
+        and s.tipo='BOLETERIA'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO'
+        and s.cortesia='NO'
+        and s.venta='F') as efectivoF");
     }
 
     public function cajaCandy(Request $request){
@@ -946,6 +967,41 @@ class SaleController extends Controller
         GROUP by  d.product_id");
         //and s.vip='NO'
 		//and s.credito='NO'
+    }
+
+    public function cajaCandyFefectivo(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+
+        return DB::SELECT("SELECT sum(d.subTotal) total
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO'
+        and s.cortesia='NO'
+        and s.venta='F'
+        ");
+    }
+    public function cajaCandyRefectivo(Request $request){
+        $cadena='';
+        if($request->id!=0)  $cadena='and s.user_id=' .$request->id;
+
+        return DB::SELECT("SELECT sum(d.subTotal) total
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO'
+        and s.cortesia='NO'
+        and s.venta='R'
+        ");
     }
 
     public function cajaCandyR(Request $request){
@@ -1018,7 +1074,17 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='SI'
         and s.venta='R') as tarjetaR,
-
+        (SELECT sum(d.subTotal) 
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO'
+        and s.cortesia='NO'
+        and s.venta='R') as efectivoR,
         (SELECT  sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
         where
@@ -1028,7 +1094,18 @@ class SaleController extends Controller
         and s.tipo='CANDY'
         and s.siatAnulado=false
         and s.credito='SI'
-        and s.venta='F') as tarjetaF ");
+        and s.venta='F') as tarjetaF,
+        (SELECT sum(d.subTotal) 
+        from sales s inner join details d on s.id=d.sale_id
+        where date(s.fechaEmision)>='$request->ini'
+        and date(s.fechaEmision)<='$request->fin'
+        ".$cadena."
+        and s.tipo='CANDY'
+        and s.siatAnulado=false
+        and s.vip='NO'
+		and s.credito='NO'
+        and s.cortesia='NO'
+        and s.venta='F') as efectivoF ");
     }
 
     public function destroy(Sale $sale)
