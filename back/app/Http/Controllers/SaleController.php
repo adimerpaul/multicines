@@ -595,6 +595,9 @@ class SaleController extends Controller
         }
 //
         $fechaEnvio=date("Y-m-d\TH:i:s.000",strtotime($sale->fechaEmision));
+        $cuf = new CUF();
+        $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+        $cuf=$cuf.$cufd->codigoControl;
 
        // $cuf = $sale->cuf;
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
@@ -605,7 +608,7 @@ class SaleController extends Controller
         <municipio>Oruro</municipio>
         <telefono>".env('TELEFONO')."</telefono>
         <numeroFactura>$sale->numeroFactura</numeroFactura>
-        <cuf>$sale->cuf</cuf>
+        <cuf>$cuf</cuf>
         <cufd>".$sale->cufd."</cufd>
         <codigoSucursal>$sale->codigoSucursal</codigoSucursal>
         <direccion>".env('DIRECCION')."</direccion>
