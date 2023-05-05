@@ -555,7 +555,6 @@ class SaleController extends Controller
 
     public function genXML($id)
     {
-       // return $request;
 
        $sale=Sale::find($id);
        $details=Detail::where('sale_id',$id)->get();
@@ -575,8 +574,6 @@ class SaleController extends Controller
         $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia',$fechacuf)->first();
 
-
-
         $detalleFactura="";
         foreach ($details as $detalle){
             $detalleFactura.="<detalle>
@@ -593,13 +590,11 @@ class SaleController extends Controller
                 <numeroImei xsi:nil='true'/>
             </detalle>";
         }
-//
         $fechaEnvio=date("Y-m-d\TH:i:s.000",strtotime($sale->fechaEmision));
         $cuf = new CUF();
-        $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+        $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000",strtotime($sale->fechaEmision)), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
         $cuf=$cuf.$cufd->codigoControl;
 
-       // $cuf = $sale->cuf;
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
         <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
         <cabecera>
@@ -609,7 +604,7 @@ class SaleController extends Controller
         <telefono>".env('TELEFONO')."</telefono>
         <numeroFactura>$sale->numeroFactura</numeroFactura>
         <cuf>$cuf</cuf>
-        <cufd>".$sale->cufd."</cufd>
+        <cufd>".$cufd->codigo."</cufd>
         <codigoSucursal>$sale->codigoSucursal</codigoSucursal>
         <direccion>".env('DIRECCION')."</direccion>
         <codigoPuntoVenta>$sale->codigoPuntoVenta</codigoPuntoVenta>
@@ -668,8 +663,6 @@ class SaleController extends Controller
 
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
         $hashArchivo=hash('sha256', $archivo);
-
-
     }
 
     public function  validarTarjeta($codigo){
