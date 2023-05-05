@@ -553,6 +553,121 @@ class SaleController extends Controller
       }
     }
 
+    public function genXML()
+    {
+       // return $request;
+        $client=Client::where('numeroDocumento','628725')->first();
+        $fechacuf='2023-04-20';
+        $id=62054;
+
+        $codigoAmbiente=env('AMBIENTE');
+        $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
+        $codigoEmision=1; // 1 online 2 offline 3 masivo
+        $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
+        $codigoPuntoVenta=0;
+        $codigoSistema=env('CODIGO_SISTEMA');
+        $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
+
+        $codigoSucursal=0;
+
+        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia',$fechacuf)->first();
+
+        $sale=Sale::find($id);
+        $details=Detail::where('sale_id',$id)->get();
+
+        $detalleFactura="";
+        foreach ($details as $detalle){
+            $detalleFactura.="<detalle>
+                <actividadEconomica>590000</actividadEconomica>
+                <codigoProductoSin>99100</codigoProductoSin>
+                <codigoProducto>".$detalle->programa_id."</codigoProducto>
+                <descripcion>".utf8_encode(str_replace("&","&amp;",$detalle->descripcion))."</descripcion>
+                <cantidad>".$detalle->cantidad."</cantidad>
+                <unidadMedida>62</unidadMedida>
+                <precioUnitario>".$detalle->precioUnitario."</precioUnitario>
+                <montoDescuento>0</montoDescuento>
+                <subTotal>".$detalle->subTotal."</subTotal>
+                <numeroSerie xsi:nil='true'/>
+                <numeroImei xsi:nil='true'/>
+            </detalle>";
+        }
+//
+        $fechaEnvio=date("Y-m-d\TH:i:s.000",strtotime($sale->fechaEmision));
+
+       // $cuf = $sale->cuf;
+        $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+        <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
+        <cabecera>
+        <nitEmisor>".env('NIT')."</nitEmisor>
+        <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
+        <municipio>Oruro</municipio>
+        <telefono>".env('TELEFONO')."</telefono>
+        <numeroFactura>$sale->numeroFactura</numeroFactura>
+        <cuf>$sale->cuf</cuf>
+        <cufd>".$sale->cufd."</cufd>
+        <codigoSucursal>$sale->codigoSucursal</codigoSucursal>
+        <direccion>".env('DIRECCION')."</direccion>
+        <codigoPuntoVenta>$sale->codigoPuntoVenta</codigoPuntoVenta>
+        <fechaEmision>$fechaEnvio</fechaEmision>
+        <nombreRazonSocial>".utf8_encode(str_replace("&","&amp;",$client->nombreRazonSocial))."</nombreRazonSocial>
+        <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
+        <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
+        <complemento>".$client->complemento."</complemento>
+        <codigoCliente>".$client->id."</codigoCliente>
+        <codigoMetodoPago>1</codigoMetodoPago>
+        <numeroTarjeta xsi:nil='true'/>
+        <montoTotal>".$sale->montoTotal."</montoTotal>
+        <montoTotalSujetoIva>".$sale->montoTotal."</montoTotalSujetoIva>
+        <codigoMoneda>1</codigoMoneda>
+        <tipoCambio>1</tipoCambio>
+        <montoTotalMoneda>".$sale->montoTotal."</montoTotalMoneda>
+        <montoGiftCard xsi:nil='true'/>
+        <descuentoAdicional>0</descuentoAdicional>
+        <codigoExcepcion>".($client->codigoTipoDocumentoIdentidad==5?1:0)."</codigoExcepcion>
+        <cafc xsi:nil='true'/>
+        <leyenda>$sale->leyenda</leyenda>
+        <usuario>".explode(" ", $sale->usuario)[0] ."</usuario>
+        <codigoDocumentoSector>".$sale->codigoDocumentoSector."</codigoDocumentoSector>
+        </cabecera>";
+        $text.=$detalleFactura;
+        $text.="</facturaElectronicaCompraVenta>";
+
+        $xml = new SimpleXMLElement($text);
+        $dom = new DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
+
+        $nameFile=$sale->id;
+        $dom->save("archivos/".$nameFile.'.xml');
+
+        $firmar = new Firmar();
+        $firmar->firmar("archivos/".$nameFile.'.xml');
+
+
+        $xml = new DOMDocument();
+        $xml->load("archivos/".$nameFile.'.xml');
+        if (!$xml->schemaValidate('./facturaElectronicaCompraVenta.xsd')) {
+            echo "invalid";
+        }
+        else {
+        }
+
+        error_log("FIRMA: ");
+
+        $file = "archivos/".$nameFile.'.xml';
+        $gzfile = "archivos/".$nameFile.'.xml'.'.gz';
+        $fp = gzopen ($gzfile, 'w9');
+        gzwrite ($fp, file_get_contents($file));
+        gzclose($fp);
+
+        $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
+        $hashArchivo=hash('sha256', $archivo);
+
+      
+    }
+
     public function  validarTarjeta($codigo){
         $codigo=$this->hexToStr($codigo);
        // return $codigo;
