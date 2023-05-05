@@ -553,12 +553,14 @@ class SaleController extends Controller
       }
     }
 
-    public function genXML()
+    public function genXML($id)
     {
        // return $request;
-        $client=Client::where('numeroDocumento','628725')->first();
-        $fechacuf='2023-04-20';
-        $id=62054;
+
+       $sale=Sale::find($id);
+       $details=Detail::where('sale_id',$id)->get();
+        $client=Client::find($sale->client_id);
+        $fechacuf=date("Y-m-d",strtotime($sale->fechaEmision));
 
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
@@ -573,8 +575,7 @@ class SaleController extends Controller
         $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia',$fechacuf)->first();
 
-        $sale=Sale::find($id);
-        $details=Detail::where('sale_id',$id)->get();
+
 
         $detalleFactura="";
         foreach ($details as $detalle){
@@ -665,7 +666,7 @@ class SaleController extends Controller
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
         $hashArchivo=hash('sha256', $archivo);
 
-      
+
     }
 
     public function  validarTarjeta($codigo){
@@ -959,7 +960,7 @@ class SaleController extends Controller
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='CANDY'
         and s.siatAnulado=false
-       
+
         and s.credito='NO'
         and s.vip='NO'
         group by usuario;
@@ -1017,7 +1018,7 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='SI'
         and s.venta='R') as tarjetaR,
-        (SELECT sum(d.subTotal) 
+        (SELECT sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
@@ -1038,7 +1039,7 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='SI'
         and s.venta='F') as tarjetaF,
-        (SELECT sum(d.subTotal) 
+        (SELECT sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
@@ -1189,7 +1190,7 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='SI'
         and s.venta='R') as tarjetaR,
-        (SELECT sum(d.subTotal) 
+        (SELECT sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
@@ -1210,7 +1211,7 @@ class SaleController extends Controller
         and s.siatAnulado=false
         and s.credito='SI'
         and s.venta='F') as tarjetaF,
-        (SELECT sum(d.subTotal) 
+        (SELECT sum(d.subTotal)
         from sales s inner join details d on s.id=d.sale_id
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
