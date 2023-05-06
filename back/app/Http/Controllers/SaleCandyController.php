@@ -447,9 +447,9 @@ class SaleCandyController extends Controller
             </detalle>";
         }
         $fechaEnvio=date("Y-m-d\TH:i:s.000",strtotime($sale->fechaEmision));
-        $cuf = new CUF();
-        $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000",strtotime($sale->fechaEmision)), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
-        $cuf=$cuf.$cufd->codigoControl;
+        //$cuf = new CUF();
+        //$cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000",strtotime($sale->fechaEmision)), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+        //$cuf=$cuf.$cufd->codigoControl;
 
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
         <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
