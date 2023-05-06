@@ -591,9 +591,9 @@ class SaleController extends Controller
             </detalle>";
         }
         $fechaEnvio=date("Y-m-d\TH:i:s.000",strtotime($sale->fechaEmision));
-        $cuf = new CUF();
-        $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000",strtotime($sale->fechaEmision)), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
-        $cuf=$cuf.$cufd->codigoControl;
+//        $cuf = new CUF();
+//        $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000",strtotime($sale->fechaEmision)), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+//        $cuf=$cuf.$cufd->codigoControl;
 
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
         <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
@@ -603,8 +603,8 @@ class SaleController extends Controller
         <municipio>Oruro</municipio>
         <telefono>".env('TELEFONO')."</telefono>
         <numeroFactura>$sale->numeroFactura</numeroFactura>
-        <cuf>$cuf</cuf>
-        <cufd>".$cufd->codigo."</cufd>
+        <cuf>".$sale->cuf."</cuf>
+        <cufd>".$sale->cufd."</cufd>
         <codigoSucursal>$sale->codigoSucursal</codigoSucursal>
         <direccion>".env('DIRECCION')."</direccion>
         <codigoPuntoVenta>$sale->codigoPuntoVenta</codigoPuntoVenta>

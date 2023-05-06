@@ -25,6 +25,8 @@ Route::get('genXML/{id}', [\App\Http\Controllers\SaleController::class,'genXML']
 Route::get('genXMLcandy/{id}', [\App\Http\Controllers\SaleCandyController::class,'genXMLcandy']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::post('getYearMonthFacturas', [\App\Http\Controllers\FacturaController::class,'getYearMonthFacturas']);
+    Route::post('import', [\App\Http\Controllers\FacturaController::class,'import']);
     Route::post('me', [App\Http\Controllers\UserController::class, 'me']);
     Route::post('logout', [App\Http\Controllers\UserController::class, 'logout']);
     Route::apiResource('user', App\Http\Controllers\UserController::class);

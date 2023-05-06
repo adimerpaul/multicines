@@ -23,6 +23,7 @@ import Login from "pages/Login";
 import Cortesia from "pages/Cortesia";
 import User from "pages/User";
 import Reportefuncion from "pages/Reportefuncion";
+import Factura from "pages/Factura.vue";
 
 
 const routes = [
@@ -54,6 +55,7 @@ const routes = [
       { path: 'cortesia', component: Cortesia ,meta: { requiresAuth: true } },
       { path: 'usuarios', component: User ,meta: { requiresAuth: true } },
       { path: 'reportefuncion', component: Reportefuncion ,meta: { requiresAuth: true } },
+      { path: 'factura', component: Factura ,meta: { requiresAuth: true } },
     ]
   },
   {

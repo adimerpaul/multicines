@@ -74,6 +74,8 @@
         <q-expansion-item dense exact expand-separator icon="o_home_work" label="Factura de Alquiler " to="rental" expand-icon="null" v-if="store.boolalquiler"/>
         <q-expansion-item dense exact expand-separator icon="o_people" label="Clientes" to="cliente" expand-icon="null" v-if="store.boolcliente"/>
         <q-expansion-item dense exact expand-separator icon="o_book_online" label="Cortesia" to="cortesia" expand-icon="null" v-if="store.boolcortesia"/>
+        <q-expansion-item dense exact expand-separator icon="o_description" label="factura" to="factura" expand-icon="null" />
+<!--        v-if="store.boolfactura"-->
       </q-list>
     </q-drawer>
 
