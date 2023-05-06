@@ -19,7 +19,24 @@ class FacturaController extends Controller{
     public function getYearMonthFacturas(Request $request){
         $year=$request->anio;
         $month=$request->mes;
-        $facturas=Factura::whereYear('fecha', '=', $year)->whereMonth('fecha', '=', $month)->get();
+        $facturas=Factura::whereYear('fecha', '=', $year)
+            ->whereMonth('fecha', '=', $month)
+            ->where('impuesto', '=', 'NO')
+            ->get();
+//        $sumFacturas=Factura::whereYear('fecha', '=', $year)
+//            ->whereMonth('fecha', '=', $month)
+//            ->where('estado', '=', 'VALIDA')
+//            ->sum('subtotal');
+//        $sumSales=Sale::whereYear('fecha', '=', $year)
+//            ->whereMonth('fecha', '=', $month)
+//            ->sum('montoTotal');
+//        $countFacturas=Factura::whereYear('fecha', '=', $year)
+//            ->whereMonth('fecha', '=', $month)
+//            ->where('impuesto', '=', 'SI')
+//            ->count();
+//        $countSales=Sale::whereYear('fecha', '=', $year)
+//            ->whereMonth('fecha', '=', $month)
+//            ->count();
         return $facturas;
     }
 

@@ -459,8 +459,8 @@ class SaleCandyController extends Controller
         <municipio>Oruro</municipio>
         <telefono>".env('TELEFONO')."</telefono>
         <numeroFactura>$sale->numeroFactura</numeroFactura>
-        <cuf>$cuf</cuf>
-        <cufd>".$cufd->codigo."</cufd>
+        <cuf>".$sale->cuf."</cuf>
+        <cufd>".$sale->cufd."</cufd>
         <codigoSucursal>$sale->codigoSucursal</codigoSucursal>
         <direccion>".env('DIRECCION')."</direccion>
         <codigoPuntoVenta>$sale->codigoPuntoVenta</codigoPuntoVenta>

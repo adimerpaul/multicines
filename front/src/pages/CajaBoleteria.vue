@@ -4,8 +4,8 @@
         <div class="col-2"><q-select dense outlined v-model="user" :options="users" label="Usuario" /></div>
         <div class="col-3"><q-input dense outlined v-model="ini" label="fecha ini" type="date" /></div>
         <div class="col-3"><q-input dense outlined v-model="fin" label="fecha fin" type="date" /></div>
-        <div class="col-2 flex flex-center"> <q-btn icon="check" color="green"  label="Consultar" @click="consultar"/></div>
-        <div class="col-2 flex flex-center"> <q-btn icon="print" color="info"  label="Imprimir" @click="impresion"/></div>
+        <div class="col-2 flex flex-center"> <q-btn :loading="loading" icon="check" color="green"  label="Consultar" @click="consultar"/></div>
+        <div class="col-2 flex flex-center"> <q-btn :loading="loading" icon="print" color="info"  label="Imprimir" @click="impresion"/></div>
         <div class="col-12">
           <q-table dense title="Listado Venta Boleteria" :rows-per-page-options="[20,50,100,0]" :rows="reporte" :columns="columna" :filter="productoFilter">
             <template v-slot:top-right>
@@ -19,7 +19,7 @@
         </div>
         <div class="col-12">
           <q-table title="Ventas" :rows="infouser" :columns="columna2" row-key="name" />
-          
+
         </div>
       </div>
       <div id="myelement" class="hidden"></div>
@@ -94,13 +94,13 @@
       consultar(){
           this.loading=true
         this.$api.post('cajaBol',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
-            console.log(res.data)
+          console.log(res.data)
           this.reporte=res.data
           this.resumen()
           this.datosuser()
           this.datosfactura()
           this.datosrecibo()
-          this.loading=false
+          // this.loading=false
         })
       },
       datosuser(){
@@ -108,7 +108,7 @@
         this.$api.post('userbol',{ini:this.ini,fin:this.fin}).then(res=>{
             console.log(res.data)
           this.infouser=res.data
-          this.loading=false
+          // this.loading=false
         })
       },
       datosfactura(){
@@ -116,7 +116,7 @@
         this.$api.post('cajaBolF',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
             console.log(res.data)
           this.reportef=res.data
-          this.loading=false
+          // this.loading=false
         })
       },
       datosrecibo(){
@@ -124,7 +124,7 @@
         this.$api.post('cajaBolR',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{
             console.log(res.data)
           this.reporter=res.data
-          this.loading=false
+          // this.loading=false
         })
       },
       resumen(){
