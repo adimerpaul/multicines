@@ -250,7 +250,7 @@
         if(this.tcandyR==null) this.tcandyR=0
 
         cadena3+="<div style='text-align:right;'><span class='f-10 titulo3'>Total: </span> "+this.ventarecibo+" Bs</div>\
-        <div style='text-align:right;'><span class='f-10 titulo3'>Total Tarjeta: </span> "+this.tefectcandyR+" Bs</div>\
+        <div style='text-align:right;'><span class='f-10 titulo3'>Total Efectivo: </span> "+this.tefectcandyR+" Bs</div>\
         <div style='text-align:right;'><span class='f-10 titulo3'>Total Tarjeta: </span> "+this.tcandyR+" Bs</div>\
         "
         document.getElementById('myelement').innerHTML = cadena3
