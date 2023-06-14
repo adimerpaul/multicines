@@ -291,6 +291,8 @@ import {globalStore} from "stores/globalStore";
 import {Printd} from "printd";
 import conversor from "conversor-numero-a-letras-es-ar";
 import QRCode from "qrcode";
+import moment from "moment"
+
 export default {
   name: `Sale`,
 
@@ -846,6 +848,10 @@ facturación en línea”</div><br>\
     myMovies(fecha) {
       this.movie={}
       this.hours=[]
+      if(moment(this.now).isAfter(moment(fecha))){
+        return false
+      }
+
       this.$api.post('movies',{fecha:fecha}).then(res => {
         console.log(res.data)
         this.movies = res.data
