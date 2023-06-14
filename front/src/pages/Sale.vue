@@ -848,6 +848,7 @@ facturación en línea”</div><br>\
     myMovies(fecha) {
       this.movie={}
       this.hours=[]
+      this.movies=[]
       if(moment(this.now).isAfter(moment(fecha))){
         return false
       }
