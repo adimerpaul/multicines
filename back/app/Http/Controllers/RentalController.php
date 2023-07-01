@@ -12,6 +12,7 @@ use App\Models\Leyenda;
 use App\Models\Momentaneo;
 use App\Models\Programa;
 use App\Models\Rental;
+use App\Models\User;
 use App\Http\Requests\StoreRentalRequest;
 use App\Http\Requests\UpdateRentalRequest;
 use App\Models\Sale;
