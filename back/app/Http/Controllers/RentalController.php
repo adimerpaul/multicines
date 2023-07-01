@@ -317,7 +317,7 @@ class RentalController extends Controller
 
 //
         $sale->save();
-        if ($request->client['email']!==''){
+        if ($request->client['email']!='' && $request->client['email']!=null ){
             $details=[
                 "title"=>"Factura",
                 "body"=>"Gracias por su compra",
