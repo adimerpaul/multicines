@@ -118,8 +118,9 @@ class FacturaController extends Controller{
                 $f->tipoVenta=$row['tipo_de_venta'];
                 $f->derecho=$row['con_derecho_a_credito_fiscal'];
                 $f->consolidado=$row['estado_consolidacion'];
-                $exitCuf=Sale::where('cuf', trim($row['codigo_de_autorizacion']))->exists();
-                $f->impuesto=($exitCuf)?'SI':'NO';
+//                $exitCuf=Sale::where('cuf', trim($row['codigo_de_autorizacion']))->exists();
+//                $f->impuesto=($exitCuf)?'SI':'NO';
+                $f->impuesto='NO';
                 $f->save();
             }
 //            echo $this->convertDate($row['fecha_de_la_factura']).'<br>';

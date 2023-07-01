@@ -40,7 +40,7 @@ return new class extends Migration
             $table->string("tipoVenta")->nullable();
             $table->string("derecho")->nullable();
             $table->string("consolidado")->nullable();
-            $table->string("impuesto",2)->nullable();
+            $table->string("impuesto",2)->nullable()->default("NO");
             $table->timestamps();
         });
     }

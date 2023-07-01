@@ -74,6 +74,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('datocine', [\App\Http\Controllers\SaleController::class,'datocine']);
     Route::post('totalventa', [\App\Http\Controllers\SaleController::class,'totalventa']);
     Route::post('anularSale', [\App\Http\Controllers\SaleController::class,'anularSale']);
+
+
     Route::post('enviarCorreo', [\App\Http\Controllers\SaleController::class,'enviarCorreo']);
     Route::post('anularRental', [\App\Http\Controllers\RentalController::class,'anularRental']);
 
@@ -107,7 +109,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('validarTarjeta/{cod}', [\App\Http\Controllers\SaleController::class, 'validarTarjeta']);
     Route::get('validanit/{nit}', [\App\Http\Controllers\SaleController::class, 'validanit']);
 });
-
+Route::post('anularCuf', [\App\Http\Controllers\SaleController::class,'anularCuf']);
 
 //Route::get('test',function (){
 //    $details=[
