@@ -30,6 +30,7 @@
       </div>
       <div class="col-2 flex flex-center">
         <q-btn
+          @click="buscarFacturas"
           :loading="loading"
           color="primary"
           label="Buscar"
@@ -114,6 +115,19 @@ export default {
     }
   },
   methods: {
+    buscarFacturas(){
+      this.$api.get('buscarFacturas').then(res=>{
+        this.facturas=res.data
+      }).catch(err=>{
+        console.log(err);
+        this.$q.notify({
+          color: "negative",
+          message: err.response.data.message,
+          icon: "report_problem",
+          position: "top",
+        });
+      })
+    },
     getYearMonthFacturas() {
       this.loading = true;
       this.$api.post(`getYearMonthFacturas`,{

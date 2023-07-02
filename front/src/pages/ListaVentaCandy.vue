@@ -20,7 +20,7 @@
         </q-form>
       </div>
       <div class="col-12">
-        <q-table :rows="listaVentaCandy" :columns="listaColums" :filter="filter">
+        <q-table :rows="listaVentaCandy" :columns="listaColums" :filter="filter" :rows-per-page-options="[0]" >
           <template v-slot:top-right>
              <q-btn color="green"  label="Export EXCEL" @click="exportar" />
              <q-input outlined dense debounce="300" v-model="filter" placeholder="Buscar">

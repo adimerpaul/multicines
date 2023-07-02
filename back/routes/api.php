@@ -27,6 +27,7 @@ Route::get('genXMLcandy/{id}', [\App\Http\Controllers\SaleCandyController::class
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('getYearMonthFacturas', [\App\Http\Controllers\FacturaController::class,'getYearMonthFacturas']);
     Route::post('import', [\App\Http\Controllers\FacturaController::class,'import']);
+    Route::get('buscarFacturas',[App\Http\Controllers\FacturaController::class,'buscarFacturas']);
     Route::post('me', [App\Http\Controllers\UserController::class, 'me']);
     Route::post('logout', [App\Http\Controllers\UserController::class, 'logout']);
     Route::apiResource('user', App\Http\Controllers\UserController::class);
@@ -110,6 +111,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('validanit/{nit}', [\App\Http\Controllers\SaleController::class, 'validanit']);
 });
 Route::post('anularCuf', [\App\Http\Controllers\SaleController::class,'anularCuf']);
+Route::get('anularMasivo', [\App\Http\Controllers\FacturaController::class,'anularMasivo']);
 
 //Route::get('test',function (){
 //    $details=[

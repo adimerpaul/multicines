@@ -571,8 +571,19 @@ class SaleController extends Controller
 
         $codigoSucursal=0;
 
-        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+//        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia',$fechacuf)->first();
+
+
+        $cuf = new CUF();
+
+        $fechaCUF=date("YmdHis000",strtotime($sale->fechaEmision));
+
+        $cuf = $cuf->obtenerCUF(env('NIT'), $fechaCUF, $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+        $cuf = $cuf.$cufd->codigoControl;
+        $sale->cuf=$cuf;
+        $sale->siatEnviado=false;
+        $sale->save();
 
         $detalleFactura="";
         foreach ($details as $detalle){

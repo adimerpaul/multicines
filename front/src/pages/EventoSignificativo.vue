@@ -2,11 +2,13 @@
 <q-page>
 <div class="row">
   <div class="col-12">
-    <q-table dense title="Control de eventos" :rows="eventoSignificativos" :columns="eventoSignificativoColumns">
+    <q-table dense title="Control de eventos" :rows="eventoSignificativos" :columns="eventoSignificativoColumns" :rows-per-page-options="[0,10]">
       <template v-slot:body-cell-Opciones="props">
-        <q-td :props="props" auto-width>
-          <q-btn @click="recepcionPaqueteFacturaClick(props.row)" label="Enviar a impuestos" color="primary" icon="send" size="10px" />
-          <q-btn class="q-ml-lg" v-if="props.row.codigoRecepcion!=null" @click="validarPaquete(props.row)" label="Validar" color="yellow-9" icon="send" size="10px" />
+        <q-td :props="props" style="width: 150px" >
+          <q-btn-group>
+            <q-btn no-caps @click="recepcionPaqueteFacturaClick(props.row)" label="Enviar a impuestos" color="primary" icon="send" size="10px" />
+            <q-btn no-caps v-if="props.row.codigoRecepcion!=null" @click="validarPaquete(props.row)" label="Validar" color="yellow-9" icon="send" size="10px" />
+          </q-btn-group>
         </q-td>
       </template>
     </q-table>
@@ -67,7 +69,7 @@ export default {
       eventoSignificativosDatos:[],
       eventoSignificativoColumns:[
         {label:'Opciones',name:'Opciones',field:'Opciones'},
-        {label:'codigoPuntoVenta',name:'codigoPuntoVenta',field:'codigoPuntoVenta'},
+        // {label:'codigoPuntoVenta',name:'codigoPuntoVenta',field:'codigoPuntoVenta'},
         {label:'codigoRecepcionEventoSignificativo',name:'codigoRecepcionEventoSignificativo',field:'codigoRecepcionEventoSignificativo'},
         {label:'codigoRecepcion',name:'codigoRecepcion',field:'codigoRecepcion'},
         {label:'codigoSucursal',name:'codigoSucursal',field:'codigoSucursal'},
@@ -93,7 +95,8 @@ export default {
   },
   methods:{
     validarPaquete(evento){
-      console.log(evento);
+      // console.log(evento);
+      this.validarPaqueteRespuesta="";
       this.recepcionPaqueteFacturaDialog = true;
       this.$api.post('validarPaquete',{
         codigoRecepcion:evento.codigoRecepcion,
@@ -113,6 +116,7 @@ export default {
       this.$api.post('recepcionPaqueteFactura',this.eventoSignificativo).then(res=>{
         console.log(res.data)
         this.eventSearch()
+        this.eventoSignificativoGet();
         this.eventoSignificativoDialog=false;
         this.loading=false;
       }).catch(err=>{
@@ -133,7 +137,7 @@ export default {
       }).then(res=>{
         this.eventoSignificativosDatos = res.data;
         this.eventoSignificativoDialog = true;
-
+        // this.eventoSignificativoGet();
       })
     },
     eventoSignificativoGet(){

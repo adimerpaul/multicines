@@ -419,7 +419,7 @@ class SaleCandyController extends Controller
 
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
-        $codigoEmision=1; // 1 online 2 offline 3 masivo
+        $codigoEmision=2; // 1 online 2 offline 3 masivo
         $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
         $codigoPuntoVenta=0;
         $codigoSistema=env('CODIGO_SISTEMA');
@@ -427,8 +427,17 @@ class SaleCandyController extends Controller
 
         $codigoSucursal=0;
 
-        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+//        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia',$fechacuf)->first();
+        $cuf = new CUF();
+
+        $fechaCUF=date("YmdHis000",strtotime($sale->fechaEmision));
+
+        $cuf = $cuf->obtenerCUF(env('NIT'), $fechaCUF, $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+        $cuf = $cuf.$cufd->codigoControl;
+        $sale->cuf=$cuf;
+        $sale->siatEnviado=false;
+        $sale->save();
 
         $detalleFactura="";
         foreach ($details as $detalle){
