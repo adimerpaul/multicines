@@ -10,7 +10,7 @@
     </div>
   </div>
   <div class="col-12">
-    <q-table label="FACTURA DE ALQUILER DE AMBIENTES" :rows="rentals" :columns="columns">
+    <q-table label="FACTURA DE ALQUILER DE AMBIENTES" :rows="rentals" :columns="columns"  :rows-per-page-options="[0,10,50,100]">
       <template v-slot:body-cell-Opciones="props">
         <q-td :props="props" auto-width>
           <q-btn-dropdown color="primary" label="Opciones" >
@@ -35,7 +35,11 @@
           </q-btn-dropdown>
         </q-td>
       </template>
-
+      <template v-slot:body-cell-siatAnulado="props">
+        <q-td :props="props" >
+          <q-badge :color="props.row.siatAnulado?'red':'green'"  :label="props.row.siatAnulado?'A':'V'" />
+        </q-td>
+      </template>
     </q-table>
   </div>
   <q-dialog full-width v-model="saleDialog">
@@ -78,7 +82,7 @@
               <q-select outlined label="Periodo:" v-model="rental.gestion" :options="gestiones" />
             </div>
             <div class="col-3">
-              <q-input outlined label="Descripcion:" v-model="rental.descripcion" required />
+              <q-input outlined label="Descripcion:" v-model="rental.descripcion" type="textarea" required />
             </div>
           </div>
         </q-card-section>
@@ -159,13 +163,13 @@ export default {
 
       columns:[
         {label:'Opciones',name:'Opciones',field:'Opciones'},
-        {label:"Factura",name:"numeroFactura",field:"numeroFactura",sortable:"true"},
+        {label:"Factura",name:"numeroFactura",field:"numeroFactura",sortable:true},
         {label:'siatEnviado',name:'siatEnviado',field:'siatEnviado',sortable:true},
-        {label:"Fecha Emision",name:"fechaEmision",field:"fechaEmision",sortable:"true"},
-        {label:"Periodo Facturado",name:"periodoFacturado",field:"periodoFacturado",sortable:"true"},
-        {label:"Descripcion",name:"descripcion",field:"descripcion",sortable:"true"},
-        {label:"Monto",name:"montoTotal",field:"montoTotal",sortable:"true"},
-        {label:"Usuario",name:"usuario",field:"usuario",sortable:"true"},
+        {label:"Fecha Emision",name:"fechaEmision",field:"fechaEmision",sortable:true},
+        {label:"Periodo Facturado",name:"periodoFacturado",field:"periodoFacturado",sortable:true},
+        {label:"Descripcion",name:"descripcion",field:"descripcion",sortable:true},
+        {label:"Monto",name:"montoTotal",field:"montoTotal",sortable:true},
+        {label:"Usuario",name:"usuario",field:"usuario",sortable:true},
         {label:'client_id',name:'client_id',field:row=>row.client.nombreRazonSocial,sortable:true},
         {label:'siatAnulado',name:'siatAnulado',field:'siatAnulado',sortable:true},
         {label:'id',name:'id',field:'id',sortable:true},

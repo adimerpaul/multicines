@@ -23,7 +23,7 @@
         <q-table :rows="listaVentaBoleteria" :columns="listaColums" :filter="filter">
           <template v-slot:top-right>
              <q-btn color="green"  label="Export EXCEL" @click="exportar" />
-            
+
             <q-input outlined dense debounce="300" v-model="filter" placeholder="Buscar">
               <template v-slot:append>
                 <q-icon name="search" />
@@ -159,6 +159,7 @@ export default {
         {name:'siatAnulado',label:'siatAnulado',field:'siatAnulado',sortable:true},
         {name:'id',label:'id',field:'id',sortable:true},
         {name:'cuf',label:'cuf',field:'cuf',sortable:true},
+        {name:'credito',label:'Tcredito',field:'credito',sortable:true}
       ],
       boletoColums:[
         {name:'opcion',label:'Opcion',field:'opcion'},

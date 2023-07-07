@@ -222,6 +222,7 @@ let data = [
       {label:'montoTotal',value:'montoTotal'},
       {label:'siatAnulado',value:'siatAnulado'},
       {label:'cuf',value:'cuf'},
+      {name:'credito',label:'Tcredito',field:'credito',sortable:true}
       // { label: "Age", value: (row) => row.age + " years" }, // Custom format
       // { label: "Phone", value: (row) => (row.more ? row.more.phone || "" : "") }, // Run functions
     ],
