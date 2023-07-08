@@ -162,6 +162,7 @@ export default {
         {name:'siatAnulado',label:'siatAnulado',field:'siatAnulado',sortable:true},
         {name:'id',label:'id',field:'id',sortable:true},
         {name:'cuf',label:'cuf',field:'cuf',sortable:true},
+        {name:'credito',label:'Tcredito',field:'credito',sortable:true}
       ],
       boletoColums:[
         {name:'opcion',label:'Opcion',field:'opcion'},
@@ -222,7 +223,6 @@ let data = [
       {label:'montoTotal',value:'montoTotal'},
       {label:'siatAnulado',value:'siatAnulado'},
       {label:'cuf',value:'cuf'},
-      {name:'credito',label:'Tcredito',field:'credito',sortable:true}
       // { label: "Age", value: (row) => row.age + " years" }, // Custom format
       // { label: "Phone", value: (row) => (row.more ? row.more.phone || "" : "") }, // Run functions
     ],
