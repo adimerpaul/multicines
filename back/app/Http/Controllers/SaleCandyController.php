@@ -11,6 +11,7 @@ use App\Models\Detail;
 use App\Models\Leyenda;
 use App\Models\Momentaneo;
 use App\Models\Programa;
+use App\Models\Rental;
 use App\Models\Sale;
 use App\Models\SaleCandy;
 use App\Http\Requests\StoreSaleCandyRequest;
@@ -408,6 +409,136 @@ class SaleCandyController extends Controller
             }
         }
      // }
+    }
+    public function genXMLRental($id){
+
+        $sale=Rental::find($id);
+        $client=Client::find($sale->client_id);
+
+        $codigoAmbiente=env('AMBIENTE');
+        $codigoDocumentoSector=2; // 1 compraventa 2 alquiler 23 prevaloradas
+        $codigoEmision=2; // 1 online 2 offline 3 masivo
+        $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
+        $codigoPuntoVenta=0;
+        $codigoSistema=env('CODIGO_SISTEMA');
+        $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
+        $unidadMedida=68;
+        $medida='MESES';
+        $codigoSucursal=0;
+        $fechaEnvio=date("Y-m-d\TH:i:s.000",strtotime($sale->fechaEmision));
+
+//        $user=User::find($request->user()->id);
+
+        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No existe CUI para la venta!!'], 500);
+        }
+        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No exite CUFD para la venta!!'], 500);
+        }
+        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+        $cufd=Cufd::where('id',$sale->cufd_id)->first();
+
+
+        $cuf = new CUF();
+        //     * @param nit NIT emisor
+//     * @param fh Fecha y Hora en formato yyyyMMddHHmmssSSS
+//     * @param sucursal
+//     * @param mod Modalidad
+//     * @param temision Tipo de Emision
+//     * @param cdf Codigo Documento Fiscal
+//     * @param tds Tipo Documento Sector
+//     * @param nf Numero de Factura
+//     * @param pos Punto de Venta
+        $fechaCUF=date("YmdHis000",strtotime($sale->fechaEmision));
+        $cuf = $cuf->obtenerCUF(env('NIT'), $fechaCUF, $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+
+        $cuf=$cuf.$cufd->codigoControl;
+
+        $sale->cuf=$cuf;
+        $sale->save();
+
+        $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<facturaElectronicaAlquilerBienInmueble xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+                                        xsi:noNamespaceSchemaLocation='facturaElectronicaAlquilerBienInmueble.xsd'>
+    <cabecera>
+        <nitEmisor>".env('NIT')."</nitEmisor>
+        <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
+        <municipio>Oruro</municipio>
+        <telefono>".env('TELEFONO')."</telefono>
+        <numeroFactura>$sale->numeroFactura</numeroFactura>
+        <cuf>$cuf</cuf>
+        <cufd>".$cufd->codigo."</cufd>
+        <codigoSucursal>$codigoSucursal</codigoSucursal>
+        <direccion>".env('DIRECCION')."</direccion>
+        <codigoPuntoVenta>$codigoPuntoVenta</codigoPuntoVenta>
+        <fechaEmision>$fechaEnvio</fechaEmision>
+        <nombreRazonSocial>".$client->nombreRazonSocial."</nombreRazonSocial>
+        <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
+        <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
+        <complemento>".$client->complemento."</complemento>
+        <codigoCliente>".$client->id."</codigoCliente>
+        <periodoFacturado>".$sale->periodoFacturado."</periodoFacturado>
+        <codigoMetodoPago>1</codigoMetodoPago>
+        <numeroTarjeta xsi:nil='true'/>
+        <montoTotal>".$sale->montoTotal."</montoTotal>
+        <montoTotalSujetoIva>".$sale->montoTotal."</montoTotalSujetoIva>
+        <codigoMoneda>1</codigoMoneda>
+        <tipoCambio>1</tipoCambio>
+        <montoTotalMoneda>".$sale->montoTotal."</montoTotalMoneda>
+        <descuentoAdicional xsi:nil='true'/>
+        <codigoExcepcion>0</codigoExcepcion>
+        <cafc xsi:nil='true'/>
+        <leyenda>$sale->leyenda</leyenda>
+        <usuario>".explode(" ", $sale->usuario)[0] ."</usuario>
+        <codigoDocumentoSector>2</codigoDocumentoSector>
+    </cabecera>
+    <detalle>
+        <actividadEconomica>681011</actividadEconomica>
+        <codigoProductoSin>72111</codigoProductoSin>
+        <codigoProducto>10101</codigoProducto>
+        <descripcion>".$sale->descripcion."</descripcion>
+        <cantidad>1</cantidad>
+        <unidadMedida>$unidadMedida</unidadMedida>
+        <precioUnitario>".$sale->montoTotal."</precioUnitario>
+        <montoDescuento>0</montoDescuento>
+        <subTotal>".$sale->montoTotal."</subTotal>
+    </detalle>
+</facturaElectronicaAlquilerBienInmueble>";
+//TODO falta colocar el 0 o 1 en excepcion
+        $xml = new SimpleXMLElement($text);
+        $dom = new DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
+        $nameFile=$sale->id;
+        $dom->save("rentals/".$nameFile.'.xml');
+
+        $firmar = new Firmar();
+        $firmar->firmar("rentals/".$nameFile.'.xml');
+
+
+        $xml = new DOMDocument();
+        $xml->load("rentals/".$nameFile.'.xml');
+        if (!$xml->schemaValidate('./facturaElectronicaAlquilerBienInmueble.xsd')) {
+            return "invalid";
+        }
+        else {
+//            return "validated";
+        }
+//        exit;
+
+
+        $file = "rentals/".$nameFile.'.xml';
+        $gzfile = "rentals/".$nameFile.'.xml'.'.gz';
+        $fp = gzopen ($gzfile, 'w9');
+        gzwrite ($fp, file_get_contents($file));
+        gzclose($fp);
+//        unlink($file);
+
+
+        $archivo=$firmar->getFileGzip("rentals/".$nameFile.'.xml'.'.gz');
+        $hashArchivo=hash('sha256', $archivo);
+        // unlink($gzfile);
     }
     public function genXMLcandy($id)
     {

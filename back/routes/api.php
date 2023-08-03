@@ -23,6 +23,7 @@ Route::post('login', [App\Http\Controllers\UserController::class, 'login']);
 Route::get('verificarComunicacion', [\App\Http\Controllers\ActivityController::class,'verificarComunicacion']);
 Route::get('genXML/{id}', [\App\Http\Controllers\SaleController::class,'genXML']);
 Route::get('genXMLcandy/{id}', [\App\Http\Controllers\SaleCandyController::class,'genXMLcandy']);
+Route::get('genXMLRental/{id}', [\App\Http\Controllers\SaleCandyController::class,'genXMLRental']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('getYearMonthFacturas', [\App\Http\Controllers\FacturaController::class,'getYearMonthFacturas']);

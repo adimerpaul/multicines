@@ -39,6 +39,7 @@ class RentalController extends Controller
         $rental = Rental::whereDate('fechaEmision','>=', $request->fechaInicio)
             ->whereDate('fechaEmision','<=', $request->fechaFin)
             ->with('client')->with('user')
+            ->orderBy('id', 'desc')
             ->get();
         return response()->json($rental);
     }
