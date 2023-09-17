@@ -1034,8 +1034,6 @@ class SaleController extends Controller
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='BOLETERIA'
         and s.siatAnulado=false
-
-        and s.credito='NO'
         and s.cortesia='NO'
         and s.vip='NO'
         group by usuario;
@@ -1050,9 +1048,7 @@ class SaleController extends Controller
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='CANDY'
-        and s.siatAnulado=false
-
-        and s.credito='NO'
+        and s.siatAnulado=false       
         and s.vip='NO'
         group by usuario;
         ");
