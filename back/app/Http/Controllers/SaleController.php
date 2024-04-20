@@ -548,8 +548,11 @@ class SaleController extends Controller
             $sale->siatEnviado=true;
             $sale->online=false;
             $tickets=Ticket::where('sale_id',$sale->id)->get();
+            $sale1=Sale::where('id',$sale->id)->with('client')->with('details')->first();
+            $sale1->siatEnviado=true;
+            $sale1->online=false;
             return response()->json([
-                'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first(),
+                'sale' => $sale1,
                 "tickets"=>$tickets,
                 "error"=>"Se creo la venta pero no se pudo enviar a siat!!!",
             ]);
