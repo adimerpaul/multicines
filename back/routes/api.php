@@ -116,18 +116,18 @@ Route::get('anularMasivo', [\App\Http\Controllers\FacturaController::class,'anul
 Route::prefix('mobile')->group(function () {
     Route::get('movies', [App\Http\Controllers\MobileController::class, 'movies']);
 });
-//Route::get('test',function (){
-//    $details=[
-//        "title"=>"Factura",
-//        "body"=>"Gracias por su compra",
-//        "online"=>true,
-//        "anulado"=>false,
-//        "cuf"=>"",
-//        "numeroFactura"=>"",
-//        "sale_id"=>1,
-//        "carpeta"=>"archivos",
-//    ];
-//    Mail::to('adimer101@gmail.com')->send(new TestMail($details));
-//});
+Route::get('test',function (){
+    $details=[
+        "title"=>"Factura",
+        "body"=>"Gracias por su compra",
+        "online"=>true,
+        "anulado"=>false,
+        "cuf"=>"",
+        "numeroFactura"=>"",
+        "sale_id"=>1,
+        "carpeta"=>"archivos",
+    ];
+    Mail::to('adimer101@gmail.com')->send(new TestMail($details));
+});
 
 

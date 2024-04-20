@@ -179,13 +179,12 @@ class SaleController extends Controller
             $max=Sale::where('cufd',$cufd->codigo)->where('tipo','BOLETERIA')->max('numeroFactura');
             $numeroFactura=intval($max)+1;
         }
-        if (count(Sale::all())==0) {
+        if (Sale::count()==0) {
             $saleId=1;
         }else{
             $sale=Sale::orderBy('id', 'desc')->first();
             $saleId=intval($sale->id)+1;
         }
-        error_log("antes del detalle");
         $detalleFactura="";
         foreach ($request->detalleVenta as $detalle){
             $detalleFactura.="<detalle>
@@ -295,8 +294,11 @@ class SaleController extends Controller
 
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
         $hashArchivo=hash('sha256', $archivo);
+
+        $exitecomunicacionSiat=$this->comunicacionSiat();
+        error_log("exitecomunicacionSiat: ".$exitecomunicacionSiat);
 //        unlink($gzfile);
-        try {
+        if($exitecomunicacionSiat){
             $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
@@ -442,7 +444,8 @@ class SaleController extends Controller
             }else{
                 return response()->json(['message' => $result->RespuestaServicioFacturacion->mensajesList->descripcion], 400);
             }
-        }catch (\Exception $e){
+        }else{
+            error_log("no exite comunicacion siat");
            // if(sizeof($request->detalleVenta)>0){
             $sale=new Sale();
             $sale->numeroFactura=$numeroFactura;
@@ -693,6 +696,31 @@ class SaleController extends Controller
             $string .= chr(hexdec($hex[$i].$hex[$i+1]));
         }
         return $string;
+    }
+    public function comunicacionSiat(){
+        try {
+            $client = new \SoapClient(env("URL_SIAT")."ServicioRecepcionCompras?wsdl",  [
+                'stream_context' => stream_context_create([
+                    'http' => [
+
+                    ]
+                ]),
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                'trace' => 1,
+                'use' => SOAP_LITERAL,
+                'style' => SOAP_DOCUMENT,
+            ]);
+
+            $result = $client->verificarComunicacion();
+            if ($result->return->transaccion) {
+                return true;
+            }else{
+                return false;
+            }
+        }catch (\Exception $e){
+            return false;
+        }
     }
 
     public function enviarCorreo(Request $request){
@@ -1048,7 +1076,7 @@ class SaleController extends Controller
         where date(s.fechaEmision)>='$request->ini'
         and date(s.fechaEmision)<='$request->fin'
         and s.tipo='CANDY'
-        and s.siatAnulado=false       
+        and s.siatAnulado=false
         and s.vip='NO'
         group by usuario;
         ");

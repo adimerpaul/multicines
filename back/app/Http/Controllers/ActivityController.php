@@ -683,7 +683,7 @@ class ActivityController extends Controller
         $client = new \SoapClient(env("URL_SIAT")."ServicioRecepcionCompras?wsdl",  [
             'stream_context' => stream_context_create([
                 'http' => [
-                    
+
                 ]
             ]),
             'cache_wsdl' => WSDL_CACHE_NONE,

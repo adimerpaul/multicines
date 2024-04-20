@@ -204,7 +204,7 @@
       <q-card-section>
         <div class="row">
           <div class="col-2">
-            <q-input outlined label="NIT/CARNET" @keyup="searchClient" required v-model="client.numeroDocumento"   />
+            <q-input outlined label="NIT/CARNET" @keyup="searchClient" required v-model="client.numeroDocumento"   debounce="300" />
           </div>
           <div class="col-2">
             <q-input outlined label="Complemento"  @keyup="searchClient" v-model="client.complemento" style="text-transform: uppercase"/>
@@ -496,9 +496,9 @@ export default {
             timeout: 5000,
           })
         }
-        if(res.data.sale.siatEnviado==1){
+        // if(res.data.sale.siatEnviado==1){
           this.printFactura(res.data.sale)
-        }
+        // }
         let valpromo=0
         res.data.tickets.forEach(r=>{
           if(r.promo) valpromo++
