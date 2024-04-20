@@ -431,10 +431,11 @@ class SaleController extends Controller
 
                 Detail::insert($dataDetail);
 
-                $sale->siatEnviado=true;
+                $sale->siatEnviado=true;                
                 $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
                 $sale->cuf=$cuf;
                 $sale->save();
+                $sale->online=true;
                 $tickets=Ticket::where('sale_id',$sale->id)->get();
                 return response()->json([
                     'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first(),
@@ -545,6 +546,7 @@ class SaleController extends Controller
             $sale->cuf=$cuf;
             $sale->save();
             $sale->siatEnviado=true;
+            $sale->online=false;
             $tickets=Ticket::where('sale_id',$sale->id)->get();
             return response()->json([
                 'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first(),
