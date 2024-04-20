@@ -541,13 +541,13 @@ class SaleController extends Controller
 
             Detail::insert($dataDetail);
 
-            $sale->siatEnviado=true;
+            $sale->siatEnviado=false;
             $sale->codigoRecepcion="";
             $sale->cuf=$cuf;
             $sale->save();
             $tickets=Ticket::where('sale_id',$sale->id)->get();
             $sale1=Sale::where('id',$sale->id)->with('client')->with('details')->first();
-            $sale1->siatEnviado=false;
+            $sale1->siatEnviado=true;
             $sale1->online=false;
             return response()->json([
                 'sale' => $sale1,
