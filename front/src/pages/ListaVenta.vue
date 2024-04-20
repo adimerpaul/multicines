@@ -348,6 +348,8 @@ xlsx(data, settings) // Will download the excel file
       this.facturadetalle = factura
       let ClaseConversor = conversor.conversorNumerosALetras;
       let miConversor = new ClaseConversor();
+      let online = '' 
+      if factura.
       let a = miConversor.convertToText( parseInt(factura.montoTotal));
       this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
       //console.log(this.qrImage)
