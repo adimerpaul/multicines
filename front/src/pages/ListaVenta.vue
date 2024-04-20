@@ -436,7 +436,7 @@ ACUERDO A LEY<br><br>\
 "+factura.leyenda+" <br><br>\
 “Este documento es la Representación Gráfica de un<br>\
 Documento Fiscal Digital emitido en una modalidad de<br>\
-facturación "+factura.siatEnviado?'fuera de ':'en '+"línea”</div><br>\
+facturación en línea”</div><br>\
 <div style='display: flex;justify-content: center;'>\
   <img src="+this.qrImage+" >\
       </div>\
