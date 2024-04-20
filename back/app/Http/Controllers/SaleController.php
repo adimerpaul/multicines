@@ -703,7 +703,7 @@ class SaleController extends Controller
     }
     public function comunicacionSiat(){
         try {
-            $client = new \SoapClient(env("URL_SIAT")."ServicioRecepcionCompras?wsdl",  [
+            $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?wsdl",  [
                 'stream_context' => stream_context_create([
                     'http' => [
 
