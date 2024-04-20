@@ -546,11 +546,11 @@ class SaleController extends Controller
             $sale->cuf=$cuf;
             $sale->save();
             $tickets=Ticket::where('sale_id',$sale->id)->get();
-            $sale1=Sale::where('id',$sale->id)->with('client')->with('details')->first();
-            $sale1->siatEnviado=true;
-            $sale1->online=false;
+            $sale=Sale::where('id',$sale->id)->with('client')->with('details')->first();
+            $sale->siatEnviado=true;
+            $sale->online=false;
             return response()->json([
-                'sale' => $sale1,
+                'sale' => $sale,
                 "tickets"=>$tickets,
                 "error"=>"Se creo la venta pero no se pudo enviar a siat!!!",
             ]);

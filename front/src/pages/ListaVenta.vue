@@ -348,8 +348,9 @@ xlsx(data, settings) // Will download the excel file
       this.facturadetalle = factura
       let ClaseConversor = conversor.conversorNumerosALetras;
       let miConversor = new ClaseConversor();
-      let online = '' 
-      if factura.
+      let online = ' en ' 
+      if (!factura.siatEnviado) 
+      online = ' fuera de '
       let a = miConversor.convertToText( parseInt(factura.montoTotal));
       this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
       //console.log(this.qrImage)
@@ -438,7 +439,7 @@ ACUERDO A LEY<br><br>\
 "+factura.leyenda+" <br><br>\
 “Este documento es la Representación Gráfica de un<br>\
 Documento Fiscal Digital emitido en una modalidad de<br>\
-facturación en línea”</div><br>\
+facturación"+online+"línea”</div><br>\
 <div style='display: flex;justify-content: center;'>\
   <img src="+this.qrImage+" >\
       </div>\
