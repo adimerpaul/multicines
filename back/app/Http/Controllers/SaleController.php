@@ -544,6 +544,7 @@ class SaleController extends Controller
             $sale->codigoRecepcion="";
             $sale->cuf=$cuf;
             $sale->save();
+            $sale->siatEnviado=true;
             $tickets=Ticket::where('sale_id',$sale->id)->get();
             return response()->json([
                 'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first(),

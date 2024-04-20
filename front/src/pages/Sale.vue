@@ -496,9 +496,9 @@ export default {
             timeout: 5000,
           })
         }
-        // if(res.data.sale.siatEnviado==1){
+        if(res.data.sale.siatEnviado==1){
           this.printFactura(res.data.sale)
-        // }
+         }
         let valpromo=0
         res.data.tickets.forEach(r=>{
           if(r.promo) valpromo++
