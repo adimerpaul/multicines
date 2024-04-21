@@ -116,6 +116,7 @@ Route::get('anularMasivo', [\App\Http\Controllers\FacturaController::class,'anul
 Route::prefix('mobile')->group(function () {
     Route::get('movies', [App\Http\Controllers\MobileController::class, 'movies']);
     Route::get('eventos', [App\Http\Controllers\MobileController::class, 'eventos']);
+    Route::get('proximos', [App\Http\Controllers\MobileController::class, 'proximos']);
 });
 Route::get('test',function (){
     $details=[

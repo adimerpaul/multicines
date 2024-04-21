@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Evento;
+use App\Models\Proximo;
 use Illuminate\Http\Request;
 
-class EventoController extends Controller{
+class ProximoController extends Controller{
 }
