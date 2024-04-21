@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Evento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,5 +18,8 @@ class MobileController extends Controller{
         where p.fecha='$date'
         and p.activo='ACTIVO'
         GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen;");
+    }
+    public function eventos(){
+        return Evento::where('estado','ACTIVO')->get();
     }
 }

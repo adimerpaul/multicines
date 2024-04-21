@@ -115,6 +115,7 @@ Route::post('anularCuf', [\App\Http\Controllers\SaleController::class,'anularCuf
 Route::get('anularMasivo', [\App\Http\Controllers\FacturaController::class,'anularMasivo']);
 Route::prefix('mobile')->group(function () {
     Route::get('movies', [App\Http\Controllers\MobileController::class, 'movies']);
+    Route::get('eventos', [App\Http\Controllers\MobileController::class, 'eventos']);
 });
 Route::get('test',function (){
     $details=[
