@@ -633,10 +633,10 @@ export default {
       ticket+="<div style='font-size: 12px' >Cod: "+bol.numboc + "<br>"
       ticket+="Trans: "+bol.sale_id+"</div>";
       ticket+="</div >"
-      ticket+="<hr>";
+      ticket+="<hr><br>";
       ticket+="<div class='tifecha'>Fecha:  <span style='font-size: 10px;'>"+bol.fechaFuncion+" "+bol.horaFuncion.substring(11)+"</span> </div>";
-      ticket+="<div class='titpelicula' style='font-size:10px'>" + bol.titulo+"<br> " + bol.nombreSala+" "+bol.letra +" - "+ bol.columna+"</div><br>";
- 
+      ticket+="<div class='titpelicula' style='font-size:10px'>" + bol.titulo+"<br> " + bol.nombreSala+" "+bol.letra +" - "+ bol.columna+"</div><div>_</div><br>";
+
       document.getElementById('myelement').innerHTML = ticket
       const d = new Printd()
       d.print( document.getElementById('myelement') )
