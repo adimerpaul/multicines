@@ -431,7 +431,7 @@ class SaleController extends Controller
 
                 Detail::insert($dataDetail);
 
-                $sale->siatEnviado=true;                
+                $sale->siatEnviado=true;
                 $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
                 $sale->cuf=$cuf;
                 $sale->save();
@@ -583,7 +583,7 @@ class SaleController extends Controller
 
 
         $cuf = new CUF();
-
+        error_log('fecha: '.date("YmdHis000",strtotime($sale->fechaEmision)));
         $fechaCUF=date("YmdHis000",strtotime($sale->fechaEmision));
 
         $cuf = $cuf->obtenerCUF(env('NIT'), $fechaCUF, $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
