@@ -633,6 +633,10 @@ export default {
       ticket+="<div style='font-size: 12px' >Cod: "+bol.numboc + "<br>"
       ticket+="Trans: "+bol.sale_id+"</div>";
       ticket+="</div >"
+      ticket+="<hr><br>";
+      ticket+="<div class='tifecha'>Fecha:  <span style='font-size: 10px;'>"+bol.fechaFuncion+" "+bol.horaFuncion.substring(11)+"</span> </div>";
+      ticket+="<div class='titpelicula' style='font-size:10px'>" + bol.titulo+"<br> " + bol.nombreSala+" "+bol.letra +" - "+ bol.columna+"</div><div>_</div><br>";
+
       document.getElementById('myelement').innerHTML = ticket
       const d = new Printd()
       d.print( document.getElementById('myelement') )
@@ -646,8 +650,8 @@ export default {
       this.facturadetalle = factura
       let ClaseConversor = conversor.conversorNumerosALetras;
       let miConversor = new ClaseConversor();
-      let online = ' en ' 
-      if (!factura.online) 
+      let online = ' en '
+      if (!factura.online)
       online = ' fuera de '
       let a = miConversor.convertToText( parseInt(factura.montoTotal));
       this.qrImage = await QRCode.toDataURL(this.cine.url2+"consulta/QR?nit="+this.cine.nit+"&cuf="+factura.cuf+"&numero="+factura.numeroFactura+"&t=2", this.opts)
