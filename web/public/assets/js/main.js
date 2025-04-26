@@ -188,33 +188,33 @@
         $(this).addClass('active');
       }
     });
-    $('.tab-slider').owlCarousel({
-      loop:true,
-      responsiveClass:true,
-      nav:false,
-      dots:false,
-      margin: 30,
-      autoplay:true,
-      autoplayTimeout:2000,
-      autoplayHoverPause:true,
-      responsive:{
-          0:{
-              items:1,
-          },
-          576:{
-              items:2,
-          },
-          768:{
-              items:2,
-          },
-          992:{
-              items:3,
-          },
-          1200:{
-              items:4,
-          }
-      }
-    })
+    // $('.tab-slider').owlCarousel({
+    //   loop:true,
+    //   responsiveClass:true,
+    //   nav:false,
+    //   dots:false,
+    //   margin: 30,
+    //   autoplay:true,
+    //   autoplayTimeout:2000,
+    //   autoplayHoverPause:true,
+    //   responsive:{
+    //       0:{
+    //           items:1,
+    //       },
+    //       576:{
+    //           items:2,
+    //       },
+    //       768:{
+    //           items:2,
+    //       },
+    //       992:{
+    //           items:3,
+    //       },
+    //       1200:{
+    //           items:4,
+    //       }
+    //   }
+    // })
     $('.sponsor-slider').owlCarousel({
       loop: true,
       responsiveClass: true,
