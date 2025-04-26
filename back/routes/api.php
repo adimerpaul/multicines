@@ -118,6 +118,9 @@ Route::prefix('mobile')->group(function () {
     Route::get('eventos', [App\Http\Controllers\MobileController::class, 'eventos']);
     Route::get('proximos', [App\Http\Controllers\MobileController::class, 'proximos']);
 });
+Route::prefix('web')->group(function () {
+    Route::get('movies', [App\Http\Controllers\WebController::class, 'movies']);
+});
 Route::get('test',function (){
     $details=[
         "title"=>"Factura",

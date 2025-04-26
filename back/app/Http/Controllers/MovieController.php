@@ -10,9 +10,15 @@ use App\Models\Rubro;
 
 class MovieController extends Controller{
     public function index(){
-        return Movie::with('distributor')
+        $movies= Movie::with('distributor')
             ->orderBy('id','desc')
             ->get();
+        foreach ($movies as $movie){
+            if (!file_exists(public_path('imagen/'.$movie->imagen))){
+                $movie->imagen='default.jpg';
+            }
+        }
+        return $movies;
     }
     public function store(StoreMovieRequest $request){
         $movie= Movie::create($request->all());
