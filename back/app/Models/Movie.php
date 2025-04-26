@@ -10,7 +10,21 @@ class Movie extends Model
 {
     use SoftDeletes;
     use HasFactory;
-    protected $fillable=['nombre','duracion','paisOrigen','genero','sipnosis','urlTrailer','formato','imagen','clasificacion','fechaEstreno','distributor_id'];
+    protected $fillable=[
+        'nombre',
+        'duracion',
+        'paisOrigen',
+        'genero',
+        'sipnosis',
+        'urlTrailer',
+        'formato',
+        'imagen',
+        'clasificacion',
+        'fechaEstreno',
+        'distributor_id',
+        'ratingPublic',
+        'ratingCritica',
+    ];
     public function distributor()
     {
         return $this->belongsTo(Distributor::class);
