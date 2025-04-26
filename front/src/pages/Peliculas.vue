@@ -147,6 +147,12 @@
               <div class="col-3">
                 <q-select dense outlined label="distributor_id" v-model="store.distributor" :options="store.distributors" option-label="nombre"/>
               </div>
+              <div class="col-2">
+                <q-input dense outlined label="ratingPublic" v-model="movie.ratingPublic" type="number" />
+              </div>
+              <div class="col-2">
+                <q-input dense outlined label="ratingPublic" v-model="movie.ratingCritica" type="number" />
+              </div>
               <div class="col-12 text-center flex flex-center">
                 <q-uploader
                   accept=".jpg, .png"
@@ -207,8 +213,14 @@
               <div class="col-3">
                 <q-select dense outlined label="distributor_id" v-model="store.distributor" :options="store.distributors" option-label="nombre"/>
               </div>
+              <div class="col-2">
+                <q-input dense outlined label="ratingPublic" v-model="movie2.ratingPublic" type="number" />
+              </div>
+              <div class="col-2">
+                <q-input dense outlined label="ratingPublic" v-model="movie2.ratingCritica" type="number" />
+              </div>
               <div class="col-12">
-                <q-btn color="yellow-8" icon="edit" class="full-width" type="submit" label="Modificar" />
+                <q-btn color="yellow-8" icon="edit" class="full-width" type="submit" label="Modificar" :loading="loading" />
               </div>
             </div>
           </q-form>
@@ -381,14 +393,17 @@ export default {
       })
     },
     movieUpdate(){
-      this.$q.loading.show()
+      // this.$q.loading.show()
+      this.loading=true
       this.$api.put('movie/'+this.movie2.id,this.movie2).then(res=>{
-        this.$q.loading.hide()
+        // this.$q.loading.hide()
         console.log(res.data)
         this.movie2={}
         let index = this.store.movies.findIndex(m => m.id == res.data.id);
         this.store.movies[index]=res.data
         this.movieUpdateDialog=false
+      }).finally(()=>{
+        this.loading=false
       })
     },
     movieDelete(id,pageIndex){
