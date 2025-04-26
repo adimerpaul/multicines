@@ -1,52 +1,111 @@
 <template>
-  <q-page>
+  <q-page class="q-pa-xs">
     <div class="row">
       <div class="col-12">
-        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter"
-        >
-          <template v-slot:top-right>
-            <q-btn
-              color="green"
-              icon="add_circle"
-              label="Agregar"
-              @click="movieDialog=true"/>
-            <q-input outlined dense debounce="300" v-model="movieFilter" placeholder="Buscar">
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </template>
-          <template v-slot:body-cell-imagen="props">
-            <q-td auto-width :props="props">
+<!--        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter"-->
+<!--        >-->
+<!--          <template v-slot:top-right>-->
+<!--            <q-btn-->
+<!--              color="green"-->
+<!--              icon="add_circle"-->
+<!--              label="Agregar"-->
+<!--              @click="movieDialog=true"/>-->
+<!--            <q-input outlined dense debounce="300" v-model="movieFilter" placeholder="Buscar">-->
+<!--              <template v-slot:append>-->
+<!--                <q-icon name="search" />-->
+<!--              </template>-->
+<!--            </q-input>-->
+<!--          </template>-->
+<!--          <template v-slot:body-cell-imagen="props">-->
+<!--            <q-td auto-width :props="props">-->
 
-                <q-img :src="url+'../imagen/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
-            </q-td>
-
-          </template>
-          <template v-slot:body-cell-opciones="props">
-            <q-td auto-width :props="props">
-              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">
-                <q-list>
-                  <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=props.row;this.store.distributor=props.row.distributor">
-                    <q-item-section>
-                      <q-item-label>Actualizar</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup @click="dialog_img=true;movie2=props.row;">
-                    <q-item-section>
-                      <q-item-label>Actualizar Imagen</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup @click="movieDelete(props.row.id,props.pageIndex)">
-                    <q-item-section>
-                      <q-item-label>Eliminar</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-            </q-td>
-          </template>
-        </q-table>
+<!--                <q-img :src="url+'../imagen/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>-->
+<!--            </q-td>-->
+<!--          </template>-->
+<!--          <template v-slot:body-cell-nombre="props">-->
+<!--            <q-td :props="props">-->
+<!--              <div style="max-width: 100px;wrap-option: wrap;line-height: 0.9;outline: 1px solid red;">-->
+<!--                {{ props.row.nombre }}-->
+<!--              </div>-->
+<!--            </q-td>-->
+<!--          </template>-->
+<!--          <template v-slot:body-cell-opciones="props">-->
+<!--            <q-td auto-width :props="props">-->
+<!--              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">-->
+<!--                <q-list>-->
+<!--                  <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=props.row;this.store.distributor=props.row.distributor">-->
+<!--                    <q-item-section>-->
+<!--                      <q-item-label>Actualizar</q-item-label>-->
+<!--                    </q-item-section>-->
+<!--                  </q-item>-->
+<!--                  <q-item clickable v-close-popup @click="dialog_img=true;movie2=props.row;">-->
+<!--                    <q-item-section>-->
+<!--                      <q-item-label>Actualizar Imagen</q-item-label>-->
+<!--                    </q-item-section>-->
+<!--                  </q-item>-->
+<!--                  <q-item clickable v-close-popup @click="movieDelete(props.row.id,props.pageIndex)">-->
+<!--                    <q-item-section>-->
+<!--                      <q-item-label>Eliminar</q-item-label>-->
+<!--                    </q-item-section>-->
+<!--                  </q-item>-->
+<!--                </q-list>-->
+<!--              </q-btn-dropdown>-->
+<!--            </q-td>-->
+<!--          </template>-->
+<!--        </q-table>-->
+        <q-markup-table flat dense bordered>
+          <thead>
+            <tr>
+              <th>Opciones</th>
+              <th>Nombre</th>
+              <th>Duracion</th>
+              <th>Formato</th>
+              <th>Imagen</th>
+              <th>Distributor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(movie,index) in store.movies" :key="index">
+              <td>
+                <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">
+                  <q-list>
+                    <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=movie;this.store.distributor=movie.distributor">
+                      <q-item-section avatar><q-icon name="edit" /></q-item-section>
+                      <q-item-section>
+                        <q-item-label>Actualizar</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup @click="dialog_img=true;movie2=movie;">
+                      <q-item-section avatar><q-icon name="picture_as_pdf" /></q-item-section>
+                      <q-item-section>
+                        <q-item-label>Actualizar Imagen</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup @click="movieDelete(movie.id,index)">
+                      <q-item-section avatar><q-icon name="delete" /></q-item-section>
+                      <q-item-section>
+                        <q-item-label>Eliminar</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-btn-dropdown>
+              </td>
+              <td>
+                <div style="max-width: 140px; word-wrap: break-word; white-space: normal; line-height: 0.9;">
+                  {{ $filters.textCapitalize(movie.nombre) }}
+                </div>
+              </td>
+              <td>{{ movie.duracion }}</td>
+              <td>{{ movie.formato }}</td>
+              <td>
+                <a :href="url+'../imagen/'+movie.imagen" target="_blank">
+                  <q-img :src="url+'../imagen/'+movie.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
+                </a>
+              </td>
+              <td>{{ movie.distributor.nombre }}</td>
+            </tr>
+          </tbody>
+        </q-markup-table>
       </div>
     </div>
     <q-dialog v-model="movieDialog" full-width>

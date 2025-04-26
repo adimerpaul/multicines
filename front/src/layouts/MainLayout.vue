@@ -34,6 +34,8 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
+      :width="300"
+      :breakpoint="350"
     >
       <q-list bordered class="rounded-borders">
         <q-item-label header class="text-center q-pa-none q-ma-none" style="background: #770050">

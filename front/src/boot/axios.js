@@ -17,6 +17,13 @@ export default boot(({ app,router }) => {
   //       so you won't necessarily have to import axios in each vue file
 
   app.config.globalProperties.$api = api
+  app.config.globalProperties.$filters = {
+    textCapitalize (value) {
+      if (!value) return ''
+      value = value.toLowerCase()
+      return value.charAt(0).toUpperCase() + value.slice(1)
+    }
+  }
   const token = localStorage.getItem('tokenMulti')
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`
