@@ -140,15 +140,15 @@
       $('.window-warning').removeClass('inActive');
     })
     //Tab Section
-    $('.tab ul.tab-menu li').on('click', function (g) {
-      var tab = $(this).closest('.tab'),
-        index = $(this).closest('li').index();
-      tab.find('li').siblings('li').removeClass('active');
-      $(this).closest('li').addClass('active');
-      tab.find('.tab-area').find('div.tab-item').not('div.tab-item:eq(' + index + ')').fadeOut(500);
-      tab.find('.tab-area').find('div.tab-item:eq(' + index + ')').fadeIn(500);
-      g.preventDefault();
-    });
+    // $('.tab ul.tab-menu li').on('click', function (g) {
+    //   var tab = $(this).closest('.tab'),
+    //     index = $(this).closest('li').index();
+    //   tab.find('li').siblings('li').removeClass('active');
+    //   $(this).closest('li').addClass('active');
+    //   tab.find('.tab-area').find('div.tab-item').not('div.tab-item:eq(' + index + ')').fadeOut(500);
+    //   tab.find('.tab-area').find('div.tab-item:eq(' + index + ')').fadeIn(500);
+    //   g.preventDefault();
+    // });
     $('.search-tab ul.tab-menu li').on('click', function (k) {
       var search_tab = $(this).closest('.search-tab'),
         searchIndex = $(this).closest('li').index();

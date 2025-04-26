@@ -72,6 +72,24 @@ export default {
       .catch(error => {
         console.error('Error fetching movies:', error);
       });
+    this.$nextTick(() => {
+      this.initTabs();
+    });
+  },
+  methods: {
+    initTabs() {
+      if (window.$) {
+        window.$('.tab ul.tab-menu li').off('click').on('click', function (g) {
+          var tab = window.$(this).closest('.tab');
+          var index = window.$(this).closest('li').index();
+          tab.find('li').siblings('li').removeClass('active');
+          window.$(this).closest('li').addClass('active');
+          tab.find('.tab-area').find('div.tab-item').not('div.tab-item:eq(' + index + ')').fadeOut(500);
+          tab.find('.tab-area').find('div.tab-item:eq(' + index + ')').fadeIn(500);
+          g.preventDefault();
+        });
+      }
+    }
   }
 }
 </script>
@@ -89,13 +107,13 @@ export default {
           </div>
           <ul class="tab-menu">
             <li class="active">
-              now showing
+              Cartelera
             </li>
             <li>
-              coming soon
+              Proximamente
             </li>
             <li>
-              exclusive
+              Todos
             </li>
           </ul>
         </div>
@@ -140,13 +158,50 @@ export default {
             </div>
           </div>
           <div class="tab-item">
-            <div class="owl-carousel owl-theme tab-slider">
-              aaaaaaaaaaaaaaa
-            </div>
+<!--            <div class="owl-carousel owl-theme tab-slider">-->
+              <p>
+<!--                texto de rrelno que iran las proximas peliculas-->
+                <span class="text-danger">¡Bienvenido!</span> Aquí puedes encontrar las mejores películas de la semana.
+              </p>
+<!--            </div>-->
           </div>
           <div class="tab-item">
-            <div class="owl-carousel owl-theme tab-slider">
-              bbbbbbbbbbbbbbbbbb
+            <div class="row">
+              <div class="col-md-4 item" v-for="pelicula in peliculas" :key="pelicula.id">
+                <div class="movie-grid">
+                  <div class="movie-thumb c-thumb">
+                    <router-link :to="`/pelicula/${pelicula.id}`">
+                      <img
+                          :src="`${$url}../../imagen/${pelicula.imagen}`"
+                          :alt="pelicula.nombre"
+                          style="width: 100%; height:450px; object-fit: cover;"
+                      >
+                    </router-link>
+                  </div>
+                  <div class="movie-content bg-one">
+                    <h5 class="title m-0">
+                      <a :href="`#${pelicula.nombre}`">
+                        {{ $filters.textCapitalize(pelicula.nombre) }}
+                        {{pelicula.formato}}
+                      </a>
+                    </h5>
+                    <ul class="movie-rating-percent">
+                      <li>
+                        <div class="thumb">
+                          <img src="/assets/images/movie/tomato.png" alt="movie">
+                        </div>
+                        <span class="content">{{ pelicula.ratingCritica? pelicula.ratingCritica : 0 }}%</span>
+                      </li>
+                      <li>
+                        <div class="thumb">
+                          <img src="/assets/images/movie/cake.png" alt="movie">
+                        </div>
+                        <span class="content">{{ pelicula.ratingPublic? pelicula.ratingPublic : 0 }}%</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
