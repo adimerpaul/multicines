@@ -2,7 +2,8 @@
   <q-page>
     <div class="row">
       <div class="col-12">
-        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[20,50,100,0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter">
+        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter"
+        >
           <template v-slot:top-right>
             <q-btn
               color="green"
@@ -24,7 +25,7 @@
           </template>
           <template v-slot:body-cell-opciones="props">
             <q-td auto-width :props="props">
-              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert">
+              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">
                 <q-list>
                   <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=props.row;this.store.distributor=props.row.distributor">
                     <q-item-section>
@@ -220,10 +221,10 @@ export default {
         {label:'opciones',field:'opciones',name:'opciones'},
         {label:'nombre',field:'nombre',name:'nombre',sortable:true},
         {label:'duracion',field:'duracion',name:'duracion',sortable:true},
-        {label:'paisOrigen',field:'paisOrigen',name:'paisOrigen',sortable:true},
-        {label:'genero',field:'genero',name:'genero',sortable:true},
-        {label:'formato',field:'formato',name:'formato',sortable:true},
-        {label:'clasificacion',field:'clasificacion',name:'clasificacion',sortable:true},
+        // {label:'paisOrigen',field:'paisOrigen',name:'paisOrigen',sortable:true},
+        // {label:'genero',field:'genero',name:'genero',sortable:true},
+        // {label:'formato',field:'formato',name:'formato',sortable:true},
+        // {label:'clasificacion',field:'clasificacion',name:'clasificacion',sortable:true},
         {label:'fechaEstreno',field:'fechaEstreno',name:'fechaEstreno',sortable:true},
         {label:'Imagen',field:'imagen',name:'imagen',sortable:true},
         {label:'distributor_id',field:row=>row.distributor.nombre,name:'distributor_id',sortable:true},

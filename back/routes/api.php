@@ -126,7 +126,7 @@ Route::get('test',function (){
         "anulado"=>false,
         "cuf"=>"",
         "numeroFactura"=>"",
-        "sale_id"=>1,
+        "sale_id"=>358702,
         "carpeta"=>"archivos",
     ];
     Mail::to('adimer101@gmail.com')->send(new TestMail($details));
