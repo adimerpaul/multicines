@@ -29,4 +29,9 @@ class Movie extends Model
     {
         return $this->belongsTo(Distributor::class);
     }
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 }

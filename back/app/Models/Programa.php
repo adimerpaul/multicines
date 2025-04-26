@@ -41,4 +41,9 @@ class Programa extends Model
     public function tickets(){
         return $this->hasMany(Ticket::class);
     }
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 }
