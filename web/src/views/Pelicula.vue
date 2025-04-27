@@ -122,7 +122,6 @@ export default {
         //   ]
         // }
         this.pelicula = response.data.movie;
-        console.log(this.pelicula.codeYoutube);
         this.ofertas = response.data.ofertas;
         this.$nextTick(() => {
           if (window.$ && typeof window.$('.casting-slider').owlCarousel === 'function') {
@@ -195,7 +194,10 @@ export default {
                 </span>
               </div>
               <div class="item">
-                <i class="far fa-clock"></i><span>2 hrs 50 mins</span>
+                <i class="far fa-clock"></i>
+                <span>
+                  {{ $filters.timeFormat(pelicula.duracion) }}
+                </span>
               </div>
             </div>
             <ul class="social-share">

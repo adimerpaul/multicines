@@ -23,6 +23,20 @@ app.config.globalProperties.$filters = {
         const mes = meses[fecha.month()]
         const anio = fecha.year()
         return `${dia} ${mes}, ${anio}`
+    },
+    timeFormat(duracionInt) {
+        if (!duracionInt) return ''
+        // 2 hrs 50 mins
+        const horas = Math.floor(duracionInt / 60)
+        const minutos = duracionInt % 60
+        let resultado = ''
+        if (horas > 0) {
+            resultado += `${horas} hrs `
+        }
+        if (minutos > 0) {
+            resultado += `${minutos} mins`
+        }
+        return resultado.trim()
     }
 }
 
