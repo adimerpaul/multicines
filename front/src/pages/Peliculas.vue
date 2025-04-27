@@ -217,7 +217,7 @@
                 <q-input dense outlined label="ratingPublic" v-model="movie2.ratingPublic" type="number" />
               </div>
               <div class="col-2">
-                <q-input dense outlined label="ratingPublic" v-model="movie2.ratingCritica" type="number" />
+                <q-input dense outlined label="ratingCritica" v-model="movie2.ratingCritica" type="number" />
               </div>
               <div class="col-12">
                 <q-btn color="yellow-8" icon="edit" class="full-width" type="submit" label="Modificar" :loading="loading" />
