@@ -40,9 +40,10 @@ export default {
     };
   },
   mounted() {
+    window.scrollTo(0, 0);
     this.$axios.get('movies')
       .then(res => {
-        console.log('Movies:', res.data);
+        // console.log('Movies:', res.data);
         this.peliculas = res.data
         this.$nextTick(() => {
           // Esperamos a que Vue termine de renderizar el DOM

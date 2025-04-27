@@ -14,7 +14,8 @@ export default {
     };
   },
   mounted() {
-    console.log(this.$route.params.id)
+    window.scrollTo(0, 0);
+    // console.log(this.$route.params.id)
 
     this.$nextTick(() => {
       if (window.$ && typeof window.$('.casting-slider').owlCarousel === 'function') {

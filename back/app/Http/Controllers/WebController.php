@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Programa;
 use Illuminate\Http\Request;
 
-class WebController extends Controller
-{
-    public function movies()
-    {
+class WebController extends Controller{
+    public function movies(){
         $hoy = date('Y-m-d');
 
         $programas = Programa::with('movie')
