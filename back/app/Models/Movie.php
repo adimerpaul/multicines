@@ -34,4 +34,8 @@ class Movie extends Model
         'updated_at',
         'deleted_at',
     ];
+    public function programas()
+    {
+        return $this->hasMany(Programa::class);
+    }
 }
