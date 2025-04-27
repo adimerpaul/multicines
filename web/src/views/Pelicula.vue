@@ -3,57 +3,182 @@ export default {
   name: 'Pelicula',
   data() {
     return {
-      pelicula: {
-        id: 3,
-        title: 'Venus',
-        image: '/assets/images/movie/movie03.jpg',
-        rating: 78,
-        ratingPublic: 80,
-        genre: 'Drama'
-      }
+      pelicula: {},
+      ofertas: [],
     };
   },
   mounted() {
+    this.movieGet()
     window.scrollTo(0, 0);
     // console.log(this.$route.params.id)
-
-    this.$nextTick(() => {
-      if (window.$ && typeof window.$('.casting-slider').owlCarousel === 'function') {
-        window.$('.casting-slider').owlCarousel({ /* config */ })
+  },
+  methods: {
+    async movieGet() {
+      try {
+        const response = await this.$axios.get('movie/' + this.$route.params.id);
+        // {
+        //   movie: {
+        //     id: 357,
+        //         nombre: "EL SEÑOR DE LOS ANILLOS: EL RETORNO DEL REY",
+        //         duracion: 215,
+        //         paisOrigen: "EEUU",
+        //         genero: "Accion",
+        //         sipnosis: "Su historia se desarrolla en la Tercera Edad del Sol de la Tierra Media, un lugar ficticio poblado por hombres y otras razas antropomorfas, como los hobbits, los elfos o los enanos, así como por muchas otras criaturas reales y fantásticas. La novela narra",
+        //         formato: "2D",
+        //         urlTrailer: "https://www.youtube.com/watch?v=mZYms2vsm2Y&ab_channel=xeofain",
+        //         imagen: "1745655578.jpg",
+        //         clasificacion: "+13",
+        //         fechaEstreno: "2025-03-27",
+        //         distributor_id: 1,
+        //         ratingCritica: 89,
+        //         ratingPublic: 90,
+        //         programas: [
+        //       {
+        //         id: 41360,
+        //         fecha: "2025-04-27",
+        //         horaInicio: "2025-04-27 10:00:00",
+        //         horaFin: "2025-04-27 13:35:00",
+        //         subtitulada: "NO",
+        //         activo: "ACTIVO",
+        //         nroFuncion: "1",
+        //         user_id: null,
+        //         movie_id: 357,
+        //         sala_id: 1,
+        //         price_id: 1
+        //       },
+        //       {
+        //         id: 41361,
+        //         fecha: "2025-04-28",
+        //         horaInicio: "2025-04-28 10:00:00",
+        //         horaFin: "2025-04-28 13:35:00",
+        //         subtitulada: "NO",
+        //         activo: "ACTIVO",
+        //         nroFuncion: "1",
+        //         user_id: null,
+        //         movie_id: 357,
+        //         sala_id: 1,
+        //         price_id: 1
+        //       },
+        //       {
+        //         id: 41362,
+        //         fecha: "2025-04-29",
+        //         horaInicio: "2025-04-29 10:00:00",
+        //         horaFin: "2025-04-29 13:35:00",
+        //         subtitulada: "NO",
+        //         activo: "ACTIVO",
+        //         nroFuncion: "1",
+        //         user_id: null,
+        //         movie_id: 357,
+        //         sala_id: 1,
+        //         price_id: 1
+        //       },
+        //       {
+        //         id: 41363,
+        //         fecha: "2025-04-30",
+        //         horaInicio: "2025-04-30 10:00:00",
+        //         horaFin: "2025-04-30 13:35:00",
+        //         subtitulada: "NO",
+        //         activo: "ACTIVO",
+        //         nroFuncion: "1",
+        //         user_id: null,
+        //         movie_id: 357,
+        //         sala_id: 1,
+        //         price_id: 1
+        //       },
+        //       {
+        //         id: 41364,
+        //         fecha: "2025-05-01",
+        //         horaInicio: "2025-05-01 10:00:00",
+        //         horaFin: "2025-05-01 13:35:00",
+        //         subtitulada: "NO",
+        //         activo: "ACTIVO",
+        //         nroFuncion: "1",
+        //         user_id: null,
+        //         movie_id: 357,
+        //         sala_id: 1,
+        //         price_id: 1
+        //       }
+        //     ]
+        //   },
+        //   ofertas: [
+        //     {
+        //       id: 1,
+        //       nombre: "Miercoles 2x1",
+        //       descripcion: "2x1 en todas las funciones",
+        //       imagen: "offer01.png"
+        //     },
+        //     {
+        //       id: 2,
+        //       nombre: "Martes duo",
+        //       descripcion: "Martes cada funcion con pipocas gratis",
+        //       imagen: "offer02.png"
+        //     },
+        //     {
+        //       id: 3,
+        //       nombre: "Jueves de Estreno",
+        //       descripcion: "Estrenos en todas las funciones",
+        //       imagen: "offer03.png"
+        //     }
+        //   ]
+        // }
+        this.pelicula = response.data.movie;
+        console.log(this.pelicula.codeYoutube);
+        this.ofertas = response.data.ofertas;
+        this.$nextTick(() => {
+          if (window.$ && typeof window.$('.casting-slider').owlCarousel === 'function') {
+            window.$('.casting-slider').owlCarousel({ /* config */ })
+          }
+          if (window.$ && typeof window.$('.casting-slider-two').owlCarousel === 'function') {
+            window.$('.casting-slider-two').owlCarousel({ /* config */ })
+          }
+          if (window.$ && typeof window.$('.details-photos').owlCarousel === 'function') {
+            window.$('.details-photos').owlCarousel({ /* config */ })
+          }
+          const $img = window.$('.bg_img');
+          $img.css('background-image', function () {
+            return 'url(' + $img.data('background') + ')';
+          });
+        })
+      } catch (error) {
+        console.error('Error fetching movie data:', error);
       }
-      if (window.$ && typeof window.$('.casting-slider-two').owlCarousel === 'function') {
-        window.$('.casting-slider-two').owlCarousel({ /* config */ })
+    },
+  },
+  computed: {
+    codeYoutube() {
+      if (this.pelicula.urlTrailer=== null || this.pelicula.urlTrailer === undefined) {
+        return 'V0wIA60ujK4';
       }
-      if (window.$ && typeof window.$('.details-photos').owlCarousel === 'function') {
-        window.$('.details-photos').owlCarousel({ /* config */ })
+      return this.pelicula.urlTrailer.split('v=')[1].split('&')[0];
+    },
+    urlYoutubeImg() {
+      if (this.pelicula.urlTrailer === null || this.pelicula.urlTrailer === undefined) {
+        return 'https://img.youtube.com/vi/V0wIA60ujK4/hqdefault.jpg';
       }
-      const $img = window.$('.bg_img');
-      $img.css('background-image', function () {
-        return 'url(' + $img.data('background') + ')';
-      });
-    })
-  }
+      return `https://img.youtube.com/vi/${this.codeYoutube}/hqdefault.jpg`;
+    },
+  },
 
 };
 </script>
 <template>
   <!-- ==========Banner-Section========== -->
-  <section class="details-banner bg_img" data-background="/assets/images/banner/banner03.jpg">
+  <section class="details-banner bg_img" :data-background="urlYoutubeImg">
     <div class="container">
       <div class="details-banner-wrapper">
         <div class="details-banner-thumb">
-          <img src="/assets/images/movie/venus.jpg" alt="movie">
-          <a href="https://www.youtube.com/embed/KGeBMAgc46E" class="video-popup">
+          <img :src="`${$url}../../imagen/${pelicula.imagen}`" alt="movie" v-if="pelicula.imagen">
+          <a :href="`https://www.youtube.com/embed/${codeYoutube}`" class="video-popup">
             <img src="/assets/images/movie/video-button.png" alt="movie">
           </a>
         </div>
         <div class="details-banner-content offset-lg-3">
-          <h3 class="title">Venus</h3>
+          <h3 class="title">{{ $filters.textCapitalize(pelicula.nombre) }}</h3>
           <div class="tags">
-            <a href="#0">English</a>
-            <a href="#0">Hindi</a>
-            <a href="#0">Telegu</a>
-            <a href="#0">Tamil</a>
+            <a href="#">Estreno</a>
+            <a href="#">Latino</a>
+<!--            <a href="#0">Telegu</a>-->
+<!--            <a href="#0">Tamil</a>-->
           </div>
           <a href="#0" class="button">horror</a>
           <div class="social-and-duration">
