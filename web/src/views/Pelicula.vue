@@ -156,6 +156,25 @@ export default {
       }
       return `https://img.youtube.com/vi/${this.codeYoutube}/hqdefault.jpg`;
     },
+    arrayImegenes() {
+      return [
+        `https://img.youtube.com/vi/${this.codeYoutube}/0.jpg`,
+        `https://img.youtube.com/vi/${this.codeYoutube}/1.jpg`,
+        `https://img.youtube.com/vi/${this.codeYoutube}/2.jpg`,
+      ];
+    },
+    puntucion5Critica() {
+      if (this.pelicula.ratingCritica === null || this.pelicula.ratingCritica === undefined) {
+        return 0;
+      }
+      return this.pelicula.ratingCritica / 20;
+    },
+    puntucion5Publico() {
+      if (this.pelicula.ratingPublic === null || this.pelicula.ratingPublic === undefined) {
+        return 0;
+      }
+      return this.pelicula.ratingPublic / 20;
+    },
   },
 
 };
@@ -226,7 +245,7 @@ export default {
                 <img src="/assets/images/movie/tomato2.png" alt="movie">
               </div>
               <div class="counter-area">
-                <span class="counter-item odometer" data-odometer-final="88">0</span>
+                <span class="counter-item odometer" data-odometer-final="88">{{ pelicula.ratingCritica }}</span>
               </div>
             </div>
             <p>tomatometer</p>
@@ -237,36 +256,29 @@ export default {
                 <img src="/assets/images/movie/cake2.png" alt="movie">
               </div>
               <div class="counter-area">
-                <span class="counter-item odometer" data-odometer-final="88">0</span>
+                <span class="counter-item odometer" data-odometer-final="88">{{ pelicula.ratingPublic }}</span>
               </div>
             </div>
-            <p>audience Score</p>
+            <p>Audiencia</p>
           </div>
           <div class="item">
             <div class="item-header">
-              <h5 class="title">4.5</h5>
+              <h5 class="title">{{ puntucion5Critica.toFixed(1) }}</h5>
               <div class="rated">
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-heart"></i>
+<!--                <i class="fas fa-heart"></i>-->
+                <i class="fas fa-heart" v-for="i in parseInt(puntucion5Critica)" :key="i"></i>
               </div>
             </div>
-            <p>Users Rating</p>
+            <p>Critica</p>
           </div>
           <div class="item">
             <div class="item-header">
               <div class="rated rate-it">
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-heart"></i>
-                <i class="fas fa-heart"></i>
+                <i class="fas fa-heart" v-for="i in parseInt(puntucion5Publico)" :key="i"></i>
               </div>
-              <h5 class="title">0.0</h5>
+              <h5 class="title">{{ puntucion5Publico.toFixed(1) }}</h5>
             </div>
-            <p><a href="#0">Rate It</a></p>
+            <p><a href="#0">Publico</a></p>
           </div>
         </div>
         <a href="#0" class="custom-button">book tickets</a>
