@@ -180,11 +180,19 @@ export default {
 <!--            <a href="#0">Telegu</a>-->
 <!--            <a href="#0">Tamil</a>-->
           </div>
-          <a href="#0" class="button">horror</a>
+          <a href="#0" class="button">
+            {{ $filters.textCapitalize(pelicula.genero) }}
+          </a>
+          <a href="#0" class="button">
+            {{ $filters.textCapitalize(pelicula.clasificacion) }}
+          </a>
           <div class="social-and-duration">
             <div class="duration-area">
               <div class="item">
-                <i class="fas fa-calendar-alt"></i><span>06 Dec, 2020</span>
+                <i class="fas fa-calendar-alt"></i>
+                <span>
+                  {{ $filters.dateFormat(pelicula.fechaEstreno) }}
+                </span>
               </div>
               <div class="item">
                 <i class="far fa-clock"></i><span>2 hrs 50 mins</span>
