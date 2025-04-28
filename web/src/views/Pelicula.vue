@@ -286,10 +286,42 @@ export default {
         </div>
 <!--        <a href="#0" class="custom-button">book tickets</a>-->
 <!--        espanol-->
-        <a href="#" class="custom-button" @click="$router.push({ name: 'pelicula', params: { id: pelicula.id } })">
+        <a class="custom-button" data-toggle="modal" data-target="#exampleModal" style="cursor: pointer" >
           <i class="fas fa-ticket-alt"></i>
           comprar entradas
         </a>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+
+              <div class="modal-body">
+                <div style="color: black; font-size: 20px; display: flex; justify-content: space-between; align-items: center;">
+                  <span><strong>Selecciona la función</strong></span>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: black; width: 30px; height: 30px;">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+
+                <div class="mt-3">
+                  <template v-for="(horarios, fecha) in pelicula.programaActivas" :key="fecha">
+                    <div style="color: black; font-size: 20px; margin-bottom: 10px; margin-top: 20px;">
+                      📅 {{ $filters.formatFecha(fecha) }}
+                    </div>
+                    <div v-for="programa in horarios" :key="programa.id" style="margin-bottom: 10px;">
+                      <button class="btn btn-outline-primary btn-block" style="text-align: left;">
+                        {{ $filters.formatHora(programa.horaInicio) }}
+                        (Subtitulada: {{ programa.subtitulada === 'SI' ? 'Sí' : 'No' }}) -
+                        Sala {{ programa.sala_id }}
+                      </button>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
