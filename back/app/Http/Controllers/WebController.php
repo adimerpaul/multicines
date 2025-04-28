@@ -8,19 +8,25 @@ use Illuminate\Http\Request;
 
 class WebController extends Controller{
     function movie($id){
+        $hoy = date('Y-m-d');
+        $hoyDatetime = date('Y-m-d H:i:s');
         $movie = Movie::where('id', $id)
-            ->with(['programas' => function ($query) {
+            ->with(['programas' => function ($query) use ($hoyDatetime, $hoy) {
                 $query->where('fecha', '>=', date('Y-m-d'))
-                    ->where('activo', 'ACTIVO');
+                    ->where('activo', 'ACTIVO')
+//                    ->where('fecha', $hoy)
+                    ->where('horaInicio', '>=', $hoyDatetime)
+                    ->orderBy('fecha')
+                    ->orderBy('horaInicio');
             }])
             ->first();
+
         $ofertas = [
             [
                 "id" => 1,
                 "nombre" => "Miercoles 2x1",
                 "descripcion" => "2x1 en todas las funciones",
                 "imagen" => "offer01.png",
-
             ],
             [
                 "id" => 2,
@@ -37,6 +43,28 @@ class WebController extends Controller{
         ];
 
         if ($movie) {
+            // Agrupar programas por fecha
+            $programasAgrupados = [];
+
+            foreach ($movie->programas as $programa) {
+                $fechaFormateada = date('Y-m-d', strtotime($programa->fecha)); // Asegurarse de que esté como '2025-04-28'
+                if (!isset($programasAgrupados[$fechaFormateada])) {
+                    $programasAgrupados[$fechaFormateada] = [];
+                }
+                $programasAgrupados[$fechaFormateada][] = [
+                    "id" => $programa->id,
+                    "horaInicio" => $programa->horaInicio,
+                    "horaFin" => $programa->horaFin,
+                    "subtitulada" => $programa->subtitulada,
+                    "sala_id" => $programa->sala_id,
+                    "nroFuncion" => $programa->nroFuncion,
+                ];
+            }
+
+            $movie->programaActivas = $programasAgrupados;
+
+            unset($movie->programas);
+
             return [
                 "movie" => $movie,
                 "ofertas" => $ofertas,
