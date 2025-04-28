@@ -13,6 +13,11 @@ export default {
     // console.log(this.$route.params.id)
   },
   methods: {
+    selectSeat(id) {
+      const modal = window.$('#exampleModal');
+      modal.modal('hide');
+      this.$router.push('/seat/' + id);
+    },
     async movieGet() {
       try {
         const response = await this.$axios.get('movie/' + this.$route.params.id);
@@ -309,7 +314,9 @@ export default {
                       📅 {{ $filters.formatFecha(fecha) }}
                     </div>
                     <div v-for="programa in horarios" :key="programa.id" style="margin-bottom: 10px;">
-                      <button class="btn btn-outline-primary btn-block" style="text-align: left;">
+                      <button class="btn btn-outline-primary btn-block" style="text-align: left;"
+                              @click="selectSeat(programa.id)"
+                      >
                         {{ $filters.formatHora(programa.horaInicio) }}
                         (Subtitulada: {{ programa.subtitulada === 'SI' ? 'Sí' : 'No' }}) -
                         Sala {{ programa.sala_id }}
