@@ -21,111 +21,6 @@ export default {
     async movieGet() {
       try {
         const response = await this.$axios.get('movie/' + this.$route.params.id);
-        // {
-        //   movie: {
-        //     id: 357,
-        //         nombre: "EL SEÑOR DE LOS ANILLOS: EL RETORNO DEL REY",
-        //         duracion: 215,
-        //         paisOrigen: "EEUU",
-        //         genero: "Accion",
-        //         sipnosis: "Su historia se desarrolla en la Tercera Edad del Sol de la Tierra Media, un lugar ficticio poblado por hombres y otras razas antropomorfas, como los hobbits, los elfos o los enanos, así como por muchas otras criaturas reales y fantásticas. La novela narra",
-        //         formato: "2D",
-        //         urlTrailer: "https://www.youtube.com/watch?v=mZYms2vsm2Y&ab_channel=xeofain",
-        //         imagen: "1745655578.jpg",
-        //         clasificacion: "+13",
-        //         fechaEstreno: "2025-03-27",
-        //         distributor_id: 1,
-        //         ratingCritica: 89,
-        //         ratingPublic: 90,
-        //         programas: [
-        //       {
-        //         id: 41360,
-        //         fecha: "2025-04-27",
-        //         horaInicio: "2025-04-27 10:00:00",
-        //         horaFin: "2025-04-27 13:35:00",
-        //         subtitulada: "NO",
-        //         activo: "ACTIVO",
-        //         nroFuncion: "1",
-        //         user_id: null,
-        //         movie_id: 357,
-        //         sala_id: 1,
-        //         price_id: 1
-        //       },
-        //       {
-        //         id: 41361,
-        //         fecha: "2025-04-28",
-        //         horaInicio: "2025-04-28 10:00:00",
-        //         horaFin: "2025-04-28 13:35:00",
-        //         subtitulada: "NO",
-        //         activo: "ACTIVO",
-        //         nroFuncion: "1",
-        //         user_id: null,
-        //         movie_id: 357,
-        //         sala_id: 1,
-        //         price_id: 1
-        //       },
-        //       {
-        //         id: 41362,
-        //         fecha: "2025-04-29",
-        //         horaInicio: "2025-04-29 10:00:00",
-        //         horaFin: "2025-04-29 13:35:00",
-        //         subtitulada: "NO",
-        //         activo: "ACTIVO",
-        //         nroFuncion: "1",
-        //         user_id: null,
-        //         movie_id: 357,
-        //         sala_id: 1,
-        //         price_id: 1
-        //       },
-        //       {
-        //         id: 41363,
-        //         fecha: "2025-04-30",
-        //         horaInicio: "2025-04-30 10:00:00",
-        //         horaFin: "2025-04-30 13:35:00",
-        //         subtitulada: "NO",
-        //         activo: "ACTIVO",
-        //         nroFuncion: "1",
-        //         user_id: null,
-        //         movie_id: 357,
-        //         sala_id: 1,
-        //         price_id: 1
-        //       },
-        //       {
-        //         id: 41364,
-        //         fecha: "2025-05-01",
-        //         horaInicio: "2025-05-01 10:00:00",
-        //         horaFin: "2025-05-01 13:35:00",
-        //         subtitulada: "NO",
-        //         activo: "ACTIVO",
-        //         nroFuncion: "1",
-        //         user_id: null,
-        //         movie_id: 357,
-        //         sala_id: 1,
-        //         price_id: 1
-        //       }
-        //     ]
-        //   },
-        //   ofertas: [
-        //     {
-        //       id: 1,
-        //       nombre: "Miercoles 2x1",
-        //       descripcion: "2x1 en todas las funciones",
-        //       imagen: "offer01.png"
-        //     },
-        //     {
-        //       id: 2,
-        //       nombre: "Martes duo",
-        //       descripcion: "Martes cada funcion con pipocas gratis",
-        //       imagen: "offer02.png"
-        //     },
-        //     {
-        //       id: 3,
-        //       nombre: "Jueves de Estreno",
-        //       descripcion: "Estrenos en todas las funciones",
-        //       imagen: "offer03.png"
-        //     }
-        //   ]
-        // }
         this.pelicula = response.data.movie;
         this.ofertas = response.data.ofertas;
         this.$nextTick(() => {
@@ -318,6 +213,7 @@ export default {
                         {{ $filters.formatHora(programa.horaInicio) }}
                         (Subtitulada: {{ programa.subtitulada === 'SI' ? 'Sí' : 'No' }}) -
                         Sala {{ programa.sala_id }}
+                        Precio {{ programa.precio }} Bs
                       </button>
                     </div>
                   </template>
