@@ -297,24 +297,22 @@ export default {
         </a>
         <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-
+          <div class="modal-dialog" >
+            <div class="modal-content" style="background: #040360">
               <div class="modal-body">
-                <div style="color: black; font-size: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="color: white; font-size: 20px; display: flex; justify-content: space-between; align-items: center;">
                   <span><strong>Selecciona la función</strong></span>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: black; width: 30px; height: 30px;">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white; width: 30px; height: 30px;">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-
                 <div class="mt-3">
                   <template v-for="(horarios, fecha) in pelicula.programaActivas" :key="fecha">
-                    <div style="color: black; font-size: 20px; margin-bottom: 10px; margin-top: 20px;">
-                      📅 {{ $filters.formatFecha(fecha) }}
+                    <div style="color: white; font-size: 15px; margin-bottom: 10px; margin-top: 20px;">
+                      {{ $filters.timeFormatLarge2(fecha) }}
                     </div>
                     <div v-for="programa in horarios" :key="programa.id" style="margin-bottom: 10px;">
-                      <button class="btn btn-outline-primary btn-block" style="text-align: left;"
+                      <button class="btn btn-outline-info btn-block bold" style="text-align: left;"
                               @click="selectSeat(programa.id)"
                       >
                         {{ $filters.formatHora(programa.horaInicio) }}

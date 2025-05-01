@@ -376,8 +376,19 @@ export default {
       // Add any data properties you need here
     };
   },
+  mounted() {
+    this.seatGet()
+  },
   methods: {
-    // Add any methods you need here
+    seatGet() {
+      this.$http.get('/api/seat')
+        .then(response => {
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching seat data:', error);
+        });
+    },
   },
 };
 </script>

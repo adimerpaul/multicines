@@ -69,6 +69,19 @@ app.config.globalProperties.$filters = {
         const ampm = fecha.format('a')
         return `${dia}, ${diaDelMes} de ${mes} ${anio} a las ${hora} ${ampm}`
 
+    },
+    timeFormatLarge2(datetime) {
+        if (!datetime) return ''
+        // Lunes, 24 de noviembre 2025
+        const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+        const fecha = moment(datetime)
+        const dia = dias[fecha.day()]
+        const diaDelMes = fecha.date()
+        const mes = meses[fecha.month()]
+        const anio = fecha.year()
+        const hora = fecha.format('HH:mm')
+        return `${dia}, ${diaDelMes} de ${mes} ${anio}`
     }
 }
 
