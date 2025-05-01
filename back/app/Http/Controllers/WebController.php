@@ -10,7 +10,7 @@ class WebController extends Controller{
 
     public function mySeats(Request $request)
     {
-        $programa = Programa::with('sala.seats')->findOrFail($request->id);
+        $programa = Programa::with('sala.seats','movie','price')->findOrFail($request->id);
         $seats = $programa->sala->seats;
 
         $result = $seats->map(function ($seat) use ($programa) {
@@ -47,7 +47,11 @@ class WebController extends Controller{
             ];
         });
 
-        return $result;
+        return [
+            "sala" => $programa->sala,
+            "seat" => $result,
+            "programa" => $programa,
+        ];
     }
 
     function movie($id){
@@ -101,6 +105,7 @@ class WebController extends Controller{
                     "subtitulada" => $programa->subtitulada,
                     "sala_id" => $programa->sala_id,
                     "nroFuncion" => $programa->nroFuncion,
+                    "precio" => $programa->price->precio,
                 ];
             }
 
