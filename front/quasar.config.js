@@ -81,7 +81,8 @@ module.exports = configure(function (ctx) {
       env: {
         API: ctx.dev
           ? 'http://localhost:8000/api/'
-          : 'http://10.200.100.20:81/api/'
+          // : 'http://10.200.100.20:81/api/'
+        : 'https://bcine.tuprogam.com/api/'
       }
 
     },
