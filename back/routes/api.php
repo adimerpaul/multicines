@@ -121,6 +121,7 @@ Route::prefix('mobile')->group(function () {
 Route::prefix('web')->group(function () {
     Route::get('movies', [App\Http\Controllers\WebController::class, 'movies']);
     Route::get('movie/{id}', [App\Http\Controllers\WebController::class, 'movie']);
+    Route::post('mySeats', [App\Http\Controllers\WebController::class, 'mySeats']);
 });
 Route::get('test',function (){
     $details=[

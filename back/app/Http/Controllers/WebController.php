@@ -7,6 +7,49 @@ use App\Models\Programa;
 use Illuminate\Http\Request;
 
 class WebController extends Controller{
+
+    public function mySeats(Request $request)
+    {
+        $programa = Programa::with('sala.seats')->findOrFail($request->id);
+        $seats = $programa->sala->seats;
+
+        $result = $seats->map(function ($seat) use ($programa) {
+            // Si el asiento está inactivo
+            if ($seat->activo !== 'ACTIVO') {
+                $estado = 'INACTIVO';
+            } else {
+                $tieneTicket = \App\Models\Ticket::where('programa_id', $programa->id)
+                    ->where('fila', $seat->fila)
+                    ->where('columna', $seat->columna)
+                    ->where('letra', $seat->letra)
+                    ->where('devuelto', 0)
+                    ->exists();
+
+                if ($tieneTicket) {
+                    $estado = 'OCUPADO';
+                } else {
+                    $reservado = \DB::table('momentaneos')
+                        ->where('programa_id', $programa->id)
+                        ->where('fila', $seat->fila)
+                        ->where('columna', $seat->columna)
+                        ->where('letra', $seat->letra)
+                        ->exists();
+
+                    $estado = $reservado ? 'RESERVADO' : 'LIBRE';
+                }
+            }
+
+            return [
+                'fila' => $seat->fila,
+                'columna' => $seat->columna,
+                'letra' => $seat->letra,
+                'activo' => $estado,
+            ];
+        });
+
+        return $result;
+    }
+
     function movie($id){
         $hoy = date('Y-m-d');
         $hoyDatetime = date('Y-m-d H:i:s');
