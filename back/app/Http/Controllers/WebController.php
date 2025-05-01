@@ -61,7 +61,7 @@ class WebController extends Controller{
             ->with(['programas' => function ($query) use ($hoyDatetime, $hoy) {
                 $query->where('fecha', '>=', date('Y-m-d'))
                     ->where('activo', 'ACTIVO')
-//                    ->where('fecha', $hoy)
+                    ->where('fecha', $hoy)
                     ->where('horaInicio', '>=', $hoyDatetime)
                     ->orderBy('fecha')
                     ->orderBy('horaInicio');
