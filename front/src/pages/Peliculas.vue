@@ -2,8 +2,8 @@
   <q-page class="q-pa-xs">
     <div class="row">
       <div class="col-12">
-        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter"-->
-        >
+        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter">
+
           <template v-slot:top-right>
             <q-btn
               color="green"
@@ -105,9 +105,9 @@
               <td>{{ movie.distributor.nombre }}</td>
             </tr>
           </tbody>
-        </q-markup-table>
+        </q-markup-table>-->
       </div>
-    </div>-->
+    </div>
     <q-dialog v-model="movieDialog" full-width>
       <q-card>
         <q-card-section class="row items-center q-pb-none">
