@@ -2,58 +2,58 @@
   <q-page class="q-pa-xs">
     <div class="row">
       <div class="col-12">
-<!--        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter"-->
-<!--        >-->
-<!--          <template v-slot:top-right>-->
-<!--            <q-btn-->
-<!--              color="green"-->
-<!--              icon="add_circle"-->
-<!--              label="Agregar"-->
-<!--              @click="movieDialog=true"/>-->
-<!--            <q-input outlined dense debounce="300" v-model="movieFilter" placeholder="Buscar">-->
-<!--              <template v-slot:append>-->
-<!--                <q-icon name="search" />-->
-<!--              </template>-->
-<!--            </q-input>-->
-<!--          </template>-->
-<!--          <template v-slot:body-cell-imagen="props">-->
-<!--            <q-td auto-width :props="props">-->
+        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter"-->
+        >
+          <template v-slot:top-right>
+            <q-btn
+              color="green"
+              icon="add_circle"
+              label="Agregar"
+              @click="movieDialog=true"/>
+            <q-input outlined dense debounce="300" v-model="movieFilter" placeholder="Buscar">
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </template>
+          <template v-slot:body-cell-imagen="props">
+            <q-td auto-width :props="props">
 
-<!--                <q-img :src="url+'../imagen/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>-->
-<!--            </q-td>-->
-<!--          </template>-->
-<!--          <template v-slot:body-cell-nombre="props">-->
-<!--            <q-td :props="props">-->
-<!--              <div style="max-width: 100px;wrap-option: wrap;line-height: 0.9;outline: 1px solid red;">-->
-<!--                {{ props.row.nombre }}-->
-<!--              </div>-->
-<!--            </q-td>-->
-<!--          </template>-->
-<!--          <template v-slot:body-cell-opciones="props">-->
-<!--            <q-td auto-width :props="props">-->
-<!--              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">-->
-<!--                <q-list>-->
-<!--                  <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=props.row;this.store.distributor=props.row.distributor">-->
-<!--                    <q-item-section>-->
-<!--                      <q-item-label>Actualizar</q-item-label>-->
-<!--                    </q-item-section>-->
-<!--                  </q-item>-->
-<!--                  <q-item clickable v-close-popup @click="dialog_img=true;movie2=props.row;">-->
-<!--                    <q-item-section>-->
-<!--                      <q-item-label>Actualizar Imagen</q-item-label>-->
-<!--                    </q-item-section>-->
-<!--                  </q-item>-->
-<!--                  <q-item clickable v-close-popup @click="movieDelete(props.row.id,props.pageIndex)">-->
-<!--                    <q-item-section>-->
-<!--                      <q-item-label>Eliminar</q-item-label>-->
-<!--                    </q-item-section>-->
-<!--                  </q-item>-->
-<!--                </q-list>-->
-<!--              </q-btn-dropdown>-->
-<!--            </q-td>-->
-<!--          </template>-->
-<!--        </q-table>-->
-        <q-markup-table flat dense bordered>
+                <q-img :src="url+'../imagen/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-nombre="props">
+            <q-td :props="props">
+              <div style="max-width: 100px;wrap-option: wrap;line-height: 0.9;outline: 1px solid red;">
+                {{ props.row.nombre }}
+              </div>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-opciones="props">
+            <q-td auto-width :props="props">
+              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">
+                <q-list>
+                  <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=props.row;this.store.distributor=props.row.distributor">
+                    <q-item-section>
+                      <q-item-label>Actualizar</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup @click="dialog_img=true;movie2=props.row;">
+                    <q-item-section>
+                      <q-item-label>Actualizar Imagen</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup @click="movieDelete(props.row.id,props.pageIndex)">
+                    <q-item-section>
+                      <q-item-label>Eliminar</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+            </q-td>
+          </template>
+        </q-table>
+        <!--<q-markup-table flat dense bordered>
           <thead>
             <tr>
               <th>Opciones</th>
@@ -107,7 +107,7 @@
           </tbody>
         </q-markup-table>
       </div>
-    </div>
+    </div>-->
     <q-dialog v-model="movieDialog" full-width>
       <q-card>
         <q-card-section class="row items-center q-pb-none">
