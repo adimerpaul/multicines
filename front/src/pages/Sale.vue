@@ -840,6 +840,7 @@ facturación" + online + "línea”</div><br>\
       // console.log(this.client)
       this.document = this.documents[0]
       this.client.nombreRazonSocial = ''
+
       this.client.email = ''
       this.client.id = undefined
       this.$api.post('searchClient', this.client).then(res => {
