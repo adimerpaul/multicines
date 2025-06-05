@@ -134,21 +134,23 @@
                   <div class="col-2">
                     <q-input
                       required
-                      @keyup="searchClient"
                       outlined
                       v-model="client.numeroDocumento"
                       label="CI / NIT *"
                       hint="Carnet o nit"
                       lazy-rules
                       :rules="[ val => val && val.length > 0 || 'Dato obligatorio']"
+                      debounce="1000"
+                      @update:model-value="searchClient"
                     />
                   </div>
                   <div class="col-2">
                     <q-input
-                      @keyup="searchClient"
                       outlined
                       v-model="client.complemento"
                       label="COMPLEMENTO"
+                      debounce="1000"
+                      @update:model-value="searchClient"
                     />
                   </div>
                   <div class="col-3">
@@ -445,6 +447,7 @@ export default {
       this.client.nombreRazonSocial=''
       this.client.email=''
       this.client.id=undefined
+      this.loading = true
       this.$api.post('searchClient',this.client).then(res=>{
         // console.log(res.data)
         if (res.data.nombreRazonSocial!=undefined) {
@@ -456,7 +459,11 @@ export default {
           this.document=documento
         }
         if(this.document.codigoClasificador==5) this.validarnit()
-      })
+      }).finally(
+        () => {
+          this.loading = false
+        }
+      )
     },
     async printFactura(factura) {
       // console.log(factura)
