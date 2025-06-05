@@ -24,9 +24,7 @@
           </template>
           <template v-slot:body-cell-nombre="props">
             <q-td :props="props">
-              <div style="max-width: 100px;wrap-option: wrap;line-height: 0.9;outline: 1px solid red;">
                 {{ props.row.nombre }}
-              </div>
             </q-td>
           </template>
           <template v-slot:body-cell-opciones="props">
