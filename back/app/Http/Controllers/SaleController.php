@@ -146,7 +146,7 @@ class SaleController extends Controller
             return $this->insertarRecibo($request,$client);
         }
 
-        error_log("cerificado todo bien");
+        //error_log("cerificado todo bien");
 
         if (sizeof($request->detalleVenta) > 0){
 
@@ -179,12 +179,14 @@ class SaleController extends Controller
             $max=Sale::where('cufd',$cufd->codigo)->where('tipo','BOLETERIA')->max('numeroFactura');
             $numeroFactura=intval($max)+1;
         }
-        if (Sale::count()==0) {
+
+        /*if (Sale::count()==0) {
             $saleId=1;
-        }else{
+        }else{*/
             $sale=Sale::orderBy('id', 'desc')->first();
             $saleId=intval($sale->id)+1;
-        }
+        //}
+
         $detalleFactura="";
         foreach ($request->detalleVenta as $detalle){
             $detalleFactura.="<detalle>
@@ -284,7 +286,7 @@ class SaleController extends Controller
         }
 //        exit;
 
-        error_log("FIRMA: ");
+        //error_log("FIRMA: ");
 
         $file = "archivos/".$nameFile.'.xml';
         $gzfile = "archivos/".$nameFile.'.xml'.'.gz';
@@ -296,7 +298,7 @@ class SaleController extends Controller
         $hashArchivo=hash('sha256', $archivo);
 
         $exitecomunicacionSiat=$this->comunicacionSiat();
-        error_log("exitecomunicacionSiat: ".$exitecomunicacionSiat);
+       // error_log("exitecomunicacionSiat: ".$exitecomunicacionSiat);
 //        unlink($gzfile);
         if($exitecomunicacionSiat){
             $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
@@ -714,15 +716,23 @@ class SaleController extends Controller
                 'trace' => 1,
                 'use' => SOAP_LITERAL,
                 'style' => SOAP_DOCUMENT,
+                'connection_timeout' => 10,
+                'default_socket_timeout' => 10,
             ]);
 
             $result = $client->verificarComunicacion();
+
+
             if ($result->return->transaccion) {
                 return true;
             }else{
                 return false;
             }
-        }catch (\Exception $e){
+        } catch (\SoapFault $e) {
+            // Si ocurre un error con el SOAP, se captura aquí
+            return false;
+        } catch (\Exception $e) {
+            // Otros errores posibles
             return false;
         }
     }
