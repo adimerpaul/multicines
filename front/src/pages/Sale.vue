@@ -242,13 +242,13 @@
               <div class="col-2">
                 <q-input outlined label="NIT/CARNET"
                          required v-model="client.numeroDocumento"
-                         debounce="1000"
+                         debounce="300"
                          @update:modelValue="searchClient"
                 />
               </div>
               <div class="col-2">
                 <q-input outlined label="Complemento" v-model="client.complemento"
-                         debounce="1000"
+                         debounce="300"
                          @update:modelValue="searchClient"
                          style="text-transform: uppercase"/>
               </div>
@@ -582,7 +582,7 @@ export default {
         this.$q.notify({
           color: 'negative',
           textColor: 'white',
-          message: err.message,
+          message: err.response.data.message,
           position: 'top',
           timeout: 5000,
         })

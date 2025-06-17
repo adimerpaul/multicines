@@ -160,16 +160,25 @@ class SaleController extends Controller
 
         $codigoSucursal=0;
 
-        $user=User::find($request->user()->id);
+        $user=$request->user();
 
-        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
-            return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
-        }
-        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
-            return response()->json(['message' => 'No exite CUFD para la venta!!'], 400);
-        }
-        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
-        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+            $cui = Cui::where('codigoPuntoVenta', $codigoPuntoVenta)
+                ->where('codigoSucursal', $codigoSucursal)
+                ->where('fechaVigencia', '>=', now())
+                ->first();
+
+            if (!$cui) {
+                return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
+            }
+
+            $cufd = Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)
+                ->where('codigoSucursal', $codigoSucursal)
+                ->where('fechaVigencia', '>=', now())
+                ->first();
+
+            if (!$cufd) {
+                return response()->json(['message' => 'No existe CUFD para la venta!!'], 400);
+            }
 
 
         if (Sale::where('cufd', $cufd->codigo)->where('tipo','BOLETERIA')->count()==0){
@@ -716,8 +725,8 @@ class SaleController extends Controller
                 'trace' => 1,
                 'use' => SOAP_LITERAL,
                 'style' => SOAP_DOCUMENT,
-                'connection_timeout' => 10,
-                'default_socket_timeout' => 10,
+                'connection_timeout' => 5,
+                'default_socket_timeout' => 5,
             ]);
 
             $result = $client->verificarComunicacion();

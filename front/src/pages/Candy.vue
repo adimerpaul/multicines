@@ -140,7 +140,7 @@
                       hint="Carnet o nit"
                       lazy-rules
                       :rules="[ val => val && val.length > 0 || 'Dato obligatorio']"
-                      debounce="1000"
+                      debounce="300"
                       @update:model-value="searchClient"
                     />
                   </div>
@@ -149,7 +149,7 @@
                       outlined
                       v-model="client.complemento"
                       label="COMPLEMENTO"
-                      debounce="1000"
+                      debounce="300"
                       @update:model-value="searchClient"
                     />
                   </div>
