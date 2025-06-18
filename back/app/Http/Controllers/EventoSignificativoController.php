@@ -216,7 +216,8 @@ class EventoSignificativoController extends Controller
             $sale=Sale::find($file['id']);
             $sale->codigoRecepcionEventoSignificativo=$request->codigoRecepcionEventoSignificativo;
             $sale->siatEnviado=1;
-            $sale->save();
+            if(!file_exists("archivos/".$file['id'].".xml"))
+                $sale->save();
         }
         return var_dump($result);
     }
