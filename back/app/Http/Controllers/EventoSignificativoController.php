@@ -8,9 +8,14 @@ use App\Models\EventoSignificativo;
 use App\Http\Requests\StoreEventoSignificativoRequest;
 use App\Http\Requests\UpdateEventoSignificativoRequest;
 use App\Models\Sale;
+use App\Models\Detail;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Phar;
 use PharData;
+use SimpleXMLElement;
+use DOMDocument;
+
 class EventoSignificativoController extends Controller
 {
     /**
@@ -128,7 +133,19 @@ class EventoSignificativoController extends Controller
         // ADD FILES TO archive.tar FILE
 
         foreach($request->datos as $file){
-            $a->addFile("archivos/".$file['id'].".xml"); //Agregamos el fichero
+            // primero verificar si el archivo existe
+            if (!file_exists("archivos/".$file['id'].".xml")) {
+                // sino existe determinar si tipo BOLETERIA o CANDY  y llmar a otras funciones
+                if ($file['tipo'] == 'BOLETERIA') {
+                    if ($this->genXMLBol($file['id']))
+                        $a->addFile("archivos/".$file['id'].".xml"); //Agregamos el fichero
+
+                } else {
+                    if ($this->genXMLCan($file['id']))
+                        $a->addFile("archivos/".$file['id'].".xml"); //Agregamos el fichero
+                }
+            }
+
         }
 
         // COMPRESS archive.tar FILE. COMPRESSED FILE WILL BE archive.tar.gz
@@ -187,13 +204,14 @@ class EventoSignificativoController extends Controller
                 "cafc"=>"XXX",
                 "cantidadFacturas"=>count($request->datos),
                 "codigoEvento"=>$request->codigoRecepcionEventoSignificativo,
-
             ]
         ]);
         error_log("resultado".json_encode($result));
+
         $eventoSignificativo=EventoSignificativo::find($request->id);
         $eventoSignificativo->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
         $eventoSignificativo->save();
+
         foreach($request->datos as $file){
             $sale=Sale::find($file['id']);
             $sale->codigoRecepcionEventoSignificativo=$request->codigoRecepcionEventoSignificativo;
@@ -202,10 +220,12 @@ class EventoSignificativoController extends Controller
         }
         return var_dump($result);
     }
+
     public function store(StoreEventoSignificativoRequest $request)
     {
         $codigoPuntoVenta=$request->codigoPuntoVenta;
         $codigoSucursal=$request->codigoSucursal;
+
         if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
         }
@@ -323,5 +343,233 @@ class EventoSignificativoController extends Controller
     public function destroy(EventoSignificativo $eventoSignificativo)
     {
         //
+    }
+
+        public function genXMLBol($id)
+    {
+
+       $sale=Sale::find($id);
+       $details=Detail::where('sale_id',$id)->get();
+        $client=Client::find($sale->client_id);
+
+        $fechacuf=date("Y-m-d",strtotime($sale->fechaEmision));
+        //details tiene datos de la venta
+        if( $details->count()==0 )
+            return false;
+        $codigoAmbiente=env('AMBIENTE');
+        $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
+        $codigoEmision=1; // 1 online 2 offline 3 masivo
+        $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
+        $codigoPuntoVenta=0;
+        $codigoSistema=env('CODIGO_SISTEMA');
+        $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
+
+        $codigoSucursal=0;
+
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia',$fechacuf)->first();
+
+        $cuf = new CUF();
+        error_log('fecha: '.date("YmdHis000",strtotime($sale->fechaEmision)));
+        $fechaCUF=date("YmdHis000",strtotime($sale->fechaEmision));
+
+        $cuf = $cuf->obtenerCUF(env('NIT'), $fechaCUF, $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+        $cuf = $cuf.$cufd->codigoControl;
+        $sale->cuf=$cuf;
+        $sale->siatEnviado=false;
+        $sale->save();
+
+        $detalleFactura="";
+        foreach ($details as $detalle){
+            $detalleFactura.="<detalle>
+                <actividadEconomica>590000</actividadEconomica>
+                <codigoProductoSin>99100</codigoProductoSin>
+                <codigoProducto>".$detalle->programa_id."</codigoProducto>
+                <descripcion>".utf8_encode(str_replace("&","&amp;",$detalle->descripcion))."</descripcion>
+                <cantidad>".$detalle->cantidad."</cantidad>
+                <unidadMedida>62</unidadMedida>
+                <precioUnitario>".$detalle->precioUnitario."</precioUnitario>
+                <montoDescuento>0</montoDescuento>
+                <subTotal>".$detalle->subTotal."</subTotal>
+                <numeroSerie xsi:nil='true'/>
+                <numeroImei xsi:nil='true'/>
+            </detalle>";
+        }
+        $fechaEnvio=date("Y-m-d\TH:i:s.000",strtotime($sale->fechaEmision));
+
+        $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+        <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
+        <cabecera>
+        <nitEmisor>".env('NIT')."</nitEmisor>
+        <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
+        <municipio>Oruro</municipio>
+        <telefono>".env('TELEFONO')."</telefono>
+        <numeroFactura>$sale->numeroFactura</numeroFactura>
+        <cuf>".$sale->cuf."</cuf>
+        <cufd>".$sale->cufd."</cufd>
+        <codigoSucursal>$sale->codigoSucursal</codigoSucursal>
+        <direccion>".env('DIRECCION')."</direccion>
+        <codigoPuntoVenta>$sale->codigoPuntoVenta</codigoPuntoVenta>
+        <fechaEmision>$fechaEnvio</fechaEmision>
+        <nombreRazonSocial>".utf8_encode(str_replace("&","&amp;",$client->nombreRazonSocial))."</nombreRazonSocial>
+        <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
+        <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
+        <complemento>".$client->complemento."</complemento>
+        <codigoCliente>".$client->id."</codigoCliente>
+        <codigoMetodoPago>1</codigoMetodoPago>
+        <numeroTarjeta xsi:nil='true'/>
+        <montoTotal>".$sale->montoTotal."</montoTotal>
+        <montoTotalSujetoIva>".$sale->montoTotal."</montoTotalSujetoIva>
+        <codigoMoneda>1</codigoMoneda>
+        <tipoCambio>1</tipoCambio>
+        <montoTotalMoneda>".$sale->montoTotal."</montoTotalMoneda>
+        <montoGiftCard xsi:nil='true'/>
+        <descuentoAdicional>0</descuentoAdicional>
+        <codigoExcepcion>".($client->codigoTipoDocumentoIdentidad==5?1:0)."</codigoExcepcion>
+        <cafc xsi:nil='true'/>
+        <leyenda>$sale->leyenda</leyenda>
+        <usuario>".explode(" ", $sale->usuario)[0] ."</usuario>
+        <codigoDocumentoSector>".$sale->codigoDocumentoSector."</codigoDocumentoSector>
+        </cabecera>";
+        $text.=$detalleFactura;
+        $text.="</facturaElectronicaCompraVenta>";
+
+        $xml = new SimpleXMLElement($text);
+        $dom = new DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
+
+        $nameFile=$sale->id;
+        $dom->save("archivos/".$nameFile.'.xml');
+
+        $firmar = new Firmar();
+        $firmar->firmar("archivos/".$nameFile.'.xml');
+
+        $xml = new DOMDocument();
+        $xml->load("archivos/".$nameFile.'.xml');
+
+        $file = "archivos/".$nameFile.'.xml';
+        $gzfile = "archivos/".$nameFile.'.xml'.'.gz';
+        $fp = gzopen ($gzfile, 'w9');
+        gzwrite ($fp, file_get_contents($file));
+        gzclose($fp);
+
+        $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
+        $hashArchivo=hash('sha256', $archivo);
+        return true;
+    }
+
+        public function genXMLCan($id)
+    {
+
+       $sale=Sale::find($id);
+       $details=Detail::where('sale_id',$id)->get();
+        if( $details->count()==0 )
+            return false;
+
+        $client=Client::find($sale->client_id);
+        $fechacuf=date("Y-m-d",strtotime($sale->fechaEmision));
+
+        $codigoAmbiente=env('AMBIENTE');
+        $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
+        $codigoEmision=2; // 1 online 2 offline 3 masivo
+        $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
+        $codigoPuntoVenta=0;
+        $codigoSistema=env('CODIGO_SISTEMA');
+        $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
+
+        $codigoSucursal=0;
+
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->whereDate('fechaVigencia',$fechacuf)->first();
+        $cuf = new CUF();
+
+        $fechaCUF=date("YmdHis000",strtotime($sale->fechaEmision));
+
+        $cuf = $cuf->obtenerCUF(env('NIT'), $fechaCUF, $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $sale->numeroFactura, $codigoPuntoVenta);
+        $cuf = $cuf.$cufd->codigoControl;
+        $sale->cuf=$cuf;
+        $sale->siatEnviado=false;
+        $sale->save();
+
+        $detalleFactura="";
+        foreach ($details as $detalle){
+            $detalleFactura.="<detalle>
+                <actividadEconomica>590000</actividadEconomica>
+                <codigoProductoSin>99100</codigoProductoSin>
+                <codigoProducto>".$detalle->product_id."</codigoProducto>
+                <descripcion>".utf8_encode(str_replace("&","&amp;",$detalle->descripcion))."</descripcion>
+                <cantidad>".$detalle->cantidad."</cantidad>
+                <unidadMedida>62</unidadMedida>
+                <precioUnitario>".$detalle->precioUnitario."</precioUnitario>
+                <montoDescuento>0</montoDescuento>
+                <subTotal>".$detalle->subTotal."</subTotal>
+                <numeroSerie xsi:nil='true'/>
+                <numeroImei xsi:nil='true'/>
+            </detalle>";
+        }
+        $fechaEnvio=date("Y-m-d\TH:i:s.000",strtotime($sale->fechaEmision));
+
+        $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+        <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
+        <cabecera>
+        <nitEmisor>".env('NIT')."</nitEmisor>
+        <razonSocialEmisor>".env('RAZON')."</razonSocialEmisor>
+        <municipio>Oruro</municipio>
+        <telefono>".env('TELEFONO')."</telefono>
+        <numeroFactura>$sale->numeroFactura</numeroFactura>
+        <cuf>".$sale->cuf."</cuf>
+        <cufd>".$sale->cufd."</cufd>
+        <codigoSucursal>$sale->codigoSucursal</codigoSucursal>
+        <direccion>".env('DIRECCION')."</direccion>
+        <codigoPuntoVenta>$sale->codigoPuntoVenta</codigoPuntoVenta>
+        <fechaEmision>$fechaEnvio</fechaEmision>
+        <nombreRazonSocial>".utf8_encode(str_replace("&","&amp;",$client->nombreRazonSocial))."</nombreRazonSocial>
+        <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
+        <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
+        <complemento>".$client->complemento."</complemento>
+        <codigoCliente>".$client->id."</codigoCliente>
+        <codigoMetodoPago>1</codigoMetodoPago>
+        <numeroTarjeta xsi:nil='true'/>
+        <montoTotal>".$sale->montoTotal."</montoTotal>
+        <montoTotalSujetoIva>".$sale->montoTotal."</montoTotalSujetoIva>
+        <codigoMoneda>1</codigoMoneda>
+        <tipoCambio>1</tipoCambio>
+        <montoTotalMoneda>".$sale->montoTotal."</montoTotalMoneda>
+        <montoGiftCard xsi:nil='true'/>
+        <descuentoAdicional>0</descuentoAdicional>
+        <codigoExcepcion>".($client->codigoTipoDocumentoIdentidad==5?1:0)."</codigoExcepcion>
+        <cafc xsi:nil='true'/>
+        <leyenda>$sale->leyenda</leyenda>
+        <usuario>".explode(" ", $sale->usuario)[0] ."</usuario>
+        <codigoDocumentoSector>".$sale->codigoDocumentoSector."</codigoDocumentoSector>
+        </cabecera>";
+        $text.=$detalleFactura;
+        $text.="</facturaElectronicaCompraVenta>";
+
+        $xml = new SimpleXMLElement($text);
+        $dom = new DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
+
+        $nameFile=$sale->id;
+        $dom->save("archivos/".$nameFile.'.xml');
+
+        $firmar = new Firmar();
+        $firmar->firmar("archivos/".$nameFile.'.xml');
+
+
+        $xml = new DOMDocument();
+        $xml->load("archivos/".$nameFile.'.xml');
+
+        $file = "archivos/".$nameFile.'.xml';
+        $gzfile = "archivos/".$nameFile.'.xml'.'.gz';
+        $fp = gzopen ($gzfile, 'w9');
+        gzwrite ($fp, file_get_contents($file));
+        gzclose($fp);
+
+        $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
+        $hashArchivo=hash('sha256', $archivo);
+        return true;
     }
 }
