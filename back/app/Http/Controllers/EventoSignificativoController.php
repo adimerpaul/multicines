@@ -134,17 +134,19 @@ class EventoSignificativoController extends Controller
 
         foreach($request->datos as $file){
             // primero verificar si el archivo existe
-                 $ruta="archivos/".$file['id'].".xml";
-            if (!file_exists($ruta)) {
+            $ruta="archivos/".$file['id'].".xml";
+
+            if (file_exists($ruta)) {
                 // sino existe determinar si tipo BOLETERIA o CANDY  y llmar a otras funciones
+                $a->addFile($ruta); //Agregamos el fichero
+
+            }
+            else{
                 if ($file['tipo'] == 'BOLETERIA') {
                     $this->genXMLBol($file['id']);
                 } else {
                     $this->genXMLCan($file['id']);
                 }
-                        $a->addFile($ruta); //Agregamos el fichero
-            }
-            else {
                 $a->addFile($ruta); //Agregamos el fichero
             }
         }
@@ -153,15 +155,11 @@ class EventoSignificativoController extends Controller
         $a->compress(Phar::GZ);
 
         // NOTE THAT BOTH FILES WILL EXISTS. SO IF YOU WANT YOU CAN UNLINK archive.tar
-        if (file_exists('archivos/archive.tar')) {
             unlink('archivos/archive.tar');
-        }
         $firmar = new Firmar();
         $archivo=$firmar->getFileGzip("archivos/archive.tar.gz");
         $hashArchivo=hash('sha256', $archivo);
-        if (file_exists('archivos/archive.tar.gz')) {
             unlink('archivos/archive.tar.gz');
-        }
 
 
         $client = new \SoapClient(env('URL_SIAT')."ServicioFacturacionCompraVenta?WSDL",  [
@@ -360,8 +358,6 @@ class EventoSignificativoController extends Controller
 
         $fechacuf=date("Y-m-d",strtotime($sale->fechaEmision));
         //details tiene datos de la venta
-        if( $details->count()==0 )
-            return false;
         $codigoAmbiente=env('AMBIENTE');
         $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
         $codigoEmision=1; // 1 online 2 offline 3 masivo
@@ -462,7 +458,6 @@ class EventoSignificativoController extends Controller
 
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
         $hashArchivo=hash('sha256', $archivo);
-        return true;
     }
 
         public function genXMLCan($id)
@@ -470,8 +465,6 @@ class EventoSignificativoController extends Controller
 
        $sale=Sale::find($id);
        $details=Detail::where('sale_id',$id)->get();
-        if( $details->count()==0 )
-            return false;
 
         $client=Client::find($sale->client_id);
         $fechacuf=date("Y-m-d",strtotime($sale->fechaEmision));
@@ -576,6 +569,5 @@ class EventoSignificativoController extends Controller
 
         $archivo=$firmar->getFileGzip("archivos/".$nameFile.'.xml'.'.gz');
         $hashArchivo=hash('sha256', $archivo);
-        return true;
     }
 }
