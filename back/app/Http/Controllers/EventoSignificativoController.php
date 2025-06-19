@@ -135,18 +135,18 @@ class EventoSignificativoController extends Controller
         foreach($request->datos as $file){
             // primero verificar si el archivo existe
                  $ruta="archivos/".$file['id'].".xml";
-            if (file_exists($ruta)) {
+            if (!file_exists($ruta)) {
                 // sino existe determinar si tipo BOLETERIA o CANDY  y llmar a otras funciones
                 if ($file['tipo'] == 'BOLETERIA') {
-                    if ($this->genXMLBol($file['id']))
-                        $a->addFile("$ruta"); //Agregamos el fichero
-
+                    $this->genXMLBol($file['id']);
                 } else {
-                    if ($this->genXMLCan($file['id']))
-                        $a->addFile("$ruta"); //Agregamos el fichero
+                    $this->genXMLCan($file['id']);
                 }
+                        $a->addFile($ruta); //Agregamos el fichero
             }
-
+            else {
+                $a->addFile($ruta); //Agregamos el fichero
+            }
         }
 
         // COMPRESS archive.tar FILE. COMPRESSED FILE WILL BE archive.tar.gz
