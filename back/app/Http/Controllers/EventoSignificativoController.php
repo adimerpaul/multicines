@@ -351,7 +351,7 @@ class EventoSignificativoController extends Controller
         //
     }
 
-        public function genXMLBol($id)
+    public function genXMLBol($id)
     {
 
        $sale=Sale::find($id);

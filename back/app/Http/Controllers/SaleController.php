@@ -676,11 +676,11 @@ class SaleController extends Controller
 
         $xml = new DOMDocument();
         $xml->load("archivos/".$nameFile.'.xml');
-        if (!$xml->schemaValidate('./facturaElectronicaCompraVenta.xsd')) {
+        /*if (!$xml->schemaValidate('./facturaElectronicaCompraVenta.xsd')) {
             echo "invalid";
         }
         else {
-        }
+        }*/
 
         error_log("FIRMA: ");
 
