@@ -134,15 +134,16 @@ class EventoSignificativoController extends Controller
 
         foreach($request->datos as $file){
             // primero verificar si el archivo existe
-            if (!file_exists("archivos/".$file['id'].".xml")) {
+                 $ruta="archivos/".$file['id'].".xml";
+            if (file_exists($ruta)) {
                 // sino existe determinar si tipo BOLETERIA o CANDY  y llmar a otras funciones
                 if ($file['tipo'] == 'BOLETERIA') {
                     if ($this->genXMLBol($file['id']))
-                        $a->addFile("archivos/".$file['id'].".xml"); //Agregamos el fichero
+                        $a->addFile("$ruta"); //Agregamos el fichero
 
                 } else {
                     if ($this->genXMLCan($file['id']))
-                        $a->addFile("archivos/".$file['id'].".xml"); //Agregamos el fichero
+                        $a->addFile("$ruta"); //Agregamos el fichero
                 }
             }
 
