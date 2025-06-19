@@ -103,6 +103,11 @@ class SaleController extends Controller
     public function store(StoreSaleRequest $request)
     {
        // return $request;
+       // validar detalleVenta
+        if (sizeof($request->detalleVenta) == 0) {
+            return response()->json(['message' => 'El detalle de la venta no puede estar vacio'], 400);
+        }
+        
         if ($request->client['complemento']==null){
             $complemento="";
         }else{

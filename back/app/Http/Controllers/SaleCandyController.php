@@ -53,7 +53,11 @@ class SaleCandyController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(StoreSaleCandyRequest $request)
-    {
+    {   // verioficar detalleVenta que no este vacio
+        if (sizeof($request->detalleVenta) == 0) {
+            return response()->json(['message' => 'El detalle de la venta no puede estar vacio'], 400);
+        }
+        
         if ($request->client['complemento']==null){
             $complemento="";
         }else{
