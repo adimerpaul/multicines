@@ -210,6 +210,10 @@ class EventoSignificativoController extends Controller
             ]
         ]);
         error_log("resultado".json_encode($result));
+        
+        if(!$result->RespuestaServicioFacturacion->transaccion){
+            return response()->json($result, 400);
+        }
 
         $eventoSignificativo=EventoSignificativo::find($request->id);
         $eventoSignificativo->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
