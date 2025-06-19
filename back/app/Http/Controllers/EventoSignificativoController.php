@@ -178,18 +178,7 @@ class EventoSignificativoController extends Controller
 
         $result= $client->recepcionPaqueteFactura([
             "SolicitudServicioRecepcionPaquete"=>[
-//                "codigoAmbiente"=>env('AMBIENTE'),
-//                "codigoMotivoEvento"=>$request->codigoMotivoEvento,
-//                "codigoPuntoVenta"=>0,
-//                "codigoSistema"=>env('CODIGO_SISTEMA'),
-//                "codigoSucursal"=>0,
-//                "cufd"=>$cufd->codigo,
-//                "cufdEvento"=>$request->cufdEvento,
-//                "cuis"=>$cui->codigo,
-//                "descripcion"=>$request->descripcion,
-//                "fechaHoraFinEvento"=>date('Y-m-d\TH:i:s.000', strtotime($request->fechaHoraFinEvento)),
-//                "fechaHoraInicioEvento"=>date('Y-m-d\TH:i:s.000', strtotime($request->fechaHoraInicioEvento)),
-//                "nit"=>env('NIT'),
+
                 "codigoAmbiente"=>$codigoAmbiente,
                 "codigoDocumentoSector"=>$codigoDocumentoSector,
                 "codigoEmision"=>$codigoEmision,
@@ -210,7 +199,7 @@ class EventoSignificativoController extends Controller
             ]
         ]);
         error_log("resultado".json_encode($result));
-        
+
         if(!$result->RespuestaServicioFacturacion->transaccion){
             return response()->json($result, 400);
         }
@@ -223,8 +212,7 @@ class EventoSignificativoController extends Controller
             $sale=Sale::find($file['id']);
             $sale->codigoRecepcionEventoSignificativo=$request->codigoRecepcionEventoSignificativo;
             $sale->siatEnviado=1;
-            if(!file_exists("archivos/".$file['id'].".xml"))
-                $sale->save();
+            $sale->save();
         }
         return var_dump($result);
     }
