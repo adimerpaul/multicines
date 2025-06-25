@@ -9,34 +9,19 @@ use App\Models\Cui;
 
 class CufdController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        return Cufd::orderBy('id', 'desc')->with(array('sales' => function($query) {
+    public function index(){
+        $perPage = request()->get('per_page', 10); // Puedes cambiar el valor por defecto
+        return Cufd::with(['sales' => function($query) {
             $query->where('siatEnviado', false);
-        }))->get();
+        }])
+            ->orderBy('id', 'desc')
+            ->paginate($perPage);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreCufdRequest  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(StoreCufdRequest $request)
     {
         if (Cufd::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->where('fechaVigencia','>=', now())->count()>=1){
@@ -70,7 +55,7 @@ class CufdController extends Controller
                 ]
             ]);
             error_log("result: ".json_encode($result));
-            
+
             $cufd = new Cufd();
             $cufd->codigo = $result->RespuestaCufd->codigo;
             $cufd->codigoControl = $result->RespuestaCufd->codigoControl;
@@ -117,46 +102,22 @@ class CufdController extends Controller
             }
             return response()->json(['success' => 'CUFD creado correctamente'], 200);
     }
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Cufd  $cufd
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Cufd $cufd)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Cufd  $cufd
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Cufd $cufd)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateCufdRequest  $request
-     * @param  \App\Models\Cufd  $cufd
-     * @return \Illuminate\Http\Response
-     */
     public function update(UpdateCufdRequest $request, Cufd $cufd)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Cufd  $cufd
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Cufd $cufd)
     {
         //
