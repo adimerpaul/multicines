@@ -2,7 +2,15 @@
   <q-page>
     <div class="row">
       <div class="col-12">
-        <q-table :rows="cufds" dense title="Gestionar cufd" :columns="cufdsColums" :rows-per-page-options="[0]" :filter="cudfFilter">
+        <q-table
+          :rows="cufds"
+          :columns="cufdsColums"
+          row-key="id"
+          :loading="loading"
+          :rows-per-page-options="[5, 10, 20]"
+          :pagination="pagination"
+          @request="onRequest"
+        >
           <template v-slot:top-right>
             <q-btn
               color="green"
@@ -15,7 +23,15 @@
                 <q-icon name="search" />
               </template>
             </q-input>
+            <q-pagination
+              v-model="pagination.page"
+              :max="pagination.last_page"
+              @update:model-value="onRequest"
+              input
+            />
           </template>
+<!--          <template v-slot:top>-->
+<!--          </template>-->
           <template v-slot:body-cell-Opciones="props">
             <q-td :props="props" auto-width>
               <q-btn v-if="props.pageIndex==0" size="10px" icon="add_circle_outline" @click="eventoSignificativoClick(props.row)" color="primary" label="Evento significativo" no-caps/>
@@ -101,7 +117,13 @@ export default {
       fechaHoraFinEvento:date.formatDate(new Date(),'YYYY-MM-DD HH:mm:ss'),
       cufd:{},
       cufdEvento:{},
-      cufds:[],
+      cufds: [],
+      pagination: {
+        page: 1,
+        rowsPerPage: 10,
+        rowsNumber: 0,
+        last_page: 1
+      },
       events:[],
       event:{},
       cui:{
@@ -134,6 +156,9 @@ export default {
     });
   },
   methods: {
+    onRequest() {
+      this.cufdGet();
+    },
     eventoSignificativoClick(cufdEvento){
       this.eventoSignificativoDialog=true;
       // this.cufd=props.row;
@@ -142,14 +167,24 @@ export default {
       this.fechaHoraFinEvento=this.cufdEvento.fechaVigencia
     },
     cufdGet() {
-      this.loading=true
-      this.$api.get('cufd').then(res => {
-        res.data.forEach(r=>{
-          r.label=' Fecha:'+r.fechaCreacion.substring(0,10)
-        })
-        this.loading=false
-        this.cufds = res.data
-      })
+      this.loading = true;
+      const { page, rowsPerPage } = this.pagination;
+
+      this.$api.get('cufd', {
+        params: {
+          page,
+          per_page: rowsPerPage,
+          filter: this.cudfFilter
+        }
+      }).then(res => {
+        this.cufds = res.data.data;
+        this.pagination.rowsNumber = res.data.total;
+        this.pagination.last_page = res.data.last_page;
+        this.pagination.page = res.data.current_page;
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      });
     },
     cuiCreate() {
       this.loading = true
