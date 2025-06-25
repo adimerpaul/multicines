@@ -49,17 +49,42 @@ class SaleController extends Controller
     }
     public function movies(Request $request)
     {
-        //return Programa::select('movie_id')->groupBy('movie_id')->with('movie')->whereDate('fecha',$request->fecha)->get();
-//        return DB::SELECT("select m.id,m.nombre,m.duracion,m.formato,m.imagen,count(*) as cantidad from programas p,movies m,tickets t where p.movie_id=m.id and t.programa_id=p.id and p.fecha='$request->fecha' GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen");
-        return DB::select("
-        select m.id,m.nombre,m.duracion,m.formato,m.imagen,(
-        SELECT count(*) FROM tickets WHERE programa_id=p.id and devuelto=0
-        ) as cantidad
-        from programas p
-        INNER JOIN movies m ON p.movie_id=m.id
-        where p.fecha='$request->fecha'
-        and p.activo='ACTIVO'
-        GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen;");
+
+//        return DB::select("
+//        select m.id,m.nombre,m.duracion,m.formato,m.imagen,(
+//        SELECT count(*) FROM tickets WHERE programa_id=p.id and devuelto=0
+//        ) as cantidad
+//        from programas p
+//        INNER JOIN movies m ON p.movie_id=m.id
+//        where p.fecha='$request->fecha'
+//        and p.activo='ACTIVO'
+//        GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen;");
+
+        $fecha = $request->fecha;
+
+        $programas = \App\Models\Programa::with(['movie'])
+            ->where('fecha', $fecha)
+            ->where('activo', 'ACTIVO')
+            ->get();
+
+        // Agrupar por película
+        $peliculas = $programas->groupBy('movie_id')->map(function ($progs) {
+            $movie = $progs->first()->movie;
+            $cantidad = $progs->sum(function ($prog) {
+                return $prog->tickets()->where('devuelto', false)->count();
+            });
+
+            return [
+                'id' => $movie->id,
+                'nombre' => $movie->nombre,
+                'duracion' => $movie->duracion,
+                'formato' => $movie->formato,
+                'imagen' => $movie->imagen,
+                'cantidad' => $cantidad
+            ];
+        })->values();
+
+        return response()->json($peliculas);
     }
 
     public function movietotal(Request $request){
@@ -107,7 +132,7 @@ class SaleController extends Controller
         if (sizeof($request->detalleVenta) == 0) {
             return response()->json(['message' => 'El detalle de la venta no puede estar vacio'], 400);
         }
-        
+
         if ($request->client['complemento']==null){
             $complemento="";
         }else{
