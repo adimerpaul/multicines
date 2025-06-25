@@ -28,10 +28,11 @@ export default boot(({ app,router }) => {
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`
     api.post('me').then((response) => {
-      console.log(response.data)
-      globalStore().user = response.data
+      console.log(response.data.user)
+      globalStore().user = response.data.user
+      globalStore().cine = response.data.datocine
       globalStore().isLoggedIn = true
-      response.data.permisos.forEach(r => {
+      response.data.user.permisos.forEach(r => {
           if(r.id==1) globalStore().booluser=true
           if(r.id==2) globalStore().boolcuis=true
           if(r.id==3) globalStore().boolsincr=true

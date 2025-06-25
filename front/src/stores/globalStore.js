@@ -5,6 +5,7 @@ export const globalStore = defineStore('global', {
     counter: 0,
     movies: [],
     user: {},
+    cine: {},
     eventNumber: 0,
     movieSingleTon: false,
     isLoggedIn: !!localStorage.getItem('tokenMulti'),
