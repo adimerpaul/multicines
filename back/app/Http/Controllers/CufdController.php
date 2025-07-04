@@ -17,6 +17,16 @@ class CufdController extends Controller
             ->orderBy('id', 'desc')
             ->paginate($perPage);
     }
+
+    public function listCufd()
+    {
+       //listar de los ultimos 60 dias
+       return Cufd::where('fechaCreacion', '>=', now()->subDays(60))
+            ->orderBy('id', 'desc')
+            ->get(); 
+
+    }
+
     public function create()
     {
         //
