@@ -214,6 +214,7 @@
         cadena2+="</tbody>\
         </table>"
         if(this.tbolF==null) this.tbolF=0
+        if(this.tbolFefectivo==null) this.tbolFefectivo=0
         cadena2+="<div class='f-10' style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventafact+" Bs</div>\
                   <div class='f-10' style='text-align:right;'><span class='titulo3'>Total Efectivo: </span> "+this.tbolFefectivo+" Bs</div>\
                   <div class='f-10' style='text-align:right;'><span class='titulo3'>Total Tarjeta: </span> "+this.tbolF+" Bs</div>\
@@ -248,8 +249,8 @@
         cadena3+="</tbody>\
         </table>"
         if(this.tbolR==null) this.tbolR=0
-
-        cadena3+="<div class='f-10' style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventarecibo+" Bs</div>\
+        if(this.tbolRefectivo==null) this.tbolRefectivo=0
+                cadena3+="<div class='f-10' style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventarecibo+" Bs</div>\
                 <div class='f-10' style='text-align:right;'><span class='titulo3'>Total Efectivo: </span> "+this.tbolRefectivo+" Bs</div>\
                 <div class='f-10' style='text-align:right;'><span class='titulo3'>Total Tarjeta: </span> "+this.tbolR+" Bs</div>\
         "

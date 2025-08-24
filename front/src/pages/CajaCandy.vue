@@ -215,6 +215,7 @@
         cadena2+="</tbody>\
         </table>"
         if(this.tcandyF==null) this.tcandyF=0
+        if(this.tefectcandyF==null) this.tefectcandyF=0
         cadena2+="<div style='text-align:right;'><span class='f-10 titulo3'>Total: </span> "+this.ventafactura+" Bs</div>\
                  <div style='text-align:right;'><span class='f-10 titulo3'>Total Efectivo: </span> "+this.tefectcandyF+" Bs</div>\
                  <div style='text-align:right;'><span class='f-10 titulo3'>Total Tarjeta: </span> "+this.tcandyF+" Bs</div>\
@@ -248,7 +249,7 @@
         cadena3+="</tbody>\
         </table>"
         if(this.tcandyR==null) this.tcandyR=0
-
+        if(this.tefectcandyR==null) this.tefectcandyR=0
         cadena3+="<div style='text-align:right;'><span class='f-10 titulo3'>Total: </span> "+this.ventarecibo+" Bs</div>\
         <div style='text-align:right;'><span class='f-10 titulo3'>Total Efectivo: </span> "+this.tefectcandyR+" Bs</div>\
         <div style='text-align:right;'><span class='f-10 titulo3'>Total Tarjeta: </span> "+this.tcandyR+" Bs</div>\

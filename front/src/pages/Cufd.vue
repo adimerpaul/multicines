@@ -83,7 +83,7 @@
           <q-form @submit.prevent="eventoSignificativoCreate">
             <div class="row">
               <div class="col-12">
-                <q-select :options="cufds" dense outlined label="CufdEvento" v-model="cufdEvento" />
+                <q-select :options="listado" dense outlined label="CufdEvento" v-model="cufdEvento" />
               </div>
               <div class="col-12">
                 <q-select :options="events" dense outlined label="codigoMotivoEvento" v-model="event" />
@@ -111,6 +111,7 @@ export default {
   name: `Cuis`,
   data() {
     return {
+      listado:[],
       loading:false,
       eventoSignificativoDialog:false,
       fechaHoraInicioEvento:date.formatDate(new Date(),'YYYY-MM-DD HH:mm:ss'),
@@ -147,6 +148,7 @@ export default {
   },
   created() {
     this.cufdGet();
+    this.getListCufd();
     this.$api.get('event').then(response => {
       response.data.forEach(r=>{
         r.label= r.codigoClasificador+' '+r.descripcion;
@@ -156,12 +158,28 @@ export default {
     });
   },
   methods: {
+    getListCufd() {
+      this.loading = true;
+      this.$api.get('listCufd').then(res => {
+        res.data.forEach(element => {
+          //solo la fecha sin hora
+          element.label = element.fechaCreacion.split(' ')[0];
+        });
+        this.listado = res.data;
+        this.cufdEvento = {label:''};
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      });
+    },
+
     onRequest() {
       this.cufdGet();
     },
     eventoSignificativoClick(cufdEvento){
       this.eventoSignificativoDialog=true;
       // this.cufd=props.row;
+      cufdEvento.label= cufdEvento.fechaCreacion.split(' ')[0];
       this.cufdEvento=cufdEvento;
       this.fechaHoraInicioEvento=this.cufdEvento.fechaCreacion
       this.fechaHoraFinEvento=this.cufdEvento.fechaVigencia
