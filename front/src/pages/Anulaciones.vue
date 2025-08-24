@@ -1,5 +1,6 @@
 <template>
   <q-page class="q-pa-xs">
+    <!-- Filtros -->
     <div class="row q-col-gutter-sm items-end q-mb-sm">
       <div class="col-12 col-sm-3">
         <q-input v-model="fi" type="date" outlined dense label="Desde" @update:model-value="fetchRows" />
@@ -8,15 +9,16 @@
         <q-input v-model="ff" type="date" outlined dense label="Hasta" @update:model-value="fetchRows" />
       </div>
       <div class="col-12 col-sm-3">
+        <q-select dense outlined clearable v-model="estado" :options="estados" label="Estado" @update:model-value="fetchRows" />
+      </div>
+      <div class="col-12 col-sm-3">
         <q-input v-model="filter" outlined dense debounce="300" label="Buscar (cajero, motivo, sección, detalle)">
           <template #append><q-icon name="search" /></template>
         </q-input>
       </div>
-      <div class="col-12 col-sm-3">
-        <q-select dense outlined clearable v-model="estado" :options="estados" label="Estado" @update:model-value="fetchRows" />
-      </div>
     </div>
 
+    <!-- Tabla -->
     <q-table
       title="Gestionar Anulaciones"
       flat bordered dense wrap-cells
@@ -123,6 +125,22 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="dialogAnular" >
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">ANULAR FACTURA</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-select label="motivo" :options="motivos" v-model="motivo"/>
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Cancel" v-close-popup :loading="loading" />
+          <q-btn flat label="ANULAR" @click="enviarAnular" :loading="loading" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -141,7 +159,7 @@ export default {
       ff: moment().endOf('month').format('YYYY-MM-DD'),
       detailDialog: false,
       selected: null,
-      authUser: null, // cambia esto por tu store real si lo tienes
+      authUser: null, // si tienes store de usuario, cámbialo aquí
       columns: [
         { name: 'opciones',       label: 'Opciones',   field: 'opciones' },
         { name: 'id',             label: '#',          field: 'id', sortable: true },
@@ -154,15 +172,42 @@ export default {
         { name: 'estado',         label: 'Estado',     field: 'estado',  sortable: true },
         { name: 'autorizado_por', label: 'Autorizado por', field: row => row.user_autoriza?.name || row.user_autoriza?.email || '-', sortable: true },
         { name: 'anulado_por',    label: 'Anulado por',    field: row => row.user_anulacion?.name || row.user_anulacion?.email || '-', sortable: true }
-      ]
+      ],
+      motivos: [],
+      motivo: null,
+      dialogAnular: false,
+      loading: false,
     }
   },
   created () {
     // si tienes /user con sanctum:
     this.$api.get('user').then(r => { this.authUser = r.data }).catch(() => (this.authUser = { id: 0 }))
     this.fetchRows()
+    this.cargarMotivo()
   },
   methods: {
+    enviarAnular(){
+      // this.$q.loading.show()
+      this.loading = true
+      this.$api.post('anularSale',{sale:this.factura,motivo:this.motivo}).then(res => {
+        // console.log(res.data)
+        // this.$q.loading.hide()
+        this.fetchRows()
+        this.dialogAnular = false
+        this.loading = false
+        this.$q.notify({ message: 'Factura anulada', color: 'positive', icon: 'done' })
+      })
+    },
+    cargarMotivo(){
+      this.$api.get('motivoanular').then(res => {
+        res.data.forEach(r=>{
+          r.label=r.descripcion
+        })
+        this.motivos=res.data;
+
+        this.motivo=this.motivos[0]
+      })
+    },
     chipColor (estado) {
       switch (estado) {
         case 'Pendiente':  return 'orange-7'
@@ -222,17 +267,19 @@ export default {
       })
     },
     onAnular (row) {
-      this.$q.dialog({
-        title: 'Anular registro',
-        message: 'Esta acción marcará la anulación como ejecutada.',
-        prompt: { model: '', type: 'text', label: 'Detalle (opcional)' },
-        cancel: true, persistent: true
-      }).onOk(detalle => {
-        this.$q.loading.show()
-        this.$api.post(`anulaciones/${row.id}/anular`, { detalle })
-          .then(res => this.replaceRow(res.data))
-          .finally(() => this.$q.loading.hide())
-      })
+      this.factura=row.sale
+      this.dialogAnular=true
+      // this.$q.dialog({
+      //   title: 'Anular registro',
+      //   message: 'Esta acción marcará la anulación como ejecutada.',
+      //   prompt: { model: '', type: 'text', label: 'Detalle (opcional)' },
+      //   cancel: true, persistent: true
+      // }).onOk(detalle => {
+      //   this.$q.loading.show()
+      //   this.$api.post(`anulaciones/${row.id}/anular`, { detalle })
+      //     .then(res => this.replaceRow(res.data))
+      //     .finally(() => this.$q.loading.hide())
+      // })
     },
     replaceRow (updated) {
       const i = this.rows.findIndex(r => r.id === updated.id)

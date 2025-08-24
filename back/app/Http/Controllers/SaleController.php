@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\TestMail;
+use App\Models\Anulacion;
 use App\Models\Client;
 use App\Models\Cortesia;
 use App\Models\Cufd;
@@ -992,6 +993,12 @@ class SaleController extends Controller
                     Mail::to($client->email)->send(new TestMail($details));
                 }
 
+            }
+            $anulacion = Anulacion::where('sale_id', $request->sale['id'])->first();
+            if ($anulacion) {
+                $anulacion->estado = 'Anulado';
+                $anulacion->user_anulacion_id = $request->user()->id;
+                $anulacion->save();
             }
             return $result;
 
