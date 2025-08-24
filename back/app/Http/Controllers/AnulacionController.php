@@ -63,9 +63,9 @@ class AnulacionController extends Controller
         if ($anulacion->estado !== 'Pendiente') {
             return response()->json(['message' => 'Solo se pueden autorizar registros en estado Pendiente'], 422);
         }
-        if ($request->user()->id === $anulacion->user_id) {
-            return response()->json(['message' => 'Quien solicita no puede autorizar su propia anulación'], 422);
-        }
+//        if ($request->user()->id === $anulacion->user_id) {
+//            return response()->json(['message' => 'Quien solicita no puede autorizar su propia anulación'], 422);
+//        }
 
         $request->validate([
             'motivo' => ['nullable','string','max:255'],
@@ -74,7 +74,7 @@ class AnulacionController extends Controller
         $anulacion->update([
             'estado'             => 'Autorizado',
             'user_autoriza_id'   => $request->user()->id,
-            'motivo'             => $request->input('motivo', $anulacion->motivo),
+            'motivo'             => $anulacion->motivo.' '.$request->input('motivo', ''),
         ]);
 
         return $anulacion->load(['user','userAutoriza','userAnulacion','sale']);
@@ -85,9 +85,9 @@ class AnulacionController extends Controller
         if ($anulacion->estado !== 'Autorizado') {
             return response()->json(['message' => 'Solo se pueden anular registros en estado Autorizado'], 422);
         }
-        if ($request->user()->id === $anulacion->user_autoriza_id) {
-            return response()->json(['message' => 'La misma persona que autorizó no puede ejecutar la anulación'], 422);
-        }
+//        if ($request->user()->id === $anulacion->user_autoriza_id) {
+//            return response()->json(['message' => 'La misma persona que autorizó no puede ejecutar la anulación'], 422);
+//        }
 
         $request->validate([
             'detalle' => ['nullable','string','max:255'],
@@ -96,7 +96,7 @@ class AnulacionController extends Controller
         $anulacion->update([
             'estado'             => 'Anulado',
             'user_anulacion_id'  => $request->user()->id,
-            'detalle'            => $request->input('detalle', $anulacion->detalle),
+            'detalle'            => $anulacion->detalle.' '.$request->input('detalle', ''),
         ]);
 
         // Aquí podrías ejecutar la lógica contable: reversar sale_id, etc.
@@ -108,9 +108,9 @@ class AnulacionController extends Controller
         if ($anulacion->estado !== 'Pendiente') {
             return response()->json(['message' => 'Solo se pueden rechazar registros en estado Pendiente'], 422);
         }
-        if ($request->user()->id === $anulacion->user_id) {
-            return response()->json(['message' => 'Quien solicita no puede rechazar su propia anulación'], 422);
-        }
+//        if ($request->user()->id === $anulacion->user_id) {
+//            return response()->json(['message' => 'Quien solicita no puede rechazar su propia anulación'], 422);
+//        }
 
         $request->validate([
             'motivo' => ['nullable','string','max:255'],
@@ -119,7 +119,7 @@ class AnulacionController extends Controller
         $anulacion->update([
             'estado'             => 'Rechazado',
             'user_autoriza_id'   => $request->user()->id, // quien rechaza queda como “autoriza” (decisor)
-            'motivo'             => $request->input('motivo', $anulacion->motivo),
+            'motivo'             => $anulacion->motivo . ' ' . $request->input('motivo', ''),
         ]);
 
         return $anulacion->load(['user','userAutoriza','userAnulacion','sale']);

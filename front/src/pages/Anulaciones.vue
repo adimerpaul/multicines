@@ -64,18 +64,28 @@
         <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">
           <q-list>
             <q-item clickable v-close-popup @click="openDetail(props.row)">
-              <q-item-section><q-item-label>Ver detalle</q-item-label></q-item-section>
+              <q-item-section avatar><q-icon name="info" /></q-item-section>
+              <q-item-section>
+                <q-item-label>Ver detalle</q-item-label>
+              </q-item-section>
             </q-item>
 
             <q-item v-if="canAutorizar(props.row)" clickable v-close-popup @click="onAutorizar(props.row)">
-              <q-item-section><q-item-label>Autorizar</q-item-label></q-item-section>
+              <q-item-section avatar><q-icon name="check_circle" /></q-item-section>
+              <q-item-section>
+                <q-item-label>Autorizar</q-item-label>
+              </q-item-section>
             </q-item>
 
             <q-item v-if="canAutorizar(props.row)" clickable v-close-popup @click="onRechazar(props.row)">
-              <q-item-section><q-item-label>Rechazar</q-item-label></q-item-section>
+              <q-item-section avatar><q-icon name="cancel" /></q-item-section>
+              <q-item-section>
+                <q-item-label>Rechazar</q-item-label>
+              </q-item-section>
             </q-item>
 
             <q-item v-if="canAnular(props.row)" clickable v-close-popup @click="onAnular(props.row)">
+              <q-item-section avatar><q-icon name="delete_forever" /></q-item-section>
               <q-item-section><q-item-label>Anular</q-item-label></q-item-section>
             </q-item>
           </q-list>
