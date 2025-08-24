@@ -56,6 +56,7 @@ const routes = [
       { path: 'usuarios', component: User ,meta: { requiresAuth: true } },
       { path: 'reportefuncion', component: Reportefuncion ,meta: { requiresAuth: true } },
       { path: 'factura', component: Factura ,meta: { requiresAuth: true } },
+      { path: 'anulaciones', component: () => import('pages/Anulaciones.vue') ,meta: { requiresAuth: true } },
     ]
   },
   {
