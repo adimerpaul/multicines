@@ -47,6 +47,10 @@ class AnulacionController extends Controller
             'seccion' => ['nullable','string','max:255'],
             'detalle' => ['nullable','string','max:255'],
         ]);
+//        si ya ecite la venta no permite crear ota vez
+        if (isset($data['sale_id']) && Anulacion::where('sale_id', $data['sale_id'])->whereIn('estado', ['Pendiente','Autorizado'])->exists()) {
+            return response()->json(['message' => 'Ya existe una solicitud de anulación pendiente o autorizada para esta venta.'], 422);
+        }
 
         $data['user_id'] = $request->user()->id;
         $data['estado']  = 'Pendiente';
