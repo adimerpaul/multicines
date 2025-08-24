@@ -90,6 +90,21 @@
               <q-item-section avatar><q-icon name="delete_forever" /></q-item-section>
               <q-item-section><q-item-label>Anular</q-item-label></q-item-section>
             </q-item>
+            <q-item clickable v-close-popup>
+              <q-item-section>
+                <q-btn
+                  type="a"
+                  color="primary"
+                  no-caps
+                  dense
+                  class="full-width"
+                  icon="print"
+                  label="Imprimir Formulario"
+                  :href="`${$api.defaults.baseURL}anulaciones/${props.row.id}/pdf`"
+                  target="_blank"
+                />
+              </q-item-section>
+            </q-item>
           </q-list>
         </q-btn-dropdown>
       </q-td>

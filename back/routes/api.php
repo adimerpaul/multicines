@@ -149,3 +149,4 @@ Route::get('test',function (){
 });
 
 
+Route::get('anulaciones/{anulacion}/pdf', [AnulacionController::class, 'pdf'])->name('anulaciones.pdf');
