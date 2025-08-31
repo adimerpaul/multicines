@@ -41,8 +41,8 @@ $box = fn($on) => $on ? '☒' : '☐';
 <table class="header" cellspacing="0" cellpadding="0">
     <tr>
         <td>
-            {{-- Si tienes logo, colócalo en public/images/logo.png --}}
-            {{-- <img class="logo" src="{{ public_path('images/logo.png') }}" alt="Logo"> --}}
+            {{-- Si tienes logo, colócalo en public/imagenes/logo.png --}}
+             <img class="logo" src="{{ public_path('imagenes/logo.png') }}" alt="Logo">
         </td>
         <td class="right small">
             <div><span class="lbl">CÓDIGO:</span> {{ $codigo }}</div>

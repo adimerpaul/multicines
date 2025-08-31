@@ -12,7 +12,7 @@ class AnulacionController extends Controller{
         $anulacion->load(['user', 'userAutoriza', 'userAnulacion', 'sale']);
 
         // Código (prioriza número de factura si existe)
-        $codigo = $anulacion->sale->numeroFactura ?? $anulacion->sale_id ?? $anulacion->id;
+        $codigo = $anulacion->sale_id ?? $anulacion->id;
 
         // Monto formateado
         $monto = number_format((float)($anulacion->monto ?? 0), 2, '.', '');
