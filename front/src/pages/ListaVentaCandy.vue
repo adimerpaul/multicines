@@ -263,7 +263,7 @@ export default {
         },
 
       },
-            formAnu: {
+      formAnu: {
         sale_id: null,
         fecha: date.formatDate(new Date(), 'YYYY-MM-DD'),
         codigo: '',
