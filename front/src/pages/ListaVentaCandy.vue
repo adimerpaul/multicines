@@ -212,6 +212,7 @@ export default {
   name: `LisaVenta`,
   data() {
     return {
+      dialogFormAnulacion: false,
       filter: '',
       lorem: 'lorem impus',
       ticketsDialog:false,
@@ -260,7 +261,9 @@ export default {
           dark: '#000000',
           light: '#FFF',
         },
-      formAnu: {
+
+      },
+            formAnu: {
         sale_id: null,
         fecha: date.formatDate(new Date(), 'YYYY-MM-DD'),
         codigo: '',
@@ -272,8 +275,6 @@ export default {
         autorizadoPor: '',
         modificadoPor: ''
       },
-      dialogFormAnulacion: false,
-      }
     }
   },
   mounted() {
