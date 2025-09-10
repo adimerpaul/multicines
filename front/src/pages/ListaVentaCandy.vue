@@ -61,7 +61,7 @@
                       <q-btn type="a" label="Imp Impuestos " class="full-width" color="info" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
                     </q-item-section>
                   </q-item>
-                 <!-- <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 ">
+                 <!-- <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 && store.boolsolicitud">
                     <q-item-section>
                       <q-btn icon="assignment" color="deep-orange" class="full-width"
                              label="Formulario de Anulación" no-caps dense
@@ -212,6 +212,7 @@ export default {
   name: `LisaVenta`,
   data() {
     return {
+      store:this.$store,
       dialogFormAnulacion: false,
       filter: '',
       lorem: 'lorem impus',

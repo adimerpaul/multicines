@@ -51,6 +51,9 @@ export const globalStore = defineStore('global', {
     boolcliente:false,
     boolcortesia:false,
     boolreporte:false,
+    boolsolicitud:false,
+    boolautorizar:false,
+    boolaprobar:false,
   }),
   getters: {
     doubleCount: (state) => state.counter * 2,
