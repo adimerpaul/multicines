@@ -898,6 +898,12 @@ class SaleController extends Controller
             $sale->siatAnulado = 1;
             $sale->save();
             DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=" . $request->sale['id']);
+                        $anulacion = Anulacion::where('sale_id', $request->sale['id'])->first();
+            if ($anulacion) {
+                $anulacion->estado = 'Anulado';
+                $anulacion->user_anulacion_id = $request->user()->id;
+                $anulacion->save();
+            }
             return true;
         }
         if ($request->sale['venta'] == 'R' && $request->sale['tipo'] == 'BOLETERIA') {
@@ -906,6 +912,12 @@ class SaleController extends Controller
             $sale->siatAnulado = 1;
             $sale->save();
             DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=" . $request->sale['id']);
+                        $anulacion = Anulacion::where('sale_id', $request->sale['id'])->first();
+            if ($anulacion) {
+                $anulacion->estado = 'Anulado';
+                $anulacion->user_anulacion_id = $request->user()->id;
+                $anulacion->save();
+            }
             return true;
         }
         if ($request->sale['venta'] == 'R' && $request->sale['tipo'] == 'CANDY') {
@@ -913,6 +925,12 @@ class SaleController extends Controller
             $sale->siatAnulado = 1;
             $sale->save();
             //DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
+                        $anulacion = Anulacion::where('sale_id', $request->sale['id'])->first();
+            if ($anulacion) {
+                $anulacion->estado = 'Anulado';
+                $anulacion->user_anulacion_id = $request->user()->id;
+                $anulacion->save();
+            }
             return true;
         }
         $codigoAmbiente = env('AMBIENTE');
