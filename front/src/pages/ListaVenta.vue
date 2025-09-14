@@ -240,14 +240,14 @@
 import {date} from "quasar";
 import { Printd } from 'printd'
 import xlsx from "json-as-xlsx"
-
+import { globalStore } from '../stores/globalStore'
 const conversor = require('conversor-numero-a-letras-es-ar');
 const QRCode = require('qrcode')
 export default {
   name: `LisaVenta`,
   data() {
     return {
-      store:this.$store,
+      store: globalStore(),
       filter: '',
       lorem: 'lorem impus',
       ticketsDialog:false,
