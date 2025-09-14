@@ -161,12 +161,12 @@
 
 <script>
 import moment from 'moment'
-
+import { globalStore } from '../stores/globalStore'
 export default {
   name: 'AnulacionesPage',
   data () {
     return {
-      store:this.$store,
+      store: globalStore(),
       rows: [],
       filter: '',
       estados: ['Pendiente', 'Autorizado', 'Anulado', 'Rechazado'],
