@@ -994,12 +994,12 @@ class SaleController extends Controller
                 }
 
             }
-           /* $anulacion = Anulacion::where('sale_id', $request->sale['id'])->first();
+            $anulacion = Anulacion::where('sale_id', $request->sale['id'])->first();
             if ($anulacion) {
                 $anulacion->estado = 'Anulado';
                 $anulacion->user_anulacion_id = $request->user()->id;
                 $anulacion->save();
-            }*/
+            }
             return $result;
 
         } catch (\Exception $e) {
