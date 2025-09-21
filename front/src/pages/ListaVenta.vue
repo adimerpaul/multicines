@@ -45,7 +45,7 @@
                     </q-item-section>
                   </q-item>
 
-                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 && store.boolimpboleto">
                     <q-item-section>
                       <q-btn icon="list" color="green" class="full-width" label="Imp Boletos" no-caps @click="detalleimp(props.row)" v-if="props.row.siatAnulado==0"/>
                     </q-item-section>
@@ -636,6 +636,7 @@ facturación"+online+"línea”</div><br>\
       this.$api.post('listaVentaBoleteria',{
         fechaIni:this.fechaIni,
         fechaFin:this.fechaFin,
+        todo:this.store.booltodoventa
       }).then(res => {
         this.loading= false;
         this.listaVentaBoleteria=res.data

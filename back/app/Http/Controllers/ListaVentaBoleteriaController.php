@@ -35,15 +35,28 @@ class ListaVentaBoleteriaController extends Controller
      */
     public function store(Request $request)
     {
-        return Sale::whereDate('fechaEmision','>=', $request->fechaIni)
+        if($request->todo){
+            return Sale::whereDate('fechaEmision','>=', $request->fechaIni)
             ->whereDate('fechaEmision','<=', $request->fechaFin)
-            ->where('tipo', '=', 'BOLETERIA')
             ->with('user')
             ->with('client')
             ->with('details')
             ->with('tickets')
             ->orderBy('id', 'desc')
             ->get();
+        }
+        else{
+        return Sale::whereDate('fechaEmision','>=', $request->fechaIni)
+            ->whereDate('fechaEmision','<=', $request->fechaFin)
+            ->where('tipo', '=', 'BOLETERIA')
+            ->where('user_id', '=', $request->user()->id)
+            ->with('user')
+            ->with('client')
+            ->with('details')
+            ->with('tickets')
+            ->orderBy('id', 'desc')
+            ->get();
+        }
     }
 
     /**

@@ -35,14 +35,26 @@ class ListaVentaCandyController extends Controller
      */
     public function store(Request $request)
     {
-        return Sale::whereDate('fechaEmision','>=', $request->fechaIni)
+        if($request->todo){
+            return Sale::whereDate('fechaEmision','>=', $request->fechaIni)
             ->whereDate('fechaEmision','<=', $request->fechaFin)
-            ->where('tipo', '=', 'CANDY')
             ->with('user')
             ->with('client')
             ->with('details')
             ->orderBy('id', 'desc')
             ->get();
+        }
+        else{
+        return Sale::whereDate('fechaEmision','>=', $request->fechaIni)
+            ->whereDate('fechaEmision','<=', $request->fechaFin)
+            ->where('tipo', '=', 'CANDY')
+            ->where('user_id', '=', $request->user()->id)
+            ->with('user')
+            ->with('client')
+            ->with('details')
+            ->orderBy('id', 'desc')
+            ->get();
+        }
     }
 
     /**

@@ -150,9 +150,12 @@ export default {
             if(r.id==19) this.store.boolalquiler=true
             if(r.id==20) this.store.boolcliente=true
             if(r.id==21) this.store.boolcortesia=true
-            if(r.id==22) this.store.boolsolicitud=true
-            if(r.id==23) this.store.boolanulacion=true
-            if(r.id==24) this.store.boolaprobar=true
+            if(r.id==22) this.store.boolreporte=true
+            if(r.id==23) this.store.boolsolicitud=true
+            if(r.id==24) this.store.boolanulacion=true
+            if(r.id==25) this.store.boolaprobar=true
+            if(r.id==26) this.store.booltodoventa=true
+            if(r.id==27) this.store.boolimpboleto=true
 
         });
         this.$api.defaults.headers.common['Authorization'] = 'Bearer '+res.data.token

@@ -674,6 +674,7 @@ facturación en línea”</div><br>\
       this.$api.post('listaVentaCandy',{
         fechaIni:this.fechaIni,
         fechaFin:this.fechaFin,
+        todo:this.store.booltodoventa
       }).then(res => {
         this.loading= false;
         this.listaVentaCandy=res.data
