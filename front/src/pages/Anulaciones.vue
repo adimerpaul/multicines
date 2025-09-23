@@ -260,13 +260,29 @@ export default {
       this.$q.dialog({
         title: 'Autorizar anulación',
         message: '¿Confirmas autorizar esta solicitud?',
-        prompt: { model: '', type: 'text', label: 'Motivo (opcional)' },
-        cancel: true, persistent: true
-      }).onOk(motivo => {
+        prompt: {
+          model: '',
+          type: 'text', // 👈 aquí puede ir 'password'
+          label: 'Confirma tu contraseña',
+          isValid: val => !!val, // opcional: fuerza que no esté vacío
+          inputClass: 'password-mask'
+        },
+        cancel: true,
+        persistent: true
+      }).onOk(password => {
         this.$q.loading.show()
-        this.$api.post(`anulaciones/${row.id}/autorizar`, { motivo })
-          .then(res => this.replaceRow(res.data))
-          .finally(() => this.$q.loading.hide())
+        this.$api.post(`anulaciones/${row.id}/autorizar`, { password })
+          .then(res => {
+            this.fetchRows()
+          })
+          .catch(err => {
+            this.$q.notify({ message: err.response?.data?.message || 'Error', color: 'negative', icon: 'error' })
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
+      }).onCancel(() => {
+        // console.log('Autorización cancelada')
       })
     },
     onRechazar (row) {
@@ -305,3 +321,9 @@ export default {
   }
 }
 </script>
+<style>
+.password-mask {
+  -webkit-text-security: disc; /* Safari/Chrome */
+  text-security: disc;         /* Otros navegadores que lo soporten */
+}
+</style>
