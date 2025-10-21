@@ -89,9 +89,7 @@
                 });
                 this.user=this.users[0]
             })
-
         },
-
       consultar(){
           this.loading=true
         this.$api.post('cajaCandy',{ini:this.ini,fin:this.fin,id:this.user.id}).then(res=>{

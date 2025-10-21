@@ -43,7 +43,8 @@ class PermisoSeeder extends Seeder
             ['id'=>24,'nombre'=>'Autorizar Anulacion'],
             ['id'=>25,'nombre'=>'Aprobar Anulacion'],
             ['id'=>26,'nombre'=>'Ver Todo Venta'],
-            ['id'=>27,'nombre'=>'Imp Boletos']
+            ['id'=>27,'nombre'=>'Imp Boletos'],
+            ['id'=>28,'nombre'=>'Imp Factura'],
 
         ]);
 

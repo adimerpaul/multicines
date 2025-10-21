@@ -39,7 +39,7 @@
             <q-td :props="props" auto-width>
               <q-btn-dropdown color="primary" label="Opciones" size="xs" no-caps>
                 <q-list>
-                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 && props.row.cortesia=='NO' && props.row.venta=='F'" >
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 && props.row.cortesia=='NO' && props.row.venta=='F' && store.boolimpfactura" >
                     <q-item-section>
                       <q-btn icon="print" color="primary" class="full-width" label="Imprimir" no-caps @click="printFactura(props.row)" v-if="props.row.siatAnulado==0 "/>
                     </q-item-section>
