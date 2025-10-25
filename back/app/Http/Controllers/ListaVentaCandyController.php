@@ -38,6 +38,7 @@ class ListaVentaCandyController extends Controller
         if($request->todo){
             return Sale::whereDate('fechaEmision','>=', $request->fechaIni)
             ->whereDate('fechaEmision','<=', $request->fechaFin)
+            ->where('tipo', '=', 'CANDY')
             ->with('user')
             ->with('client')
             ->with('details')
