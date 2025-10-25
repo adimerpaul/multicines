@@ -1128,6 +1128,18 @@ class SaleController extends Controller
         GROUP by d.descripcion, d.pelicula_id;");
     }
 
+    public function reportGenAnulacion(Request $request){
+        return DB::SELECT("SELECT u.name usuario, COUNT(*) total, SUM(a.monto) monto
+        from anulaciones a inner join users u on a.user_id=u.id
+        inner join sales s on a.sale_id=s.id
+        where date(a.fecha)>='$request->ini'
+        and date(a.fecha)<='$request->fin'
+        and a.estado='Anulado'
+        and s.tipo='$request->tipo'
+        group by  u.name
+        ");
+    }
+    
     public function cajaBolF(Request $request)
     {
         $cadena = '';

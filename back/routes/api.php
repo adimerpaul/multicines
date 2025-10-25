@@ -121,6 +121,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('validanit/{nit}', [\App\Http\Controllers\SaleController::class, 'validanit']);
 
     Route::get('listCufd', [\App\Http\Controllers\CufdController::class,'listCufd']);
+    Route::post('reportGenAnulacion', [\App\Http\Controllers\SaleController::class, 'reportGenAnulacion']);
+
 });
 Route::post('anularCuf', [\App\Http\Controllers\SaleController::class,'anularCuf']);
 Route::get('anularMasivo', [\App\Http\Controllers\FacturaController::class,'anularMasivo']);
