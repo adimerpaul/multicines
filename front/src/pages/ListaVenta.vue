@@ -266,7 +266,7 @@ export default {
         {name:'fechaEmision',label:'fechaEmision',field:'fechaEmision',sortable:true},
         {name:'client_id',label:'client_id',field:row=>row.client.nombreRazonSocial,sortable:true},
         {name:'user_id',label:'user_id',field:row=>row.user.name,sortable:true},
-        //{name:'montoTotal',label:'montoTotal',field:'montoTotal',sortable:true},
+        {name:'montoTotal',label:'montoTotal',field: row=>this.store.booluser?row.montoTotal:'',sortable:true},
         {name:'siatAnulado',label:'siatAnulado',field:'siatAnulado',sortable:true},
         {name:'id',label:'id',field:'id',sortable:true},
         {name:'cuf',label:'cuf',field:'cuf',sortable:true},
