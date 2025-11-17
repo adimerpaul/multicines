@@ -29,6 +29,9 @@
     :filter="filter"
     separator="cell"
     >
+    <template v-slot:top-right>
+        <q-btn color="green"  label="EXCEL"   @click="exportar"/>
+    </template>
     <!-- fecha -->
     <template #body-cell-fecha="props">
       <q-td :props="props">{{ props.row.fecha }}</q-td>
@@ -72,21 +75,21 @@
               </q-item-section>
             </q-item>
 
-            <q-item v-if="canAutorizar(props.row)" clickable v-close-popup @click="onAutorizar(props.row)">
+            <q-item v-if="props.row.estado =='Pendiente' && store.boolautorizar" clickable v-close-popup @click="onAutorizar(props.row)">
               <q-item-section avatar><q-icon name="check_circle" /></q-item-section>
               <q-item-section>
                 <q-item-label>Autorizar</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item v-if="canAutorizar(props.row)" clickable v-close-popup @click="onRechazar(props.row)">
+            <q-item v-if="props.row.estado =='Pendiente' && store.boolautorizar" clickable v-close-popup @click="onRechazar(props.row)">
               <q-item-section avatar><q-icon name="cancel" /></q-item-section>
               <q-item-section>
                 <q-item-label>Rechazar</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item v-if="canAnular(props.row)" clickable v-close-popup @click="onAnular(props.row)">
+            <q-item v-if="props.row.estado =='Autorizado' && store.boolaprobar" clickable v-close-popup @click="onAnular(props.row)">
               <q-item-section avatar><q-icon name="delete_forever" /></q-item-section>
               <q-item-section><q-item-label>Anular</q-item-label></q-item-section>
             </q-item>
@@ -160,12 +163,15 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from "moment"
+import { globalStore } from '../stores/globalStore'
+import xlsx from "json-as-xlsx"
 
 export default {
   name: 'AnulacionesPage',
   data () {
     return {
+      store: globalStore(),
       rows: [],
       filter: '',
       estados: ['Pendiente', 'Autorizado', 'Anulado', 'Rechazado'],
@@ -201,6 +207,36 @@ export default {
     this.cargarMotivo()
   },
   methods: {
+    exportar(){
+      if(this.rows.length==0) return
+      let data = [
+        {
+          sheet: "Anulados",
+          columns: [
+            { label: "id", value: "id" },
+            {label:'fecha',value:row => 'fecha'},
+            {label:'cajero',value:'cajero'},
+            {label:'monto',value:'monto'},
+            {label:'seccion',value:'seccion'},
+            {label:'motivo',value:'motivo'},
+            {label:'detalle',value:'detalle'},
+            {label:'estado',value:'estado'},
+            // { label: "Age", value: (row) => row.age + " years" }, // Custom format
+            // { label: "Phone", value: (row) => (row.more ? row.more.phone || "" : "") }, // Run functions
+          ],
+          content: this.rows,
+        },
+      ]
+
+      let settings = {
+        fileName: "Anulados" + moment().format('YYYY-MM-DD'),
+        // extraLength: 3, // A bigger number means that columns will be wider
+        // writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
+        writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
+        // RTL: true, // Display the columns from right-to-left (the default value is false)
+      }
+      xlsx(data, settings) // Will download the excel file
+    },
     enviarAnular(){
       // this.$q.loading.show()
       this.loading = true
@@ -259,13 +295,29 @@ export default {
       this.$q.dialog({
         title: 'Autorizar anulación',
         message: '¿Confirmas autorizar esta solicitud?',
-        prompt: { model: '', type: 'text', label: 'Motivo (opcional)' },
-        cancel: true, persistent: true
-      }).onOk(motivo => {
+        prompt: {
+          model: '',
+          type: 'text', // 👈 aquí puede ir 'password'
+          label: 'Confirma tu contraseña',
+          isValid: val => !!val, // opcional: fuerza que no esté vacío
+          inputClass: 'password-mask'
+        },
+        cancel: true,
+        persistent: true
+      }).onOk(password => {
         this.$q.loading.show()
-        this.$api.post(`anulaciones/${row.id}/autorizar`, { motivo })
-          .then(res => this.replaceRow(res.data))
-          .finally(() => this.$q.loading.hide())
+        this.$api.post(`anulaciones/${row.id}/autorizar`, { password })
+          .then(res => {
+            this.fetchRows()
+          })
+          .catch(err => {
+            this.$q.notify({ message: err.response?.data?.message || 'Error', color: 'negative', icon: 'error' })
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
+      }).onCancel(() => {
+        // console.log('Autorización cancelada')
       })
     },
     onRechazar (row) {
@@ -304,3 +356,9 @@ export default {
   }
 }
 </script>
+<style>
+.password-mask {
+  -webkit-text-security: disc; /* Safari/Chrome */
+  text-security: disc;         /* Otros navegadores que lo soporten */
+}
+</style>

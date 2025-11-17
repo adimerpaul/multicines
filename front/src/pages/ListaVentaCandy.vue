@@ -39,7 +39,7 @@
             <q-td :props="props" auto-width>
               <q-btn-dropdown color="primary" label="Opciones">
                 <q-list>
-                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 && store.boolimpfactura">
                     <q-item-section>
                       <q-btn icon="print" color="primary" class="full-width" label="Imprimir" no-caps @click="printFactura(props.row)" v-if="props.row.siatAnulado==0"/>
                     </q-item-section>
@@ -51,7 +51,7 @@
                     </q-item-section>
                   </q-item>
 
-                 <!-- <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
+                  <!--<q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
                     <q-item-section>
                       <q-btn icon="cancel_presentation" color="red" class="full-width" label="Anular" no-caps @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
                     </q-item-section>
@@ -61,7 +61,7 @@
                       <q-btn type="a" label="Imp Impuestos " class="full-width" color="info" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
                     </q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 ">
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 && store.boolsolicitud">
                     <q-item-section>
                       <q-btn icon="assignment" color="deep-orange" class="full-width"
                              label="Formulario de Anulación" no-caps dense
@@ -205,13 +205,14 @@
 import {date} from "quasar";
 import { Printd } from 'printd'
 import xlsx from "json-as-xlsx"
-
+import { globalStore } from '../stores/globalStore'
 const conversor = require('conversor-numero-a-letras-es-ar');
 const QRCode = require('qrcode')
 export default {
   name: `LisaVenta`,
   data() {
     return {
+      store:globalStore(),
       dialogFormAnulacion: false,
       filter: '',
       lorem: 'lorem impus',
@@ -231,7 +232,7 @@ export default {
         {name:'fechaEmision',label:'fechaEmision',field:'fechaEmision',sortable:true},
         {name:'client_id',label:'client_id',field:row=>row.client.nombreRazonSocial,sortable:true},
         {name:'user_id',label:'user_id',field:row=>row.user.name,sortable:true},
-        {name:'montoTotal',label:'montoTotal',field:'montoTotal',sortable:true},
+        {name:'montoTotal',label:'montoTotal',field:row=>this.store.booluser?row.montoTotal:'',sortable:true},
         {name:'siatAnulado',label:'siatAnulado',field:'siatAnulado',sortable:true},
         {name:'id',label:'id',field:'id',sortable:true},
         {name:'cuf',label:'cuf',field:'cuf',sortable:true},
@@ -673,6 +674,7 @@ facturación en línea”</div><br>\
       this.$api.post('listaVentaCandy',{
         fechaIni:this.fechaIni,
         fechaFin:this.fechaFin,
+        todo:this.store.booltodoventa
       }).then(res => {
         this.loading= false;
         this.listaVentaCandy=res.data

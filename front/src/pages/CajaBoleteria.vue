@@ -71,7 +71,8 @@
         columna2:[
           {label:'USUARIO',field:'usuario',name:'usuario',sortable:true},
           {label:'TOTAL',field:'total',name:'total',sortable:true},
-        ]
+        ],
+        anulados:[],
       }
     },
     created() {
@@ -100,9 +101,18 @@
           this.datosuser()
           this.datosfactura()
           this.datosrecibo()
+          this.getAnulados()
           // this.loading=false
         })
       },
+    getAnulados () {
+      this.loading = true
+      this.$api.post('reportGenAnulacion', { ini: this.ini, fin: this.fin, tipo: 'BOLETERIA' }).then(res => {
+        console.log(res.data)
+        this.anulados = res.data
+        this.loading = false
+      })
+    },
       datosuser(){
           this.loading=true
         this.$api.post('userbol',{ini:this.ini,fin:this.fin}).then(res=>{
@@ -151,6 +161,7 @@
 
         let cadena="<style>\
         .f-10{font-size:10px;}\
+        .centro{text-align:center;}\
         .titulo{text-align:center;\
           font-weight:bold;}\
         .titulo2{font-weight:bold;}\
@@ -179,12 +190,22 @@
           cadena+="<tr><td class='f-10'>"+r.usuario+"</td> <td class='f-10'>"+r.total+"</td></tr>"
           })
         cadena+="</table>"}
-
+        if(this.anulados.length>0){
+          cadena += "<table class='table'>\
+          <thead><tr><th class='f-10'>USUARIO</th><th class='f-10'>TOTAL ANULADOS</th><th class='f-10'>MONTO</th></tr></thead>\
+          <tbody>"
+            this.anulados.forEach(r => {
+              cadena+="<tr><td class='f-10 centro'>"+r.usuario+"</td><td class='f-10 centro'>"+r.total+"</td><td class='f-10 centro'>"+r.monto+"</td></tr>"
+            });
+          cadena+="</tbody>\
+          </table>"
+        }
         cadena+="<div class='f-10' style='text-align:right;'><span class='titulo3'>Total: </span> "+this.ventatotal+" Bs</div>\
         <div class='f-10' style='text-align:right;'><span class='titulo3'>Total VIP: </span> "+this.tvip+" Bs</div>\
         <div class='f-10' style='text-align:right;'><span class='titulo3'>Total Credito: </span> "+this.tcredito+" Bs</div>\
         <div class='f-10' style='text-align:right;'><span class='titulo3'>Total Efectivo: </span> "+this.tefectivo+" Bs</div>\
         "
+
         document.getElementById('myelement').innerHTML = cadena
         const d = new Printd()
         d.print( document.getElementById('myelement') )

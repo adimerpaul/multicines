@@ -38,6 +38,14 @@ class PermisoSeeder extends Seeder
             ['id'=>19,'nombre'=>'Alquiler Ambiente'],
             ['id'=>20,'nombre'=>'Clientes'],
             ['id'=>21,'nombre'=>'Cortesia'],
+            ['id'=>22,'nombre'=>'Reporte Funcion'],
+            ['id'=>23,'nombre'=>'Solicitud Anulacion'],
+            ['id'=>24,'nombre'=>'Autorizar Anulacion'],
+            ['id'=>25,'nombre'=>'Aprobar Anulacion'],
+            ['id'=>26,'nombre'=>'Ver Todo Venta'],
+            ['id'=>27,'nombre'=>'Imp Boletos'],
+            ['id'=>28,'nombre'=>'Imp Factura'],
+
         ]);
 
     }
