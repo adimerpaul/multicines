@@ -16,4 +16,4 @@ yarn-error.log
 /.vscode
 /public/archivos
 /public/rentals
-/storage
+#/storage

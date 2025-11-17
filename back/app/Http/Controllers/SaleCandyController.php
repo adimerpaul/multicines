@@ -57,7 +57,7 @@ class SaleCandyController extends Controller
         if (sizeof($request->detalleVenta) == 0) {
             return response()->json(['message' => 'El detalle de la venta no puede estar vacio'], 400);
         }
-        
+
         if ($request->client['complemento']==null){
             $complemento="";
         }else{
@@ -108,6 +108,7 @@ class SaleCandyController extends Controller
         $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
 
         $codigoSucursal=0;
+        error_log("request: ".json_encode($request->all()));
 
         $user=User::find($request->user()->id);
 
@@ -120,7 +121,7 @@ class SaleCandyController extends Controller
         $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
         $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
 
-
+        error_log("cui: ".json_encode($cui));
         if (Sale::where('cufd', $cufd->codigo)->where('tipo','CANDY')->count()==0){
             $numeroFactura=1;
         }else{
@@ -128,12 +129,15 @@ class SaleCandyController extends Controller
             $max=Sale::where('cufd',$cufd->codigo)->where('tipo','CANDY')->max('numeroFactura');
             $numeroFactura=intval($max)+1;
         }
-        if (count(Sale::all())==0) {
+        error_log("numeroFactura A: ".$numeroFactura);
+//        if (count(Sale::all())==0) { cambiar por count
+        if (Sale::count()==0) {
             $saleId=1;
         }else{
             $sale=Sale::orderBy('id', 'desc')->first();
             $saleId=$sale->id+1;
         }
+        error_log("numeroFactura B: ".$numeroFactura);
         $detalleFactura="";
         foreach ($request->detalleVenta as $detalle){
             $detalleFactura.="<detalle>
@@ -167,6 +171,7 @@ class SaleCandyController extends Controller
 //     * @param nf Numero de Factura
 //     * @param pos Punto de Venta
         $leyenda=Leyenda::where("codigoActividad","590000")->get();
+        error_log("leyenda: ".json_encode($leyenda));
         $count=$leyenda->count();
         $leyenda=$leyenda[rand(0,$count-1)]->descripcionLeyenda;
 
@@ -243,6 +248,7 @@ class SaleCandyController extends Controller
         $hashArchivo=hash('sha256', $archivo);
 //        unlink($gzfile);
         try {
+            error_log('entro try');
             $clientSoap = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
@@ -255,6 +261,7 @@ class SaleCandyController extends Controller
                 'use' => SOAP_LITERAL,
                 'style' => SOAP_DOCUMENT,
             ]);
+            error_log('despues client');
             $result= $clientSoap->recepcionFactura([
                 "SolicitudServicioRecepcionFactura"=>[
                     "codigoAmbiente"=>$codigoAmbiente,
