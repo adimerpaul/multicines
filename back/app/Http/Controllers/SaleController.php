@@ -1824,7 +1824,7 @@ class SaleController extends Controller
                 'actividadEconomica' => "590000",
                 'codigoProductoSin' => "99100",
                 'cantidad' => $detalle['cantidad'],
-                'precioUnitario' => $detalle['subtotal'],
+                'precioUnitario' => $detalle['precio'],
                 'subTotal' => $detalle['subtotal'],
                 'sale_id' => $sale->id,
                 'programa_id' => $detalle['programa_id'],
