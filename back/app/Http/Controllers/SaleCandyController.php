@@ -590,7 +590,7 @@ class SaleCandyController extends Controller
                 <descripcion>".utf8_encode(str_replace("&","&amp;",$detalle->descripcion))."</descripcion>
                 <cantidad>".$detalle->cantidad."</cantidad>
                 <unidadMedida>62</unidadMedida>
-                <precioUnitario>".$detalle->precioUnitario."</precioUnitario>
+                <precioUnitario>".($detalle->subTotal/$detalle->cantidad)."</precioUnitario>
                 <montoDescuento>0</montoDescuento>
                 <subTotal>".$detalle->subTotal."</subTotal>
                 <numeroSerie xsi:nil='true'/>

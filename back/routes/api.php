@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 //});
 Route::post('login', [App\Http\Controllers\UserController::class, 'login']);
 Route::get('verificarComunicacion', [\App\Http\Controllers\ActivityController::class,'verificarComunicacion']);
+Route::get('verificarFacturas', [\App\Http\Controllers\ActivityController::class,'verificarFacturas']);
 Route::get('genXML/{id}', [\App\Http\Controllers\SaleController::class,'genXML']);
 Route::get('genXMLcandy/{id}', [\App\Http\Controllers\SaleCandyController::class,'genXMLcandy']);
 Route::get('genXMLRental/{id}', [\App\Http\Controllers\SaleCandyController::class,'genXMLRental']);

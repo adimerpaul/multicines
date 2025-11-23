@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cufd;
 use App\Models\Leyenda;
 use App\Models\Activity;
 use App\Models\Medida;
+use App\Models\Sale;
 use App\Models\Servicio;
 use App\Models\Message;
 use App\Models\Event;
@@ -19,13 +21,114 @@ use App\Models\Tipopago;
 use Illuminate\Http\Request;
 
 
-class ActivityController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+class ActivityController extends Controller{
+    function verificarFacturas(){
+//        https://pilotosiatservicios.impuestos.gob.bo/v2/ServicioFacturacionCompraVenta
+//        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:siat="https://siat.impuestos.gob.bo/">
+//   <soapenv:Header/>
+//   <soapenv:Body>
+//      <siat:verificacionEstadoFactura>
+//         <SolicitudServicioVerificacionEstadoFactura>
+//            <codigoAmbiente>?</codigoAmbiente>
+//            <codigoDocumentoSector>?</codigoDocumentoSector>
+//            <codigoEmision>?</codigoEmision>
+//            <codigoModalidad>?</codigoModalidad>
+//            <!--Optional:-->
+//            <codigoPuntoVenta>?</codigoPuntoVenta>
+//            <codigoSistema>?</codigoSistema>
+//            <codigoSucursal>?</codigoSucursal>
+//            <cufd>?</cufd>
+//            <cuis>?</cuis>
+//            <nit>?</nit>
+//            <tipoFacturaDocumento>?</tipoFacturaDocumento>
+//            <cuf>?</cuf>
+//         </SolicitudServicioVerificacionEstadoFactura>
+//      </siat:verificacionEstadoFactura>
+//   </soapenv:Body>
+//</soapenv:Envelope>
+
+        $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?wsdl",  [
+            'stream_context' => stream_context_create([
+                'http' => [
+
+                ]
+            ]),
+            'cache_wsdl' => WSDL_CACHE_NONE,
+            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+            'trace' => 1,
+            'use' => SOAP_LITERAL,
+            'style' => SOAP_DOCUMENT,
+        ]);
+        $cui = Cui::where('codigoPuntoVenta', 0)->where('codigoSucursal', 0)->where('fechaVigencia','>=', now());
+
+        $cudf= Cufd::where('codigoPuntoVenta', 0)->where('codigoSucursal', 0)->where('fechaVigencia','>=', now());
+
+
+        $sales = Sale::whereIn('id', [452968,
+            453044,
+            453104,
+            453081,
+            452500,
+            452513,
+            452522,
+            453062,
+            453103,
+            452737,
+            452844,
+            453041,
+            452699,
+            452543,
+            452586,
+            452829,
+            452955,
+            452419,
+            453092,
+            452452,
+            453011,
+            452433,
+            452569,
+            452423,
+            453031,
+            452540,
+            453002,
+            452695,
+            452704,
+            452708,
+            452964,
+            452739,
+            452736,
+            452475,
+            453085,
+            452545,
+            452566])->get();
+
+
+
+        foreach ($sales as $sale){
+
+            $result = $client->verificacionEstadoFactura([
+                "SolicitudServicioVerificacionEstadoFactura"=>[
+                    "codigoAmbiente"=>env('AMBIENTE'),
+                    "codigoDocumentoSector"=>1,
+                    "codigoEmision"=>1,
+                    "codigoModalidad"=>1,
+                    "codigoPuntoVenta"=>0,
+                    "codigoSistema"=>env('CODIGO_SISTEMA'),
+                    "codigoSucursal"=>0,
+                    "cufd"=>$cudf->first()->codigo,
+                    "cuis"=>$cui->first()->codigo,
+                    "nit"=>env('NIT'),
+                    "tipoFacturaDocumento"=>1,
+                    "cuf"=>$sale->cuf
+                ]
+            ]);
+//            if ($result->RespuestaServicioFacturacion->codigoDescripcion=="RECHAZADA"){
+                echo  json_encode($result)."<br>". $sale->id." ".$sale->tipo;
+                echo "<br>-----------------<br>";
+//                echo $sale->id." ".$sale->tipo." <br>";
+//            }
+        }
+    }
     public function index()
     {
 
