@@ -153,3 +153,5 @@ Route::get('test',function (){
 
 
 Route::get('anulaciones/{anulacion}/pdf', [AnulacionController::class, 'pdf'])->name('anulaciones.pdf');
+
+Route::post('sendPrueba', [\App\Http\Controllers\MailController::class,'sendPrueba']);

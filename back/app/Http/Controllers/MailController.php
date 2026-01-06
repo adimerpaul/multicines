@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\TestMail;
+use App\Mail\CorreoPrueba;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -25,6 +26,31 @@ class MailController extends Controller
     public function index()
     {
         //
+    }
+
+    public function sendPrueba(Request $request)
+    {
+        // Validar JSON recibido
+        $data = $request->validate([
+            'email'   => 'required|email',
+            'subject' => 'required|string',
+            'message' => 'required|string',
+        ]);
+        try {
+            Mail::to($data['email'])->send(
+                new CorreoPrueba($data['subject'], $data['message'])
+            );
+
+            return response()->json([
+                'success' => true,
+                'status' => 'Correo enviado al servidor SMTP'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
