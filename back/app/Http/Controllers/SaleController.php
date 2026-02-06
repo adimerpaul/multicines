@@ -627,6 +627,96 @@ class SaleController extends Controller
             //    }
         }
     }
+    public function revertirAnularSale(Request $request){
+                $token= env('TOKEN');
+
+        $sale=Sale::find($request->id);
+        $codigoAmbiente=env('AMBIENTE');
+        $codigoDocumentoSector=1; // 1 compraventa 2 alquiler 23 prevaloradas
+        $codigoEmision=1; // 1 online 2 offline 3 masivo
+        $codigoModalidad=env('MODALIDAD'); //1 electronica 2 computarizada
+        $codigoPuntoVenta=0;
+        $codigoSistema=env('CODIGO_SISTEMA');
+        $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
+        $codigoSucursal=0;
+        $nit=env('NIT');
+
+        $user=User::find($request->user()->id);
+
+        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
+        }
+        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+            return response()->json(['message' => 'No exite CUFD para la venta!!'], 400);
+        }
+        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->orderBy('id','desc')->first();
+
+
+            $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
+                'stream_context' => stream_context_create([
+                    'http' => [
+                        'header' => "apikey: TokenApi " . $token->codigo,
+                    ]
+                ]),
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                'trace' => 1,
+                'use' => SOAP_LITERAL,
+                'style' => SOAP_DOCUMENT,
+            ]);
+
+            $result= $client->reversionAnulacionFactura([
+                "SolicitudServicioReversionAnulacionFactura"=>[
+                    "codigoAmbiente"=>$codigoAmbiente,
+                    "codigoDocumentoSector"=>$codigoDocumentoSector,
+                    "codigoEmision"=>$codigoEmision,
+                    "codigoModalidad"=>$codigoModalidad,
+                    "codigoPuntoVenta"=>$codigoPuntoVenta,
+                    "codigoSistema"=>$codigoSistema,
+                    "codigoSucursal"=>$codigoSucursal,
+                    "cufd"=>$cufd->codigo,
+                    "cuis"=>$cui->codigo,
+                    "nit"=>env('NIT'),
+                    "tipoFacturaDocumento"=>$tipoFacturaDocumento,
+                    "cuf"=>$request->cuf
+                ]
+            ]);
+
+            error_log(json_encode($result));
+            if($result->RespuestaServicioFacturacion->transaccion){
+                $sale=Sale::with('cliente')->where('id',$sale->id)->first();
+                $sale->siatAnulado=0;
+                //$sale->user_anular=$user->name;
+                $sale->save();
+                try {
+                    if ($sale->cliente['correo']!='' && $sale->cliente['correo']!=null ){
+                        $details=[
+                            "title"=>"Habilitar Factura",
+                            "body"=>"La factura se ha habilitado Nuevamente, Gracias por su Preferencia",
+                            "online"=>true,
+                            "anulado"=>false,
+                            "habilita"=>true,
+                            "cuf"=>$sale->cuf,
+                            "numeroFactura"=>$sale->numero_factura,
+                            "sale_id"=>$sale->id,
+                            "carpeta"=>"archivos/".$codigoSucursal,
+                        ];
+                        Mail::to($sale->cliente['correo'])->send(new TestMail($details));
+
+                    }
+                }catch (\Exception $e){
+                    error_log("error mail sale: ".$e->getMessage());
+                }
+                return response()->json([
+                    'sale' => Sale::where('id',$sale->id)->with('dependencia')->with('cliente')->with('details')->with('user')->first(),
+                   // "tickets"=>$tickets,
+                    "error"=>"",
+                ]);
+            }
+            return $result;
+    }
+
 
     public function genXML($id)
     {
