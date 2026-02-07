@@ -1016,6 +1016,7 @@ class SaleController extends Controller
         if ($request->sale['venta'] == 'R' && $request->sale['tipo'] == 'CANDY') {
             $sale = Sale::find($request->sale['id']);
             $sale->siatAnulado = 1;
+            $sale->user_anular = $request->user()->name;
             $sale->save();
             //DB::SELECT("UPDATE tickets set devuelto=1 where sale_id=".$request->sale['id']);
                         $anulacion = Anulacion::where('sale_id', $request->sale['id'])->first();

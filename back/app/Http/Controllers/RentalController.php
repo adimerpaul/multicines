@@ -395,6 +395,7 @@ class RentalController extends Controller
             if($result->RespuestaServicioFacturacion->transaccion){
                 $rental=Rental::find($request->rental['id']);
                 $rental->siatAnulado=1;
+                $rental->user_anular=$user->name;
                 $rental->save();
                 $client=Client::find($rental->client_id);
                 if ($client->email!=''){
