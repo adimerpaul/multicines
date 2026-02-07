@@ -425,6 +425,7 @@ class SaleController extends Controller
                                 "body" => "Gracias por su compra",
                                 "online" => true,
                                 "anulado" => false,
+                                "habilitar" => false,
                                 "cuf" => "",
                                 "numeroFactura" => "",
                                 "sale_id" => $sale->id,
@@ -540,6 +541,7 @@ class SaleController extends Controller
                         "body" => "Gracias por su compra",
                         "online" => false,
                         "anulado" => false,
+                        "habilitar" => false,
                         "cuf" => "",
                         "numeroFactura" => "",
                         "sale_id" => $sale->id,
@@ -696,11 +698,11 @@ class SaleController extends Controller
                             "body"=>"La factura se ha habilitado Nuevamente, Gracias por su Preferencia",
                             "online"=>true,
                             "anulado"=>false,
-                            "habilita"=>true,
+                            "habilitar"=>true,
                             "cuf"=>$sale->cuf,
                             "numeroFactura"=>$sale->numero_factura,
                             "sale_id"=>$sale->id,
-                            "carpeta"=>"archivos/".$codigoSucursal,
+                            "carpeta"=>"archivos",
                         ];
                         Mail::to($sale->cliente['correo'])->send(new TestMail($details));
 
@@ -709,7 +711,7 @@ class SaleController extends Controller
                     error_log("error mail sale: ".$e->getMessage());
                 }
                 return response()->json([
-                    'sale' => Sale::where('id',$sale->id)->with('dependencia')->with('cliente')->with('details')->with('user')->first(),
+                    'sale' => Sale::where('id',$sale->id)->with('cliente')->with('user')->first(),
                    // "tickets"=>$tickets,
                     "error"=>"",
                 ]);
@@ -904,6 +906,7 @@ class SaleController extends Controller
                 "title" => "Factura",
                 "body" => "Gracias por su compra",
                 "anulado" => false,
+                "habilitar" => false,
                 "cuf" => "",
                 "numeroFactura" => "",
                 "sale_id" => $request->sale['id'],
@@ -1093,6 +1096,7 @@ class SaleController extends Controller
                         "body" => "Factura anulada",
                         "online" => true,
                         "anulado" => true,
+                        "habilitar" => false,
                         "cuf" => $sale->cuf,
                         "numeroFactura" => $sale->numeroFactura,
                         "sale_id" => $sale->id,

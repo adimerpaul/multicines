@@ -68,6 +68,13 @@
                              @click="openFormularioAnulacion(props.row)"/>
                     </q-item-section>
                   </q-item>
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==1 && props.row.siatEnviado==1 && props.row.cuf && !props.row.user_anular">
+                    <q-item-section>
+                      <q-btn icon="replay" color="purple" class="full-width"
+                             label="Revertir Anulación" no-caps dense
+                             @click="revertirAnulacion(props.row)"/>
+                    </q-item-section>
+                  </q-item>
                   <q-item clickable v-close-popup v-if="props.row.siatAnulado==0">
                     <q-item-section>
                       <q-btn label="Enviar Correo " class="full-width" color="teal" @click="correo(props.row)"/>
@@ -295,6 +302,26 @@ export default {
     this.cargarMotivo()
   },
   methods: {
+              revertirAnulacion(dato){console.log(dato)
+        //return false
+        this.$q.dialog({
+          title: 'Revertir la Anulacion ',
+          message: 'Esta seguro, no se podra modificar?',
+          cancel: true,
+          persistent: false
+        }).onOk(() => {
+          // console.log('>>>> OK')
+        this.$api.post('revertirAnularSale',dato).then(res => {
+          this.listaVentaCandyGet()
+          })
+        }).onOk(() => {
+          // console.log('>>>> second OK catcher')
+        }).onCancel(() => {
+          // console.log('>>>> Cancel')
+        }).onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        })
+      },
         enviarFormularioAnulacion () {
       // construir motivo como en el papel
       const seleccionados = []

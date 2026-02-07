@@ -26,6 +26,11 @@
                       <q-btn icon="cancel_presentation" color="red" class="full-width" label="Anular" no-caps @click="anularSale(props.row)" v-if="props.row.siatAnulado==0"/>
                     </q-item-section>
                   </q-item>
+                  <q-item clickable v-close-popup v-if="props.row.siatAnulado==1 && props.row.siatEnviado==1 && props.row.user_anular!=null">
+                    <q-item-section>
+                      <q-btn icon="replay" color="purple" class="full-width" label="Habilitar" no-caps @click="revertirAnulacion(props.row)" />
+                    </q-item-section>
+                  </q-item>
                   <q-item clickable v-close-popup>
                     <q-item-section>
                       <q-btn type="a" label="Imp Impuestos " class="full-width" color="info" target="_blank" :href="`${cine.url2}consulta/QR?nit=${cine.nit}&cuf=${props.row.cuf}&numero=${props.row.numeroFactura }&t=2`" />
@@ -216,6 +221,26 @@ export default {
     this.cargarMotivo()
   },
   methods:{
+      revertirAnulacion(dato){console.log(dato)
+        //return false
+        this.$q.dialog({
+          title: 'Revertir la Anulacion ',
+          message: 'Esta seguro, no se podra modificar?',
+          cancel: true,
+          persistent: false
+        }).onOk(() => {
+          // console.log('>>>> OK')
+        this.$api.post('revertirAnularRental',dato).then(res => {
+          this.rentalConsulta()
+          })
+        }).onOk(() => {
+          // console.log('>>>> second OK catcher')
+        }).onCancel(() => {
+          // console.log('>>>> Cancel')
+        }).onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        })
+      },
     anularSale(factura){
       //console.log(factura)
       this.factura=factura

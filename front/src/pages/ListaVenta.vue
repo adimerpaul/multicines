@@ -336,7 +336,7 @@ export default {
     this.cargarMotivo()
   },
   methods: {
-          revertirAnular(dato){console.log(dato)
+          revertirAnulacion(dato){console.log(dato)
         //return false
         this.$q.dialog({
           title: 'Revertir la Anulacion ',

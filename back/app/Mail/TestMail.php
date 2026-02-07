@@ -42,7 +42,21 @@ class TestMail extends Mailable
                 ->with($this->details);
             exit;
         }
+
+        if ($this->details['habilitar']){
+            $datos['cuf']=$this->details['cuf'];
+            $datos['numeroFactura']=$this->details['numeroFactura'];
+        return $this->from(env('MAIL_FROM_ADDRESS'),env('MAIL_FROM_NAME'))
+            ->view('habilitar',$datos)
+            ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.pdf')
+            ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.xml')
+            ->subject('MULTICINES PLAZA')
+            ->with($this->details);
+            exit;
+        }
+
         $pathXmlFile=$this->details['carpeta'].'/'.$this->details['sale_id'].'.xml';
+
         if (!file_exists($pathXmlFile)) return false;
         $nameFile = substr($pathXmlFile, 0, strlen($pathXmlFile) - 4);
         $content = file_get_contents($pathXmlFile);
@@ -55,6 +69,7 @@ class TestMail extends Mailable
                 $cuf .= substr($xml->cabecera->cuf, $i, 1);
             }
         }
+
         $html = self::generateHTML($xml,$cuf,$this->details['online']);
         $dompdf = new Dompdf();
         $dompdf->loadHtml($html);
