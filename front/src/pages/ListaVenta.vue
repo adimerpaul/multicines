@@ -347,6 +347,10 @@ export default {
           // console.log('>>>> OK')
         this.$api.post('revertirAnularSale',dato).then(res => {
           this.listaVentaBoleteriaGet()
+          }).finally(() => {
+            this.$q.notify({ message: 'Anulación revertida', color: 'green', icon: 'check' })
+          }).catch(() => {
+            this.$q.notify({ message: 'Error al revertir la anulación', color: 'red', icon: 'error' })
           })
         }).onOk(() => {
           // console.log('>>>> second OK catcher')

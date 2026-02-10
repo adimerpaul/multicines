@@ -47,9 +47,9 @@ class TestMail extends Mailable
             $datos['cuf']=$this->details['cuf'];
             $datos['numeroFactura']=$this->details['numeroFactura'];
         return $this->from(env('MAIL_FROM_ADDRESS'),env('MAIL_FROM_NAME'))
-            ->view('habilitar',$datos)
-            ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.pdf')
-            ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.xml')
+            ->view('habilita',$datos)
+//            ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.pdf')
+//            ->attach($this->details['carpeta'].'/'.$this->details['sale_id'].'.xml')
             ->subject('MULTICINES PLAZA')
             ->with($this->details);
             exit;

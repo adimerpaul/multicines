@@ -1106,6 +1106,8 @@ class SaleController extends Controller
                     Mail::to($client->email)->send(new TestMail($details));
                 }
 
+            }else{
+                return response()->json(['message' => $result], 400);
             }
             $anulacion = Anulacion::where('sale_id', $request->sale['id'])->first();
             if ($anulacion) {

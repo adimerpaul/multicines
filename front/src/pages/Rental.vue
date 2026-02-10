@@ -254,7 +254,18 @@ export default {
         this.rentalConsulta()
         this.dialogAnular=false
         this.loading=false
-
+      }).catch(err=>{
+        console.log(err.response.data.message)
+        // this.loading=false
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          // message: json.stringify(err.response.data.message),
+          message: JSON.stringify(err.response.data.message),
+          position: 'top',
+        })
+      }).finally(()=>{
+        this.loading=false
       })
     },
     cargarMotivo(){

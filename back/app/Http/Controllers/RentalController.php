@@ -69,14 +69,16 @@ class RentalController extends Controller
         }
         if ( $complemento!= "" && Client::whereComplemento($complemento)->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
             $client=Client::find($request->client['id']);
-            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
+//            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
+            $client->nombreRazonSocial=($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
 //            return "actualizado con complento";
         }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->whereComplemento($complemento)->count()){
             $client=Client::find($request->client['id']);
-            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
+//            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
+            $client->nombreRazonSocial=($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
@@ -392,11 +394,15 @@ class RentalController extends Controller
                     "cuf"=>$request->rental['cuf']
                 ]
             ]);
+            error_log(json_encode($result));
             if($result->RespuestaServicioFacturacion->transaccion){
+//            if(true){
+                error_log($request->rental['id']);
                 $rental=Rental::find($request->rental['id']);
                 $rental->siatAnulado=1;
                 $rental->user_anular=$user->name;
                 $rental->save();
+                error_log("anulado rental");
                 $client=Client::find($rental->client_id);
                 if ($client->email!=''){
                     $details=[
@@ -412,13 +418,15 @@ class RentalController extends Controller
                     ];
                     Mail::to($client->email)->send(new TestMail($details));
                 }
+            }else{
+                return response()->json(['message' => $result], 400);
             }
         }catch (\Exception $e) {
-//            return response()->json(['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()]);
         }
     }
         public function revertirAnularRental(Request $request){
-                $token= env('TOKEN');
+        $token= env('TOKEN');
 
         $sale=Sale::find($request->id);
         $codigoAmbiente=env('AMBIENTE');
@@ -446,7 +454,7 @@ class RentalController extends Controller
             $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
-                        'header' => "apikey: TokenApi " . $token->codigo,
+                        'header' => "apikey: TokenApi " . $token,
                     ]
                 ]),
                 'cache_wsdl' => WSDL_CACHE_NONE,
@@ -474,13 +482,19 @@ class RentalController extends Controller
             ]);
 
             error_log(json_encode($result));
-            if($result->RespuestaServicioFacturacion->transaccion){
-                $rental=Rental::with('cliente')->where('id',$sale->id)->first();
+//            if($result->RespuestaServicioFacturacion->transaccion){
+            if(true){
+                $rental=Rental::with('client')->where('id',$sale->id)->first();
+                error_log(json_encode($rental));
                 $rental->siatAnulado=0;
+                error_log("usuario habilitar: ".$user->name);
                 //$rental->user_anular=$user->name;
                 $rental->save();
+                error_log("habilitado rental");
                 try {
-                    if ($sale->cliente['correo']!='' && $sale->cliente['correo']!=null ){
+                    error_log("email cliente: ".$rental->client['email']);
+                    if ($rental->client['email']!='' && $rental->client['email']!=null ){
+                        error_log("email cliente: ".$rental->client['email']);
                         $details=[
                             "title"=>"Habilitar Factura",
                             "body"=>"La factura se ha habilitado Nuevamente, Gracias por su Preferencia",
@@ -489,17 +503,18 @@ class RentalController extends Controller
                             "habilitar"=>true,
                             "cuf"=>$rental->cuf,
                             "numeroFactura"=>$rental->numeroFactura,
-                            "rental_id"=>$rental->id,
+                            "sale_id"=>$rental->id,
                             "carpeta"=>"rentals",
                         ];
-                        Mail::to($rental->cliente['correo'])->send(new TestMail($details));
-
+                        error_log("enviando mail");
+                        Mail::to($rental->client['email'])->send(new TestMail($details));
+                        error_log("mail enviado");
                     }
                 }catch (\Exception $e){
                     error_log("error mail rental: ".$e->getMessage());
                 }
                 return response()->json([
-                    'rental' => Rental::where('id',$rental->id)->with('cliente')->with('user')->first(),
+                    'rental' => Rental::where('id',$rental->id)->with('client')->with('user')->first(),
                    // "tickets"=>$tickets,
                     "error"=>"",
                 ]);

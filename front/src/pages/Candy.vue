@@ -154,13 +154,14 @@
                     />
                   </div>
                   <div class="col-3">
+<!--                    style="text-transform: uppercase"-->
                     <q-input
                       required
                       outlined
                       v-model="client.nombreRazonSocial"
                       label="Nombre y razon *"
                       hint="Razon social"
-                      style="text-transform: uppercase"
+
                       lazy-rules
                       :rules="[ val => val && val.length > 0 || 'Dato obligatorio']"
                     />

@@ -65,14 +65,16 @@ class SaleCandyController extends Controller
         }
         if ( $complemento!= "" && Client::whereComplemento($complemento)->where('numeroDocumento',$request->client['numeroDocumento'])->count()==1) {
             $client=Client::find($request->client['id']);
-            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
+//            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
+            $client->nombreRazonSocial=($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
 //            return "actualizado con complento";
         }else if(Client::where('numeroDocumento',$request->client['numeroDocumento'])->whereComplemento($complemento)->count()){
             $client=Client::find($request->client['id']);
-            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
+//            $client->nombreRazonSocial=strtoupper($request->client['nombreRazonSocial']);
+            $client->nombreRazonSocial=($request->client['nombreRazonSocial']);
             $client->codigoTipoDocumentoIdentidad=$request->client['codigoTipoDocumentoIdentidad'];
             $client->email=$request->client['email'];
             $client->save();
@@ -192,7 +194,7 @@ class SaleCandyController extends Controller
         <direccion>".env('DIRECCION')."</direccion>
         <codigoPuntoVenta>$codigoPuntoVenta</codigoPuntoVenta>
         <fechaEmision>$fechaEnvio</fechaEmision>
-        <nombreRazonSocial>".utf8_encode(str_replace("&","&amp;",$client->nombreRazonSocial))."</nombreRazonSocial>
+        <nombreRazonSocial>".str_replace("&","&amp;",trim($client->nombreRazonSocial)) ."</nombreRazonSocial>
         <codigoTipoDocumentoIdentidad>".$client->codigoTipoDocumentoIdentidad."</codigoTipoDocumentoIdentidad>
         <numeroDocumento>".$client->numeroDocumento."</numeroDocumento>
         <complemento>".$client->complemento."</complemento>

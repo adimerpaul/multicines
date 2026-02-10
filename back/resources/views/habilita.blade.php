@@ -9,6 +9,6 @@
 </head>
 <body>
 Una factura suya fue habilitada con codigo de autorizacion N: {{ $cuf }} <br>
-Pueve ver el estado en <a href="{{env('URL_SIAT2')}}/consulta/QR?nit=329448023&cuf={{$cuf}}&numero={{$numeroFactura}}&t=2">AQUI</a>
+Pueve ver el estado en <a href="{{env('URL_SIAT2')}}consulta/QR?nit=329448023&cuf={{$cuf}}&numero={{$numeroFactura}}&t=2">AQUI</a>
 </body>
 </html>
