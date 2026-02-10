@@ -658,7 +658,7 @@ class SaleController extends Controller
             $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
-                        'header' => "apikey: TokenApi " . $token->codigo,
+                        'header' => "apikey: TokenApi " . $token,
                     ]
                 ]),
                 'cache_wsdl' => WSDL_CACHE_NONE,
@@ -687,12 +687,12 @@ class SaleController extends Controller
 
             error_log(json_encode($result));
             if($result->RespuestaServicioFacturacion->transaccion){
-                $sale=Sale::with('cliente')->where('id',$sale->id)->first();
+                $sale=Sale::with('client')->where('id',$sale->id)->first();
                 $sale->siatAnulado=0;
                 //$sale->user_anular=$user->name;
                 $sale->save();
                 try {
-                    if ($sale->cliente['correo']!='' && $sale->cliente['correo']!=null ){
+                    if ($sale->client['email']!='' && $sale->client['email']!=null ){
                         $details=[
                             "title"=>"Habilitar Factura",
                             "body"=>"La factura se ha habilitado Nuevamente, Gracias por su Preferencia",
@@ -704,14 +704,14 @@ class SaleController extends Controller
                             "sale_id"=>$sale->id,
                             "carpeta"=>"archivos",
                         ];
-                        Mail::to($sale->cliente['correo'])->send(new TestMail($details));
+                        Mail::to($sale->client['email'])->send(new TestMail($details));
 
                     }
                 }catch (\Exception $e){
                     error_log("error mail sale: ".$e->getMessage());
                 }
                 return response()->json([
-                    'sale' => Sale::where('id',$sale->id)->with('cliente')->with('user')->first(),
+                    'sale' => Sale::where('id',$sale->id)->with('client')->with('user')->first(),
                    // "tickets"=>$tickets,
                     "error"=>"",
                 ]);
