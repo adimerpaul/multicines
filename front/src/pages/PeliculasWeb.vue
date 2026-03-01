@@ -128,9 +128,9 @@
               <div class="col-12 col-md-2"><q-input dense outlined label="Bucket" v-model="form.bucket" /></div>
               <div class="col-12 col-md-3"><q-input dense outlined label="Fecha Estreno" v-model="form.fecha_estreno" type="date" /></div>
 
-              <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje Web (0-10)" v-model.number="form.puntaje_web" type="number" step="0.1" /></div>
+              <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje Web (0-10)" v-model.number="form.puntaje_web" type="number" step="0.001" /></div>
               <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje Tomatoes (0-10)" v-model.number="form.puntaje_tomatoes" type="number" step="0.1" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje IBM (0-10)" v-model.number="form.puntaje_ibm" type="number" step="0.1" /></div>
+              <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje IBM (0-10)" v-model.number="form.puntaje_ibm" type="number" step="0.001" /></div>
               <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje Metacritic (0-10)" v-model.number="form.puntaje_metacritic" type="number" step="0.1" /></div>
 
               <div class="col-12 col-md-3"><q-input dense outlined label="Votos Total" v-model.number="form.votos_total" type="number" /></div>

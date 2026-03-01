@@ -9,7 +9,7 @@
         bordered
         class="bg-grey-9 text-white section-card"
       >
-        <q-img :src="resolvePoster(item)" ratio="2/3" spinner-color="pink-5">
+        <q-img :src="resolvePoster(item)" class="section-poster" spinner-color="pink-5" fit="cover">
           <template v-slot:error>
             <div class="absolute-full flex flex-center bg-grey-8 text-grey-4">
               Sin imagen
@@ -67,10 +67,16 @@ export default defineComponent({
   min-width: 220px;
   width: 220px;
 }
+.section-poster {
+  height: 310px;
+}
 @media (max-width: 600px) {
   .section-card {
     min-width: 160px;
     width: 160px;
+  }
+  .section-poster {
+    height: 230px;
   }
 }
 </style>
