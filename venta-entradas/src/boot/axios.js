@@ -15,7 +15,7 @@ const api = axios.create({ baseURL: 'https://api.example.com' })
 export default defineBoot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
-  app.config.globalProperties.$axios = axios
+  // app.config.globalProperties.$axios = axios
   app.config.globalProperties.$axios = axios.create({ baseURL: import.meta.env.VITE_API_BACK })
   app.config.globalProperties.$alert = Alert
   app.config.globalProperties.$store = useCounterStore()

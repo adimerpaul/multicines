@@ -12,6 +12,7 @@ class WebMovie extends Model
     protected $fillable = [
         'titulo',
         'tipo',
+        'carrusel_tipo',
         'tmdb_id',
         'imdb_id',
         'titulo_original',

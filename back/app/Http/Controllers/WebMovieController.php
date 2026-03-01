@@ -107,6 +107,7 @@ class WebMovieController extends Controller
         $request->validate([
             'tmdb_id' => 'required|integer',
             'tipo' => 'nullable|in:pelicula,proximo',
+            'carrusel_tipo' => 'nullable|in:ninguno,carrusel_1,carrusel_2,ambos',
             'calidad' => 'nullable|string|max:50',
             'bucket' => 'nullable|string|max:100',
             'descuento' => 'nullable|numeric|min:0|max:100',
@@ -164,6 +165,7 @@ class WebMovieController extends Controller
             [
                 'titulo' => $movieData['title'] ?? 'Sin titulo',
                 'tipo' => $request->tipo ?? 'pelicula',
+                'carrusel_tipo' => $request->carrusel_tipo ?? 'ninguno',
                 'tmdb_id' => $movieData['id'],
                 'imdb_id' => $imdbId,
                 'titulo_original' => $movieData['original_title'] ?? null,
@@ -252,6 +254,7 @@ class WebMovieController extends Controller
         return $request->validate([
             'titulo' => 'required|string|max:255',
             'tipo' => 'nullable|in:pelicula,proximo',
+            'carrusel_tipo' => 'nullable|in:ninguno,carrusel_1,carrusel_2,ambos',
             'tmdb_id' => 'nullable|integer',
             'imdb_id' => 'nullable|string|max:50',
             'titulo_original' => 'nullable|string|max:255',

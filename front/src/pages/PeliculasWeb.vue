@@ -39,6 +39,14 @@
             <q-td :props="props">{{ props.row.studio ? props.row.studio.nombre : '' }}</q-td>
           </template>
 
+          <template v-slot:body-cell-estado="props">
+            <q-td :props="props">
+              <q-chip dense :color="props.row.estado === 'ACTIVO' ? 'positive' : 'negative'" text-color="white">
+                {{ props.row.estado || 'INACTIVO' }}
+              </q-chip>
+            </q-td>
+          </template>
+
           <template v-slot:body-cell-actores="props">
             <q-td :props="props" style="max-width: 340px">
               <div class="ellipsis">{{ (props.row.actores || []).map((a) => a.nombre).join(', ') }}</div>
@@ -126,9 +134,11 @@
               <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje Metacritic (0-10)" v-model.number="form.puntaje_metacritic" type="number" step="0.1" /></div>
 
               <div class="col-12 col-md-3"><q-input dense outlined label="Votos Total" v-model.number="form.votos_total" type="number" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Popularidad" v-model.number="form.popularidad" type="number" step="0.01" /></div>
+              <div class="col-12 col-md-3"><q-input dense outlined label="Popularidad" v-model.number="form.popularidad" type="number" step="0.001" /></div>
               <div class="col-12 col-md-3"><q-input dense outlined label="Clasificacion" v-model="form.clasificacion" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Estado" v-model="form.estado" /></div>
+              <div class="col-12 col-md-3">
+                <q-select dense outlined label="Estado" v-model="form.estado" :options="['ACTIVO', 'INACTIVO']" />
+              </div>
 
               <div class="col-12 col-md-4"><q-input dense outlined label="Genero" v-model="form.genero" /></div>
               <div class="col-12 col-md-4"><q-input dense outlined label="Pais" v-model="form.pais" /></div>
@@ -141,6 +151,22 @@
 
               <div class="col-12 col-md-6"><q-input dense outlined label="URL video YouTube" v-model="form.url_video_youtube" /></div>
               <div class="col-12 col-md-6"><q-input dense outlined label="URL oficial" v-model="form.url_oficial" /></div>
+              <div class="col-12 col-md-6">
+                <q-select
+                  dense
+                  outlined
+                  label="Carrusel"
+                  v-model="form.carrusel_tipo"
+                  :options="[
+                    { label: 'Ninguno', value: 'ninguno' },
+                    { label: 'Carrusel 1 (principal)', value: 'carrusel_1' },
+                    { label: 'Carrusel 2 (secundario)', value: 'carrusel_2' },
+                    { label: 'Ambos', value: 'ambos' }
+                  ]"
+                  emit-value
+                  map-options
+                />
+              </div>
 
               <div class="col-12"><q-input dense outlined label="Actores (separados por coma)" v-model="actoresTexto" /></div>
               <div class="col-12"><q-input dense outlined label="Premios" v-model="form.premios" /></div>
@@ -154,6 +180,16 @@
               <div class="col-12 col-md-7">
                 <div class="text-caption text-grey-7 q-mb-xs">Vista previa</div>
                 <q-img :src="posterPreview || movieImage(form.imagen)" style="height: 160px; max-width: 220px; border-radius: 10px" />
+              </div>
+
+              <div class="col-12 col-md-5">
+                <q-file dense outlined v-model="backdropFile" label="Imagen de background (opcional)" accept=".jpg,.jpeg,.png" @update:model-value="onBackdropSelected">
+                  <template v-slot:prepend><q-icon name="wallpaper" /></template>
+                </q-file>
+              </div>
+              <div class="col-12 col-md-7">
+                <div class="text-caption text-grey-7 q-mb-xs">Vista previa background</div>
+                <q-img :src="backdropPreview || movieImage(form.backdrop_imagen)" style="height: 160px; max-width: 320px; border-radius: 10px" />
               </div>
 
               <div class="col-12" v-if="uploadProgress > 0 && uploadProgress < 100">
@@ -301,6 +337,7 @@
 const emptyForm = () => ({
   titulo: '',
   tipo: 'pelicula',
+  carrusel_tipo: 'ninguno',
   tmdb_id: null,
   imdb_id: null,
   titulo_original: null,
@@ -358,6 +395,8 @@ export default {
       form: emptyForm(),
       posterFile: null,
       posterPreview: '',
+      backdropFile: null,
+      backdropPreview: '',
       replaceImageFile: null,
       replaceImagePreview: '',
       imageDialogCurrent: '',
@@ -372,7 +411,9 @@ export default {
         { label: 'Imagen', field: 'imagen', name: 'imagen' },
         { label: 'BG', field: 'backdrop_imagen', name: 'backdrop_imagen' },
         { label: 'Titulo', field: 'titulo', name: 'titulo', sortable: true },
+        { label: 'Estado', field: 'estado', name: 'estado', sortable: true },
         { label: 'Tipo', field: 'tipo', name: 'tipo', sortable: true },
+        { label: 'Carrusel', field: 'carrusel_tipo', name: 'carrusel_tipo', sortable: true },
         { label: 'Puntaje', field: 'puntaje_web', name: 'puntaje_web', sortable: true },
         { label: 'Descuento %', field: 'descuento', name: 'descuento', sortable: true },
         { label: 'Bucket', field: 'bucket', name: 'bucket', sortable: true },
@@ -444,6 +485,8 @@ export default {
       this.actoresTexto = '';
       this.posterFile = null;
       this.posterPreview = '';
+      this.backdropFile = null;
+      this.backdropPreview = '';
       this.dialog = true;
     },
     openEdit(row) {
@@ -458,6 +501,8 @@ export default {
       this.actoresTexto = (row.actores || []).map((a) => a.nombre).join(', ');
       this.posterFile = null;
       this.posterPreview = '';
+      this.backdropFile = null;
+      this.backdropPreview = '';
       this.dialog = true;
     },
     openImageDialog(row) {
@@ -489,6 +534,9 @@ export default {
     onPosterSelected(file) {
       this.posterPreview = file ? URL.createObjectURL(file) : '';
     },
+    onBackdropSelected(file) {
+      this.backdropPreview = file ? URL.createObjectURL(file) : '';
+    },
     onReplaceSelected(file) {
       this.replaceImagePreview = file ? URL.createObjectURL(file) : '';
     },
@@ -516,13 +564,18 @@ export default {
       try {
         this.loading = true;
         let uploaded = null;
+        let uploadedBackdrop = null;
         if (this.posterFile) {
           uploaded = await this.uploadImage(this.posterFile);
+        }
+        if (this.backdropFile) {
+          uploadedBackdrop = await this.uploadImage(this.backdropFile);
         }
 
         const payload = {
           ...this.form,
           imagen: uploaded || this.form.imagen,
+          backdrop_imagen: uploadedBackdrop || this.form.backdrop_imagen,
           trailer_youtube: this.form.url_video_youtube || this.form.trailer_youtube,
           url_video_youtube: this.form.url_video_youtube || this.form.trailer_youtube,
           actores: this.buildActors(),

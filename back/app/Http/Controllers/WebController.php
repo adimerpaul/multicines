@@ -4,9 +4,77 @@ namespace App\Http\Controllers;
 
 use App\Models\Movie;
 use App\Models\Programa;
+use App\Models\WebMovie;
 use Illuminate\Http\Request;
 
 class WebController extends Controller{
+
+    public function home()
+    {
+        $base = WebMovie::with(['actores', 'programas.sala', 'programas.price'])
+            ->where('estado', 'ACTIVO');
+
+        $hero = (clone $base)
+            ->whereIn('carrusel_tipo', ['carrusel_1', 'ambos'])
+            ->whereNotNull('backdrop_imagen')
+            ->orderByDesc('id')
+            ->limit(6)
+            ->get();
+
+        if ($hero->isEmpty()) {
+            $hero = (clone $base)
+                ->whereNotNull('backdrop_imagen')
+                ->orderByDesc('puntaje_web')
+                ->orderByDesc('popularidad')
+                ->limit(6)
+                ->get();
+        }
+
+        $peliculas = (clone $base)
+            ->where('tipo', 'pelicula')
+            ->orderByDesc('puntaje_web')
+            ->orderByDesc('popularidad')
+            ->get();
+
+        $proximos = (clone $base)
+            ->where('tipo', 'proximo')
+            ->orderByDesc('fecha_estreno')
+            ->orderByDesc('id')
+            ->get();
+
+        $carousel2 = (clone $base)
+            ->whereIn('carrusel_tipo', ['carrusel_2', 'ambos'])
+            ->whereNotNull('backdrop_imagen')
+            ->orderByDesc('id')
+            ->limit(6)
+            ->get();
+
+        if ($carousel2->isEmpty()) {
+            $carousel2 = (clone $base)
+                ->whereNotNull('backdrop_imagen')
+                ->inRandomOrder()
+                ->limit(6)
+                ->get();
+        }
+
+        $accion = (clone $base)
+            ->where('genero', 'like', '%Acc%')
+            ->orderByDesc('puntaje_web')
+            ->limit(15)
+            ->get();
+
+        if ($accion->isEmpty()) {
+            $accion = $peliculas->take(15);
+        }
+
+        return response()->json([
+            'hero' => $hero,
+            'peliculas' => $peliculas,
+            'proximos' => $proximos,
+            'carousel2' => $carousel2,
+            'accion' => $accion,
+        ]);
+    }
 
     public function mySeats(Request $request)
     {
