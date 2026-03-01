@@ -15,17 +15,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('eventos', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->string('descripcion');
-            $table->date('fecha');
-            $table->time('hora');
-            $table->string('lugar');
-            $table->string('imagen');
-            $table->string('estado');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('eventos')) {
+            Schema::create('eventos', function (Blueprint $table) {
+                $table->id();
+                $table->string('nombre');
+                $table->string('descripcion');
+                $table->date('fecha');
+                $table->time('hora');
+                $table->string('lugar');
+                $table->string('imagen');
+                $table->string('estado');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

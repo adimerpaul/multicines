@@ -48,6 +48,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::resource('/permiso',\App\Http\Controllers\PermisoController::class);
     Route::get("sendEmail",[\App\Http\Controllers\MailController::class,'sendEmail']);
     Route::resource('movie', \App\Http\Controllers\MovieController::class);
+    Route::resource('webMovie', \App\Http\Controllers\WebMovieController::class);
+    Route::post('webMovieSearchExternal', [\App\Http\Controllers\WebMovieController::class, 'searchExternal']);
+    Route::post('webMovieImportExternal', [\App\Http\Controllers\WebMovieController::class, 'importExternal']);
     Route::resource('cortesia', \App\Http\Controllers\CortesiaController::class);
     Route::get('free', [\App\Http\Controllers\CortesiaController::class,'free']);
     Route::resource('distributor', \App\Http\Controllers\DistributorController::class);

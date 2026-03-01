@@ -1,5 +1,6 @@
 import IndexPage from "pages/IndexPage";
 import Peliculas from "pages/Peliculas";
+import PeliculasWeb from "pages/PeliculasWeb";
 import Distribuidores from "pages/Distribuidores";
 import Cuis from "pages/Cuis";
 import Sincronizacion from "pages/Sincronizacion";
@@ -33,6 +34,7 @@ const routes = [
     children: [
       { path: '', component: IndexPage,meta: { requiresAuth: true } },
       { path: 'peliculas', component: Peliculas ,meta: { requiresAuth: true } },
+      { path: 'peliculas-web', component: PeliculasWeb ,meta: { requiresAuth: true } },
       { path: 'distribuidores', component: Distribuidores ,meta: { requiresAuth: true } },
       { path: 'cuis', component: Cuis ,meta: { requiresAuth: true } },
       { path: 'cufd', component: Cufd ,meta: { requiresAuth: true } },

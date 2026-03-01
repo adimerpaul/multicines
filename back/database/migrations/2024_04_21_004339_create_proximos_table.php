@@ -13,22 +13,24 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('proximos', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->string('descripcion');
-            $table->date('fecha');
-            $table->integer('start');
-            $table->string('director');
-            $table->string('imagen');
-            $table->string('trailer');
-            $table->string('estado');
-            $table->integer('minutos');
-            $table->string('pais');
-            $table->string('clasificacion');
-            $table->string('generos');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('proximos')) {
+            Schema::create('proximos', function (Blueprint $table) {
+                $table->id();
+                $table->string('nombre');
+                $table->string('descripcion');
+                $table->date('fecha');
+                $table->integer('start');
+                $table->string('director');
+                $table->string('imagen');
+                $table->string('trailer');
+                $table->string('estado');
+                $table->integer('minutos');
+                $table->string('pais');
+                $table->string('clasificacion');
+                $table->string('generos');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

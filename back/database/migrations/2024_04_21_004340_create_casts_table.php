@@ -13,14 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('casts', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->string('imagen');
-            $table->unsignedBigInteger('proximo_id');
-            $table->foreign('proximo_id')->references('id')->on('proximos');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('casts')) {
+            Schema::create('casts', function (Blueprint $table) {
+                $table->id();
+                $table->string('nombre');
+                $table->string('imagen');
+                $table->unsignedBigInteger('proximo_id');
+                $table->foreign('proximo_id')->references('id')->on('proximos');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

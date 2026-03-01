@@ -51,6 +51,7 @@
         </q-expansion-item>
         <q-expansion-item expand-separator dense exact icon="o_movie_filter" label="Peliculas" v-if="store.boolmovie||store.booldistrib">
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_movie" label="Peliculas" default-opened to="peliculas" expand-icon="null" v-if="store.boolmovie"/>
+          <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_public" label="Peliculas Web" default-opened to="peliculas-web" expand-icon="null" v-if="store.boolmovie"/>
           <q-expansion-item dense exact :header-inset-level="1" expand-separator icon="o_cast_for_education" label="Distribuidores" default-opened to="distribuidores" expand-icon="null" v-if="store.booldistrib"/>
         </q-expansion-item>
         <q-expansion-item dense exact expand-separator icon="o_living" label="Salas" to="salas" expand-icon="null" v-if="store.boolsala"/>

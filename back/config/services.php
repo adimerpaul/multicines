@@ -31,4 +31,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'tmdb' => [
+        'url' => env('TMDB_API_URL', 'https://api.themoviedb.org/3'),
+        'image_url' => env('TMDB_IMAGE_URL', 'https://image.tmdb.org/t/p'),
+        'bearer_token' => env('TMDB_BEARER_TOKEN'),
+        'api_key' => env('TMDB_API_KEY'),
+        'language' => env('TMDB_LANGUAGE', 'es-ES'),
+    ],
+
 ];
