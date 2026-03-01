@@ -61,4 +61,10 @@ class WebMovie extends Model
     {
         return $this->hasMany(WebMovieActor::class);
     }
+
+    public function programas()
+    {
+        return $this->belongsToMany(Programa::class, 'web_movie_programa')
+            ->with('movie', 'sala', 'price');
+    }
 }

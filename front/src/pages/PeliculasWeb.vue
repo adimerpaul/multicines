@@ -29,6 +29,12 @@
             </q-td>
           </template>
 
+          <template v-slot:body-cell-backdrop_imagen="props">
+            <q-td :props="props" auto-width>
+              <q-img :src="movieImage(props.row.backdrop_imagen)" style="height: 45px; width: 80px; border-radius: 8px" />
+            </q-td>
+          </template>
+
           <template v-slot:body-cell-estudio="props">
             <q-td :props="props">{{ props.row.studio ? props.row.studio.nombre : '' }}</q-td>
           </template>
@@ -57,6 +63,22 @@
                     </q-item-section>
                     <q-item-section>
                       <q-item-label>Actualizar imagen</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup @click="openBackgroundDialog(props.row)">
+                    <q-item-section avatar>
+                      <q-icon name="wallpaper" color="deep-orange" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Actualizar background</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup @click="openLinkProgramDialog(props.row)">
+                    <q-item-section avatar>
+                      <q-icon name="link" color="secondary" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Vincular con programacion</q-item-label>
                     </q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup @click="removeRow(props.row.id)">
@@ -150,7 +172,7 @@
     <q-dialog v-model="imageDialog" persistent>
       <q-card style="min-width: 700px; max-width: 90vw">
         <q-card-section class="row items-center">
-          <div class="text-h6">Actualizar imagen</div>
+          <div class="text-h6">{{ imageDialogMode === 'background' ? 'Actualizar background' : 'Actualizar imagen' }}</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
@@ -173,7 +195,63 @@
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Cancelar" color="negative" v-close-popup />
-          <q-btn label="Actualizar imagen" color="warning" icon="cloud_upload" :loading="loading" @click="saveImageOnly" />
+          <q-btn :label="imageDialogMode === 'background' ? 'Actualizar background' : 'Actualizar imagen'" color="warning" icon="cloud_upload" :loading="loading" @click="saveImageOnly" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="linkProgramDialog" persistent full-width>
+      <q-card>
+        <q-card-section class="row items-center">
+          <div class="text-h6">Vincular con programacion</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <div class="row q-col-gutter-sm q-mb-sm">
+            <div class="col-12 col-md-4">
+              <q-input dense outlined v-model="programFilterText" label="Filtrar por pelicula" clearable>
+                <template v-slot:append><q-icon name="search" /></template>
+              </q-input>
+            </div>
+            <div class="col-12 col-md-3">
+              <q-select dense outlined v-model="programFilterSala" label="Filtrar por sala" :options="programSalaOptions" clearable />
+            </div>
+            <div class="col-12 col-md-3">
+              <q-select dense outlined v-model="programFilterTarifa" label="Filtrar por tarifa" :options="programTarifaOptions" clearable />
+            </div>
+            <div class="col-12 col-md-2 row q-gutter-xs">
+              <q-btn dense color="secondary" icon="done_all" label="Todos" @click="selectAllFilteredPrograms" />
+              <q-btn dense flat color="negative" icon="clear_all" label="Limpiar" @click="clearProgramSelection" />
+            </div>
+          </div>
+          <q-table
+            dense
+            :rows="filteredProgramRows"
+            :columns="programColumns"
+            row-key="id"
+            :rows-per-page-options="[0]"
+            selection="multiple"
+            v-model:selected="selectedProgramRows"
+          >
+            <template v-slot:body-cell-fecha="props">
+              <q-td :props="props">{{ formatProgramDate(props.row.fecha, props.row.horaInicio) }}</q-td>
+            </template>
+            <template v-slot:body-cell-pelicula="props">
+              <q-td :props="props">{{ props.row.movie ? props.row.movie.nombre : '' }}</q-td>
+            </template>
+            <template v-slot:body-cell-sala="props">
+              <q-td :props="props">{{ props.row.sala ? props.row.sala.nombre : '' }}</q-td>
+            </template>
+            <template v-slot:body-cell-tarifa="props">
+              <q-td :props="props">{{ props.row.price ? props.row.price.precio : '' }}</q-td>
+            </template>
+          </q-table>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancelar" color="negative" v-close-popup />
+          <q-btn color="primary" icon="save" label="Guardar vinculos" :loading="loading" @click="saveProgramLinks" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -269,6 +347,7 @@ export default {
       dialog: false,
       importDialog: false,
       imageDialog: false,
+      linkProgramDialog: false,
       isEdit: false,
       currentRow: null,
       searchQuery: '',
@@ -282,22 +361,65 @@ export default {
       replaceImageFile: null,
       replaceImagePreview: '',
       imageDialogCurrent: '',
+      imageDialogMode: 'poster',
+      programRows: [],
+      selectedProgramRows: [],
+      programFilterText: '',
+      programFilterSala: null,
+      programFilterTarifa: null,
       columns: [
         { label: 'Opciones', field: 'opciones', name: 'opciones' },
         { label: 'Imagen', field: 'imagen', name: 'imagen' },
+        { label: 'BG', field: 'backdrop_imagen', name: 'backdrop_imagen' },
         { label: 'Titulo', field: 'titulo', name: 'titulo', sortable: true },
         { label: 'Tipo', field: 'tipo', name: 'tipo', sortable: true },
         { label: 'Puntaje', field: 'puntaje_web', name: 'puntaje_web', sortable: true },
         { label: 'Descuento %', field: 'descuento', name: 'descuento', sortable: true },
         { label: 'Bucket', field: 'bucket', name: 'bucket', sortable: true },
+        { label: 'Programas', field: (row) => (row.programas || []).length, name: 'programas', sortable: true },
         { label: 'YouTube', field: 'url_video_youtube', name: 'url_video_youtube' },
         { label: 'Estudio', field: 'estudio', name: 'estudio', sortable: true },
         { label: 'Actores', field: 'actores', name: 'actores' },
+      ],
+      programColumns: [
+        { label: 'ID', field: 'id', name: 'id', sortable: true },
+        { label: 'Fecha', field: 'fecha', name: 'fecha', sortable: true },
+        { label: 'Inicio', field: 'horaInicio', name: 'horaInicio', sortable: true },
+        { label: 'Fin', field: 'horaFin', name: 'horaFin', sortable: true },
+        { label: 'Nro Funcion', field: 'nroFuncion', name: 'nroFuncion', sortable: true },
+        { label: 'Pelicula', field: 'pelicula', name: 'pelicula' },
+        { label: 'Sala', field: 'sala', name: 'sala' },
+        { label: 'Tarifa', field: 'tarifa', name: 'tarifa' },
       ],
     };
   },
   created() {
     this.loadRows();
+  },
+  computed: {
+    filteredProgramRows() {
+      return (this.programRows || []).filter((row) => {
+        const movieName = row.movie?.nombre || '';
+        const salaName = row.sala?.nombre || '';
+        const tarifa = row.price?.precio != null ? String(row.price.precio) : '';
+
+        const byName = this.programFilterText
+          ? movieName.toLowerCase().includes(this.programFilterText.toLowerCase())
+          : true;
+        const bySala = this.programFilterSala ? salaName === this.programFilterSala : true;
+        const byTarifa = this.programFilterTarifa ? tarifa === String(this.programFilterTarifa) : true;
+
+        return byName && bySala && byTarifa;
+      });
+    },
+    programSalaOptions() {
+      const names = [...new Set((this.programRows || []).map((row) => row.sala?.nombre).filter(Boolean))];
+      return names.sort();
+    },
+    programTarifaOptions() {
+      const tarifas = [...new Set((this.programRows || []).map((row) => row.price?.precio).filter((v) => v != null))];
+      return tarifas.sort((a, b) => a - b).map((v) => String(v));
+    },
   },
   methods: {
     required(v) {
@@ -343,7 +465,26 @@ export default {
       this.imageDialogCurrent = this.movieImage(row.imagen);
       this.replaceImageFile = null;
       this.replaceImagePreview = '';
+      this.imageDialogMode = 'poster';
       this.imageDialog = true;
+    },
+    openBackgroundDialog(row) {
+      this.currentRow = row;
+      this.imageDialogCurrent = this.movieImage(row.backdrop_imagen);
+      this.replaceImageFile = null;
+      this.replaceImagePreview = '';
+      this.imageDialogMode = 'background';
+      this.imageDialog = true;
+    },
+    async openLinkProgramDialog(row) {
+      this.currentRow = row;
+      this.linkProgramDialog = true;
+      this.programFilterText = '';
+      this.programFilterSala = null;
+      this.programFilterTarifa = null;
+      await this.loadProgramRows();
+      const selectedIds = (row.programas || []).map((p) => p.id);
+      this.selectedProgramRows = this.programRows.filter((p) => selectedIds.includes(p.id));
     },
     onPosterSelected(file) {
       this.posterPreview = file ? URL.createObjectURL(file) : '';
@@ -419,15 +560,67 @@ export default {
           ...row,
           studio_nombre: row.studio ? row.studio.nombre : null,
           actores: row.actores || [],
-          imagen: uploaded,
+          imagen: this.imageDialogMode === 'poster' ? uploaded : row.imagen,
+          backdrop_imagen: this.imageDialogMode === 'background' ? uploaded : row.backdrop_imagen,
         };
         const res = await this.$api.put('webMovie/' + row.id, payload);
         const i = this.rows.findIndex((x) => x.id === res.data.id);
         if (i !== -1) this.rows[i] = res.data;
         this.imageDialog = false;
-        this.$q.notify({ color: 'positive', icon: 'done', message: 'Imagen actualizada' });
+        this.$q.notify({ color: 'positive', icon: 'done', message: this.imageDialogMode === 'background' ? 'Background actualizado' : 'Imagen actualizada' });
       } catch (e) {
         this.$q.notify({ color: 'negative', icon: 'error', message: e?.response?.data?.message || 'No se pudo actualizar imagen' });
+      } finally {
+        this.loading = false;
+      }
+    },
+    async loadProgramRows() {
+      const res = await this.$api.get('webMovieProgramaciones');
+      this.programRows = res.data || [];
+    },
+    selectAllFilteredPrograms() {
+      this.selectedProgramRows = [...this.filteredProgramRows];
+    },
+    clearProgramSelection() {
+      this.selectedProgramRows = [];
+    },
+    formatProgramDate(value, horaInicio) {
+      if (!value) return '';
+      const date = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return value;
+      const dayName = date.toLocaleDateString('es-ES', { weekday: 'long' });
+      const formatted = date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      let hourText = '';
+      if (horaInicio) {
+        const start = new Date(horaInicio);
+        if (!Number.isNaN(start.getTime())) {
+          hourText = start.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+          });
+        }
+      }
+      return `${dayName.charAt(0).toUpperCase()}${dayName.slice(1)} ${formatted}${hourText ? ` ${hourText}` : ''}`;
+    },
+    async saveProgramLinks() {
+      if (!this.currentRow) return;
+      try {
+        this.loading = true;
+        const programaIds = this.selectedProgramRows.map((p) => p.id);
+        const res = await this.$api.post(`webMovie/${this.currentRow.id}/syncProgramaciones`, {
+          programa_ids: programaIds,
+        });
+        const i = this.rows.findIndex((x) => x.id === res.data.id);
+        if (i !== -1) this.rows[i] = res.data;
+        this.linkProgramDialog = false;
+        this.$q.notify({ color: 'positive', icon: 'done', message: 'Programacion vinculada correctamente' });
+      } catch (e) {
+        this.$q.notify({ color: 'negative', icon: 'error', message: e?.response?.data?.message || 'No se pudo vincular programacion' });
       } finally {
         this.loading = false;
       }

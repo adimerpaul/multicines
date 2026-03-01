@@ -14,7 +14,7 @@ class WebMovieController extends Controller
 {
     public function index()
     {
-        return WebMovie::with(['studio', 'actores'])
+        return WebMovie::with(['studio', 'actores', 'programas'])
             ->orderBy('id', 'desc')
             ->get();
     }
@@ -38,7 +38,7 @@ class WebMovieController extends Controller
 
     public function show(WebMovie $webMovie)
     {
-        return WebMovie::with(['studio', 'actores'])->findOrFail($webMovie->id);
+        return WebMovie::with(['studio', 'actores', 'programas'])->findOrFail($webMovie->id);
     }
 
     public function update(Request $request, WebMovie $webMovie)
@@ -223,6 +223,28 @@ class WebMovieController extends Controller
         }
 
         return $this->show($movie);
+    }
+
+    public function listProgramaciones()
+    {
+        return \App\Models\Programa::whereDate('fecha', '>=', now()->toDateString())
+            ->with('movie', 'sala', 'price')
+            ->orderBy('fecha')
+            ->orderBy('horaInicio')
+            ->get();
+    }
+
+    public function syncProgramaciones(Request $request, WebMovie $webMovie)
+    {
+        $data = $request->validate([
+            'programa_ids' => 'nullable|array',
+            'programa_ids.*' => 'integer|exists:programas,id',
+        ]);
+
+        $ids = $data['programa_ids'] ?? [];
+        $webMovie->programas()->sync($ids);
+
+        return $this->show($webMovie);
     }
 
     private function validatePayload(Request $request): array

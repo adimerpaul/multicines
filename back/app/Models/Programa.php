@@ -41,6 +41,11 @@ class Programa extends Model
     public function tickets(){
         return $this->hasMany(Ticket::class);
     }
+
+    public function webMovies()
+    {
+        return $this->belongsToMany(WebMovie::class, 'web_movie_programa');
+    }
     protected $hidden = [
         'created_at',
         'updated_at',
