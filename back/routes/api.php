@@ -131,6 +131,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('revertirAnularSale', [\App\Http\Controllers\SaleController::class, 'revertirAnularSale']);
 
     Route::post('revertirAnularRental', [\App\Http\Controllers\RentalController::class, 'revertirAnularRental']);
+    Route::post('cambioPago', [\App\Http\Controllers\SaleController::class,'cambioPago']);
 });
 Route::post('anularCuf', [\App\Http\Controllers\SaleController::class,'anularCuf']);
 Route::get('anularMasivo', [\App\Http\Controllers\FacturaController::class,'anularMasivo']);

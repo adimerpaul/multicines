@@ -1982,5 +1982,13 @@ class SaleController extends Controller
                 group by f.id order by fec asc,sala asc,horaInicio asc;
         ");
     }
+
+    public function cambioPago(Request $request)
+    {
+        $sale = Sale::find($request->id);
+        $sale->credito = $request->credito;
+        $sale->save();
+        return $sale;
+    }
 }
 

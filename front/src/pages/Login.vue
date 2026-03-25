@@ -157,6 +157,7 @@ export default {
             if(r.id==26) this.store.booltodoventa=true
             if(r.id==27) this.store.boolimpboleto=true
             if(r.id==28) this.store.boolimpfactura=true
+            if(r.id==29) this.store.booltipopago=true
 
         });
         this.$api.defaults.headers.common['Authorization'] = 'Bearer '+res.data.token
