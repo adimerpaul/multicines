@@ -225,7 +225,7 @@
     </q-card-section>
     <q-card-actions align="right">
     <q-btn flat label="ACTUALIZAR" color="green" @click="actualizarTipoPago" />
-    <q-btn flat label="cerrar" color="red" v-close-popup />
+    <q-btn flat label="cerrar" color="red" @click="dialogCambioPago=false; listaVentaCandyGet()" />
     </q-card-actions>
     </q-card>
     </q-dialog>   

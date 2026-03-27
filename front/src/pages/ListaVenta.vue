@@ -41,7 +41,7 @@
                 <q-list>
                   <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 && validarFecha(props.row.fechaEmision) && store.booltipopago" >
                     <q-item-section>
-                      <q-btn icon="paid" color="purple" class="full-width" label="Tipo Pago" no-caps @click="cambioPago(props.row)" v-if="props.row.siatAnulado==0 && validarFecha(props.row.fechaEmision)"/>
+                      <q-btn icon="paid" color="purple" class="full-width" label="Tipo Pago" no-caps @click="cambioPago(props.row)" v-if="props.row.siatAnulado==0 "/>
                     </q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup v-if="props.row.siatAnulado==0 && props.row.cortesia=='NO' && props.row.venta=='F' && store.boolimpfactura" >
@@ -264,7 +264,7 @@
     </q-card-section>
     <q-card-actions align="right">
     <q-btn flat label="ACTUALIZAR" color="green" @click="actualizarTipoPago" />
-    <q-btn flat label="cerrar" color="red" v-close-popup />
+    <q-btn flat label="cerrar" color="red" @click="dialogCambioPago=false; listaVentaBoleteriaGet()" />
     </q-card-actions>
     </q-card>
     </q-dialog>   
