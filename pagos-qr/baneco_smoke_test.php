@@ -49,6 +49,41 @@ function banecoGet(string $baseUrl, string $path, array $query = []): string
     return trim($response, "\" \r\n\t");
 }
 
+function banecoGetTextAuth(string $baseUrl, string $path, string $token, array $query = []): string
+{
+    $url = rtrim($baseUrl, '/') . $path;
+    if (!empty($query)) {
+        $url .= '?' . http_build_query($query);
+    }
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token,
+        ],
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+    ]);
+
+    $response = curl_exec($ch);
+    if ($response === false) {
+        $error = curl_error($ch);
+        curl_close($ch);
+        throw new RuntimeException("Error GET cURL: $error");
+    }
+
+    $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($statusCode < 200 || $statusCode >= 300) {
+        throw new RuntimeException("GET HTTP $statusCode: $response");
+    }
+
+    return trim($response);
+}
+
 function banecoPost(string $baseUrl, string $path, array $body): array
 {
     $url = rtrim($baseUrl, '/') . $path;
@@ -169,6 +204,28 @@ function banecoGetAuth(string $baseUrl, string $path, string $token): array
 }
 
 try {
+    $passwordEncrypted = banecoGet($baseUrl, '/api/authentication/encrypt', [
+        'text' => $passwordPlain,
+        'aesKey' => $aesKey,
+    ]);
+    $auth = banecoPost($baseUrl, '/api/authentication/authenticate', [
+        'userName' => $userName,
+        'password' => $passwordEncrypted,
+    ]);
+//    error_log($passwordEncrypted);
+//    error_log(json_encode($auth, JSON_PRETTY_PRINT));
+    $token = (string)($auth['token'] ?? '');
+    if ($token === '') {
+        throw new RuntimeException('No se recibió token de autenticación.');
+    }
+//  request ejemplo:
+//  https://apimktdesa.baneco.com.bo/ApiGateway/api/qrsimple/v2/paidQR/20210719
+    $paidQr = banecoGetTextAuth($baseUrl, '/api/qrsimple/v2/paidQR/20210719', $token);
+    echo "== Prueba paidQR ==\n";
+    echo $paidQr . "\n";
+
+    exit();
+
     echo "== Prueba 1: Encriptación ==\n";
     $cipherText = banecoGet($baseUrl, '/api/authentication/encrypt', [
         'text' => $plainText,

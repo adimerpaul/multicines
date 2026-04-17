@@ -78,6 +78,7 @@
         <q-expansion-item dense exact expand-separator icon="o_people" label="Clientes" to="cliente" expand-icon="null" v-if="store.boolcliente"/>
         <q-expansion-item dense exact expand-separator icon="o_block" label="Anulaciones" to="anulaciones" expand-icon="null" v-if="store.boolaprobar || store.boolautorizar"/>
         <q-expansion-item dense exact expand-separator icon="o_book_online" label="Cortesia" to="cortesia" expand-icon="null" v-if="store.boolcortesia"/>
+        <q-expansion-item dense exact expand-separator icon="o_payments" label="Pagos" to="pagos" expand-icon="null" v-if="store.boolpagos"/>
         <q-expansion-item dense exact expand-separator icon="o_description" label="factura" to="factura" expand-icon="null" />
 <!--        v-if="store.boolfactura"-->
       </q-list>
@@ -140,6 +141,7 @@ export default {
           globalStore().boolalquiler=false
           globalStore().boolcliente=false
           globalStore().boolcortesia=false
+          globalStore().boolpagos=false
         })
 
       }).onCancel(() => {

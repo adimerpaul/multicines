@@ -147,6 +147,38 @@ class GenerateQrController extends Controller
         }
     }
 
+    public function movimientosQr(Request $request)
+    {
+        $payload = $request->validate([
+            'fecha' => 'required|date',
+        ]);
+
+        $fecha = $payload['fecha'];
+
+        try {
+            $token = $this->authenticate();
+            $result = $this->tryMovements($fecha, $token);
+
+            if ($result === null) {
+                return response()->json([
+                    'message' => 'No se pudo obtener la lista de pagos desde Baneco con el endpoint 7.6 configurado.',
+                ], 422);
+            }
+
+            return response()->json([
+                'message' => 'Lista de pagos obtenida desde Baneco.',
+                'fecha' => $fecha,
+                'source' => 'baneco',
+                'items' => $this->normalizeMovements($result, $fecha),
+                'raw' => $result,
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Error al consultar movimientos QR: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     private function authenticate(): string
     {
         $passwordEncrypted = $this->encrypt($this->passwordPlain);
@@ -244,6 +276,69 @@ class GenerateQrController extends Controller
         }
 
         return null;
+    }
+
+    private function tryMovements(string $fecha, string $token): ?array
+    {
+        $result = $this->getJson('/api/qrsimple/paymentList?fecha=' . rawurlencode($fecha), $token);
+
+        $responseCode = $result['responseCode'] ?? null;
+        if (
+            $responseCode === 0 ||
+            $responseCode === '0' ||
+            isset($result['movements']) ||
+            isset($result['payments']) ||
+            isset($result['paymentList']) ||
+            isset($result['data'])
+        ) {
+            return $result;
+        }
+
+        return null;
+    }
+
+    private function normalizeMovements(array $result, string $fecha): array
+    {
+        $lists = [
+            $result['movements'] ?? null,
+            $result['movement'] ?? null,
+            $result['payments'] ?? null,
+            $result['paymentList'] ?? null,
+            $result['transactions'] ?? null,
+            $result['data'] ?? null,
+            $result['items'] ?? null,
+            $result['records'] ?? null,
+        ];
+
+        $items = null;
+        foreach ($lists as $candidate) {
+            if (is_array($candidate)) {
+                $items = $candidate;
+                break;
+            }
+        }
+
+        if ($items === null) {
+            $items = array_is_list($result) ? $result : [$result];
+        }
+
+        return collect($items)
+            ->filter(fn ($item) => is_array($item))
+            ->map(function (array $item) use ($fecha) {
+                return [
+                    'fecha' => $item['paymentDate'] ?? $item['date'] ?? $item['fecha'] ?? $fecha,
+                    'qrId' => $item['qrId'] ?? $item['idQr'] ?? $item['qrID'] ?? $item['id'] ?? '',
+                    'transactionId' => $item['transactionId'] ?? $item['transactionID'] ?? $item['reference'] ?? '',
+                    'monto' => $item['amount'] ?? $item['paymentAmount'] ?? $item['monto'] ?? '',
+                    'estado' => $item['status'] ?? $item['statusDescription'] ?? $item['statusQrCode'] ?? $item['statusQRCode'] ?? '',
+                    'descripcion' => $item['description'] ?? $item['detail'] ?? $item['gloss'] ?? '',
+                    'cliente' => $item['client'] ?? $item['customer'] ?? '',
+                    'origen' => 'baneco',
+                    'raw' => $item,
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     private function banecoRequest(): PendingRequest
