@@ -29,6 +29,8 @@ function banecoGet(string $baseUrl, string $path, array $query = []): string
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
         CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
     ]);
 
     $response = curl_exec($ch);
@@ -62,6 +64,8 @@ function banecoPost(string $baseUrl, string $path, array $body): array
         CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
         CURLOPT_POSTFIELDS => $payload,
         CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
     ]);
 
     $response = curl_exec($ch);
@@ -103,6 +107,8 @@ function banecoPostAuth(string $baseUrl, string $path, array $body, string $toke
         ],
         CURLOPT_POSTFIELDS => $payload,
         CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
     ]);
 
     $response = curl_exec($ch);
@@ -137,6 +143,8 @@ function banecoGetAuth(string $baseUrl, string $path, string $token): array
             'Authorization: Bearer ' . $token,
         ],
         CURLOPT_TIMEOUT => 30,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
     ]);
 
     $response = curl_exec($ch);
@@ -307,4 +315,3 @@ try {
     fwrite(STDERR, "ERROR: " . $e->getMessage() . PHP_EOL);
     exit(1);
 }
-
