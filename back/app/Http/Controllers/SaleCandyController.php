@@ -26,6 +26,14 @@ use SimpleXMLElement;
 
 class SaleCandyController extends Controller
 {
+    private function applyQrData(Sale $sale, Request $request): void
+    {
+        $sale->pagoQr = $request->boolean('pagoQr');
+        $sale->qrId = $request->input('qrId');
+        $sale->qrTransactionId = $request->input('qrTransactionId');
+        $sale->qrPagadoAt = $request->boolean('pagoQr') ? now() : null;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -302,6 +310,7 @@ class SaleCandyController extends Controller
                 $sale->leyenda=$leyenda;
                 $sale->vip=$request->vip;
                 $sale->credito=$request->tarjeta;
+                $this->applyQrData($sale, $request);
                 $sale->save();
 
                 error_log("sale candy: ".json_encode($sale));
@@ -376,6 +385,7 @@ class SaleCandyController extends Controller
             $sale->leyenda=$leyenda;
             $sale->vip=$request->vip;
             $sale->credito=$request->tarjeta;
+            $this->applyQrData($sale, $request);
             $sale->save();
 
             if ($request->client['email']!='' && $request->client['email']!= null  ){
@@ -745,6 +755,7 @@ class SaleCandyController extends Controller
         $sale->venta="R";
         $sale->vip=$request->vip;
         $sale->credito=$request->tarjeta;
+        $this->applyQrData($sale, $request);
         $sale->save();
 
 
@@ -808,6 +819,7 @@ class SaleCandyController extends Controller
             $sale->vip=$request->vip;
             $sale->credito=$request->tarjeta;
             $sale->venta="R";
+            $this->applyQrData($sale, $request);
             $sale->save();
 
             $dataDetail=[];

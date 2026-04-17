@@ -220,14 +220,16 @@
                 </div>
               </div>
                 <div>
-                  <q-btn  label="venta" :loading="loading" icon="send" type="submit" color="positive" :disable="btn"/>
+                  <q-btn  label="venta" :loading="loading" icon="send" type="submit" color="positive" :disable="btn || qrPolling"/>
                   <q-btn label="Cerrar" :loading="loading" type="button" size="md" icon="delete" color="negative" class="q-ml-sm" @click="cancelarVenta" />
-                  <q-btn label="Generar QR" :loading="loading" type="button" size="md" icon="qr_code_2" color="teal" class="q-ml-sm" @click="generarQr()" />
+                  <q-btn label="Generar QR" :loading="loading" type="button" size="md" icon="qr_code_2" color="teal" class="q-ml-sm" :disable="qrPolling" @click="generarQr()" />
+                  <q-btn v-if="qrId" label="Cancelar QR" :loading="loading" type="button" size="md" icon="cancel" color="warning" class="q-ml-sm" @click="cancelarQr()" />
                 </div>
                 <div v-if="qrImage" class="q-mt-md">
                   <q-banner class="bg-teal-1 text-dark">
                     <div><strong>ID QR:</strong> {{ qrId }}</div>
                     <div><strong>ID Venta:</strong> {{ qrTransactionId }}</div>
+                    <div><strong>Estado:</strong> {{ qrStatusMessage }}</div>
                   </q-banner>
                   <div class="row justify-center q-mt-md">
                     <img :src="qrImage" alt="QR de pago" style="max-width: 260px; width: 100%;">
@@ -279,8 +281,14 @@ export default {
       tarjeta:false,
       cine:{},
       leyendas:[],
+      pagoQr:false,
       qrId:'',
       qrImage:'',
+      qrPolling:false,
+      qrPollTimer:null,
+      qrPaymentConfirmed:false,
+      qrPaymentData:[],
+      qrStatusMessage:'',
       qrTransactionId:'',
       nombresaldo:{},
       tienerebaja:false,
@@ -318,29 +326,64 @@ export default {
         this.document=this.documents[0]
       })
   },
+  beforeUnmount() {
+    this.stopQrPolling()
+  },
   methods: {
+    resetQrState(){
+      this.stopQrPolling()
+      this.pagoQr=false
+      this.qrId=''
+      this.qrImage=''
+      this.qrPolling=false
+      this.qrPaymentConfirmed=false
+      this.qrPaymentData=[]
+      this.qrStatusMessage=''
+      this.qrTransactionId=''
+    },
+    stopQrPolling(){
+      if (this.qrPollTimer) {
+        clearInterval(this.qrPollTimer)
+        this.qrPollTimer = null
+      }
+      this.qrPolling = false
+    },
+    startQrPolling(){
+      this.stopQrPolling()
+      this.qrPolling = true
+      this.qrStatusMessage = 'Esperando pago QR'
+      this.verificarEstadoQr()
+      this.qrPollTimer = setInterval(() => {
+        this.verificarEstadoQr()
+      }, 3000)
+    },
     openSale(){
       if (this.store.detallecandy.length==0){
         this.$alert.error('Debe agregar al menos un producto a la venta')
         return false
       }
-      this.qrId=''
-      this.qrImage=''
-      this.qrTransactionId=''
+      this.resetQrState()
       this.icon = true;
       this.tienerebaja=false;
       this.booltarjeta=false;
       this.tarjeta=false;
     },
     generarQr(){
+      if (this.qrPolling){
+        return
+      }
       this.loading = true
+      this.resetQrState()
       this.$api.post('generarQr',{
         client:this.client,
         montoTotal:this.total,
       }).then(res=>{
+        this.pagoQr = true
         this.qrImage = res.data.qr
         this.qrId = res.data.qrId
         this.qrTransactionId = res.data.transactionId
+        this.qrStatusMessage = 'QR generado, esperando pago'
+        this.startQrPolling()
         this.$q.notify({
           message: res.data.message || 'QR generado correctamente',
           color: 'positive',
@@ -349,6 +392,7 @@ export default {
         this.loading=false
       }).catch(err=>{
         console.log(err)
+        this.resetQrState()
         this.$q.notify({
           color: 'negative',
           textColor: 'white',
@@ -359,13 +403,81 @@ export default {
         this.loading=false
       })
     },
+    verificarEstadoQr(){
+      if (!this.qrId || this.qrPaymentConfirmed){
+        return
+      }
+      this.$api.get('statusQr/'+this.qrId).then(res=>{
+        const status = parseInt(res.data.statusQrCode)
+        this.qrPaymentData = Array.isArray(res.data.payment) ? res.data.payment : []
+        if (status === 1){
+          this.stopQrPolling()
+          this.pagoQr = true
+          this.qrPaymentConfirmed = true
+          this.qrStatusMessage = 'Pago QR confirmado'
+          this.$q.notify({
+            color: 'positive',
+            textColor: 'white',
+            message: 'Pago QR confirmado. Registrando venta...',
+            position: 'top',
+            timeout: 3000,
+          })
+          this.saleInsert(true)
+          return
+        }
+        if (status === 9){
+          this.stopQrPolling()
+          this.qrStatusMessage = 'QR anulado'
+          this.$q.notify({
+            color: 'warning',
+            textColor: 'black',
+            message: 'El QR fue anulado',
+            position: 'top',
+            timeout: 4000,
+          })
+          return
+        }
+        this.qrStatusMessage = 'Esperando pago QR'
+      }).catch(err=>{
+        console.log(err)
+        this.qrStatusMessage = err.response?.data?.message || 'Error al verificar QR'
+      })
+    },
+    cancelarQr(){
+      if (!this.qrId){
+        return
+      }
+      const qrId = this.qrId
+      this.stopQrPolling()
+      this.loading = true
+      this.$api.post('cancelarQr/'+qrId).then(res=>{
+        this.$q.notify({
+          color: res.data.cancelled ? 'positive' : 'warning',
+          textColor: 'white',
+          message: res.data.message || 'QR cancelado',
+          position: 'top',
+          timeout: 5000,
+        })
+      }).catch(err=>{
+        console.log(err)
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          message: err.response?.data?.message || 'No se pudo cancelar el QR',
+          position: 'top',
+          timeout: 5000,
+        })
+      }).finally(()=>{
+        this.loading=false
+        this.resetQrState()
+      })
+    },
     cancelarVenta(){
+      this.stopQrPolling()
       this.codigo=''
       this.booltarjeta=false
       this.nombresaldo={}
-      this.qrId=''
-      this.qrImage=''
-      this.qrTransactionId=''
+      this.resetQrState()
       this.icon=false
       this.verificar()
     },
@@ -433,9 +545,7 @@ export default {
     reset(){
       this.client={complemento:''}
       this.store.detallecandy=[]
-      this.qrId=''
-      this.qrImage=''
-      this.qrTransactionId=''
+      this.resetQrState()
     },
     quitar(index){
       this.store.detallecandy.splice(index,1);
@@ -468,7 +578,17 @@ export default {
       })
 
         },
-    saleInsert(){
+    saleInsert(qrConfirmado = false){
+      if (this.qrId && !qrConfirmado && !this.qrPaymentConfirmed){
+        this.$q.notify({
+          color: 'warning',
+          textColor: 'black',
+          message: 'El QR aun no fue pagado. Espere la confirmacion o cancele el QR.',
+          position: 'top',
+          timeout: 5000,
+        })
+        return
+      }
       this.error=''
       this.loading=true
       this.client.codigoTipoDocumentoIdentidad=this.document.codigoClasificador
@@ -480,7 +600,11 @@ export default {
         tarjeta:this.credito?'SI':'NO',
         codigoTarjeta:this.codigo,
         vip:this.booltarjeta?'SI':'NO',
+        pagoQr:this.pagoQr && this.qrPaymentConfirmed,
+        qrId:this.qrId,
+        qrTransactionId:this.qrTransactionId,
       }).then(res=>{
+        this.stopQrPolling()
         this.reset()
           if(res.data.sale.siatEnviado==1){
             this.printFactura(res.data.sale)
@@ -495,7 +619,7 @@ export default {
         this.$q.notify({
           color: 'negative',
           textColor: 'white',
-          message: err.message,
+          message: err.response?.data?.message || err.message,
           position: 'top',
           timeout: 5000,
         })
