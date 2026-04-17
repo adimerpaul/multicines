@@ -32,6 +32,14 @@ use DOMDocument;
 
 class SaleController extends Controller
 {
+    private function applyQrData(Sale $sale, Request $request): void
+    {
+        $sale->pagoQr = $request->boolean('pagoQr');
+        $sale->qrId = $request->input('qrId');
+        $sale->qrTransactionId = $request->input('qrTransactionId');
+        $sale->qrPagadoAt = $request->boolean('pagoQr') ? now() : null;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -415,6 +423,7 @@ class SaleController extends Controller
                     $sale->leyenda = $leyenda;
                     $sale->vip = $request->vip;
                     $sale->credito = $request->tarjeta;
+                    $this->applyQrData($sale, $request);
                     $sale->save();
                     error_log("sale: " . json_encode($sale));
 
@@ -533,6 +542,7 @@ class SaleController extends Controller
                 $sale->leyenda = $leyenda;
                 $sale->vip = $request->vip;
                 $sale->credito = $request->tarjeta;
+                $this->applyQrData($sale, $request);
                 $sale->save();
 
                 if ($request->client['email'] != '' && $request->client['email'] != null) {
@@ -1607,6 +1617,7 @@ class SaleController extends Controller
         $sale->vip = $request->vip;
         $sale->credito = $request->tarjeta;
         $sale->venta = "R";
+        $this->applyQrData($sale, $request);
         $sale->save();
 
         $user = User::find($request->user()->id);
@@ -1723,6 +1734,7 @@ class SaleController extends Controller
         $sale->credito = $request->tarjeta;
         $sale->cortesia = 'SI';
         $sale->venta = "R";
+        $this->applyQrData($sale, $request);
         $sale->save();
 
         $user = User::find($request->user()->id);
@@ -1869,6 +1881,7 @@ class SaleController extends Controller
         $sale->venta = "R";
         $sale->vip = $request->vip;
         $sale->credito = $request->tarjeta;
+        $this->applyQrData($sale, $request);
         $sale->save();
 
 

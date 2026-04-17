@@ -320,14 +320,35 @@
           </q-card-section>
           <q-separator/>
           <q-card-section>
-            <div class="row">
-              <div class="col-6">
-                <q-btn type="submit" class="full-width" icon="o_add_circle" label="Realizar venta" :loading="loading"
-                       no-caps color="green" :disable="btn"/>
+            <div class="row q-col-gutter-md items-stretch">
+              <div class="col-12 col-md-4">
+                <q-btn type="submit" class="full-width q-py-sm" icon="o_add_circle" label="Realizar venta" :loading="loading"
+                       no-caps color="green" :disable="btn || qrPolling"/>
               </div>
-              <div class="col-6">
-                <q-btn class="full-width" icon="undo" @click="saleDialog=false, consultartarjeta" label="Atras" no-caps
+              <div class="col-12 col-md-3">
+                <q-btn class="full-width q-py-sm" icon="qr_code_2" @click="generarQr" label="Generar QR" no-caps
+                       color="teal" :loading="loading" :disable="qrPolling"/>
+              </div>
+              <div class="col-12 col-md-2">
+                <q-btn v-if="qrId" class="full-width q-py-sm" icon="cancel" @click="cancelarQr" label="Cancelar QR" no-caps
+                       color="warning" :loading="loading"/>
+                <div v-else class="full-width q-py-sm"></div>
+              </div>
+              <div class="col-12 col-md-3">
+                <q-btn class="full-width q-py-sm" icon="undo" @click="cancelarDialogoVenta" label="Atras" no-caps
                        color="red"/>
+              </div>
+              <div class="col-12" v-if="qrImage">
+                <q-card flat bordered class="bg-teal-1">
+                  <q-card-section class="q-pb-sm">
+                    <div><strong>ID QR:</strong> {{ qrId }}</div>
+                    <div><strong>ID Venta:</strong> {{ qrTransactionId }}</div>
+                    <div><strong>Estado:</strong> {{ qrStatusMessage }}</div>
+                  </q-card-section>
+                  <q-card-section class="row justify-center q-pt-none">
+                    <img :src="qrImage" alt="QR de pago" style="max-width: 260px; width: 100%;">
+                  </q-card-section>
+                </q-card>
               </div>
             </div>
           </q-card-section>
@@ -393,6 +414,15 @@ export default {
       booltarjeta: false,
       codigo: '',
       frees: [],
+      pagoQr: false,
+      qrId: '',
+      qrImage: '',
+      qrPolling: false,
+      qrPollTimer: null,
+      qrPaymentConfirmed: false,
+      qrPaymentData: [],
+      qrStatusMessage: '',
+      qrTransactionId: '',
       opts: {
         errorCorrectionLevel: 'M',
         type: 'png',
@@ -418,7 +448,37 @@ export default {
 
     this.myMovies(this.fecha)
   },
+  beforeUnmount() {
+    this.stopQrPolling()
+  },
   methods: {
+    resetQrState() {
+      this.stopQrPolling()
+      this.pagoQr = false
+      this.qrId = ''
+      this.qrImage = ''
+      this.qrPolling = false
+      this.qrPaymentConfirmed = false
+      this.qrPaymentData = []
+      this.qrStatusMessage = ''
+      this.qrTransactionId = ''
+    },
+    stopQrPolling() {
+      if (this.qrPollTimer) {
+        clearInterval(this.qrPollTimer)
+        this.qrPollTimer = null
+      }
+      this.qrPolling = false
+    },
+    startQrPolling() {
+      this.stopQrPolling()
+      this.qrPolling = true
+      this.qrStatusMessage = 'Esperando pago QR'
+      this.verificarEstadoQr()
+      this.qrPollTimer = setInterval(() => {
+        this.verificarEstadoQr()
+      }, 3000)
+    },
     loadDocuments(){
       this.$api.get('document').then(res => {
         res.data.forEach(r => {
@@ -512,12 +572,121 @@ export default {
         this.totalventa = res.data
       })
     },
+    generarQr() {
+      if (this.qrPolling) {
+        return
+      }
+      this.loading = true
+      this.resetQrState()
+      this.$api.post('generarQr', {
+        client: this.client,
+        montoTotal: this.total,
+      }).then(res => {
+        this.pagoQr = true
+        this.qrImage = res.data.qr
+        this.qrId = res.data.qrId
+        this.qrTransactionId = res.data.transactionId
+        this.qrStatusMessage = 'QR generado, esperando pago'
+        this.startQrPolling()
+        this.$q.notify({
+          message: res.data.message || 'QR generado correctamente',
+          color: 'positive',
+          icon: 'qr_code_2'
+        })
+        this.loading = false
+      }).catch(err => {
+        console.log(err)
+        this.resetQrState()
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          message: err.response?.data?.message || 'No se pudo generar el QR',
+          position: 'top',
+          timeout: 5000,
+        })
+        this.loading = false
+      })
+    },
+    verificarEstadoQr() {
+      if (!this.qrId || this.qrPaymentConfirmed) {
+        return
+      }
+      this.$api.get('statusQr/' + this.qrId).then(res => {
+        const status = parseInt(res.data.statusQrCode)
+        this.qrPaymentData = Array.isArray(res.data.payment) ? res.data.payment : []
+        if (status === 1) {
+          this.stopQrPolling()
+          this.pagoQr = true
+          this.qrPaymentConfirmed = true
+          this.qrStatusMessage = 'Pago QR confirmado'
+          this.$q.notify({
+            color: 'positive',
+            textColor: 'white',
+            message: 'Pago QR confirmado. Registrando venta...',
+            position: 'top',
+            timeout: 3000,
+          })
+          this.saleInsert(true)
+          return
+        }
+        if (status === 9) {
+          this.stopQrPolling()
+          this.qrStatusMessage = 'QR anulado'
+          this.$q.notify({
+            color: 'warning',
+            textColor: 'black',
+            message: 'El QR fue anulado',
+            position: 'top',
+            timeout: 4000,
+          })
+          return
+        }
+        this.qrStatusMessage = 'Esperando pago QR'
+      }).catch(err => {
+        console.log(err)
+        this.qrStatusMessage = err.response?.data?.message || 'Error al verificar QR'
+      })
+    },
+    cancelarQr() {
+      if (!this.qrId) {
+        return
+      }
+      const qrId = this.qrId
+      this.stopQrPolling()
+      this.loading = true
+      this.$api.post('cancelarQr/' + qrId).then(res => {
+        this.$q.notify({
+          color: res.data.cancelled ? 'positive' : 'warning',
+          textColor: 'white',
+          message: res.data.message || 'QR cancelado',
+          position: 'top',
+          timeout: 5000,
+        })
+      }).catch(err => {
+        console.log(err)
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          message: err.response?.data?.message || 'No se pudo cancelar el QR',
+          position: 'top',
+          timeout: 5000,
+        })
+      }).finally(() => {
+        this.loading = false
+        this.resetQrState()
+      })
+    },
+    cancelarDialogoVenta() {
+      this.resetQrState()
+      this.saleDialog = false
+      this.consultartarjeta()
+    },
     eventSearch() {
       this.$api.post('eventSearch').then(res => {
         this.store.eventNumber = res.data
       })
     },
-    saleInsert() {
+    saleInsert(qrConfirmado = false) {
       // if (this.client.numeroDocumento==0) {
       //   this.$q.notify({
       //     color: 'red',
@@ -526,6 +695,16 @@ export default {
       //   })
       //  return false
       // }
+      if (this.qrId && !qrConfirmado && !this.qrPaymentConfirmed) {
+        this.$q.notify({
+          color: 'warning',
+          textColor: 'black',
+          message: 'El QR aun no fue pagado. Espere la confirmacion o cancele el QR.',
+          position: 'top',
+          timeout: 5000,
+        })
+        return
+      }
       this.error = ''
       this.loading = true
       this.client.codigoTipoDocumentoIdentidad = this.document.codigoClasificador
@@ -539,8 +718,12 @@ export default {
         tarjeta: this.credito,
         codigoTarjeta: this.codigo,
         cortesia: this.cortesia ? 'SI' : 'NO',
-        frees: this.frees
+        frees: this.frees,
+        pagoQr: this.pagoQr && this.qrPaymentConfirmed,
+        qrId: this.qrId,
+        qrTransactionId: this.qrTransactionId,
       }).then(res => {
+        this.stopQrPolling()
         this.freeGet()
         this.tarjeta = 'NO'
         // console.log(res.data)
@@ -573,6 +756,7 @@ export default {
         this.momentaneoDeleteAll()
         this.tventa()
         this.client = {complemento: '', vip: 'NO', credito: 'NO'}
+        this.resetQrState()
         this.saleDialog = false
         this.myMovies(this.fecha)
         this.loading = false
@@ -585,7 +769,7 @@ export default {
         this.$q.notify({
           color: 'negative',
           textColor: 'white',
-          message: err.response.data.message,
+          message: err.response?.data?.message || err.message,
           position: 'top',
           timeout: 5000,
         })
@@ -639,6 +823,7 @@ export default {
       this.tienerebaja = false
       this.codigo = ''
       this.nombresaldo = {}
+      this.resetQrState()
       this.saleDialog = true
       this.client = {complemento: '', vip: 'NO', credito: 'NO'}
     },
