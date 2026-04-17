@@ -1,5 +1,5 @@
 import {Dialog, Notify} from 'quasar'
-import Icon from "components/Icon.vue";
+// import Icon from "components/Icon.vue";
 
 export class Alert{
   static warning(message, subTitle = '') {
@@ -74,39 +74,39 @@ export class Alert{
       classes: 'bg.jpg-white text-black text-bold left-red-border'
     });
   }
-  static dialog (title, message) {
-    // return Dialog.create({
-    //   title: 'Confirmación',
-    //   component: undefined,
-    //   message,
-    //   // position: 'top',
-    //   color: 'positive',
-    //   ok: {
-    //     label: 'Aceptar',
-    //     color: 'positive'
-    //   },
-    //   cancel: {
-    //     label: 'Cancelar',
-    //     color: 'negative'
-    //   },
-    // })
-    // this.$q.dialog({
-    //   title: 'Anular Pago',
-    //   message: '¿Está seguro de anular el pago?',
-    //   cancel: true,
-    //   component: Icon,
-    // })
-
-    return Dialog.create({
-      component: Icon,
-      componentProps: {
-        title: title,
-        message: message,
-        icon: 'warning',
-        color: 'negative',
-      }
-    })
-  }
+  // static dialog (title, message) {
+  //   // return Dialog.create({
+  //   //   title: 'Confirmación',
+  //   //   component: undefined,
+  //   //   message,
+  //   //   // position: 'top',
+  //   //   color: 'positive',
+  //   //   ok: {
+  //   //     label: 'Aceptar',
+  //   //     color: 'positive'
+  //   //   },
+  //   //   cancel: {
+  //   //     label: 'Cancelar',
+  //   //     color: 'negative'
+  //   //   },
+  //   // })
+  //   // this.$q.dialog({
+  //   //   title: 'Anular Pago',
+  //   //   message: '¿Está seguro de anular el pago?',
+  //   //   cancel: true,
+  //   //   component: Icon,
+  //   // })
+  //
+  //   return Dialog.create({
+  //     component: Icon,
+  //     componentProps: {
+  //       title: title,
+  //       message: message,
+  //       icon: 'warning',
+  //       color: 'negative',
+  //     }
+  //   })
+  // }
   static confirm (message) {
     return Dialog.create({
       title: 'Confirmación',

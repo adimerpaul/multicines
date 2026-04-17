@@ -129,6 +129,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('listCufd', [\App\Http\Controllers\CufdController::class,'listCufd']);
     Route::post('reportGenAnulacion', [\App\Http\Controllers\SaleController::class, 'reportGenAnulacion']);
     Route::post('revertirAnularSale', [\App\Http\Controllers\SaleController::class, 'revertirAnularSale']);
+    Route::post('generarQr', [\App\Http\Controllers\GenerateQrController::class, 'generarQr']);
 
     Route::post('revertirAnularRental', [\App\Http\Controllers\RentalController::class, 'revertirAnularRental']);
     Route::post('cambioPago', [\App\Http\Controllers\SaleController::class,'cambioPago']);

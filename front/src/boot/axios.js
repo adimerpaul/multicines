@@ -1,6 +1,7 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import {globalStore} from "stores/globalStore";
+import {Alert} from "src/addons/Alert";
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
 // If any client changes this (global) instance, it might be a
@@ -13,6 +14,7 @@ export default boot(({ app,router }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
   app.config.globalProperties.$axios = axios
+  app.config.globalProperties.$alert = Alert
   // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
   //       so you won't necessarily have to import axios in each vue file
 
@@ -95,9 +97,9 @@ export default boot(({ app,router }) => {
       globalStore().boolautorizar=false
       globalStore().boolaprobar=false
       globalStore().booltodoventa=false
-      globalStore().boolimpboleto=false 
-      globalStore().boolimpfactura=false  
-      globalStore().booltipopago=false   
+      globalStore().boolimpboleto=false
+      globalStore().boolimpfactura=false
+      globalStore().booltipopago=false
       router.push('/login')
     })
   }else {
@@ -132,7 +134,7 @@ export default boot(({ app,router }) => {
     globalStore().booltodoventa=false
     globalStore().boolimpboleto=false
     globalStore().boolimpfactura=false
-    globalStore().booltipopago=false   
+    globalStore().booltipopago=false
     localStorage.removeItem('tokenMulti')
     globalStore().isLoggedIn=false
   }

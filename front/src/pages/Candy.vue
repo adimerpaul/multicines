@@ -74,7 +74,7 @@
             <div class="row">
               <div class="col-4 flex flex-center" ><q-icon name="point_of_sale"></q-icon> VENTA </div>
               <div class="col-4 text-center" ><q-btn @click="reset"  color="negative" size="14px" icon="restart_alt" label="cancelar"/></div>
-              <div class="col-4 text-center" ><q-btn @click="icon = true;tienerebaja=false; booltarjeta=false; tarjeta=false;"  color="positive" label="Venta" size="14px" icon="add_circle"/></div>
+              <div class="col-4 text-center" ><q-btn @click="openSale()"  color="positive" label="Venta" size="14px" icon="add_circle"/></div>
             </div>
 
           </q-card-section>
@@ -222,6 +222,16 @@
                 <div>
                   <q-btn  label="venta" :loading="loading" icon="send" type="submit" color="positive" :disable="btn"/>
                   <q-btn label="Cerrar" :loading="loading" type="button" size="md" icon="delete" color="negative" class="q-ml-sm" @click="cancelarVenta" />
+                  <q-btn label="Generar QR" :loading="loading" type="button" size="md" icon="qr_code_2" color="teal" class="q-ml-sm" @click="generarQr()" />
+                </div>
+                <div v-if="qrImage" class="q-mt-md">
+                  <q-banner class="bg-teal-1 text-dark">
+                    <div><strong>ID QR:</strong> {{ qrId }}</div>
+                    <div><strong>ID Venta:</strong> {{ qrTransactionId }}</div>
+                  </q-banner>
+                  <div class="row justify-center q-mt-md">
+                    <img :src="qrImage" alt="QR de pago" style="max-width: 260px; width: 100%;">
+                  </div>
                 </div>
               </q-form>
 
@@ -269,6 +279,9 @@ export default {
       tarjeta:false,
       cine:{},
       leyendas:[],
+      qrId:'',
+      qrImage:'',
+      qrTransactionId:'',
       nombresaldo:{},
       tienerebaja:false,
       booltarjeta:false,
@@ -306,10 +319,53 @@ export default {
       })
   },
   methods: {
+    openSale(){
+      if (this.store.detallecandy.length==0){
+        this.$alert.error('Debe agregar al menos un producto a la venta')
+        return false
+      }
+      this.qrId=''
+      this.qrImage=''
+      this.qrTransactionId=''
+      this.icon = true;
+      this.tienerebaja=false;
+      this.booltarjeta=false;
+      this.tarjeta=false;
+    },
+    generarQr(){
+      this.loading = true
+      this.$api.post('generarQr',{
+        client:this.client,
+        montoTotal:this.total,
+      }).then(res=>{
+        this.qrImage = res.data.qr
+        this.qrId = res.data.qrId
+        this.qrTransactionId = res.data.transactionId
+        this.$q.notify({
+          message: res.data.message || 'QR generado correctamente',
+          color: 'positive',
+          icon: 'qr_code_2'
+        })
+        this.loading=false
+      }).catch(err=>{
+        console.log(err)
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          message: err.response?.data?.message || 'No se pudo generar el QR',
+          position: 'top',
+          timeout: 5000,
+        })
+        this.loading=false
+      })
+    },
     cancelarVenta(){
       this.codigo=''
       this.booltarjeta=false
       this.nombresaldo={}
+      this.qrId=''
+      this.qrImage=''
+      this.qrTransactionId=''
       this.icon=false
       this.verificar()
     },
@@ -377,6 +433,9 @@ export default {
     reset(){
       this.client={complemento:''}
       this.store.detallecandy=[]
+      this.qrId=''
+      this.qrImage=''
+      this.qrTransactionId=''
     },
     quitar(index){
       this.store.detallecandy.splice(index,1);
