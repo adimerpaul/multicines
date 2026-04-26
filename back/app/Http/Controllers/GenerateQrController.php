@@ -280,7 +280,8 @@ class GenerateQrController extends Controller
 
     private function tryMovements(string $fecha, string $token): ?array
     {
-        $result = $this->getJson('/api/qrsimple/paymentList?fecha=' . rawurlencode($fecha), $token);
+        $fechaBaneco = date('Ymd', strtotime($fecha));
+        $result = $this->getJson('/api/qrsimple/v2/paidQR/' . rawurlencode($fechaBaneco), $token);
 
         $responseCode = $result['responseCode'] ?? null;
         if (
@@ -289,6 +290,7 @@ class GenerateQrController extends Controller
             isset($result['movements']) ||
             isset($result['payments']) ||
             isset($result['paymentList']) ||
+            isset($result['paidQR']) ||
             isset($result['data'])
         ) {
             return $result;
@@ -300,6 +302,7 @@ class GenerateQrController extends Controller
     private function normalizeMovements(array $result, string $fecha): array
     {
         $lists = [
+            $result['paidQR'] ?? null,
             $result['movements'] ?? null,
             $result['movement'] ?? null,
             $result['payments'] ?? null,
