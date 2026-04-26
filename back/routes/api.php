@@ -115,10 +115,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('cajaBolR', [\App\Http\Controllers\SaleController::class, 'cajaBolR']);
     Route::post('resumenBol', [\App\Http\Controllers\SaleController::class, 'resumenBol']);
     Route::post('resumenBolRF', [\App\Http\Controllers\SaleController::class, 'resumenBolRF']);
+    Route::post('reporteCajaBoleteria', [\App\Http\Controllers\SaleController::class, 'reporteCajaBoleteria']);
     Route::post('userbol', [\App\Http\Controllers\SaleController::class, 'userbol']);
     Route::post('usercandy', [\App\Http\Controllers\SaleController::class, 'usercandy']);
     Route::post('resumenCandy', [\App\Http\Controllers\SaleController::class, 'resumenCandy']);
     Route::post('resumenCandyRF', [\App\Http\Controllers\SaleController::class, 'resumenCandyRF']);
+    Route::post('reporteCajaCandy', [\App\Http\Controllers\SaleController::class, 'reporteCajaCandy']);
     Route::post('reporteFuncion', [\App\Http\Controllers\SaleController::class, 'reporteFuncion']);
     Route::post('cajaCandy', [\App\Http\Controllers\SaleController::class, 'cajaCandy']);
     Route::post('cajaCandyF', [\App\Http\Controllers\SaleController::class, 'cajaCandyF']);

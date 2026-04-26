@@ -1408,6 +1408,144 @@ class SaleController extends Controller
         and s.venta='F') as efectivoF");
     }
 
+    public function reporteCajaBoleteria(Request $request)
+    {
+        $ini = $request->ini . ' 00:00:00';
+        $fin = $request->fin . ' 23:59:59';
+        $userId = (int) $request->id;
+
+        $ventas = Detail::query()
+            ->join('sales', 'details.sale_id', '=', 'sales.id')
+            ->join('users', 'sales.user_id', '=', 'users.id')
+            ->whereBetween('sales.fechaEmision', [$ini, $fin])
+            ->where('sales.tipo', 'BOLETERIA')
+            ->where('sales.siatAnulado', false)
+            ->when($userId !== 0, function ($query) use ($userId) {
+                $query->where('sales.user_id', $userId);
+            })
+            ->groupBy('details.pelicula_id', 'users.id', 'users.name')
+            ->select([
+                'details.pelicula_id',
+                DB::raw('MAX(details.descripcion) as descripcion'),
+                'users.id as user_id',
+                'users.name as usuario',
+                DB::raw('SUM(details.cantidad) as cantidad'),
+                DB::raw('SUM(details.subTotal) as total'),
+                DB::raw("SUM(CASE WHEN sales.venta='F' AND sales.cortesia='NO' THEN details.cantidad ELSE 0 END) as cantidadF"),
+                DB::raw("SUM(CASE WHEN sales.venta='F' AND sales.cortesia='NO' THEN details.subTotal ELSE 0 END) as totalF"),
+                DB::raw("SUM(CASE WHEN sales.venta='R' AND sales.cortesia='NO' THEN details.cantidad ELSE 0 END) as cantidadR"),
+                DB::raw("SUM(CASE WHEN sales.venta='R' AND sales.cortesia='NO' THEN details.subTotal ELSE 0 END) as totalR"),
+                DB::raw("SUM(CASE WHEN sales.vip='NO' AND sales.cortesia='NO' THEN details.subTotal ELSE 0 END) as totalUsuario"),
+                DB::raw("SUM(CASE WHEN sales.credito='SI' THEN details.subTotal ELSE 0 END) as tarjeta"),
+                DB::raw("SUM(CASE WHEN sales.vip='SI' THEN details.subTotal ELSE 0 END) as vip"),
+                DB::raw("SUM(CASE WHEN sales.qrId IS NOT NULL AND sales.qrId<>'' THEN details.subTotal ELSE 0 END) as qr"),
+                DB::raw("SUM(CASE WHEN sales.vip='NO' AND sales.credito='NO' AND sales.cortesia='NO' AND (sales.qrId IS NULL OR sales.qrId='') THEN details.subTotal ELSE 0 END) as efectivo"),
+                DB::raw("SUM(CASE WHEN sales.credito='SI' AND sales.venta='R' THEN details.subTotal ELSE 0 END) as tarjetaR"),
+                DB::raw("SUM(CASE WHEN sales.vip='NO' AND sales.credito='NO' AND sales.cortesia='NO' AND sales.venta='R' AND (sales.qrId IS NULL OR sales.qrId='') THEN details.subTotal ELSE 0 END) as efectivoR"),
+                DB::raw("SUM(CASE WHEN sales.credito='SI' AND sales.venta='F' THEN details.subTotal ELSE 0 END) as tarjetaF"),
+                DB::raw("SUM(CASE WHEN sales.vip='NO' AND sales.credito='NO' AND sales.cortesia='NO' AND sales.venta='F' AND (sales.qrId IS NULL OR sales.qrId='') THEN details.subTotal ELSE 0 END) as efectivoF"),
+            ])
+            ->get();
+
+        $peliculas = [];
+        $peliculasFactura = [];
+        $peliculasRecibo = [];
+        $usuarios = [];
+        $resumen = [
+            'tarjeta' => 0,
+            'vip' => 0,
+            'qr' => 0,
+            'efectivo' => 0,
+        ];
+        $resumenRF = [
+            'tarjetaR' => 0,
+            'efectivoR' => 0,
+            'tarjetaF' => 0,
+            'efectivoF' => 0,
+        ];
+
+        foreach ($ventas as $venta) {
+            $peliculaId = $venta->pelicula_id;
+            if (!isset($peliculas[$peliculaId])) {
+                $peliculas[$peliculaId] = [
+                    'descripcion' => $venta->descripcion,
+                    'pelicula_id' => $peliculaId,
+                    'total' => 0,
+                    'cantidad' => 0,
+                ];
+                $peliculasFactura[$peliculaId] = [
+                    'descripcion' => $venta->descripcion,
+                    'pelicula_id' => $peliculaId,
+                    'total' => 0,
+                    'cantidad' => 0,
+                ];
+                $peliculasRecibo[$peliculaId] = [
+                    'descripcion' => $venta->descripcion,
+                    'pelicula_id' => $peliculaId,
+                    'total' => 0,
+                    'cantidad' => 0,
+                ];
+            }
+
+            $peliculas[$peliculaId]['total'] += (float) $venta->total;
+            $peliculas[$peliculaId]['cantidad'] += (float) $venta->cantidad;
+            $peliculasFactura[$peliculaId]['total'] += (float) $venta->totalF;
+            $peliculasFactura[$peliculaId]['cantidad'] += (float) $venta->cantidadF;
+            $peliculasRecibo[$peliculaId]['total'] += (float) $venta->totalR;
+            $peliculasRecibo[$peliculaId]['cantidad'] += (float) $venta->cantidadR;
+
+            if (!isset($usuarios[$venta->user_id])) {
+                $usuarios[$venta->user_id] = [
+                    'usuario' => $venta->usuario,
+                    'total' => 0,
+                ];
+            }
+            $usuarios[$venta->user_id]['total'] += (float) $venta->totalUsuario;
+
+            $resumen['tarjeta'] += (float) $venta->tarjeta;
+            $resumen['vip'] += (float) $venta->vip;
+            $resumen['qr'] += (float) $venta->qr;
+            $resumen['efectivo'] += (float) $venta->efectivo;
+            $resumenRF['tarjetaR'] += (float) $venta->tarjetaR;
+            $resumenRF['efectivoR'] += (float) $venta->efectivoR;
+            $resumenRF['tarjetaF'] += (float) $venta->tarjetaF;
+            $resumenRF['efectivoF'] += (float) $venta->efectivoF;
+        }
+
+        $anulados = Anulacion::query()
+            ->join('users', 'anulaciones.user_id', '=', 'users.id')
+            ->join('sales', 'anulaciones.sale_id', '=', 'sales.id')
+            ->whereBetween('anulaciones.fecha', [$ini, $fin])
+            ->where('anulaciones.estado', 'Anulado')
+            ->where('sales.tipo', 'BOLETERIA')
+            ->when($userId !== 0, function ($query) use ($userId) {
+                $query->where('anulaciones.user_id', $userId);
+            })
+            ->groupBy('users.name')
+            ->select([
+                'users.name as usuario',
+                DB::raw('COUNT(*) as total'),
+                DB::raw('SUM(anulaciones.monto) as monto'),
+            ])
+            ->get();
+
+        return [
+            'reporte' => array_values($peliculas),
+            'reportef' => array_values(array_filter($peliculasFactura, function ($pelicula) {
+                return $pelicula['cantidad'] > 0;
+            })),
+            'reporter' => array_values(array_filter($peliculasRecibo, function ($pelicula) {
+                return $pelicula['cantidad'] > 0;
+            })),
+            'infouser' => array_values(array_filter($usuarios, function ($usuario) {
+                return $usuario['total'] > 0;
+            })),
+            'resumen' => $resumen,
+            'resumenRF' => $resumenRF,
+            'anulados' => $anulados,
+        ];
+    }
+
     public function cajaCandy(Request $request)
     {
         $cadena = '';
@@ -1586,6 +1724,144 @@ class SaleController extends Controller
 		and s.credito='NO'
         and s.cortesia='NO'
         and s.venta='F') as efectivoF ");
+    }
+
+    public function reporteCajaCandy(Request $request)
+    {
+        $ini = $request->ini . ' 00:00:00';
+        $fin = $request->fin . ' 23:59:59';
+        $userId = (int) $request->id;
+
+        $ventas = Detail::query()
+            ->join('sales', 'details.sale_id', '=', 'sales.id')
+            ->join('users', 'sales.user_id', '=', 'users.id')
+            ->whereBetween('sales.fechaEmision', [$ini, $fin])
+            ->where('sales.tipo', 'CANDY')
+            ->where('sales.siatAnulado', false)
+            ->when($userId !== 0, function ($query) use ($userId) {
+                $query->where('sales.user_id', $userId);
+            })
+            ->groupBy('details.product_id', 'users.id', 'users.name')
+            ->select([
+                'details.product_id',
+                DB::raw('MAX(details.descripcion) as descripcion'),
+                'users.id as user_id',
+                'users.name as usuario',
+                DB::raw('SUM(details.cantidad) as cantidad'),
+                DB::raw('SUM(details.subTotal) as total'),
+                DB::raw("SUM(CASE WHEN sales.venta='F' AND sales.cortesia='NO' THEN details.cantidad ELSE 0 END) as cantidadF"),
+                DB::raw("SUM(CASE WHEN sales.venta='F' AND sales.cortesia='NO' THEN details.subTotal ELSE 0 END) as totalF"),
+                DB::raw("SUM(CASE WHEN sales.venta='R' AND sales.cortesia='NO' THEN details.cantidad ELSE 0 END) as cantidadR"),
+                DB::raw("SUM(CASE WHEN sales.venta='R' AND sales.cortesia='NO' THEN details.subTotal ELSE 0 END) as totalR"),
+                DB::raw("SUM(CASE WHEN sales.vip='NO' THEN details.subTotal ELSE 0 END) as totalUsuario"),
+                DB::raw("SUM(CASE WHEN sales.credito='SI' THEN details.subTotal ELSE 0 END) as tarjeta"),
+                DB::raw("SUM(CASE WHEN sales.vip='SI' THEN details.subTotal ELSE 0 END) as vip"),
+                DB::raw("SUM(CASE WHEN sales.qrId IS NOT NULL AND sales.qrId<>'' THEN details.subTotal ELSE 0 END) as qr"),
+                DB::raw("SUM(CASE WHEN sales.vip='NO' AND sales.credito='NO' AND (sales.qrId IS NULL OR sales.qrId='') THEN details.subTotal ELSE 0 END) as efectivo"),
+                DB::raw("SUM(CASE WHEN sales.credito='SI' AND sales.venta='R' THEN details.subTotal ELSE 0 END) as tarjetaR"),
+                DB::raw("SUM(CASE WHEN sales.vip='NO' AND sales.credito='NO' AND sales.cortesia='NO' AND sales.venta='R' AND (sales.qrId IS NULL OR sales.qrId='') THEN details.subTotal ELSE 0 END) as efectivoR"),
+                DB::raw("SUM(CASE WHEN sales.credito='SI' AND sales.venta='F' THEN details.subTotal ELSE 0 END) as tarjetaF"),
+                DB::raw("SUM(CASE WHEN sales.vip='NO' AND sales.credito='NO' AND sales.cortesia='NO' AND sales.venta='F' AND (sales.qrId IS NULL OR sales.qrId='') THEN details.subTotal ELSE 0 END) as efectivoF"),
+            ])
+            ->get();
+
+        $productos = [];
+        $productosFactura = [];
+        $productosRecibo = [];
+        $usuarios = [];
+        $resumen = [
+            'tarjeta' => 0,
+            'vip' => 0,
+            'qr' => 0,
+            'efectivo' => 0,
+        ];
+        $resumenRF = [
+            'tarjetaR' => 0,
+            'efectivoR' => 0,
+            'tarjetaF' => 0,
+            'efectivoF' => 0,
+        ];
+
+        foreach ($ventas as $venta) {
+            $productId = $venta->product_id;
+            if (!isset($productos[$productId])) {
+                $productos[$productId] = [
+                    'descripcion' => $venta->descripcion,
+                    'product_id' => $productId,
+                    'total' => 0,
+                    'cantidad' => 0,
+                ];
+                $productosFactura[$productId] = [
+                    'descripcion' => $venta->descripcion,
+                    'product_id' => $productId,
+                    'total' => 0,
+                    'cantidad' => 0,
+                ];
+                $productosRecibo[$productId] = [
+                    'descripcion' => $venta->descripcion,
+                    'product_id' => $productId,
+                    'total' => 0,
+                    'cantidad' => 0,
+                ];
+            }
+
+            $productos[$productId]['total'] += (float) $venta->total;
+            $productos[$productId]['cantidad'] += (float) $venta->cantidad;
+            $productosFactura[$productId]['total'] += (float) $venta->totalF;
+            $productosFactura[$productId]['cantidad'] += (float) $venta->cantidadF;
+            $productosRecibo[$productId]['total'] += (float) $venta->totalR;
+            $productosRecibo[$productId]['cantidad'] += (float) $venta->cantidadR;
+
+            if (!isset($usuarios[$venta->user_id])) {
+                $usuarios[$venta->user_id] = [
+                    'usuario' => $venta->usuario,
+                    'total' => 0,
+                ];
+            }
+            $usuarios[$venta->user_id]['total'] += (float) $venta->totalUsuario;
+
+            $resumen['tarjeta'] += (float) $venta->tarjeta;
+            $resumen['vip'] += (float) $venta->vip;
+            $resumen['qr'] += (float) $venta->qr;
+            $resumen['efectivo'] += (float) $venta->efectivo;
+            $resumenRF['tarjetaR'] += (float) $venta->tarjetaR;
+            $resumenRF['efectivoR'] += (float) $venta->efectivoR;
+            $resumenRF['tarjetaF'] += (float) $venta->tarjetaF;
+            $resumenRF['efectivoF'] += (float) $venta->efectivoF;
+        }
+
+        $anulados = Anulacion::query()
+            ->join('users', 'anulaciones.user_id', '=', 'users.id')
+            ->join('sales', 'anulaciones.sale_id', '=', 'sales.id')
+            ->whereBetween('anulaciones.fecha', [$ini, $fin])
+            ->where('anulaciones.estado', 'Anulado')
+            ->where('sales.tipo', 'CANDY')
+            ->when($userId !== 0, function ($query) use ($userId) {
+                $query->where('anulaciones.user_id', $userId);
+            })
+            ->groupBy('users.name')
+            ->select([
+                'users.name as usuario',
+                DB::raw('COUNT(*) as total'),
+                DB::raw('SUM(anulaciones.monto) as monto'),
+            ])
+            ->get();
+
+        return [
+            'reporte' => array_values($productos),
+            'reportef' => array_values(array_filter($productosFactura, function ($producto) {
+                return $producto['cantidad'] > 0;
+            })),
+            'reporter' => array_values(array_filter($productosRecibo, function ($producto) {
+                return $producto['cantidad'] > 0;
+            })),
+            'infouser' => array_values(array_filter($usuarios, function ($usuario) {
+                return $usuario['total'] > 0;
+            })),
+            'resumen' => $resumen,
+            'resumenRF' => $resumenRF,
+            'anulados' => $anulados,
+        ];
     }
 
     public function destroy(Sale $sale)
