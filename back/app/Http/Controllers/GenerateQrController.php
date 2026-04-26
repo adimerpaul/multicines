@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sale;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
@@ -157,9 +158,11 @@ class GenerateQrController extends Controller
     {
         $payload = $request->validate([
             'fecha' => 'required|date',
+            'tipo' => 'nullable|in:TODOS,BOLETERIA,CANDY',
         ]);
 
         $fecha = $payload['fecha'];
+        $tipo = $payload['tipo'] ?? 'TODOS';
 
         try {
             $token = $this->authenticate();
@@ -175,7 +178,7 @@ class GenerateQrController extends Controller
                 'message' => 'Lista de pagos obtenida desde Baneco.',
                 'fecha' => $fecha,
                 'source' => 'baneco',
-                'items' => $this->normalizeMovements($result, $fecha),
+                'items' => $this->attachSalesToMovements($this->normalizeMovements($result, $fecha), $tipo),
                 'raw' => $result,
             ]);
         } catch (Throwable $e) {
@@ -334,8 +337,13 @@ class GenerateQrController extends Controller
         return collect($items)
             ->filter(fn ($item) => is_array($item))
             ->map(function (array $item) use ($fecha) {
+                $paymentDate = $item['paymentDate'] ?? $item['date'] ?? $item['fecha'] ?? $fecha;
+                $paymentTime = $item['paymentTime'] ?? $item['time'] ?? $item['hora'] ?? '';
+
                 return [
-                    'fecha' => $item['paymentDate'] ?? $item['date'] ?? $item['fecha'] ?? $fecha,
+                    'fecha' => $paymentDate,
+                    'hora' => $paymentTime,
+                    'fechaHora' => trim((string) $paymentDate . ' ' . (string) $paymentTime),
                     'qrId' => $item['qrId'] ?? $item['idQr'] ?? $item['qrID'] ?? $item['id'] ?? '',
                     'transactionId' => $item['transactionId'] ?? $item['transactionID'] ?? $item['reference'] ?? '',
                     'monto' => $item['amount'] ?? $item['paymentAmount'] ?? $item['monto'] ?? '',
@@ -345,6 +353,66 @@ class GenerateQrController extends Controller
                     'origen' => 'baneco',
                     'raw' => $item,
                 ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function attachSalesToMovements(array $items, string $tipo): array
+    {
+        $qrIds = collect($items)->pluck('qrId')->filter()->map(fn ($id) => (string) $id)->unique()->values();
+        $transactionIds = collect($items)->pluck('transactionId')->filter()->map(fn ($id) => (string) $id)->unique()->values();
+
+        if ($qrIds->isEmpty() && $transactionIds->isEmpty()) {
+            return collect($items)
+                ->map(function (array $item) {
+                    $item['vinculado'] = false;
+                    $item['ventaId'] = '';
+                    $item['ventaTipo'] = '';
+                    $item['ventaTotal'] = '';
+                    $item['ventaFecha'] = '';
+                    $item['ventaUsuario'] = '';
+
+                    return $item;
+                })
+                ->filter(fn (array $item) => $tipo === 'TODOS')
+                ->values()
+                ->all();
+        }
+
+        $sales = Sale::query()
+            ->with('user')
+            ->where(function ($query) use ($qrIds, $transactionIds) {
+                if ($qrIds->isNotEmpty()) {
+                    $query->whereIn('qrId', $qrIds);
+                }
+                if ($transactionIds->isNotEmpty()) {
+                    $qrIds->isNotEmpty()
+                        ? $query->orWhereIn('qrTransactionId', $transactionIds)
+                        : $query->whereIn('qrTransactionId', $transactionIds);
+                }
+            })
+            ->get();
+
+        $salesByQrId = $sales->filter(fn ($sale) => $sale->qrId)->keyBy(fn ($sale) => (string) $sale->qrId);
+        $salesByTransactionId = $sales->filter(fn ($sale) => $sale->qrTransactionId)->keyBy(fn ($sale) => (string) $sale->qrTransactionId);
+
+        return collect($items)
+            ->map(function (array $item) use ($salesByQrId, $salesByTransactionId) {
+                $sale = $salesByQrId->get((string) ($item['qrId'] ?? ''))
+                    ?: $salesByTransactionId->get((string) ($item['transactionId'] ?? ''));
+
+                $item['vinculado'] = $sale !== null;
+                $item['ventaId'] = $sale->id ?? '';
+                $item['ventaTipo'] = $sale->tipo ?? '';
+                $item['ventaTotal'] = $sale->montoTotal ?? '';
+                $item['ventaFecha'] = $sale->fechaEmision ?? '';
+                $item['ventaUsuario'] = $sale->user->name ?? ($sale->usuario ?? '');
+
+                return $item;
+            })
+            ->filter(function (array $item) use ($tipo) {
+                return $tipo === 'TODOS' || ($item['ventaTipo'] ?? '') === $tipo;
             })
             ->values()
             ->all();
