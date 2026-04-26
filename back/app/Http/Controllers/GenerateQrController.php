@@ -34,21 +34,24 @@ class GenerateQrController extends Controller
             'client.nombreRazonSocial' => 'nullable|string',
             'client.numeroDocumento' => 'nullable|string',
             'montoTotal' => 'required|numeric|min:0.01',
+            'tipoVenta' => 'nullable|in:BOLETERIA,CANDY',
         ]);
 
         try {
             $client = $payload['client'] ?? [];
             $amount = round((float) $payload['montoTotal'], 2);
+            $tipoVenta = $payload['tipoVenta'] ?? 'CANDY';
+            $tipoDescripcion = $tipoVenta === 'BOLETERIA' ? 'Boleteria' : 'Candy';
             $clientName = trim((string) ($client['nombreRazonSocial'] ?? 'CLIENTE'));
             $clientDocument = trim((string) ($client['numeroDocumento'] ?? ''));
-            $description = 'Candy ' . ($clientName !== '' ? $clientName : 'CLIENTE');
+            $description = $tipoDescripcion . ' ' . ($clientName !== '' ? $clientName : 'CLIENTE');
             if ($clientDocument !== '') {
                 $description .= ' ' . $clientDocument;
             }
 
             $token = $this->authenticate();
             $accountCreditEncrypted = $this->encrypt($this->accountCredit);
-            $transactionId = 'CANDY' . now()->format('YmdHis');
+            $transactionId = $tipoVenta . now()->format('YmdHis');
 
             $qrResponse = $this->post(
                 '/api/qrsimple/generateQR',

@@ -389,6 +389,7 @@ export default {
       this.$api.post('generarQr',{
         client:this.client,
         montoTotal:this.total,
+        tipoVenta:'CANDY',
       }).then(res=>{
         this.pagoQr = true
         this.qrImage = res.data.qr
