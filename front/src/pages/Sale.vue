@@ -327,7 +327,7 @@
               </div>
               <div class="col-12 col-md-3">
                 <q-btn class="full-width q-py-sm" icon="qr_code_2" @click="generarQr" label="Generar QR" no-caps
-                       color="teal" :loading="loading" :disable="qrPolling"/>
+                       color="teal" :loading="loading" :disable="qrPolling || !numeroDocumentoValido"/>
               </div>
               <div class="col-12 col-md-2">
                 <q-btn v-if="qrId" class="full-width q-py-sm" icon="cancel" @click="cancelarQr" label="Cancelar QR" no-caps
@@ -423,6 +423,7 @@ export default {
       qrPaymentData: [],
       qrStatusMessage: '',
       qrTransactionId: '',
+      qrSaleProcessing: false,
       opts: {
         errorCorrectionLevel: 'M',
         type: 'png',
@@ -462,6 +463,7 @@ export default {
       this.qrPaymentData = []
       this.qrStatusMessage = ''
       this.qrTransactionId = ''
+      this.qrSaleProcessing = false
     },
     stopQrPolling() {
       if (this.qrPollTimer) {
@@ -576,6 +578,16 @@ export default {
       if (this.qrPolling) {
         return
       }
+      if (!this.numeroDocumentoValido) {
+        this.$q.notify({
+          color: 'warning',
+          textColor: 'black',
+          message: 'Debe ingresar CI/NIT antes de generar el QR',
+          position: 'top',
+          timeout: 4000,
+        })
+        return
+      }
       this.loading = true
       this.resetQrState()
       this.$api.post('generarQr', {
@@ -615,14 +627,18 @@ export default {
         const status = parseInt(res.data.statusQrCode)
         this.qrPaymentData = Array.isArray(res.data.payment) ? res.data.payment : []
         if (status === 1) {
+          if (this.qrSaleProcessing) {
+            return
+          }
           this.stopQrPolling()
           this.pagoQr = true
           this.qrPaymentConfirmed = true
+          this.qrSaleProcessing = true
           this.qrStatusMessage = 'Pago QR confirmado'
           this.$q.notify({
             color: 'positive',
             textColor: 'white',
-            message: 'Pago QR confirmado. Registrando venta...',
+            message: 'Pago QR confirmado. Registrando venta e imprimiendo...',
             position: 'top',
             timeout: 3000,
           })
@@ -687,6 +703,9 @@ export default {
       })
     },
     saleInsert(qrConfirmado = false) {
+      if (this.qrSaleProcessing && !qrConfirmado) {
+        return
+      }
       // if (this.client.numeroDocumento==0) {
       //   this.$q.notify({
       //     color: 'red',
@@ -765,6 +784,7 @@ export default {
         this.loading = false
       }).catch(err => {
         //this.error=err.response.data.message
+        this.qrSaleProcessing = false
         this.loading = false
         this.$q.notify({
           color: 'negative',
@@ -938,6 +958,9 @@ export default {
     }
   },
   computed: {
+    numeroDocumentoValido() {
+      return !!(this.client?.numeroDocumento && this.client.numeroDocumento.toString().trim().length > 0)
+    },
 
     btnCortesia() {
       if (this.cortesia) {

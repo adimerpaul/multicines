@@ -10,11 +10,17 @@ use Throwable;
 
 class GenerateQrController extends Controller
 {
-    private string $baseUrl = 'https://apimktdesa.baneco.com.bo/ApiGateway';
-    private string $aesKey = '40A318B299F245C2B697176723088629';
-    private string $userName = '26551010';
-    private string $passwordPlain = '1234';
-    private string $accountCredit = '1061602532';
+    private string $baseUrl = 'https://apimkt.baneco.com.bo/ApiGateway';
+    private string $aesKey = 'EAC24282B8DD481CA45D09BED45FC900';
+    private string $userName = 'A56859645';
+    private string $passwordPlain = '4920';
+    private string $accountCredit = '4041488168';
+
+//    private string $baseUrl = 'https://apimkt.baneco.com.bo/ApiGateway';
+//    private string $aesKey = 'EAC24282B8DD481CA45D09BED45FC900';
+//    private string $userName = 'A56859645';
+//    private string $passwordPlain = '4920';
+//    private string $accountCredit = '4041488168';
     private string $currency = 'BOB';
     private bool $singleUse = true;
     private bool $modifyAmount = false;

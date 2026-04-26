@@ -72,9 +72,9 @@
         <q-card>
           <q-card-section class="bg-accent text-white q-pa-xs">
             <div class="row">
-              <div class="col-4 flex flex-center" ><q-icon name="point_of_sale"></q-icon> VENTA </div>
+              <div class="col-4 flex flex-center" ><q-icon name="point_of_sale"></q-icon> VENTA CANDY </div>
               <div class="col-4 text-center" ><q-btn @click="reset"  color="negative" size="14px" icon="restart_alt" label="cancelar"/></div>
-              <div class="col-4 text-center" ><q-btn @click="openSale()"  color="positive" label="Venta" size="14px" icon="add_circle"/></div>
+              <div class="col-4 text-center" ><q-btn @click="openSale()"  color="positive" label="Cobrar Candy" size="14px" icon="add_circle"/></div>
             </div>
 
           </q-card-section>
@@ -222,7 +222,7 @@
                 <div>
                   <q-btn  label="venta" :loading="loading" icon="send" type="submit" color="positive" :disable="btn || qrPolling"/>
                   <q-btn label="Cerrar" :loading="loading" type="button" size="md" icon="delete" color="negative" class="q-ml-sm" @click="cancelarVenta" />
-                  <q-btn label="Generar QR" :loading="loading" type="button" size="md" icon="qr_code_2" color="teal" class="q-ml-sm" :disable="qrPolling" @click="generarQr()" />
+                  <q-btn label="Generar QR" :loading="loading" type="button" size="md" icon="qr_code_2" color="teal" class="q-ml-sm" :disable="qrPolling || !numeroDocumentoValido" @click="generarQr()" />
                   <q-btn v-if="qrId" label="Cancelar QR" :loading="loading" type="button" size="md" icon="cancel" color="warning" class="q-ml-sm" @click="cancelarQr()" />
                 </div>
                 <div v-if="qrImage" class="q-mt-md">
@@ -290,6 +290,7 @@ export default {
       qrPaymentData:[],
       qrStatusMessage:'',
       qrTransactionId:'',
+      qrSaleProcessing:false,
       nombresaldo:{},
       tienerebaja:false,
       booltarjeta:false,
@@ -340,6 +341,7 @@ export default {
       this.qrPaymentData=[]
       this.qrStatusMessage=''
       this.qrTransactionId=''
+      this.qrSaleProcessing=false
     },
     stopQrPolling(){
       if (this.qrPollTimer) {
@@ -370,6 +372,16 @@ export default {
     },
     generarQr(){
       if (this.qrPolling){
+        return
+      }
+      if (!this.numeroDocumentoValido){
+        this.$q.notify({
+          color: 'warning',
+          textColor: 'black',
+          message: 'Debe ingresar CI/NIT antes de generar el QR',
+          position: 'top',
+          timeout: 4000,
+        })
         return
       }
       this.loading = true
@@ -411,14 +423,18 @@ export default {
         const status = parseInt(res.data.statusQrCode)
         this.qrPaymentData = Array.isArray(res.data.payment) ? res.data.payment : []
         if (status === 1){
+          if (this.qrSaleProcessing){
+            return
+          }
           this.stopQrPolling()
           this.pagoQr = true
           this.qrPaymentConfirmed = true
+          this.qrSaleProcessing = true
           this.qrStatusMessage = 'Pago QR confirmado'
           this.$q.notify({
             color: 'positive',
             textColor: 'white',
-            message: 'Pago QR confirmado. Registrando venta...',
+            message: 'Pago QR confirmado. Registrando venta e imprimiendo...',
             position: 'top',
             timeout: 3000,
           })
@@ -579,6 +595,9 @@ export default {
 
         },
     saleInsert(qrConfirmado = false){
+      if (this.qrSaleProcessing && !qrConfirmado){
+        return
+      }
       if (this.qrId && !qrConfirmado && !this.qrPaymentConfirmed){
         this.$q.notify({
           color: 'warning',
@@ -615,6 +634,7 @@ export default {
         this.loading=false
       }).catch(err=>{
         console.log(err)
+        this.qrSaleProcessing=false
         this.loading=false
         this.$q.notify({
           color: 'negative',
@@ -885,6 +905,9 @@ facturación en línea”</div><br>\
 
   },
   computed:{
+    numeroDocumentoValido(){
+      return !!(this.client?.numeroDocumento && this.client.numeroDocumento.toString().trim().length > 0)
+    },
     cambio(){
       let cambio=parseFloat(this.efectivo==''?0:this.efectivo)- parseFloat(this.total)
       return  Math.round(cambio*100)/100
