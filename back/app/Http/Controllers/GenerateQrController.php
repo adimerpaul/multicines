@@ -162,6 +162,7 @@ class GenerateQrController extends Controller
         $payload = $request->validate([
             'fecha' => 'required|date',
             'tipo' => 'nullable|in:TODOS,BOLETERIA,CANDY',
+            'todo' => 'nullable|boolean',
         ]);
 
         $fecha = $payload['fecha'];
@@ -189,6 +190,106 @@ class GenerateQrController extends Controller
                 'message' => 'Error al consultar movimientos QR: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function ventasParaVincularQr(Request $request)
+    {
+        $payload = $request->validate([
+            'fecha' => 'required|date',
+            'tipo' => 'nullable|in:TODOS,BOLETERIA,CANDY',
+        ]);
+
+        $tipo = $payload['tipo'] ?? 'TODOS';
+
+        $query = Sale::query()
+            ->with(['user', 'client'])
+            ->whereDate('fechaEmision', $payload['fecha'])
+            ->where(function ($query) {
+                $query->whereNull('qrId')
+                    ->orWhere('qrId', '');
+            })
+            ->where(function ($query) {
+                $query->whereNull('siatAnulado')
+                    ->orWhere('siatAnulado', false);
+            });
+
+        if ($tipo !== 'TODOS') {
+            $query->where('tipo', $tipo);
+        }
+
+        if (!$request->boolean('todo')) {
+            $query->where('user_id', $request->user()->id);
+        }
+
+        return $query
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function (Sale $sale) {
+                return [
+                    'id' => $sale->id,
+                    'tipo' => $sale->tipo,
+                    'fechaEmision' => $sale->fechaEmision,
+                    'montoTotal' => $sale->montoTotal,
+                    'numeroFactura' => $sale->numeroFactura,
+                    'venta' => $sale->venta,
+                    'cliente' => $sale->client->nombreRazonSocial ?? '',
+                    'usuario' => $sale->user->name ?? ($sale->usuario ?? ''),
+                ];
+            })
+            ->values();
+    }
+
+    public function vincularVentaQr(Request $request)
+    {
+        $payload = $request->validate([
+            'sale_id' => 'required|integer|exists:sales,id',
+            'qrId' => 'required|string',
+            'transactionId' => 'nullable|string',
+            'fecha' => 'nullable|date',
+        ]);
+
+        $sale = Sale::findOrFail($payload['sale_id']);
+
+        if (!empty($sale->qrId) && $sale->qrId !== $payload['qrId']) {
+            return response()->json([
+                'message' => 'La venta #' . $sale->id . ' ya tiene un pago QR vinculado.',
+            ], 422);
+        }
+
+        $existingSale = Sale::query()
+            ->where('id', '<>', $sale->id)
+            ->where(function ($query) use ($payload) {
+                $query->where('qrId', $payload['qrId']);
+
+                if (!empty($payload['transactionId'])) {
+                    $query->orWhere('qrTransactionId', $payload['transactionId']);
+                }
+            })
+            ->first();
+
+        if ($existingSale) {
+            return response()->json([
+                'message' => 'Este pago QR ya esta vinculado a la venta #' . $existingSale->id . '.',
+            ], 422);
+        }
+
+        $sale->pagoQr = true;
+        $sale->qrId = $payload['qrId'];
+        $sale->qrTransactionId = $payload['transactionId'] ?? $sale->qrTransactionId;
+        $sale->qrPagadoAt = !empty($payload['fecha']) ? $payload['fecha'] : now();
+        $sale->credito = 'NO';
+        $sale->save();
+
+        return response()->json([
+            'message' => 'Pago QR vinculado a la venta #' . $sale->id . '.',
+            'sale' => [
+                'id' => $sale->id,
+                'tipo' => $sale->tipo,
+                'montoTotal' => $sale->montoTotal,
+                'qrId' => $sale->qrId,
+                'qrTransactionId' => $sale->qrTransactionId,
+            ],
+        ]);
     }
 
     private function authenticate(): string
