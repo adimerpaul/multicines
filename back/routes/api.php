@@ -138,6 +138,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('movimientosQr', [\App\Http\Controllers\GenerateQrController::class, 'movimientosQr']);
     Route::post('ventasParaVincularQr', [\App\Http\Controllers\GenerateQrController::class, 'ventasParaVincularQr']);
     Route::post('vincularVentaQr', [\App\Http\Controllers\GenerateQrController::class, 'vincularVentaQr']);
+    Route::get('historialVincularQr', [\App\Http\Controllers\GenerateQrController::class, 'historialVincularQr']);
 
     Route::post('revertirAnularRental', [\App\Http\Controllers\RentalController::class, 'revertirAnularRental']);
     Route::post('cambioPago', [\App\Http\Controllers\SaleController::class,'cambioPago']);

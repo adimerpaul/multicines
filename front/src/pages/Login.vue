@@ -159,6 +159,7 @@ export default {
             if(r.id==28) this.store.boolimpfactura=true
             if(r.id==29) this.store.booltipopago=true
             if(r.id==30) this.store.boolpagos=true
+            if(r.id==31) this.store.boolvincularpago=true
 
         });
         this.$api.defaults.headers.common['Authorization'] = 'Bearer '+res.data.token

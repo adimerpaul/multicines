@@ -53,7 +53,13 @@
                     </q-item-section>
                     <q-item-section>Ver</q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup :disable="props.row.vinculado || !props.row.qrId" @click="abrirVincular(props.row)">
+                  <q-item
+                    v-if="store.boolvincularpago"
+                    clickable
+                    v-close-popup
+                    :disable="props.row.vinculado || !props.row.qrId"
+                    @click="abrirVincular(props.row)"
+                  >
                     <q-item-section avatar>
                       <q-icon name="link" color="positive" />
                     </q-item-section>
@@ -82,6 +88,54 @@
           </template>
         </q-table>
       </q-card-section>
+    </q-card>
+
+    <!-- Historial de vinculaciones -->
+    <q-card flat bordered class="q-mt-md">
+      <q-card-section class="row items-center q-py-sm">
+        <div class="text-subtitle2 text-grey-8 col">
+          <q-icon name="history" class="q-mr-xs" />
+          Historial de vinculaciones
+        </div>
+        <q-btn
+          flat
+          dense
+          no-caps
+          :icon="mostrarHistorial ? 'expand_less' : 'expand_more'"
+          :label="mostrarHistorial ? 'Ocultar' : 'Mostrar'"
+          color="grey-7"
+          @click="toggleHistorial"
+        />
+      </q-card-section>
+
+      <q-slide-transition>
+        <div v-show="mostrarHistorial">
+          <q-separator />
+          <q-card-section>
+            <q-table
+              :rows="historialRows"
+              :columns="historialColumns"
+              row-key="id"
+              :loading="historialLoading"
+              flat
+              dense
+              bordered
+              :rows-per-page-options="[10, 25, 50]"
+            >
+              <template v-slot:body-cell-venta_monto="props">
+                <q-td :props="props" class="text-right">
+                  {{ formatMoney(props.row.venta_monto) }} Bs
+                </q-td>
+              </template>
+              <template v-slot:body-cell-created_at="props">
+                <q-td :props="props">
+                  {{ formatFechaTexto(props.row.created_at) }}
+                </q-td>
+              </template>
+            </q-table>
+          </q-card-section>
+        </div>
+      </q-slide-transition>
     </q-card>
 
     <q-dialog v-model="rawDialog">
@@ -169,6 +223,9 @@ export default {
       sales: [],
       salesOptions: [],
       pagination: { rowsPerPage: 0 },
+      mostrarHistorial: false,
+      historialLoading: false,
+      historialRows: [],
       columns: [
         { name: 'acciones', label: 'Acciones', field: 'acciones', align: 'left' },
         { name: 'fechaHora', label: 'Fecha/Hora', field: row => this.formatFechaHora(row), align: 'left', sortable: true },
@@ -178,6 +235,15 @@ export default {
         { name: 'transactionId', label: 'Transaccion', field: 'transactionId', align: 'left', sortable: true },
         { name: 'monto', label: 'Monto', field: 'monto', align: 'right', sortable: true },
         { name: 'descripcion', label: 'Descripcion', field: 'descripcion', align: 'left', sortable: true },
+      ],
+      historialColumns: [
+        { name: 'created_at', label: 'Fecha/Hora', field: 'created_at', align: 'left', sortable: true },
+        { name: 'user_name', label: 'Usuario', field: 'user_name', align: 'left', sortable: true },
+        { name: 'sale_id', label: 'Venta #', field: 'sale_id', align: 'left', sortable: true },
+        { name: 'venta_tipo', label: 'Tipo', field: 'venta_tipo', align: 'left', sortable: true },
+        { name: 'venta_monto', label: 'Monto', field: 'venta_monto', align: 'right', sortable: true },
+        { name: 'qr_id', label: 'QR ID', field: 'qr_id', align: 'left', sortable: true },
+        { name: 'transaction_id', label: 'Transaccion', field: 'transaction_id', align: 'left', sortable: true },
       ],
     }
   },
@@ -208,6 +274,27 @@ export default {
         })
       }).finally(() => {
         this.loading = false
+      })
+    },
+    toggleHistorial() {
+      this.mostrarHistorial = !this.mostrarHistorial
+      if (this.mostrarHistorial && this.historialRows.length === 0) {
+        this.cargarHistorial()
+      }
+    },
+    cargarHistorial() {
+      this.historialLoading = true
+      this.$api.get('historialVincularQr').then(res => {
+        this.historialRows = res.data || []
+      }).catch(() => {
+        this.$q.notify({
+          color: 'negative',
+          textColor: 'white',
+          message: 'No se pudo cargar el historial',
+          position: 'top',
+        })
+      }).finally(() => {
+        this.historialLoading = false
       })
     },
     verRaw(raw) {
@@ -274,6 +361,11 @@ export default {
         })
         this.linkDialog = false
         this.consultar()
+        if (this.mostrarHistorial) {
+          this.cargarHistorial()
+        } else {
+          this.historialRows = []
+        }
       }).catch(err => {
         this.$q.notify({
           color: 'negative',

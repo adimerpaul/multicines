@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PagoVincularLog;
 use App\Models\Sale;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
@@ -241,6 +242,15 @@ class GenerateQrController extends Controller
 
     public function vincularVentaQr(Request $request)
     {
+        $user = $request->user();
+        $tienePermiso = $user->permisos()->where('permisos.id', 31)->exists();
+
+        if (!$tienePermiso) {
+            return response()->json([
+                'message' => 'No tiene permiso para vincular pagos QR.',
+            ], 403);
+        }
+
         $payload = $request->validate([
             'sale_id' => 'required|integer|exists:sales,id',
             'qrId' => 'required|string',
@@ -280,6 +290,14 @@ class GenerateQrController extends Controller
         $sale->credito = 'NO';
         $sale->save();
 
+        PagoVincularLog::create([
+            'sale_id' => $sale->id,
+            'qr_id' => $sale->qrId,
+            'transaction_id' => $sale->qrTransactionId,
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+        ]);
+
         return response()->json([
             'message' => 'Pago QR vinculado a la venta #' . $sale->id . '.',
             'sale' => [
@@ -290,6 +308,28 @@ class GenerateQrController extends Controller
                 'qrTransactionId' => $sale->qrTransactionId,
             ],
         ]);
+    }
+
+    public function historialVincularQr(Request $request)
+    {
+        $logs = PagoVincularLog::with('sale')
+            ->orderBy('created_at', 'desc')
+            ->limit(200)
+            ->get()
+            ->map(function (PagoVincularLog $log) {
+                return [
+                    'id' => $log->id,
+                    'sale_id' => $log->sale_id,
+                    'qr_id' => $log->qr_id,
+                    'transaction_id' => $log->transaction_id,
+                    'user_name' => $log->user_name,
+                    'created_at' => $log->created_at,
+                    'venta_tipo' => $log->sale->tipo ?? '',
+                    'venta_monto' => $log->sale->montoTotal ?? '',
+                ];
+            });
+
+        return response()->json($logs);
     }
 
     private function authenticate(): string
