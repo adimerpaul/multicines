@@ -205,7 +205,7 @@
                     />
                   </div>
                   <div class="row col-3">
-                    <q-checkbox v-model="credito"  label="T Credito" dense/>
+                    <q-checkbox v-model="credito"  label="T Credito" dense :disable="qrId || qrPolling"/>
                     <q-checkbox  v-model="booltarjeta"  label="T VIP" dense @click="verificar"/>
                   </div>
                   <div class="col-12">
@@ -385,6 +385,7 @@ export default {
         return
       }
       this.loading = true
+      this.credito = false
       this.resetQrState()
       this.$api.post('generarQr',{
         client:this.client,

@@ -278,7 +278,7 @@
               </div>
               <div class="col-2 flex flex-center">
                 <q-toggle outlined :label="`${credito} T CREDITO`" v-model="credito" color="green" false-value="NO"
-                          true-value="SI"/>
+                          true-value="SI" :disable="qrId || qrPolling"/>
               </div>
               <div class="col-2 flex flex-center">
                 <q-checkbox outlined label="N CORTESIA" @update:model-value="habilitarCortesia" v-model="cortesia"
@@ -589,6 +589,7 @@ export default {
         return
       }
       this.loading = true
+      this.credito = 'NO'
       this.resetQrState()
       this.$api.post('generarQr', {
         client: this.client,
