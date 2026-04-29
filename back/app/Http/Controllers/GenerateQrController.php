@@ -260,17 +260,18 @@ class GenerateQrController extends Controller
 
         $sale = Sale::findOrFail($payload['sale_id']);
 
+        // Si la venta destino ya tiene un QR diferente vinculado, bloqueamos
         if (!empty($sale->qrId) && $sale->qrId !== $payload['qrId']) {
             return response()->json([
-                'message' => 'La venta #' . $sale->id . ' ya tiene un pago QR vinculado.',
+                'message' => 'La venta #' . $sale->id . ' ya tiene otro pago QR vinculado.',
             ], 422);
         }
 
+        // Si el QR ya está en otra venta, la desvinculamos primero
         $existingSale = Sale::query()
             ->where('id', '<>', $sale->id)
             ->where(function ($query) use ($payload) {
                 $query->where('qrId', $payload['qrId']);
-
                 if (!empty($payload['transactionId'])) {
                     $query->orWhere('qrTransactionId', $payload['transactionId']);
                 }
@@ -278,9 +279,11 @@ class GenerateQrController extends Controller
             ->first();
 
         if ($existingSale) {
-            return response()->json([
-                'message' => 'Este pago QR ya esta vinculado a la venta #' . $existingSale->id . '.',
-            ], 422);
+            $existingSale->pagoQr = false;
+            $existingSale->qrId = null;
+            $existingSale->qrTransactionId = null;
+            $existingSale->qrPagadoAt = null;
+            $existingSale->save();
         }
 
         $sale->pagoQr = true;

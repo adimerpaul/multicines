@@ -57,7 +57,7 @@
                     v-if="store.boolvincularpago"
                     clickable
                     v-close-popup
-                    :disable="props.row.vinculado || !props.row.qrId"
+                    :disable="!props.row.qrId"
                     @click="abrirVincular(props.row)"
                   >
                     <q-item-section avatar>
