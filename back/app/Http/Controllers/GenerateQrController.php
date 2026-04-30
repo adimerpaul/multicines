@@ -254,17 +254,14 @@ class GenerateQrController extends Controller
         $payload = $request->validate([
             'sale_id' => 'required|integer|exists:sales,id',
             'qrId' => 'required|string',
-            'transactionId' => 'required|string',
+            'transactionId' => 'nullable|string',
             'fecha' => 'nullable|date',
         ]);
 
         $sale = Sale::findOrFail($payload['sale_id']);
 
         // Si la venta destino ya tiene un QR diferente vinculado, bloqueamos
-        if (
-            (!empty($sale->qrId) && $sale->qrId !== $payload['qrId']) ||
-            (!empty($sale->qrTransactionId) && $sale->qrTransactionId !== $payload['transactionId'])
-        ) {
+        if (!empty($sale->qrId) && $sale->qrId !== $payload['qrId']) {
             return response()->json([
                 'message' => 'La venta #' . $sale->id . ' ya tiene otro pago QR vinculado.',
             ], 422);
@@ -273,8 +270,12 @@ class GenerateQrController extends Controller
         // Si el QR ya está en otra venta, la desvinculamos primero
         $existingSale = Sale::query()
             ->where('id', '<>', $sale->id)
-            ->where('qrId', $payload['qrId'])
-            ->where('qrTransactionId', $payload['transactionId'])
+            ->where(function ($query) use ($payload) {
+                $query->where('qrId', $payload['qrId']);
+                if (!empty($payload['transactionId'])) {
+                    $query->orWhere('qrTransactionId', $payload['transactionId']);
+                }
+            })
             ->first();
 
         if ($existingSale) {
@@ -287,7 +288,7 @@ class GenerateQrController extends Controller
 
         $sale->pagoQr = true;
         $sale->qrId = $payload['qrId'];
-        $sale->qrTransactionId = $payload['transactionId'];
+        $sale->qrTransactionId = $payload['transactionId'] ?? $sale->qrTransactionId;
         $sale->qrPagadoAt = !empty($payload['fecha']) ? $payload['fecha'] : now();
         $sale->credito = 'NO';
         $sale->save();
@@ -509,7 +510,7 @@ class GenerateQrController extends Controller
         $qrIds = collect($items)->pluck('qrId')->filter()->map(fn ($id) => (string) $id)->unique()->values();
         $transactionIds = collect($items)->pluck('transactionId')->filter()->map(fn ($id) => (string) $id)->unique()->values();
 
-        if ($qrIds->isEmpty() || $transactionIds->isEmpty()) {
+        if ($qrIds->isEmpty() && $transactionIds->isEmpty()) {
             return collect($items)
                 ->map(function (array $item) {
                     $item['vinculado'] = false;
@@ -528,20 +529,25 @@ class GenerateQrController extends Controller
 
         $sales = Sale::query()
             ->with('user')
-            ->whereIn('qrId', $qrIds)
-            ->whereIn('qrTransactionId', $transactionIds)
+            ->where(function ($query) use ($qrIds, $transactionIds) {
+                if ($qrIds->isNotEmpty()) {
+                    $query->whereIn('qrId', $qrIds);
+                }
+                if ($transactionIds->isNotEmpty()) {
+                    $qrIds->isNotEmpty()
+                        ? $query->orWhereIn('qrTransactionId', $transactionIds)
+                        : $query->whereIn('qrTransactionId', $transactionIds);
+                }
+            })
             ->get();
 
-        $salesByPaymentKey = $sales
-            ->filter(fn ($sale) => $sale->qrId && $sale->qrTransactionId)
-            ->keyBy(fn ($sale) => $this->paymentKey($sale->qrId, $sale->qrTransactionId));
+        $salesByQrId = $sales->filter(fn ($sale) => $sale->qrId)->keyBy(fn ($sale) => (string) $sale->qrId);
+        $salesByTransactionId = $sales->filter(fn ($sale) => $sale->qrTransactionId)->keyBy(fn ($sale) => (string) $sale->qrTransactionId);
 
         return collect($items)
-            ->map(function (array $item) use ($salesByPaymentKey) {
-                $sale = $salesByPaymentKey->get($this->paymentKey(
-                    $item['qrId'] ?? '',
-                    $item['transactionId'] ?? ''
-                ));
+            ->map(function (array $item) use ($salesByQrId, $salesByTransactionId) {
+                $sale = $salesByQrId->get((string) ($item['qrId'] ?? ''))
+                    ?: $salesByTransactionId->get((string) ($item['transactionId'] ?? ''));
 
                 $item['vinculado'] = $sale !== null;
                 $item['ventaId'] = $sale->id ?? '';
@@ -557,11 +563,6 @@ class GenerateQrController extends Controller
             })
             ->values()
             ->all();
-    }
-
-    private function paymentKey($qrId, $transactionId): string
-    {
-        return (string) $qrId . '|' . (string) $transactionId;
     }
 
     private function banecoRequest(): PendingRequest

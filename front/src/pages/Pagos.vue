@@ -57,7 +57,7 @@
                     v-if="store.boolvincularpago"
                     clickable
                     v-close-popup
-                    :disable="!props.row.qrId || !props.row.transactionId"
+                    :disable="!props.row.qrId"
                     @click="abrirVincular(props.row)"
                   >
                     <q-item-section avatar>
@@ -160,8 +160,7 @@
         </q-card-section>
         <q-card-section>
           <div class="q-mb-sm">
-            <div><strong>QR ID:</strong> {{ selectedPayment?.qrId }}</div>
-            <div><strong>Transaccion:</strong> {{ selectedPayment?.transactionId }}</div>
+            <div><strong>Pago QR:</strong> {{ selectedPayment?.qrId }}</div>
             <div><strong>Monto:</strong> {{ formatMoney(selectedPayment?.monto) }} Bs</div>
           </div>
           <q-select
@@ -344,16 +343,6 @@ export default {
     },
     vincularVenta() {
       if (!this.selectedPayment || !this.selectedSale) {
-        return
-      }
-      if (!this.selectedPayment.qrId || !this.selectedPayment.transactionId) {
-        this.$q.notify({
-          color: 'warning',
-          textColor: 'black',
-          message: 'El pago debe tener QR ID y transaccion para vincularse',
-          position: 'top',
-          timeout: 5000,
-        })
         return
       }
 
