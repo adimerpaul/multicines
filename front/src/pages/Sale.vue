@@ -705,6 +705,10 @@ export default {
       })
     },
     saleInsert(qrConfirmado = false) {
+      // Un solo envio a la vez: dos POST seguidos generaban dos ventas.
+      if (this.loading) {
+        return
+      }
       if (this.qrSaleProcessing && !qrConfirmado) {
         return
       }

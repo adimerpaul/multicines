@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ReservaFacturaException;
+use App\Http\Controllers\Concerns\BoletosDeVenta;
+use App\Http\Controllers\Concerns\ReservaFactura;
 use App\Mail\TestMail;
 use App\Models\Anulacion;
 use App\Models\Client;
@@ -32,6 +35,8 @@ use DOMDocument;
 
 class SaleController extends Controller
 {
+    use ReservaFactura, BoletosDeVenta;
+
     private function applyQrData(Sale $sale, Request $request): void
     {
         $sale->pagoQr = $request->boolean('pagoQr');
@@ -236,27 +241,46 @@ class SaleController extends Controller
             }
             error_log('Paso 2.6 - Validación de CUFD: ' . (microtime(true) - $startTime));
 
-//            if (Sale::where('cufd', $cufd->codigo)->where('tipo', 'BOLETERIA')->count() == 0) {
-//                $numeroFactura = 1;
-//            } else {
-////            $sale=Sale::where('cufd',$cufd->codigo)->where('tipo','BOLETERIA')->orderBy('numeroFactura', 'desc')->first();
-//                $max = Sale::where('cufd', $cufd->codigo)->where('tipo', 'BOLETERIA')->max('numeroFactura');
-//                $numeroFactura = intval($max) + 1;
-//            }
-            $max = Sale::where('cufd', $cufd->codigo)
-                ->where('tipo', 'BOLETERIA')
-                ->max('numeroFactura');
+            $leyendas = Leyenda::where("codigoActividad", "590000")->get();
+            $leyenda = $leyendas[rand(0, $leyendas->count() - 1)]->descripcionLeyenda;
 
-            $numeroFactura = $max ? intval($max) + 1 : 1;
+            $fechaEmision = now();
 
-            error_log('Paso 3 - CUFD y CUI cargados: ' . (microtime(true) - $startTime));
+            // La venta se reserva ANTES de armar el XML: el correlativo y el id
+            // son propios de esta venta y no dependen de lo que haga otra caja.
+            try {
+                $sale = $this->reservarVenta($cufd->codigo, "BOLETERIA", function ($numeroFactura) use ($request, $user, $client, $cui, $cufd, $codigoSucursal, $codigoPuntoVenta, $codigoDocumentoSector, $leyenda, $fechaEmision) {
+                    $sale = new Sale();
+                    $sale->numeroFactura = $numeroFactura;
+                    $sale->cuf = "";
+                    $sale->cufd = $cufd->codigo;
+                    $sale->cui = $cui->codigo;
+                    $sale->codigoSucursal = $codigoSucursal;
+                    $sale->codigoPuntoVenta = $codigoPuntoVenta;
+                    $sale->fechaEmision = $fechaEmision;
+                    $sale->montoTotal = $request->montoTotal;
+                    $sale->usuario = $user->name;
+                    $sale->codigoDocumentoSector = $codigoDocumentoSector;
+                    $sale->user_id = $user->id;
+                    $sale->cufd_id = $cufd->id;
+                    $sale->client_id = $client->id;
+                    $sale->tipo = "BOLETERIA";
+                    $sale->leyenda = $leyenda;
+                    $sale->vip = $request->vip;
+                    $sale->credito = $request->tarjeta;
+                    $sale->siatEnviado = false;
+                    $sale->codigoRecepcion = "";
+                    $this->applyQrData($sale, $request);
+                    $sale->save();
 
-            /*if (Sale::count()==0) {
-                $saleId=1;
-            }else{*/
-            $sale = Sale::orderBy('id', 'desc')->first();
-            $saleId = intval($sale->id) + 1;
-            //}
+                    return $sale;
+                });
+            } catch (ReservaFacturaException $e) {
+                return response()->json(['message' => $e->getMessage()], 409);
+            }
+
+            $numeroFactura = $sale->numeroFactura;
+            error_log('Paso 3 - Venta reservada id=' . $sale->id . ' numeroFactura=' . $numeroFactura . ': ' . (microtime(true) - $startTime));
 
             $detalleFactura = "";
             foreach ($request->detalleVenta as $detalle) {
@@ -290,14 +314,14 @@ class SaleController extends Controller
 //     * @param tds Tipo Documento Sector
 //     * @param nf Numero de Factura
 //     * @param pos Punto de Venta
-            $leyenda = Leyenda::where("codigoActividad", "590000")->get();
-            $count = $leyenda->count();
-            $leyenda = $leyenda[rand(0, $count - 1)]->descripcionLeyenda;
+            // El CUF se calcula con la misma fechaEmision guardada en la venta,
+            // para que al regenerar el XML salga identico.
+            $fechaEnvio = $fechaEmision->format("Y-m-d\TH:i:s.000");
 
-            $fechaEnvio = date("Y-m-d\TH:i:s.000");
-
-            $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
+            $cuf = $cuf->obtenerCUF(env('NIT'), $fechaEmision->format("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
             $cuf = $cuf . $cufd->codigoControl;
+            $sale->cuf = $cuf;
+            $sale->save();
             $text = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
         <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>
         <cabecera>
@@ -340,7 +364,9 @@ class SaleController extends Controller
             $dom->preserveWhiteSpace = false;
             $dom->formatOutput = true;
             $dom->loadXML($xml->asXML());
-            $nameFile = $saleId;
+            // El archivo lleva el id real de la venta: nunca lo pisa otra caja y
+            // el correo/PDF siempre adjuntan la factura de esta venta.
+            $nameFile = $sale->id;
             $dom->save("archivos/" . $nameFile . '.xml');
 
             $firmar = new Firmar();
@@ -349,12 +375,12 @@ class SaleController extends Controller
 
             $xml = new DOMDocument();
             $xml->load("archivos/" . $nameFile . '.xml');
+            libxml_use_internal_errors(true);
             if (!$xml->schemaValidate('./facturaElectronicaCompraVenta.xsd')) {
-                echo "invalid";
-            } else {
-//            echo "validated";
+                // Nunca imprimir aqui: rompe el JSON de respuesta.
+                error_log("xml boleteria invalido venta " . $sale->id);
             }
-//        exit;
+            libxml_clear_errors();
 
             //error_log("FIRMA: ");
 
@@ -370,272 +396,94 @@ class SaleController extends Controller
             $exitecomunicacionSiat = $this->comunicacionSiat();
             // error_log("exitecomunicacionSiat: ".$exitecomunicacionSiat);
 //        unlink($gzfile);
+            $resultadoSiat = null;
+            $rechazoSiat = null;
+
             if ($exitecomunicacionSiat) {
-                $clientSoap = new \SoapClient(env("URL_SIAT") . "ServicioFacturacionCompraVenta?WSDL", [
-                    'stream_context' => stream_context_create([
-                        'http' => [
-                            'header' => "apikey: TokenApi " . env('TOKEN'),
-                        ]
-                    ]),
-                    'cache_wsdl' => WSDL_CACHE_NONE,
-                    'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
-                    'trace' => 1,
-                    'use' => SOAP_LITERAL,
-                    'style' => SOAP_DOCUMENT,
-                ]);
-                $result = $clientSoap->recepcionFactura([
-                    "SolicitudServicioRecepcionFactura" => [
-                        "codigoAmbiente" => $codigoAmbiente,
-                        "codigoDocumentoSector" => $codigoDocumentoSector,
-                        "codigoEmision" => $codigoEmision,
-                        "codigoModalidad" => $codigoModalidad,
-                        "codigoPuntoVenta" => $codigoPuntoVenta,
-                        "codigoSistema" => $codigoSistema,
-                        "codigoSucursal" => $codigoSucursal,
-                        "cufd" => $cufd->codigo,
-                        "cuis" => $cui->codigo,
-                        "nit" => env('NIT'),
-                        "tipoFacturaDocumento" => $tipoFacturaDocumento,
-                        "archivo" => $archivo,
-                        "fechaEnvio" => $fechaEnvio,
-                        "hashArchivo" => $hashArchivo,
-                    ]
-                ]);
-
-                error_log("result: " . json_encode($result));
-                error_log('Paso 5 - SIAT respondido: ' . (microtime(true) - $startTime));
-
-                if ($result->RespuestaServicioFacturacion->transaccion) {
-                    $sale = new Sale();
-                    $sale->numeroFactura = $numeroFactura;
-                    $sale->cuf = "";
-                    $sale->cufd = $cufd->codigo;
-                    $sale->cui = $cui->codigo;
-                    $sale->codigoSucursal = $codigoSucursal;
-                    $sale->codigoPuntoVenta = $codigoPuntoVenta;
-                    $sale->fechaEmision = now();
-                    $sale->montoTotal = $request->montoTotal;
-                    $sale->usuario = $user->name;
-                    $sale->codigoDocumentoSector = $codigoDocumentoSector;
-                    $sale->user_id = $user->id;
-                    $sale->cufd_id = $cufd->id;
-                    $sale->client_id = $client->id;
-                    $sale->leyenda = $leyenda;
-                    $sale->vip = $request->vip;
-                    $sale->credito = $request->tarjeta;
-                    $this->applyQrData($sale, $request);
-                    $sale->save();
-                    error_log("sale: " . json_encode($sale));
-
-                    try {
-                        if ($request->client['email'] != '' && $request->client['email'] != null) {
-                            $details = [
-                                "title" => "Factura",
-                                "body" => "Gracias por su compra",
-                                "online" => true,
-                                "anulado" => false,
-                                "habilitar" => false,
-                                "cuf" => "",
-                                "numeroFactura" => "",
-                                "sale_id" => $sale->id,
-                                "carpeta" => "archivos",
-                            ];
-                            Mail::to($request->client['email'])->send(new TestMail($details));
-                        }
-                    } catch (\Exception $e) {
-                        error_log("error mail: " . $e->getMessage());
-                    }
-                    error_log('Paso 6 - Tickets y detalles guardados: ' . (microtime(true) - $startTime));
-
-                    $momentaneos = Momentaneo::where('user_id', $user->id)->get();
-                    $data = [];
-                    $dataDetail = [];
-                    foreach ($momentaneos as $m) {
-                        $programa = Programa::find($m->programa_id);
-                        $numBoleto = Ticket::where('programa_id', $m->programa_id)->count() + 1;
-                        if (Ticket::where('programa_id', $m->programa_id)
-                                ->where("fila", $m->fila)
-                                ->where("devuelto", 0)
-                                ->where("columna", $m->columna)
-                                ->where("letra", $m->letra)->where("sala_id", $programa->sala->id)->count() == 0) {
-                            $d = [
-                                "numboc" => $programa->sala->nro . $programa->sala->id . date('Ymd', strtotime($programa->fecha)) . $programa->nroFuncion . $programa->price->serie . '-' . $numBoleto,
-                                "numero" => $numBoleto,
-                                "fecha" => now(),
-                                "numeroFuncion" => $programa->nroFuncion,
-                                "nombreSala" => $programa->sala->nombre,
-                                "serieTarifa" => $programa->price->serie,
-                                "fechaFuncion" => $programa->fecha,
-                                "horaFuncion" => $programa->horaInicio,
-                                "fila" => $m->fila,
-                                "columna" => $m->columna,
-                                "letra" => $m->letra,
-                                "costo" => $programa->price->precio,
-                                "titulo" => $m->pelicula,
-                                "pelicula_id" => $m->pelicula_id,
-                                "devuelto" => "0",
-                                "idCupon" => "",
-                                "tarjeta" => "",
-                                "credito" => "",
-                                "promo" => $m->promo,
-                                "client_id" => $client->id,
-                                "programa_id" => $programa->id,
-                                "sale_id" => $sale->id,
-                                "price_id" => $programa->price->id,
-                                "sala_id" => $programa->sala->id,
-                                "user_id" => $user->id,
-                            ];
-                            array_push($data, $d);
-                        }
-                    }
-                    foreach ($request->detalleVenta as $detalle) {
-                        $d = [
-                            'actividadEconomica' => "590000",
-                            'codigoProductoSin' => "99100",
-                            'cantidad' => $detalle['cantidad'],
-                            'precioUnitario' => $detalle['precio'],
-                            'subTotal' => $detalle['subtotal'],
-                            'sale_id' => $sale->id,
-                            'programa_id' => $detalle['programa_id'],
-                            'pelicula_id' => $detalle['pelicula_id'],
-                            'descripcion' => $detalle['pelicula'],
-                        ];
-                        array_push($dataDetail, $d);
-                    }
-
-                    Ticket::insert($data);
-
-                    Detail::insert($dataDetail);
-
-                    $sale->siatEnviado = true;
-                    $sale->codigoRecepcion = $result->RespuestaServicioFacturacion->codigoRecepcion;
-                    $sale->cuf = $cuf;
-                    $sale->save();
-                    $sale->online = true;
-                    $tickets = Ticket::where('sale_id', $sale->id)->get();
-                    error_log('Paso 7 - Tiempo total: ' . (microtime(true) - $startTime) . ' segundos');
-                    return response()->json([
-                        'sale' => Sale::where('id', $sale->id)->with('client')->with('details')->first(),
-                        "tickets" => $tickets,
-                        "error" => "",
+                try {
+                    $clientSoap = new \SoapClient(env("URL_SIAT") . "ServicioFacturacionCompraVenta?WSDL", [
+                        'stream_context' => stream_context_create([
+                            'http' => [
+                                'header' => "apikey: TokenApi " . env('TOKEN'),
+                            ]
+                        ]),
+                        'cache_wsdl' => WSDL_CACHE_NONE,
+                        'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                        'trace' => 1,
+                        'use' => SOAP_LITERAL,
+                        'style' => SOAP_DOCUMENT,
                     ]);
-                } else {
-                    return response()->json(['message' => $result->RespuestaServicioFacturacion->mensajesList->descripcion], 400);
+                    $resultadoSiat = $clientSoap->recepcionFactura([
+                        "SolicitudServicioRecepcionFactura" => [
+                            "codigoAmbiente" => $codigoAmbiente,
+                            "codigoDocumentoSector" => $codigoDocumentoSector,
+                            "codigoEmision" => $codigoEmision,
+                            "codigoModalidad" => $codigoModalidad,
+                            "codigoPuntoVenta" => $codigoPuntoVenta,
+                            "codigoSistema" => $codigoSistema,
+                            "codigoSucursal" => $codigoSucursal,
+                            "cufd" => $cufd->codigo,
+                            "cuis" => $cui->codigo,
+                            "nit" => env('NIT'),
+                            "tipoFacturaDocumento" => $tipoFacturaDocumento,
+                            "archivo" => $archivo,
+                            "fechaEnvio" => $fechaEnvio,
+                            "hashArchivo" => $hashArchivo,
+                        ]
+                    ]);
+
+                    error_log("result: " . json_encode($resultadoSiat));
+                    error_log('Paso 5 - SIAT respondido: ' . (microtime(true) - $startTime));
+
+                    if (!$resultadoSiat->RespuestaServicioFacturacion->transaccion) {
+                        $mensajes = $resultadoSiat->RespuestaServicioFacturacion->mensajesList;
+                        $mensajes = is_array($mensajes) ? ($mensajes[0] ?? null) : $mensajes;
+                        $rechazoSiat = $mensajes->descripcion ?? 'SIAT rechazo la factura';
+                    }
+                } catch (\Exception $e) {
+                    // Si el envio falla la venta se registra offline, igual que
+                    // cuando no hay comunicacion con SIAT.
+                    error_log("error siat boleteria: " . $e->getMessage());
+                    $exitecomunicacionSiat = false;
+                    $resultadoSiat = null;
                 }
             } else {
                 error_log("no exite comunicacion siat");
-                // if(sizeof($request->detalleVenta)>0){
-                $sale = new Sale();
-                $sale->numeroFactura = $numeroFactura;
-                $sale->cuf = "";
-                $sale->cufd = $cufd->codigo;
-                $sale->cui = $cui->codigo;
-                $sale->codigoSucursal = $codigoSucursal;
-                $sale->codigoPuntoVenta = $codigoPuntoVenta;
-                $sale->fechaEmision = now();
-                $sale->montoTotal = $request->montoTotal;
-                $sale->usuario = $user->name;
-                $sale->codigoDocumentoSector = $codigoDocumentoSector;
-                $sale->user_id = $user->id;
-                $sale->cufd_id = $cufd->id;
-                $sale->client_id = $client->id;
-                $sale->leyenda = $leyenda;
-                $sale->vip = $request->vip;
-                $sale->credito = $request->tarjeta;
-                $this->applyQrData($sale, $request);
-                $sale->save();
-
-                if ($request->client['email'] != '' && $request->client['email'] != null) {
-                    $details = [
-                        "title" => "Factura",
-                        "body" => "Gracias por su compra",
-                        "online" => false,
-                        "anulado" => false,
-                        "habilitar" => false,
-                        "cuf" => "",
-                        "numeroFactura" => "",
-                        "sale_id" => $sale->id,
-                        "carpeta" => "archivos",
-                    ];
-                    Mail::to($request->client['email'])->send(new TestMail($details));
-                }
-
-
-                $momentaneos = Momentaneo::where('user_id', $user->id)->get();
-                $data = [];
-                $dataDetail = [];
-                foreach ($momentaneos as $m) {
-                    $programa = Programa::find($m->programa_id);
-                    $numBoleto = Ticket::where('programa_id', $m->programa_id)->count() + 1;
-                    if (Ticket::where('programa_id', $m->programa_id)
-                            ->where("fila", $m->fila)
-                            ->where("devuelto", 0)
-                            ->where("columna", $m->columna)
-                            ->where("letra", $m->letra)->where("sala_id", $programa->sala->id)->count() == 0) {
-                        $d = [
-                            "numboc" => $programa->sala->nro . $programa->sala->id . date('Ymd', strtotime($programa->fecha)) . $programa->nroFuncion . $programa->price->serie . '-' . $numBoleto,
-                            "numero" => $numBoleto,
-                            "fecha" => now(),
-                            "numeroFuncion" => $programa->nroFuncion,
-                            "nombreSala" => $programa->sala->nombre,
-                            "serieTarifa" => $programa->price->serie,
-                            "fechaFuncion" => $programa->fecha,
-                            "horaFuncion" => $programa->horaInicio,
-                            "fila" => $m->fila,
-                            "columna" => $m->columna,
-                            "letra" => $m->letra,
-                            "costo" => $programa->price->precio,
-                            "titulo" => $m->pelicula,
-                            "devuelto" => "0",
-                            "idCupon" => "",
-                            "tarjeta" => "",
-                            "credito" => "",
-                            "promo" => $m->promo,
-                            "client_id" => $client->id,
-                            "programa_id" => $programa->id,
-                            "pelicula_id" => $m->id,
-                            "sale_id" => $sale->id,
-                            "price_id" => $programa->price->id,
-                            "sala_id" => $programa->sala->id,
-                            "user_id" => $user->id,
-                        ];
-                        array_push($data, $d);
-                    }
-                }
-                foreach ($request->detalleVenta as $detalle) {
-                    $d = [
-                        'actividadEconomica' => "590000",
-                        'codigoProductoSin' => "99100",
-                        'cantidad' => $detalle['cantidad'],
-                        'precioUnitario' => $detalle['precio'],
-                        'subTotal' => $detalle['subtotal'],
-                        'sale_id' => $sale->id,
-                        'programa_id' => $detalle['programa_id'],
-                        'pelicula_id' => $detalle['pelicula_id'],
-                        'descripcion' => $detalle['pelicula'],
-                    ];
-                    array_push($dataDetail, $d);
-                }
-
-                Ticket::insert($data);
-
-                Detail::insert($dataDetail);
-
-                $sale->siatEnviado = false;
-                $sale->codigoRecepcion = "";
-                $sale->cuf = $cuf;
-                $sale->save();
-                $tickets = Ticket::where('sale_id', $sale->id)->get();
-                $sale = Sale::where('id', $sale->id)->with('client')->with('details')->first();
-                $sale->siatEnviado = true;
-                $sale->online = false;
-                return response()->json([
-                    'sale' => $sale,
-                    "tickets" => $tickets,
-                    "error" => "Se creo la venta pero no se pudo enviar a siat!!!",
-                ]);
-                return response()->json(['message' => $e->getMessage()], 500);
             }
+
+            if ($rechazoSiat !== null) {
+                // SIAT rechazo la factura: se libera el correlativo. Los
+                // asientos momentaneos quedan intactos para reintentar.
+                $sale->delete();
+
+                return response()->json(['message' => $rechazoSiat], 400);
+            }
+
+            // Boletos y detalle se generan una sola vez, contra el id real de
+            // la venta, sin importar si SIAT respondio o no.
+            $tickets = $this->generarBoletos($sale, $client, $user);
+            $this->generarDetalles($sale, $request->detalleVenta);
+            error_log('Paso 6 - Boletos y detalles guardados: ' . (microtime(true) - $startTime));
+
+            $sale->siatEnviado = $exitecomunicacionSiat;
+            $sale->codigoRecepcion = $exitecomunicacionSiat
+                ? $resultadoSiat->RespuestaServicioFacturacion->codigoRecepcion
+                : "";
+            $sale->save();
+
+            $this->enviarFacturaPorCorreo($request, $sale, $exitecomunicacionSiat);
+
+            $respuesta = Sale::where('id', $sale->id)->with('client')->with('details')->first();
+            // La factura se imprime tambien cuando la venta quedo offline.
+            $respuesta->siatEnviado = true;
+
+            error_log('Paso 7 - Tiempo total: ' . (microtime(true) - $startTime) . ' segundos');
+
+            return response()->json([
+                'sale' => $respuesta,
+                "tickets" => $tickets,
+                "error" => $exitecomunicacionSiat ? "" : "Se creo la venta pero no se pudo enviar a siat!!!",
+            ]);
             //    }
         }
     }
@@ -905,6 +753,33 @@ class SaleController extends Controller
         } catch (\Exception $e) {
             // Otros errores posibles
             return false;
+        }
+    }
+
+    /**
+     * Envia la factura de la venta al correo del cliente. El adjunto se arma
+     * con archivos/{id de la venta}.xml, por eso el XML debe llevar el id real.
+     */
+    private function enviarFacturaPorCorreo(Request $request, Sale $sale, bool $online): void
+    {
+        $email = $request->client['email'] ?? '';
+        if ($email == '' || $email == null) {
+            return;
+        }
+        try {
+            Mail::to($email)->send(new TestMail([
+                "title" => "Factura",
+                "body" => "Gracias por su compra",
+                "online" => $online,
+                "anulado" => false,
+                "habilitar" => false,
+                "cuf" => "",
+                "numeroFactura" => "",
+                "sale_id" => $sale->id,
+                "carpeta" => "archivos",
+            ]));
+        } catch (\Exception $e) {
+            error_log("error mail boleteria: " . $e->getMessage());
         }
     }
 
@@ -1898,65 +1773,8 @@ class SaleController extends Controller
 
         $user = User::find($request->user()->id);
 
-        $momentaneos = Momentaneo::where('user_id', $user->id)->get();
-        $data = [];
-        $dataDetail = [];
-        foreach ($momentaneos as $m) {
-            $programa = Programa::find($m->programa_id);
-            $numBoleto = Ticket::where('programa_id', $m->programa_id)->count() + 1;
-            if (Ticket::where('programa_id', $m->programa_id)
-                    ->where("fila", $m->fila)
-                    ->where("devuelto", 0)
-                    ->where("columna", $m->columna)
-                    ->where("letra", $m->letra)->where("sala_id", $programa->sala->id)->count() == 0) {
-                $d = [
-                    "numboc" => $programa->sala->nro . $programa->sala->id . date('Ymd', strtotime($programa->fecha)) . $programa->nroFuncion . $programa->price->serie . '-' . $numBoleto,
-                    "numero" => $numBoleto,
-                    "fecha" => now(),
-                    "numeroFuncion" => $programa->nroFuncion,
-                    "nombreSala" => $programa->sala->nombre,
-                    "serieTarifa" => $programa->price->serie,
-                    "fechaFuncion" => $programa->fecha,
-                    "horaFuncion" => $programa->horaInicio,
-                    "fila" => $m->fila,
-                    "columna" => $m->columna,
-                    "letra" => $m->letra,
-                    "costo" => $programa->price->precio,
-                    "titulo" => $m->pelicula,
-                    "devuelto" => "0",
-                    "idCupon" => "",
-                    "tarjeta" => "",
-                    "credito" => "",
-                    "promo" => $m->promo,
-                    "client_id" => $client->id,
-                    "programa_id" => $programa->id,
-                    "pelicula_id" => $m->id,
-                    "sale_id" => $sale->id,
-                    "price_id" => $programa->price->id,
-                    "sala_id" => $programa->sala->id,
-                    "user_id" => $user->id,
-                ];
-                array_push($data, $d);
-            }
-        }
-        foreach ($request->detalleVenta as $detalle) {
-            $d = [
-                'actividadEconomica' => "590000",
-                'codigoProductoSin' => "99100",
-                'cantidad' => $detalle['cantidad'],
-                'precioUnitario' => $detalle['precio'],
-                'subTotal' => $detalle['subtotal'],
-                'sale_id' => $sale->id,
-                'programa_id' => $detalle['programa_id'],
-                'pelicula_id' => $detalle['pelicula_id'],
-                'descripcion' => $detalle['pelicula'],
-            ];
-            array_push($dataDetail, $d);
-        }
-
-        Ticket::insert($data);
-
-        Detail::insert($dataDetail);
+        $tickets = $this->generarBoletos($sale, $client, $user);
+        $this->generarDetalles($sale, $request->detalleVenta);
 
         $sale->siatEnviado = true;
         $sale->codigoRecepcion = "";
@@ -2015,66 +1833,8 @@ class SaleController extends Controller
 
         $user = User::find($request->user()->id);
 
-        $momentaneos = Momentaneo::where('user_id', $user->id)->get();
-        $data = [];
-        $dataDetail = [];
-        foreach ($momentaneos as $m) {
-            $programa = Programa::find($m->programa_id);
-            $numBoleto = Ticket::where('programa_id', $m->programa_id)->count() + 1;
-            if (Ticket::where('programa_id', $m->programa_id)
-                    ->where("fila", $m->fila)
-                    ->where("devuelto", 0)
-                    ->where("columna", $m->columna)
-                    ->where("letra", $m->letra)->where("sala_id", $programa->sala->id)->count() == 0) {
-                $d = [
-                    "numboc" => $programa->sala->nro . $programa->sala->id . date('Ymd', strtotime($programa->fecha)) . $programa->nroFuncion . $programa->price->serie . '-' . $numBoleto,
-                    "numero" => $numBoleto,
-                    "fecha" => now(),
-                    "numeroFuncion" => $programa->nroFuncion,
-                    "nombreSala" => $programa->sala->nombre,
-                    "serieTarifa" => $programa->price->serie,
-                    "fechaFuncion" => $programa->fecha,
-                    "horaFuncion" => $programa->horaInicio,
-                    "fila" => $m->fila,
-                    "columna" => $m->columna,
-                    "letra" => $m->letra,
-                    "costo" => $programa->price->precio,
-                    "titulo" => $m->pelicula,
-                    "devuelto" => "0",
-                    "idCupon" => "",
-                    "tarjeta" => "",
-                    "credito" => "",
-                    //"cortesia"=>"SI",
-                    "promo" => $m->promo,
-                    "client_id" => $client->id,
-                    "programa_id" => $programa->id,
-                    "pelicula_id" => $m->id,
-                    "sale_id" => $sale->id,
-                    "price_id" => $programa->price->id,
-                    "sala_id" => $programa->sala->id,
-                    "user_id" => $user->id,
-                ];
-                array_push($data, $d);
-            }
-        }
-        foreach ($request->detalleVenta as $detalle) {
-            $d = [
-                'actividadEconomica' => "590000",
-                'codigoProductoSin' => "99100",
-                'cantidad' => $detalle['cantidad'],
-                'precioUnitario' => 0,
-                'subTotal' => 0,
-                'sale_id' => $sale->id,
-                'programa_id' => $detalle['programa_id'],
-                'pelicula_id' => $detalle['pelicula_id'],
-                'descripcion' => $detalle['pelicula'],
-            ];
-            array_push($dataDetail, $d);
-        }
-
-        Ticket::insert($data);
-
-        Detail::insert($dataDetail);
+        $tickets = $this->generarBoletos($sale, $client, $user);
+        $this->generarDetalles($sale, $request->detalleVenta);
 
         $sale->siatEnviado = true;
         $sale->codigoRecepcion = "";
@@ -2163,66 +1923,8 @@ class SaleController extends Controller
 
         $user = User::find($request->user()->id);
 
-        $momentaneos = Momentaneo::where('user_id', $user->id)->get();
-        $data = [];
-        $dataDetail = [];
-        foreach ($momentaneos as $m) {
-            $programa = Programa::find($m->programa_id);
-            $numBoleto = Ticket::where('programa_id', $m->programa_id)->count() + 1;
-            if (Ticket::where('programa_id', $m->programa_id)
-                    ->where("fila", $m->fila)
-                    ->where("devuelto", 0)
-                    ->where("columna", $m->columna)
-                    ->where("letra", $m->letra)->where("sala_id", $programa->sala->id)->count() == 0) {
-                $d = [
-                    "numboc" => $programa->sala->nro . $programa->sala->id . date('Ymd', strtotime($programa->fecha)) . $programa->nroFuncion . $programa->price->serie . '-' . $numBoleto,
-                    "numero" => $numBoleto,
-                    "fecha" => now(),
-                    "numeroFuncion" => $programa->nroFuncion,
-                    "nombreSala" => $programa->sala->nombre,
-                    "serieTarifa" => $programa->price->serie,
-                    "fechaFuncion" => $programa->fecha,
-                    "horaFuncion" => $programa->horaInicio,
-                    "fila" => $m->fila,
-                    "columna" => $m->columna,
-                    "letra" => $m->letra,
-                    "costo" => $programa->price->precio,
-                    "titulo" => $m->pelicula,
-                    "devuelto" => "0",
-                    "idCupon" => "",
-                    "tarjeta" => "",
-                    "credito" => "",
-                    //"cortesia"=>"SI",
-                    "promo" => $m->promo,
-                    "client_id" => $client->id,
-                    "programa_id" => $programa->id,
-                    "pelicula_id" => $m->id,
-                    "sale_id" => $sale->id,
-                    "price_id" => $programa->price->id,
-                    "sala_id" => $programa->sala->id,
-                    "user_id" => $user->id,
-                ];
-                array_push($data, $d);
-            }
-        }
-        foreach ($request->detalleVenta as $detalle) {
-            $d = [
-                'actividadEconomica' => "590000",
-                'codigoProductoSin' => "99100",
-                'cantidad' => $detalle['cantidad'],
-                'precioUnitario' => $detalle['precio'],
-                'subTotal' => $detalle['subtotal'],
-                'sale_id' => $sale->id,
-                'programa_id' => $detalle['programa_id'],
-                'pelicula_id' => $detalle['pelicula_id'],
-                'descripcion' => $detalle['pelicula'],
-            ];
-            array_push($dataDetail, $d);
-        }
-
-        Ticket::insert($data);
-
-        Detail::insert($dataDetail);
+        $tickets = $this->generarBoletos($sale, $client, $user);
+        $this->generarDetalles($sale, $request->detalleVenta);
 
         $sale->siatEnviado = true;
         $sale->codigoRecepcion = "";

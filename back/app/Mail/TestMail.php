@@ -33,6 +33,15 @@ class TestMail extends Mailable
      */
     public function build()
     {
+        // Los llamadores arman este arreglo a mano, asi que las banderas se
+        // leen con valor por defecto en vez de reventar por clave faltante.
+        $this->details['anulado']=$this->details['anulado'] ?? false;
+        $this->details['habilitar']=$this->details['habilitar'] ?? false;
+        $this->details['online']=$this->details['online'] ?? false;
+        $this->details['cuf']=$this->details['cuf'] ?? '';
+        $this->details['numeroFactura']=$this->details['numeroFactura'] ?? '';
+        $this->details['carpeta']=$this->details['carpeta'] ?? 'archivos';
+
         if ($this->details['anulado']){
             $datos['cuf']=$this->details['cuf'];
             $datos['numeroFactura']=$this->details['numeroFactura'];
@@ -57,7 +66,12 @@ class TestMail extends Mailable
 
         $pathXmlFile=$this->details['carpeta'].'/'.$this->details['sale_id'].'.xml';
 
-        if (!file_exists($pathXmlFile)) return false;
+        if (!file_exists($pathXmlFile)) {
+            // Sin XML no hay factura que adjuntar; se deja rastro porque de
+            // otro modo el correo no sale y no queda ningun aviso.
+            error_log("TestMail: no existe ".$pathXmlFile." (venta ".$this->details['sale_id'].")");
+            return false;
+        }
         $nameFile = substr($pathXmlFile, 0, strlen($pathXmlFile) - 4);
         $content = file_get_contents($pathXmlFile);
         $xml = simplexml_load_string($content);

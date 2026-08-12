@@ -65,22 +65,22 @@
                       <q-item-label>Actualizar</q-item-label>
                     </q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup @click="openImageDialog(props.row)">
-                    <q-item-section avatar>
-                      <q-icon name="image" color="warning" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Actualizar imagen</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup @click="openBackgroundDialog(props.row)">
-                    <q-item-section avatar>
-                      <q-icon name="wallpaper" color="deep-orange" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Actualizar background</q-item-label>
-                    </q-item-section>
-                  </q-item>
+<!--                  <q-item clickable v-close-popup @click="openImageDialog(props.row)">-->
+<!--                    <q-item-section avatar>-->
+<!--                      <q-icon name="image" color="warning" />-->
+<!--                    </q-item-section>-->
+<!--                    <q-item-section>-->
+<!--                      <q-item-label>Actualizar imagen</q-item-label>-->
+<!--                    </q-item-section>-->
+<!--                  </q-item>-->
+<!--                  <q-item clickable v-close-popup @click="openBackgroundDialog(props.row)">-->
+<!--                    <q-item-section avatar>-->
+<!--                      <q-icon name="wallpaper" color="deep-orange" />-->
+<!--                    </q-item-section>-->
+<!--                    <q-item-section>-->
+<!--                      <q-item-label>Actualizar background</q-item-label>-->
+<!--                    </q-item-section>-->
+<!--                  </q-item>-->
                   <q-item clickable v-close-popup @click="openLinkProgramDialog(props.row)">
                     <q-item-section avatar>
                       <q-icon name="link" color="secondary" />
@@ -107,98 +107,126 @@
 
     <q-dialog v-model="dialog" persistent full-width>
       <q-card>
-        <q-card-section class="row items-center">
+        <q-card-section class="row items-center q-py-sm">
           <div class="text-h6">{{ isEdit ? 'Editar pelicula web' : 'Nueva pelicula web' }}</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-separator />
-        <q-card-section>
+        <q-card-section class="q-pa-sm">
           <q-form @submit.prevent="saveRow">
-            <div class="row q-col-gutter-sm">
-              <div class="col-12 col-md-4"><q-input dense outlined label="Titulo" v-model="form.titulo" :rules="[required]" /></div>
-              <div class="col-12 col-md-2"><q-select dense outlined label="Tipo" v-model="form.tipo" :options="['pelicula', 'proximo']" /></div>
-              <div class="col-12 col-md-2"><q-input dense outlined label="TMDB ID" v-model.number="form.tmdb_id" type="number" /></div>
-              <div class="col-12 col-md-2"><q-input dense outlined label="IMDb ID" v-model="form.imdb_id" /></div>
-              <div class="col-12 col-md-2"><q-input dense outlined label="Anio" v-model.number="form.anio" type="number" /></div>
+            <div class="row q-col-gutter-xs">
 
-              <div class="col-12 col-md-3"><q-input dense outlined label="Estudio" v-model="form.studio_nombre" /></div>
-              <div class="col-12 col-md-2"><q-input dense outlined label="Calidad" v-model="form.calidad" /></div>
-              <div class="col-12 col-md-2"><q-input dense outlined label="Descuento (%)" v-model.number="form.descuento" type="number" min="0" max="100" step="0.1" /></div>
-              <div class="col-12 col-md-2"><q-input dense outlined label="Bucket" v-model="form.bucket" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Fecha Estreno" v-model="form.fecha_estreno" type="date" /></div>
+              <!-- Campos del formulario -->
+              <div class="col-12 col-md-9">
+                <div class="row q-col-gutter-xs">
+                  <div class="col-12"><q-input dense outlined label="Titulo" v-model="form.titulo" :rules="[required]" /></div>
+                  <div class="col-4"><q-select dense outlined label="Tipo" v-model="form.tipo" :options="['pelicula', 'proximo']" /></div>
+                  <div class="col-4"><q-input dense outlined label="TMDB ID" v-model.number="form.tmdb_id" type="number" /></div>
+                  <div class="col-4"><q-input dense outlined label="Anio" v-model.number="form.anio" type="number" /></div>
 
-              <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje Web (0-10)" v-model.number="form.puntaje_web" type="number" step="0.001" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje Tomatoes (0-10)" v-model.number="form.puntaje_tomatoes" type="number" step="0.1" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje IBM (0-10)" v-model.number="form.puntaje_ibm" type="number" step="0.001" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Puntaje Metacritic (0-10)" v-model.number="form.puntaje_metacritic" type="number" step="0.1" /></div>
+                  <div class="col-4"><q-input dense outlined label="IMDb ID" v-model="form.imdb_id" /></div>
+                  <div class="col-4"><q-input dense outlined label="Calidad" v-model="form.calidad" /></div>
+                  <div class="col-4"><q-input dense outlined label="Bucket" v-model="form.bucket" /></div>
 
-              <div class="col-12 col-md-3"><q-input dense outlined label="Votos Total" v-model.number="form.votos_total" type="number" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Popularidad" v-model.number="form.popularidad" type="number" step="0.001" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Clasificacion" v-model="form.clasificacion" /></div>
-              <div class="col-12 col-md-3">
-                <q-select dense outlined label="Estado" v-model="form.estado" :options="['ACTIVO', 'INACTIVO']" />
+                  <div class="col-6"><q-input dense outlined label="Estudio" v-model="form.studio_nombre" /></div>
+                  <div class="col-3"><q-input dense outlined label="Descuento (%)" v-model.number="form.descuento" type="number" min="0" max="100" step="0.1" /></div>
+                  <div class="col-3"><q-input dense outlined label="Fecha Estreno" v-model="form.fecha_estreno" type="date" /></div>
+
+                  <div class="col-3"><q-input dense outlined label="Clasificacion" v-model="form.clasificacion" /></div>
+                  <div class="col-3"><q-select dense outlined label="Estado" v-model="form.estado" :options="['ACTIVO', 'INACTIVO']" /></div>
+                  <div class="col-3"><q-input dense outlined label="Duracion" v-model="form.duracion" /></div>
+                  <div class="col-3"><q-input dense outlined label="Tele" v-model="form.tele" /></div>
+
+                  <div class="col-3"><q-input dense outlined label="Puntaje Web" v-model.number="form.puntaje_web" type="number" step="0.001" /></div>
+                  <div class="col-3"><q-input dense outlined label="Puntaje Tomatoes" v-model.number="form.puntaje_tomatoes" type="number" step="0.1" /></div>
+                  <div class="col-3"><q-input dense outlined label="Puntaje IBM" v-model.number="form.puntaje_ibm" type="number" step="0.001" /></div>
+                  <div class="col-3"><q-input dense outlined label="Metacritic" v-model.number="form.puntaje_metacritic" type="number" step="0.1" /></div>
+
+                  <div class="col-4"><q-input dense outlined label="Votos Total" v-model.number="form.votos_total" type="number" /></div>
+                  <div class="col-4"><q-input dense outlined label="Popularidad" v-model.number="form.popularidad" type="number" step="0.001" /></div>
+                  <div class="col-4"><q-input dense outlined label="Me gusta" v-model.number="form.me_gusta" type="number" /></div>
+
+                  <div class="col-4"><q-input dense outlined label="Genero" v-model="form.genero" /></div>
+                  <div class="col-4"><q-input dense outlined label="Pais" v-model="form.pais" /></div>
+                  <div class="col-4"><q-input dense outlined label="Idioma" v-model="form.idioma" /></div>
+
+                  <div class="col-4"><q-input dense outlined label="URL YouTube" v-model="form.url_video_youtube" /></div>
+                  <div class="col-4"><q-input dense outlined label="URL oficial" v-model="form.url_oficial" /></div>
+                  <div class="col-4"><q-input dense outlined label="Tagline" v-model="form.tagline" /></div>
+
+                  <div class="col-6">
+                    <q-select dense outlined label="Carrusel" v-model="form.carrusel_tipo"
+                      :options="[
+                        { label: 'Ninguno', value: 'ninguno' },
+                        { label: 'Carrusel 1 (principal)', value: 'carrusel_1' },
+                        { label: 'Carrusel 2 (secundario)', value: 'carrusel_2' },
+                        { label: 'Ambos', value: 'ambos' }
+                      ]" emit-value map-options />
+                  </div>
+                  <div class="col-6"><q-input dense outlined label="Premios" v-model="form.premios" /></div>
+
+                  <div class="col-12"><q-input dense outlined label="Actores (separados por coma)" v-model="actoresTexto" /></div>
+                  <div class="col-12"><q-input dense outlined type="textarea" rows="2" label="Descripcion" v-model="form.descripcion" /></div>
+                </div>
               </div>
 
-              <div class="col-12 col-md-4"><q-input dense outlined label="Genero" v-model="form.genero" /></div>
-              <div class="col-12 col-md-4"><q-input dense outlined label="Pais" v-model="form.pais" /></div>
-              <div class="col-12 col-md-4"><q-input dense outlined label="Idioma" v-model="form.idioma" /></div>
+              <!-- Panel de imagenes -->
+              <div class="col-12 col-md-3 column q-gutter-xs">
+                <div class="row items-center">
+                  <div class="text-caption text-grey-7">Poster — arrastra para cambiar</div>
+                  <q-space />
+                  <q-btn flat round dense icon="open_in_new" size="xs" color="grey-7"
+                    @click.stop="openImageFull(posterPreview || movieImage(form.imagen))"
+                    title="Ver imagen completa" />
+                </div>
+                <div
+                  class="img-drop-zone"
+                  :class="{ 'img-drop-zone--active': isDraggingPoster }"
+                  @dragover.prevent="isDraggingPoster = true"
+                  @dragleave.prevent="isDraggingPoster = false"
+                  @drop.prevent="onDropPoster"
+                >
+                  <q-img :src="posterPreview || movieImage(form.imagen)" style="height: 180px; border-radius: 6px" />
+                  <div v-if="isDraggingPoster" class="img-drop-overlay">
+                    <div class="text-center"><q-icon name="image" size="32px" /><br>Soltar imagen</div>
+                  </div>
+                  <div v-if="posterPreview" class="img-drop-badge">
+                    <q-icon name="check_circle" color="positive" size="20px" />
+                  </div>
+                </div>
 
-              <div class="col-12 col-md-3"><q-input dense outlined label="Duracion" v-model="form.duracion" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Tele" v-model="form.tele" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Me gusta" v-model.number="form.me_gusta" type="number" /></div>
-              <div class="col-12 col-md-3"><q-input dense outlined label="Tagline" v-model="form.tagline" /></div>
+                <div class="row items-center q-mt-xs">
+                  <div class="text-caption text-grey-7">Background — arrastra para cambiar</div>
+                  <q-space />
+                  <q-btn flat round dense icon="open_in_new" size="xs" color="grey-7"
+                    @click.stop="openImageFull(backdropPreview || movieImage(form.backdrop_imagen))"
+                    title="Ver imagen completa" />
+                </div>
+                <div
+                  class="img-drop-zone"
+                  :class="{ 'img-drop-zone--active': isDraggingBackdrop }"
+                  @dragover.prevent="isDraggingBackdrop = true"
+                  @dragleave.prevent="isDraggingBackdrop = false"
+                  @drop.prevent="onDropBackdrop"
+                >
+                  <q-img :src="backdropPreview || movieImage(form.backdrop_imagen)" style="height: 110px; border-radius: 6px" />
+                  <div v-if="isDraggingBackdrop" class="img-drop-overlay">
+                    <div class="text-center"><q-icon name="wallpaper" size="32px" /><br>Soltar imagen</div>
+                  </div>
+                  <div v-if="backdropPreview" class="img-drop-badge">
+                    <q-icon name="check_circle" color="positive" size="20px" />
+                  </div>
+                </div>
 
-              <div class="col-12 col-md-6"><q-input dense outlined label="URL video YouTube" v-model="form.url_video_youtube" /></div>
-              <div class="col-12 col-md-6"><q-input dense outlined label="URL oficial" v-model="form.url_oficial" /></div>
-              <div class="col-12 col-md-6">
-                <q-select
-                  dense
-                  outlined
-                  label="Carrusel"
-                  v-model="form.carrusel_tipo"
-                  :options="[
-                    { label: 'Ninguno', value: 'ninguno' },
-                    { label: 'Carrusel 1 (principal)', value: 'carrusel_1' },
-                    { label: 'Carrusel 2 (secundario)', value: 'carrusel_2' },
-                    { label: 'Ambos', value: 'ambos' }
-                  ]"
-                  emit-value
-                  map-options
-                />
+                <div v-if="uploadProgress > 0 && uploadProgress < 100" class="q-mt-xs">
+                  <q-linear-progress :value="uploadProgress / 100" color="primary" rounded size="6px" />
+                </div>
+
+                <q-space />
+                <q-btn class="full-width q-mt-sm" color="positive" icon="save" type="submit" :loading="loading" label="Guardar" />
               </div>
 
-              <div class="col-12"><q-input dense outlined label="Actores (separados por coma)" v-model="actoresTexto" /></div>
-              <div class="col-12"><q-input dense outlined label="Premios" v-model="form.premios" /></div>
-              <div class="col-12"><q-input dense outlined type="textarea" label="Descripcion" v-model="form.descripcion" /></div>
-
-              <div class="col-12 col-md-5">
-                <q-file dense outlined v-model="posterFile" label="Imagen de portada (opcional)" accept=".jpg,.jpeg,.png" @update:model-value="onPosterSelected">
-                  <template v-slot:prepend><q-icon name="image" /></template>
-                </q-file>
-              </div>
-              <div class="col-12 col-md-7">
-                <div class="text-caption text-grey-7 q-mb-xs">Vista previa</div>
-                <q-img :src="posterPreview || movieImage(form.imagen)" style="height: 160px; max-width: 220px; border-radius: 10px" />
-              </div>
-
-              <div class="col-12 col-md-5">
-                <q-file dense outlined v-model="backdropFile" label="Imagen de background (opcional)" accept=".jpg,.jpeg,.png" @update:model-value="onBackdropSelected">
-                  <template v-slot:prepend><q-icon name="wallpaper" /></template>
-                </q-file>
-              </div>
-              <div class="col-12 col-md-7">
-                <div class="text-caption text-grey-7 q-mb-xs">Vista previa background</div>
-                <q-img :src="backdropPreview || movieImage(form.backdrop_imagen)" style="height: 160px; max-width: 320px; border-radius: 10px" />
-              </div>
-
-              <div class="col-12" v-if="uploadProgress > 0 && uploadProgress < 100">
-                <q-linear-progress :value="uploadProgress / 100" color="primary" rounded size="8px" />
-              </div>
-
-              <div class="col-12">
-                <q-btn class="full-width" color="positive" icon="save" type="submit" :loading="loading" label="Guardar cambios" />
-              </div>
             </div>
           </q-form>
         </q-card-section>
@@ -206,7 +234,7 @@
     </q-dialog>
 
     <q-dialog v-model="imageDialog" persistent>
-      <q-card style="min-width: 700px; max-width: 90vw">
+      <q-card style="min-width: 720px; max-width: 92vw">
         <q-card-section class="row items-center">
           <div class="text-h6">{{ imageDialogMode === 'background' ? 'Actualizar background' : 'Actualizar imagen' }}</div>
           <q-space />
@@ -221,8 +249,18 @@
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2 q-mb-sm">Nueva imagen</div>
-              <q-file dense outlined v-model="replaceImageFile" accept=".jpg,.jpeg,.png" label="Seleccionar imagen" @update:model-value="onReplaceSelected" />
-              <q-img v-if="replaceImagePreview" class="q-mt-md" :src="replaceImagePreview" style="height: 260px; border-radius: 12px" />
+              <div
+                class="drop-zone rounded-borders q-pa-md text-center"
+                :class="{ 'drop-zone--active': isDraggingImage }"
+                @dragover.prevent="isDraggingImage = true"
+                @dragleave.prevent="isDraggingImage = false"
+                @drop.prevent="onDropImage"
+              >
+                <q-icon name="cloud_upload" size="36px" :color="isDraggingImage ? 'primary' : 'grey-5'" />
+                <div class="text-grey-6 q-mt-xs q-mb-sm">Arrastra una imagen aqui o</div>
+                <q-file dense outlined v-model="replaceImageFile" accept=".jpg,.jpeg,.png" label="Seleccionar archivo" @update:model-value="onReplaceSelected" />
+                <q-img v-if="replaceImagePreview" class="q-mt-md" :src="replaceImagePreview" style="height: 180px; border-radius: 12px" />
+              </div>
             </div>
           </div>
           <div class="q-mt-md" v-if="uploadProgress > 0 && uploadProgress < 100">
@@ -391,6 +429,9 @@ export default {
       externalResults: [],
       loadingImportId: null,
       uploadProgress: 0,
+      isDraggingImage: false,
+      isDraggingPoster: false,
+      isDraggingBackdrop: false,
       actoresTexto: '',
       form: emptyForm(),
       posterFile: null,
@@ -531,14 +572,35 @@ export default {
       const selectedIds = (row.programas || []).map((p) => p.id);
       this.selectedProgramRows = this.programRows.filter((p) => selectedIds.includes(p.id));
     },
-    onPosterSelected(file) {
-      this.posterPreview = file ? URL.createObjectURL(file) : '';
+    openImageFull(src) {
+      window.open(src, '_blank');
     },
-    onBackdropSelected(file) {
-      this.backdropPreview = file ? URL.createObjectURL(file) : '';
+    onDropPoster(event) {
+      this.isDraggingPoster = false;
+      const file = event.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        this.posterFile = file;
+        this.posterPreview = URL.createObjectURL(file);
+      }
+    },
+    onDropBackdrop(event) {
+      this.isDraggingBackdrop = false;
+      const file = event.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        this.backdropFile = file;
+        this.backdropPreview = URL.createObjectURL(file);
+      }
     },
     onReplaceSelected(file) {
       this.replaceImagePreview = file ? URL.createObjectURL(file) : '';
+    },
+    onDropImage(event) {
+      this.isDraggingImage = false;
+      const file = event.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        this.replaceImageFile = file;
+        this.replaceImagePreview = URL.createObjectURL(file);
+      }
     },
     async uploadImage(file) {
       if (!file) return null;
@@ -563,18 +625,11 @@ export default {
     async saveRow() {
       try {
         this.loading = true;
-        let uploaded = null;
-        let uploadedBackdrop = null;
-        if (this.posterFile) {
-          uploaded = await this.uploadImage(this.posterFile);
-        }
-        if (this.backdropFile) {
-          uploadedBackdrop = await this.uploadImage(this.backdropFile);
-        }
-
+        const uploadedPoster = this.posterFile ? await this.uploadImage(this.posterFile) : null;
+        const uploadedBackdrop = this.backdropFile ? await this.uploadImage(this.backdropFile) : null;
         const payload = {
           ...this.form,
-          imagen: uploaded || this.form.imagen,
+          imagen: uploadedPoster || this.form.imagen,
           backdrop_imagen: uploadedBackdrop || this.form.backdrop_imagen,
           trailer_youtube: this.form.url_video_youtube || this.form.trailer_youtube,
           url_video_youtube: this.form.url_video_youtube || this.form.trailer_youtube,
@@ -729,5 +784,48 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.drop-zone {
+  border: 2px dashed #ccc;
+  transition: border-color 0.2s, background 0.2s;
+  min-height: 120px;
+}
+.drop-zone--active {
+  border-color: #1976d2;
+  background: rgba(25, 118, 210, 0.06);
+}
+.img-drop-zone {
+  position: relative;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+  overflow: hidden;
+  cursor: pointer;
+}
+.img-drop-zone:hover {
+  border-color: #9e9e9e;
+}
+.img-drop-zone--active {
+  border-color: #1976d2;
+}
+.img-drop-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(25, 118, 210, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1;
+}
+.img-drop-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: white;
+  border-radius: 50%;
+  z-index: 2;
 }
 </style>
