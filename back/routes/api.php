@@ -162,12 +162,15 @@ Route::get('test',function (){
         "body"=>"Gracias por su compra",
         "online"=>true,
         "anulado"=>false,
+        "habilitar"=>false,
         "cuf"=>"",
         "numeroFactura"=>"",
-        "sale_id"=>358702,
+        "sale_id"=>452419,
         "carpeta"=>"archivos",
     ];
     Mail::to('adimer101@gmail.com')->send(new TestMail($details));
+
+    return "correo enviado a adimer101@gmail.com";
 });
 
 

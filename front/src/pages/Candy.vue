@@ -271,7 +271,6 @@ export default {
       codigo:'',
       productos:[],
       client:{complemento:''},
-      temporal:[],
       loading:false,
       documents:[],
       document:{},
@@ -597,6 +596,10 @@ export default {
 
         },
     saleInsert(qrConfirmado = false){
+      // Un solo envio a la vez: dos POST seguidos generaban dos facturas.
+      if (this.loading){
+        return
+      }
       if (this.qrSaleProcessing && !qrConfirmado){
         return
       }

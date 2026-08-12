@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ReservaFacturaException;
+use App\Http\Controllers\Concerns\ReservaFactura;
 use App\Mail\TestMail;
 use App\Models\Client;
 use App\Models\Cortesia;
@@ -26,6 +28,8 @@ use SimpleXMLElement;
 
 class SaleCandyController extends Controller
 {
+    use ReservaFactura;
+
     private function applyQrData(Sale $sale, Request $request): void
     {
         $sale->pagoQr = $request->boolean('pagoQr');
@@ -118,43 +122,82 @@ class SaleCandyController extends Controller
         $tipoFacturaDocumento=1; // 1 con credito fiscal 2 sin creditofical 3 nota debito credito
 
         $codigoSucursal=0;
-        error_log("request: ".json_encode($request->all()));
 
         $user=User::find($request->user()->id);
 
-        if (Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+        if (!$cui){
             return response()->json(['message' => 'No existe CUI para la venta!!'], 400);
         }
-        if (Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->count()==0){
+        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
+        if (!$cufd){
             return response()->json(['message' => 'No exite CUFD para la venta!!'], 400);
         }
-        $cui=Cui::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
-        $cufd=Cufd::where('codigoPuntoVenta', $codigoPuntoVenta)->where('codigoSucursal', $codigoSucursal)->where('fechaVigencia','>=', now())->first();
 
-        error_log("cui: ".json_encode($cui));
-        if (Sale::where('cufd', $cufd->codigo)->where('tipo','CANDY')->count()==0){
-            $numeroFactura=1;
-        }else{
-//            $sale=Sale::where('cufd',$cufd->codigo)->where('tipo','CANDY')->orderBy('numeroFactura', 'desc')->first();
-            $max=Sale::where('cufd',$cufd->codigo)->where('tipo','CANDY')->max('numeroFactura');
-            $numeroFactura=intval($max)+1;
+        $leyendas=Leyenda::where("codigoActividad","590000")->get();
+        $leyenda=$leyendas[rand(0,$leyendas->count()-1)]->descripcionLeyenda;
+
+        $fechaEmision=now();
+
+        // La venta se reserva ANTES de armar el XML: asi el correlativo y el id
+        // son propios de esta venta y no dependen de lo que haga otra caja.
+        try {
+            $sale=$this->reservarVenta($cufd->codigo, "CANDY", function ($numeroFactura) use ($request,$user,$client,$cui,$cufd,$codigoSucursal,$codigoPuntoVenta,$codigoDocumentoSector,$leyenda,$fechaEmision){
+                $sale=new Sale();
+                $sale->numeroFactura=$numeroFactura;
+                $sale->cuf="";
+                $sale->cufd=$cufd->codigo;
+                $sale->cui=$cui->codigo;
+                $sale->codigoSucursal=$codigoSucursal;
+                $sale->codigoPuntoVenta=$codigoPuntoVenta;
+                $sale->fechaEmision=$fechaEmision;
+                $sale->montoTotal=$request->montoTotal;
+                $sale->usuario=$user->name;
+                $sale->codigoDocumentoSector=$codigoDocumentoSector;
+                $sale->user_id=$user->id;
+                $sale->cufd_id=$cufd->id;
+                $sale->client_id=$client->id;
+                $sale->tipo="CANDY";
+                $sale->leyenda=$leyenda;
+                $sale->vip=$request->vip;
+                $sale->credito=$request->tarjeta;
+                $sale->siatEnviado=false;
+                $sale->codigoRecepcion="";
+                $this->applyQrData($sale, $request);
+                $sale->save();
+
+                return $sale;
+            });
+        }catch (ReservaFacturaException $e){
+            return response()->json(['message' => $e->getMessage()], 409);
         }
-        error_log("numeroFactura A: ".$numeroFactura);
-//        if (count(Sale::all())==0) { cambiar por count
-        if (Sale::count()==0) {
-            $saleId=1;
-        }else{
-            $sale=Sale::orderBy('id', 'desc')->first();
-            $saleId=$sale->id+1;
+
+        $numeroFactura=$sale->numeroFactura;
+        error_log("venta candy reservada: id=".$sale->id." numeroFactura=".$numeroFactura." usuario=".$user->name);
+
+        // El detalle se guarda contra el id real de la venta.
+        $dataDetail=[];
+        foreach ($request->detalleVenta as $detalle){
+            $dataDetail[]=[
+                'actividadEconomica'=>"590000",
+                'codigoProductoSin'=>"99100",
+                'cantidad'=>$detalle['cantidad'],
+                'precioUnitario'=>$detalle['precio'],
+                'subTotal'=>$detalle['subtotal'],
+                'sale_id'=>$sale->id,
+                'product_id'=>$detalle['product_id'],
+                'descripcion'=>$detalle['nombre'],
+            ];
         }
-        error_log("numeroFactura B: ".$numeroFactura);
+        Detail::insert($dataDetail);
+
         $detalleFactura="";
         foreach ($request->detalleVenta as $detalle){
             $detalleFactura.="<detalle>
                 <actividadEconomica>590000</actividadEconomica>
                 <codigoProductoSin>99100</codigoProductoSin>
                 <codigoProducto>".$detalle['product_id']."</codigoProducto>
-                <descripcion>".$detalle['nombre']."</descripcion>
+                <descripcion>".str_replace("&","&amp;",$detalle['nombre'])."</descripcion>
                 <cantidad>".$detalle['cantidad']."</cantidad>
                 <unidadMedida>62</unidadMedida>
                 <precioUnitario>".$detalle['precio']."</precioUnitario>
@@ -164,12 +207,6 @@ class SaleCandyController extends Controller
                 <numeroImei xsi:nil='true'/>
             </detalle>";
         }
-//
-//        Ticket::insert($data);
-//
-//        Detail::insert($dataDetail);
-
-
         $cuf = new CUF();
         //     * @param nit NIT emisor
 //     * @param fh Fecha y Hora en formato yyyyMMddHHmmssSSS
@@ -180,15 +217,15 @@ class SaleCandyController extends Controller
 //     * @param tds Tipo Documento Sector
 //     * @param nf Numero de Factura
 //     * @param pos Punto de Venta
-        $leyenda=Leyenda::where("codigoActividad","590000")->get();
-        error_log("leyenda: ".json_encode($leyenda));
-        $count=$leyenda->count();
-        $leyenda=$leyenda[rand(0,$count-1)]->descripcionLeyenda;
 
-        $fechaEnvio=date("Y-m-d\TH:i:s.000");
+        // El CUF se calcula con la misma fechaEmision guardada en la venta,
+        // para que al regenerar el XML salga identico.
+        $fechaEnvio=$fechaEmision->format("Y-m-d\TH:i:s.000");
 
-        $cuf = $cuf->obtenerCUF(env('NIT'), date("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
+        $cuf = $cuf->obtenerCUF(env('NIT'), $fechaEmision->format("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
         $cuf=$cuf.$cufd->codigoControl;
+        $sale->cuf=$cuf;
+        $sale->save();
         $text="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <facturaElectronicaCompraVenta xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='facturaElectronicaCompraVenta.xsd'>    <cabecera>
         <nitEmisor>".env('NIT')."</nitEmisor>
@@ -230,7 +267,9 @@ class SaleCandyController extends Controller
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
-        $nameFile=$saleId;
+        // El archivo lleva el id real de la venta: nunca lo pisa otra caja y el
+        // correo/PDF siempre adjuntan la factura de esta venta.
+        $nameFile=$sale->id;
         $dom->save("archivos/".$nameFile.'.xml');
 
         $firmar = new Firmar();
@@ -239,13 +278,12 @@ class SaleCandyController extends Controller
 
         $xml = new DOMDocument();
         $xml->load("archivos/".$nameFile.'.xml');
+        libxml_use_internal_errors(true);
         if (!$xml->schemaValidate('./facturaElectronicaCompraVenta.xsd')) {
-            echo "invalid";
+            // Nunca imprimir aqui: rompe el JSON de respuesta.
+            error_log("xml candy invalido venta ".$sale->id);
         }
-        else {
-//            echo "validated";
-        }
-//        exit;
+        libxml_clear_errors();
 
 
         $file = "archivos/".$nameFile.'.xml';
@@ -291,149 +329,72 @@ class SaleCandyController extends Controller
                 ]
             ]);
             error_log("resultcandy ".json_encode($result));
-            if ($result->RespuestaServicioFacturacion->transaccion) {
-                $sale=new Sale();
-                $sale->numeroFactura=$numeroFactura;
-                $sale->cuf="";
-                $sale->cufd=$cufd->codigo;
-                $sale->cui=$cui->codigo;
-                $sale->codigoSucursal=$codigoSucursal;
-                $sale->codigoPuntoVenta=$codigoPuntoVenta;
-                $sale->fechaEmision=now();
-                $sale->montoTotal=$request->montoTotal;
-                $sale->usuario=$user->name;
-                $sale->codigoDocumentoSector=$codigoDocumentoSector;
-                $sale->user_id=$user->id;
-                $sale->cufd_id=$cufd->id;
-                $sale->client_id=$client->id;
-                $sale->tipo="CANDY";
-                $sale->leyenda=$leyenda;
-                $sale->vip=$request->vip;
-                $sale->credito=$request->tarjeta;
-                $this->applyQrData($sale, $request);
-                $sale->save();
+            if (!$result->RespuestaServicioFacturacion->transaccion) {
+                $mensajes=$result->RespuestaServicioFacturacion->mensajesList;
+                $mensajes=is_array($mensajes)?($mensajes[0] ?? null):$mensajes;
+                $mensaje=$mensajes->descripcion ?? 'SIAT rechazo la factura';
 
-                error_log("sale candy: ".json_encode($sale));
+                // SIAT rechazo la factura: se libera el correlativo reservado.
+                Detail::where('sale_id',$sale->id)->delete();
+                $sale->delete();
 
-                try {
-                    if ($request->client['email']!='' && $request->client['email']!=null ){
-                        $details=[
-                            "title"=>"Factura",
-                            "body"=>"Gracias por su compra",
-                            "online"=>true,
-                            "anulado"=>false,
-                            "habilitar" => false,
-                            "cuf"=>"",
-                            "numeroFactura"=>"",
-                            "sale_id"=>$sale->id,
-                            "carpeta"=>"archivos",
-                        ];
-                        Mail::to($request->client['email'])->send(new TestMail($details));
-                    }
-                }catch (\Exception $e){
-                    error_log("error mail candy: ".$e->getMessage());
-                }
-
-                $dataDetail=[];
-                foreach ($request->detalleVenta as $detalle){
-                    $d=[
-                        'actividadEconomica'=>"590000",
-                        'codigoProductoSin'=>"99100",
-                        'cantidad'=>$detalle['cantidad'],
-                        'precioUnitario'=>$detalle['precio'],
-                        'subTotal'=>$detalle['subtotal'],
-                        'sale_id'=>$sale->id,
-//                        'programa_id'=>$detalle['programa_id'],
-                        'product_id'=>$detalle['product_id'],
-                        'descripcion'=>$detalle['nombre'],
-                    ];
-                    array_push($dataDetail, $d);
-                }
-
-                Detail::insert($dataDetail);
-
-                $sale->siatEnviado=true;
-                $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
-                $sale->cuf=$cuf;
-                $sale->save();
-               // $tickets=Ticket::where('sale_id',$sale->id)->get();
-                return response()->json([
-                    'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->with('user')->first(),
-                   // "tickets"=>$tickets,
-                    "error"=>"",
-                ]);
-            }else{
-                return response()->json(['message' => $result->RespuestaServicioFacturacion->mensajesList->descripcion], 400);
+                return response()->json(['message' => $mensaje], 400);
             }
-        }catch (\Exception $e){
-            //if(sizeof($request->detalleVenta) > 0){
-            $sale=new Sale();
-            $sale->numeroFactura=$numeroFactura;
-            $sale->cuf="";
-            $sale->cufd=$cufd->codigo;
-            $sale->cui=$cui->codigo;
-            $sale->codigoSucursal=$codigoSucursal;
-            $sale->codigoPuntoVenta=$codigoPuntoVenta;
-            $sale->fechaEmision=now();
-            $sale->montoTotal=$request->montoTotal;
-            $sale->usuario=$user->name;
-            $sale->codigoDocumentoSector=$codigoDocumentoSector;
-            $sale->user_id=$user->id;
-            $sale->cufd_id=$cufd->id;
-            $sale->client_id=$client->id;
-            $sale->tipo="CANDY";
-            $sale->leyenda=$leyenda;
-            $sale->vip=$request->vip;
-            $sale->credito=$request->tarjeta;
-            $this->applyQrData($sale, $request);
+
+            $sale->siatEnviado=true;
+            $sale->codigoRecepcion=$result->RespuestaServicioFacturacion->codigoRecepcion;
             $sale->save();
+            error_log("sale candy: ".json_encode($sale));
 
-            if ($request->client['email']!='' && $request->client['email']!= null  ){
-                $details=[
-                    "title"=>"Factura",
-                    "body"=>"Gracias por su compra",
-                    "online"=>false,
-                    "anulado"=>false,
-                    "habilitar" => false,
-                    "cuf"=>"",
-                    "numeroFactura"=>"",
-                    "sale_id"=>$sale->id,
-                    "carpeta"=>"archivos",
-                ];
-                Mail::to($request->client['email'])->send(new TestMail($details));
+            $this->enviarCorreo($request, $sale, true);
+
+            return response()->json([
+                'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->with('user')->first(),
+                "error"=>"",
+            ]);
+        }catch (\Exception $e){
+            // No hubo comunicacion con SIAT: la venta queda registrada offline.
+            error_log("error siat candy: ".$e->getMessage());
+            if (!$sale->exists){
+                // La venta ya fue descartada por rechazo de SIAT.
+                return response()->json(['message' => $e->getMessage()], 400);
             }
-            $dataDetail=[];
-            foreach ($request->detalleVenta as $detalle){
-                $d=[
-                    'actividadEconomica'=>"590000",
-                    'codigoProductoSin'=>"99100",
-                    'cantidad'=>$detalle['cantidad'],
-                    'precioUnitario'=>$detalle['precio'],
-                    'subTotal'=>$detalle['subtotal'],
-                    'sale_id'=>$sale->id,
-//                    'programa_id'=>$detalle['programa_id'],
-                    'product_id'=>$detalle['product_id'],
-                    'descripcion'=>$detalle['nombre'],
-                ];
-                array_push($dataDetail, $d);
-            }
-
-            Detail::insert($dataDetail);
-
             $sale->siatEnviado=false;
             $sale->codigoRecepcion="";
-            $sale->cuf=$cuf;
             $sale->save();
-           // $tickets=Ticket::where('sale_id',$sale->id)->get();
+
+            $this->enviarCorreo($request, $sale, false);
+
             return response()->json([
                 'sale' => Sale::where('id',$sale->id)->with('client')->with('details')->first(),
-              // "tickets"=>$tickets,
                 "error"=>"Se creo la venta pero no se pudo enviar a siat!!!",
             ]);
-            return response()->json(['message' => $e->getMessage()], 500);
-            }
+        }
         }
      // }
+    }
+
+    private function enviarCorreo(Request $request, Sale $sale, bool $online): void
+    {
+        $email=$request->client['email'] ?? '';
+        if ($email=='' || $email==null){
+            return;
+        }
+        try {
+            Mail::to($email)->send(new TestMail([
+                "title"=>"Factura",
+                "body"=>"Gracias por su compra",
+                "online"=>$online,
+                "anulado"=>false,
+                "habilitar" => false,
+                "cuf"=>"",
+                "numeroFactura"=>"",
+                "sale_id"=>$sale->id,
+                "carpeta"=>"archivos",
+            ]));
+        }catch (\Exception $e){
+            error_log("error mail candy: ".$e->getMessage());
+        }
     }
     public function genXMLRental($id){
 
