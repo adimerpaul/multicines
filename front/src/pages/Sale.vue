@@ -31,20 +31,22 @@
         <div class="row">
           <div class="col-2" v-for="m in movies" :key="m.id">
             <q-card @click="myHours(m)" class="q-ma-xs cursor-pointer movie-card"
-                    :class="movie.id === m.id ? 'bg-green-8 text-white' : 'bg-grey-9 text-white'">
-              <q-card-section class="q-pa-sm column justify-between full-height">
+                    :class="{'movie-card--activa': movie.id === m.id}"
+                    :style="posterStyle(m)">
+              <q-icon v-if="!m.imagen" name="movie" size="44px" class="movie-sin-imagen"/>
+              <div class="movie-degradado column justify-end q-pa-sm">
                 <div class="movie-name">{{ m.nombre }}</div>
-                <div class="row items-center q-gutter-xs no-wrap">
+                <div class="row items-center q-gutter-xs no-wrap q-mt-xs">
                   <q-badge color="blue-8">{{ m.formato }}</q-badge>
-                  <q-badge color="grey-7">{{ m.duracion }} min</q-badge>
+                  <q-badge color="grey-9">{{ m.duracion }} min</q-badge>
                   <q-space/>
-                  <q-badge :color="parseInt(m.cantidad) > 0 ? 'white' : 'grey-6'"
+                  <q-badge :color="parseInt(m.cantidad) > 0 ? 'white' : 'grey-8'"
                            :text-color="parseInt(m.cantidad) > 0 ? 'green-9' : 'white'" class="text-bold">
                     <q-icon name="o_confirmation_number" size="12px" class="q-mr-xs"/>
                     {{ m.cantidad }}
                   </q-badge>
                 </div>
-              </q-card-section>
+              </div>
             </q-card>
           </div>
 
@@ -475,6 +477,13 @@ export default {
       this.qrPollTimer = setInterval(() => {
         this.verificarEstadoQr()
       }, 3000)
+    },
+    // El poster va de fondo de la tarjeta: si no hay imagen queda el degradado del CSS
+    posterStyle(m) {
+      if (!m.imagen) {
+        return {}
+      }
+      return {backgroundImage: `url('${this.url}../imagen/${m.imagen}')`}
     },
     // Carga todo el panel en una sola peticion
     loadSale(fecha) {
@@ -1020,13 +1029,57 @@ input {
 }
 
 .movie-card {
-  height: 90px;
+  position: relative;
+  height: 150px;
+  border-radius: 10px;
+  overflow: hidden;
+  /* Si la pelicula no tiene imagen (o el archivo no existe) queda este fondo */
+  background-color: #263238;
+  background-image: linear-gradient(135deg, #37474f 0%, #1b2429 100%);
+  background-size: cover;
+  background-position: center;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.movie-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .45);
+}
+
+.movie-card--activa {
+  outline: 3px solid #21ba45;
+  outline-offset: -3px;
+}
+
+.movie-sin-imagen {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, .35);
+}
+
+/* Degradado para que el nombre se lea sobre cualquier poster */
+.movie-card .movie-degradado {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, .95) 0%,
+    rgba(0, 0, 0, .80) 32%,
+    rgba(0, 0, 0, .30) 62%,
+    rgba(0, 0, 0, 0) 100%);
 }
 
 .movie-name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   line-height: 1.15;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;

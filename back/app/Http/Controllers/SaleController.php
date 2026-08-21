@@ -88,7 +88,7 @@ class SaleController extends Controller
     private function peliculasDelDia($fecha)
     {
         return DB::select("
-            SELECT m.id, m.nombre, m.duracion, m.formato,
+            SELECT m.id, m.nombre, m.duracion, m.formato, m.imagen,
                    COALESCE(SUM(t.cantidad), 0) as cantidad
             FROM programas p
             INNER JOIN movies m ON m.id = p.movie_id
