@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Anulacion extends Model{
+class Anulacion extends Model implements AuditableContract{
+    use Auditable;
     use HasFactory, SoftDeletes;
     protected $table = 'anulaciones';
 

@@ -12,6 +12,7 @@ use App\Models\Cortesia;
 use App\Models\Cufd;
 use App\Models\Cui;
 use App\Models\Detail;
+use App\Models\Document;
 use App\Models\Leyenda;
 use App\Models\Momentaneo;
 use App\Models\Programa;
@@ -77,31 +78,46 @@ class SaleController extends Controller
 //        and p.activo='ACTIVO'
 //        GROUP by m.id,m.nombre,m.duracion,m.formato,m.imagen;");
 
-        $fecha = $request->fecha;
+        return response()->json($this->peliculasDelDia($request->fecha));
+    }
 
-        $programas = \App\Models\Programa::with(['movie'])
-            ->where('fecha', $fecha)
-            ->where('activo', 'ACTIVO')
-            ->get();
+    /**
+     * Peliculas programadas de un dia con la cantidad de boletos vendidos.
+     * Una sola consulta agregada (antes era 1 consulta por programa).
+     */
+    private function peliculasDelDia($fecha)
+    {
+        return DB::select("
+            SELECT m.id, m.nombre, m.duracion, m.formato,
+                   COALESCE(SUM(t.cantidad), 0) as cantidad
+            FROM programas p
+            INNER JOIN movies m ON m.id = p.movie_id
+            LEFT JOIN (
+                SELECT programa_id, COUNT(*) as cantidad
+                FROM tickets
+                WHERE devuelto = 0 AND deleted_at IS NULL
+                GROUP BY programa_id
+            ) t ON t.programa_id = p.id
+            WHERE p.fecha = ? AND p.activo = 'ACTIVO' AND p.deleted_at IS NULL AND m.deleted_at IS NULL
+            GROUP BY m.id, m.nombre, m.duracion, m.formato
+            ORDER BY m.nombre", [$fecha]);
+    }
 
-        // Agrupar por película
-        $peliculas = $programas->groupBy('movie_id')->map(function ($progs) {
-            $movie = $progs->first()->movie;
-            $cantidad = $progs->sum(function ($prog) {
-                return $prog->tickets()->where('devuelto', false)->count();
-            });
-
-            return [
-                'id' => $movie->id,
-                'nombre' => $movie->nombre,
-                'duracion' => $movie->duracion,
-                'formato' => $movie->formato,
-                'imagen' => $movie->imagen,
-                'cantidad' => $cantidad
-            ];
-        })->values();
-
-        return response()->json($peliculas);
+    /**
+     * Carga inicial del panel de ventas en una sola peticion.
+     * Reemplaza a: document, free, momentaneo, eventSearch, totalventa y movies.
+     */
+    public function saleInit(Request $request)
+    {
+        return response()->json([
+            'documents' => Document::orderBy('id')->get(['id', 'codigoClasificador', 'descripcion']),
+            'frees' => Cortesia::whereNull('user_id')->limit(30)->get(['id']),
+            'momentaneos' => Momentaneo::where('user_id', $request->user()->id)
+                ->get(['id', 'programa_id', 'pelicula', 'pelicula_id', 'fecha', 'precio', 'promo', 'fila', 'columna', 'letra']),
+            'eventNumber' => Sale::where('siatEnviado', false)->where('siatAnulado', false)->count(),
+            'totalventa' => Ticket::whereDate('fechaFuncion', $request->fecha)->where('devuelto', '0')->count(),
+            'movies' => $this->peliculasDelDia($request->fecha),
+        ]);
     }
 
     public function movietotal(Request $request)
@@ -116,7 +132,29 @@ class SaleController extends Controller
 
     public function hours(Request $request)
     {
-        return Programa::with('sala')->with('price')->with('movie')->whereDate('fecha', $request->fecha)->where('movie_id', $request->id)->get();
+        return Programa::whereDate('fecha', $request->fecha)
+            ->where('movie_id', $request->id)
+            ->with([
+                'sala:id,nombre,filas,columnas,capacidad',
+                'price:id,precio,promo',
+                'movie:id,nombre,formato',
+            ])
+            ->orderBy('horaInicio')
+            ->get(['id', 'horaInicio', 'sala_id', 'price_id', 'movie_id']);
+    }
+
+    /**
+     * Butacas + resumen de una funcion en una sola peticion.
+     * Reemplaza a: mySeats + disponibleSeats.
+     */
+    public function salaData(Request $request)
+    {
+        $resumen = $this->disponibleSeats($request);
+
+        return response()->json([
+            'seats' => $this->mySeats($request),
+            'resumen' => $resumen[0] ?? null,
+        ]);
     }
 
     /**
@@ -129,22 +167,22 @@ class SaleController extends Controller
     {
         $seats = DB::select("SELECT a.fila,a.columna,a.letra,(
             IF(a.activo='ACTIVO',
-               IF((SELECT COUNT(*) FROM tickets t WHERE t.programa_id=p.id AND t.fila=a.fila AND t.columna=a.columna AND t.letra=a.letra and t.devuelto=0)=1, 'OCUPADO',
-                 IF((SELECT COUNT(*) FROM momentaneos m WHERE m.programa_id=p.id AND m.fila=a.fila AND m.columna=a.columna AND m.letra=a.letra)=1,'RESERVADO','LIBRE'))
+               IF((SELECT COUNT(*) FROM tickets t WHERE t.programa_id=p.id AND t.fila=a.fila AND t.columna=a.columna AND t.letra=a.letra and t.devuelto=0 AND t.deleted_at IS NULL)>=1, 'OCUPADO',
+                 IF((SELECT COUNT(*) FROM momentaneos m WHERE m.programa_id=p.id AND m.fila=a.fila AND m.columna=a.columna AND m.letra=a.letra)>=1,'RESERVADO','LIBRE'))
                , 'INACTIVO')
             ) activo
             FROM programas p
             INNER JOIN salas s ON s.id=p.sala_id
             INNER JOIN seats a ON a.sala_id=s.id
-            WHERE p.id=" . $request->id . ";");
+            WHERE p.id=" . $request->id . " AND a.deleted_at IS NULL;");
         return $seats;
     }
 
     public function disponibleSeats(Request $request)
     {
-        return DB::SELECT("Select (select count(*) from tickets t where t.programa_id=$request->id and t.devuelto=0) as venta,
+        return DB::SELECT("Select (select count(*) from tickets t where t.programa_id=$request->id and t.devuelto=0 and t.deleted_at is null) as venta,
        (selecT COUNT(*) from momentaneos m where m.programa_id=$request->id) as temp,
-       (select count(*) from tickets t where t.programa_id=$request->id and t.devuelto=1) as dev,
+       (select count(*) from tickets t where t.programa_id=$request->id and t.devuelto=1 and t.deleted_at is null) as dev,
        (SELECT s.capacidad from salas s, programas p where s.id=p.sala_id and p.id=$request->id) as salatotal;");
     }
 
@@ -454,7 +492,9 @@ class SaleController extends Controller
             if ($rechazoSiat !== null) {
                 // SIAT rechazo la factura: se libera el correlativo. Los
                 // asientos momentaneos quedan intactos para reintentar.
-                $sale->delete();
+                // forceDelete y no delete: la venta nunca existio, no debe
+                // quedar como soft delete ensuciando los reportes en SQL crudo.
+                $sale->forceDelete();
 
                 return response()->json(['message' => $rechazoSiat], 400);
             }

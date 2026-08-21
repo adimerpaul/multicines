@@ -335,8 +335,10 @@ class SaleCandyController extends Controller
                 $mensaje=$mensajes->descripcion ?? 'SIAT rechazo la factura';
 
                 // SIAT rechazo la factura: se libera el correlativo reservado.
-                Detail::where('sale_id',$sale->id)->delete();
-                $sale->delete();
+                // forceDelete y no delete: la venta nunca existio, no debe
+                // quedar como soft delete ensuciando los reportes en SQL crudo.
+                Detail::where('sale_id',$sale->id)->forceDelete();
+                $sale->forceDelete();
 
                 return response()->json(['message' => $mensaje], 400);
             }

@@ -209,7 +209,7 @@ class WebMovieController extends Controller
             ]
         );
 
-        $movie->actores()->delete();
+        $movie->actores()->forceDelete();
         $cast = array_slice($movieData['credits']['cast'] ?? [], 0, 20);
         foreach ($cast as $actor) {
             $actorImage = $this->downloadImageLocally(
@@ -306,7 +306,7 @@ class WebMovieController extends Controller
 
     private function syncActors(WebMovie $movie, array $actors): void
     {
-        $movie->actores()->delete();
+        $movie->actores()->forceDelete();
         foreach ($actors as $actor) {
             WebMovieActor::create([
                 'web_movie_id' => $movie->id,

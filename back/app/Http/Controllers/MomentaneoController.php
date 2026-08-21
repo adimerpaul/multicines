@@ -37,14 +37,34 @@ class MomentaneoController extends Controller
      */
     public function store(StoreMomentaneoRequest $request)
     {
-        if (Momentaneo::where("user_id",$request->user()->id)
-            ->where("programa_id",$request->programa_id)
-            ->where("fila",$request->fila)
-            ->where("columna",$request->columna)
-            ->where("letra",$request->letra)->count()==1){
+        $datos = [
+            'user_id' => $request->user()->id,
+            'programa_id' => $request->programa_id,
+            'fila' => $request->fila,
+            'columna' => $request->columna,
+            'letra' => $request->letra,
+            'fecha' => $request->fecha,
+            'precio' => $request->precio,
+            'pelicula' => $request->pelicula,
+            'pelicula_id' => $request->pelicula_id,
+            'promo' => $request->promo ? 1 : 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        // insertOrIgnore + indice unico momentaneos_butaca_unique: si la butaca ya
+        // esta tomada (por este cajero o por otro) no se crea una segunda reserva.
+        // Se devuelve 1 para que el front refresque la sala.
+        if (!Momentaneo::insertOrIgnore($datos)) {
             return 1;
         }
-        Momentaneo::create($request->all());
+
+        // Se devuelve el registro creado para que el front no tenga que volver a pedir la lista.
+        return Momentaneo::where('programa_id', $request->programa_id)
+            ->where('fila', $request->fila)
+            ->where('columna', $request->columna)
+            ->where('letra', $request->letra)
+            ->first();
     }
     public function momentaneoDelete(Request $request)
     {

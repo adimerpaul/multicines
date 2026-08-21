@@ -99,6 +99,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('momentaneoDelete', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDelete']);
     Route::post('momentaneoDeleteUser', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDeleteUser']);
     Route::post('momentaneoDeleteall', [\App\Http\Controllers\MomentaneoController::class,'momentaneoDeleteall']);
+    Route::post('saleInit', [\App\Http\Controllers\SaleController::class, 'saleInit']);
+    Route::post('salaData', [\App\Http\Controllers\SaleController::class, 'salaData']);
     Route::post('movies', [\App\Http\Controllers\SaleController::class, 'movies']);
     Route::post('movietotal', [\App\Http\Controllers\SaleController::class, 'movietotal']);
     Route::post('hours', [\App\Http\Controllers\SaleController::class, 'hours']);

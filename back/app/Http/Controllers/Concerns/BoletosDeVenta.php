@@ -37,12 +37,23 @@ trait BoletosDeVenta
             $momentaneos = Momentaneo::where('user_id', $user->id)->get();
             $data = [];
             $ultimoNumero = []; // programa_id => ultimo numero de boleto usado
+            $yaEnLote = [];     // butacas ya incluidas en este mismo insert
 
             foreach ($momentaneos as $m) {
                 $programa = Programa::find($m->programa_id);
                 if (!$programa) {
                     continue;
                 }
+
+                // Si el mismo asiento viene repetido en los momentaneos (doble clic,
+                // reintento de red), se imprimiria dos veces el mismo boleto: el
+                // control de $ocupado no lo detecta porque el insert recien ocurre
+                // al terminar el foreach.
+                $butaca = $m->programa_id . '|' . $m->fila . '|' . $m->columna . '|' . $m->letra;
+                if (isset($yaEnLote[$butaca])) {
+                    continue;
+                }
+                $yaEnLote[$butaca] = true;
 
                 $ocupado = Ticket::where('programa_id', $m->programa_id)
                     ->where("fila", $m->fila)

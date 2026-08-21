@@ -170,7 +170,7 @@ class ActivityController extends Controller{
             if ($cui->count()==0){
                 return response()->json(['message' => 'El CUI no existe'], 400);
             }
-            Activity::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Activity::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
             $client = new \SoapClient(env("URL_SIAT")."FacturacionSincronizacion?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
@@ -194,7 +194,7 @@ class ActivityController extends Controller{
                 ]
             ]);
 
-            Sector::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Sector::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
             foreach ($result->RespuestaListaActividades->listaActividades as $actividad) {
                 $activity = new Activity();
                 $activity->codigoCaeb = $actividad->codigoCaeb;
@@ -224,7 +224,7 @@ class ActivityController extends Controller{
                 $sector->save();
             }
 
-            Leyenda::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Leyenda::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarListaLeyendasFactura([
                 "SolicitudSincronizacion"=>[
@@ -245,7 +245,7 @@ class ActivityController extends Controller{
                 $leyenda->save();
             }
 
-            Message::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Message::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarListaMensajesServicios([
                 "SolicitudSincronizacion"=>[
@@ -266,7 +266,7 @@ class ActivityController extends Controller{
                 $mensaje->save();
             }
 
-            Servicio::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Servicio::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarListaProductosServicios([
                 "SolicitudSincronizacion"=>[
@@ -288,7 +288,7 @@ class ActivityController extends Controller{
                 $servicio->save();
             }
 
-            Event::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Event::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarParametricaEventosSignificativos([
                 "SolicitudSincronizacion"=>[
@@ -309,7 +309,7 @@ class ActivityController extends Controller{
                 $evento->save();
             }
 
-            Motivo::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Motivo::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarParametricaMotivoAnulacion([
                 "SolicitudSincronizacion"=>[
@@ -352,7 +352,7 @@ class ActivityController extends Controller{
                 ]
             ]);
 
-            Document::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Document::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarParametricaTipoDocumentoIdentidad([
                 "SolicitudSincronizacion"=>[
@@ -373,7 +373,7 @@ class ActivityController extends Controller{
                 $document->save();
             }
 
-            Documentsector::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Documentsector::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarParametricaTipoDocumentoSector([
                 "SolicitudSincronizacion"=>[
@@ -416,7 +416,7 @@ class ActivityController extends Controller{
                 ]
             ]);
 
-            Tipopago::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Tipopago::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarParametricaTipoMetodoPago([
                 "SolicitudSincronizacion"=>[
@@ -490,7 +490,7 @@ class ActivityController extends Controller{
             //unidades
 
 
-            Medida::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->delete();
+            Medida::where('codigoPuntoVenta', $request->codigoPuntoVenta)->where('codigoSucursal', $request->codigoSucursal)->forceDelete();
 
             $result= $client->sincronizarParametricaUnidadMedida([
                 "SolicitudSincronizacion"=>[

@@ -30,17 +30,21 @@
       <q-card-section>
         <div class="row">
           <div class="col-2" v-for="m in movies" :key="m.id">
-            <q-card @click="myHours(m)" style="height: 150px" class="q-ma-xs">
-              <q-img :src="url+'../imagen/'+m.imagen" height="150px">
-                <div class="absolute-bottom text-subtitle2 text-center" style="padding: 0px;margin:0px;border: 0px">
-                  <div class="row">
-                    <div class="col-6 q-pa-none q-ma-none">
-                      <div class="subtitule-text">{{ m.nombre }} {{ m.formato }}</div>
-                    </div>
-                    <div class="col-6 text-right flex flex-center"> {{ m.cantidad }}</div>
-                  </div>
+            <q-card @click="myHours(m)" class="q-ma-xs cursor-pointer movie-card"
+                    :class="movie.id === m.id ? 'bg-green-8 text-white' : 'bg-grey-9 text-white'">
+              <q-card-section class="q-pa-sm column justify-between full-height">
+                <div class="movie-name">{{ m.nombre }}</div>
+                <div class="row items-center q-gutter-xs no-wrap">
+                  <q-badge color="blue-8">{{ m.formato }}</q-badge>
+                  <q-badge color="grey-7">{{ m.duracion }} min</q-badge>
+                  <q-space/>
+                  <q-badge :color="parseInt(m.cantidad) > 0 ? 'white' : 'grey-6'"
+                           :text-color="parseInt(m.cantidad) > 0 ? 'green-9' : 'white'" class="text-bold">
+                    <q-icon name="o_confirmation_number" size="12px" class="q-mr-xs"/>
+                    {{ m.cantidad }}
+                  </q-badge>
                 </div>
-              </q-img>
+              </q-card-section>
             </q-card>
           </div>
 
@@ -70,7 +74,7 @@
               <div class="row">
                 <div class="col-4">Detalle venta</div>
                 <div class="col-4">
-                  <q-btn color="red" :loading="loading" @click="momentaneoDeleteAll" dense label="Cancelar Venta"
+                  <q-btn color="red" :loading="loading" @click="momentaneoDeleteAll()" dense label="Cancelar Venta"
                          no-caps icon="o_delete"/>
                 </div>
                 <div class="col-4">
@@ -222,7 +226,7 @@
             </div>
             <div class="col-12 text-center">
               <q-btn icon="check_circle" class="q-ml-lg" :disable="seleccionados.length==0" color="primary"
-                     :loading="loading" label="Agregar" @click="myMomentaneo();salaDialog=false"/>
+                     :loading="loading" label="Agregar" @click="salaDialog=false"/>
               <q-btn icon="highlight_off" class="q-ml-lg" color="red" label="Cancelar" @click="salaDialogClose"/>
             </div>
           </div>
@@ -407,7 +411,6 @@ export default {
       totalventa: 0,
       // cine: {},
       // leyendas: [],
-      totventa: [],
       error: '',
       btn: false,
       tienerebaja: false,
@@ -438,16 +441,8 @@ export default {
     }
   },
   created() {
-    // this.cargarLeyenda()
-    // this.encabezado()
-
-    this.freeGet()
-    this.tventa()
-    this.myMomentaneo()
-    this.eventSearch()
-    this.loadDocuments()
-
-    this.myMovies(this.fecha)
+    // Una sola peticion inicial (antes eran 6: document, free, momentaneo, eventSearch, totalventa, movies)
+    this.loadSale(this.fecha)
   },
   beforeUnmount() {
     this.stopQrPolling()
@@ -481,22 +476,22 @@ export default {
         this.verificarEstadoQr()
       }, 3000)
     },
-    loadDocuments(){
-      this.$api.get('document').then(res => {
-        res.data.forEach(r => {
-          r.label = r.descripcion
-        })
-        this.documents = res.data
+    // Carga todo el panel en una sola peticion
+    loadSale(fecha) {
+      this.movie = {}
+      this.hours = []
+      this.loading = true
+      this.$api.post('saleInit', {fecha: fecha}).then(res => {
+        const data = res.data
+        this.documents = data.documents.map(r => ({...r, label: r.descripcion}))
         this.document = this.documents[0]
-      })
-    },
-    freeGet() {
-      this.$api.get('free').then(res => {
-        this.frees = []
-        res.data.forEach(r => {
-          r.status = false
-          this.frees = res.data
-        })
+        this.frees = data.frees.map(r => ({...r, status: false}))
+        this.momentaneos = data.momentaneos
+        this.store.eventNumber = data.eventNumber
+        this.totalventa = data.totalventa
+        this.movies = data.movies
+      }).finally(() => {
+        this.loading = false
       })
     },
     habilitarCortesia() {
@@ -547,15 +542,6 @@ export default {
         })
       }
     },
-    movieVenta(fecha) {
-      this.$api.post('movietotal', {'fecha': fecha}).then(res => {
-        this.totventa = res.data
-        this.movies.forEach(r => {
-
-        })
-      })
-
-    },
     // cargarLeyenda() {
     //   this.$api.post('listleyenda', {codigo: '590000'}).then(res => {
     //     // console.log(res.data)
@@ -568,12 +554,6 @@ export default {
     //     // console.log(this.cine)
     //   })
     // },
-    tventa() {
-      this.$api.post('totalventa', {'fecha': this.fecha}).then(res => {
-        // console.log(res.data)
-        this.totalventa = res.data
-      })
-    },
     generarQr() {
       if (this.qrPolling) {
         return
@@ -699,11 +679,6 @@ export default {
       this.saleDialog = false
       this.consultartarjeta()
     },
-    eventSearch() {
-      this.$api.post('eventSearch').then(res => {
-        this.store.eventNumber = res.data
-      })
-    },
     saleInsert(qrConfirmado = false) {
       // Un solo envio a la vez: dos POST seguidos generaban dos ventas.
       if (this.loading) {
@@ -749,7 +724,6 @@ export default {
         qrTransactionId: this.qrTransactionId,
       }).then(res => {
         this.stopQrPolling()
-        this.freeGet()
         this.tarjeta = 'NO'
         // console.log(res.data)
         if (res.data.error != '') {
@@ -778,14 +752,12 @@ export default {
             this.printPromo(res.data.sale)
           }
         }
-        this.momentaneoDeleteAll()
-        this.tventa()
+        // 2 peticiones: limpiar reservas temporales y recargar el panel
+        this.momentaneoDeleteAll(true)
         this.client = {complemento: '', vip: 'NO', credito: 'NO'}
         this.resetQrState()
         this.saleDialog = false
-        this.myMovies(this.fecha)
         this.loading = false
-        this.eventSearch()
       }).finally(() => {
         this.loading = false
       }).catch(err => {
@@ -853,47 +825,40 @@ export default {
       this.saleDialog = true
       this.client = {complemento: '', vip: 'NO', credito: 'NO'}
     },
-    momentaneoDeleteAll() {
+    momentaneoDeleteAll(recargar = false) {
       this.loading = true
-      this.$api.post('momentaneoDeleteall').then(res => {
+      this.$api.post('momentaneoDeleteall').then(() => {
+        this.momentaneos = []
+        if (recargar) {
+          this.loadSale(this.fecha)
+        }
+      }).finally(() => {
         this.loading = false
-        this.myMomentaneo();
-      });
-    },
-    myMomentaneo() {
-      this.$api.get('momentaneo').then(res => {
-        // console.log(res.data)
-        this.momentaneos = res.data
-      });
+      })
     },
     salaDialogClose() {
-      this.$api.post('momentaneoDeleteUser', {
-        programa_id: this.hour.id
-      }).then(res => {
-        this.myMomentaneo()
-      })
+      const programaId = this.hour.id
       this.salaDialog = false
-
+      this.$api.post('momentaneoDeleteUser', {
+        programa_id: programaId
+      }).then(() => {
+        this.momentaneos = this.momentaneos.filter(m => m.programa_id != programaId)
+      })
     },
+    // Butacas y resumen de la funcion en una sola peticion
     clickSala(h) {
       this.hour = h
       this.loading = true
-      this.$api.post('mySeats', {id: h.id}).then(res => {
-        // console.log(res.data)
-        this.seats = res.data
-
-        this.$api.post('disponibleSeats', {id: h.id}).then(res => {
-          // console.log(res)
-          let valores = res.data[0]
-          this.disponible = parseInt(valores.salatotal) - parseInt(valores.venta) - parseInt(valores.temp)
-          this.vendido = parseInt(valores.venta)
-          this.devueltos = parseInt(valores.dev)
-          this.capacidad = parseInt(valores.salatotal)
-          this.salaDialog = true
-          this.loading = false
-        })
-
-
+      this.$api.post('salaData', {id: h.id}).then(res => {
+        this.seats = res.data.seats
+        let valores = res.data.resumen || {salatotal: 0, venta: 0, temp: 0, dev: 0}
+        this.disponible = parseInt(valores.salatotal) - parseInt(valores.venta) - parseInt(valores.temp)
+        this.vendido = parseInt(valores.venta)
+        this.devueltos = parseInt(valores.dev)
+        this.capacidad = parseInt(valores.salatotal)
+        this.salaDialog = true
+      }).finally(() => {
+        this.loading = false
       })
     },
     myMovies(fecha) {
@@ -903,15 +868,7 @@ export default {
       if (moment(this.now).isAfter(moment(fecha))) {
         return false
       }
-
-      this.$api.post('movies', {fecha: fecha}).then(res => {
-        console.log(res.data)
-        this.movies = res.data
-        this.tventa()
-        this.movieVenta(fecha)
-        // this.movie = this.movies[0].movie //
-        // this.myHours(this.movie) //
-      });
+      this.loadSale(fecha)
     },
     myHours(movie) {
       this.movie = movie
@@ -933,9 +890,9 @@ export default {
           fila: seat.fila,
           columna: seat.columna,
           letra: seat.letra,
-        }).then(res => {
+        }).then(() => {
           this.loading = false
-          this.myMomentaneo()
+          this.momentaneos = this.momentaneos.filter(m => !(m.programa_id == funcion.id && m.fila == seat.fila && m.columna == seat.columna && m.letra == seat.letra))
         })
       } else {
         seat.activo = 'SELECCIONADO'
@@ -952,9 +909,11 @@ export default {
           promo: funcion.price.promo == 'SI' ? true : false
         }).then(res => {
           this.loading = false
-          this.myMomentaneo()
           if (res.data == 1) {
+            // La butaca ya estaba tomada: se refresca la sala
             this.clickSala(funcion)
+          } else if (res.data && res.data.id) {
+            this.momentaneos = [...this.momentaneos, res.data]
           }
         })
       }
@@ -1058,5 +1017,19 @@ input {
   font-size: 12px;
   line-height: 1;
   color: #fff;
+}
+
+.movie-card {
+  height: 90px;
+}
+
+.movie-name {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.15;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 </style>

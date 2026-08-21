@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PagoVincularLog extends Model
 {
+    use SoftDeletes;
     protected $table = 'pago_vincular_logs';
 
     protected $fillable = [
