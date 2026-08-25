@@ -1335,6 +1335,7 @@ class SaleController extends Controller
             ->whereBetween('sales.fechaEmision', [$ini, $fin])
             ->where('sales.tipo', 'BOLETERIA')
             ->where('sales.siatAnulado', false)
+            ->where('sales.cortesia', 'NO')
             ->when($userId !== 0, function ($query) use ($userId) {
                 $query->where('sales.user_id', $userId);
             })
