@@ -36,6 +36,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('anulaciones/{anulacion}/anular',     [AnulacionController::class, 'anular']);
     Route::post('anulaciones/{anulacion}/rechazar',   [AnulacionController::class, 'rechazar']);
 
+    Route::post('facturasConciliacion', [\App\Http\Controllers\FacturaController::class, 'conciliacion']);
     Route::post('getYearMonthFacturas', [\App\Http\Controllers\FacturaController::class,'getYearMonthFacturas']);
     Route::post('import', [\App\Http\Controllers\FacturaController::class,'import']);
     Route::get('buscarFacturas',[App\Http\Controllers\FacturaController::class,'buscarFacturas']);
