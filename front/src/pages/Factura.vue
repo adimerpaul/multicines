@@ -46,16 +46,29 @@
       >
         <template #prepend><q-icon name="attach_file" /></template>
       </q-file>
-      <div class="col-12 col-md-2">
+      <div class="col-12 col-md-2 row items-center q-gutter-x-sm">
         <q-btn
-          color="primary"
-          label="Importar"
-          icon="cloud_upload"
+          :color="reemplazar ? 'negative' : 'primary'"
+          :label="reemplazar ? 'Borrar y recargar' : 'Importar'"
+          :icon="reemplazar ? 'restart_alt' : 'cloud_upload'"
           no-caps
           :loading="importing"
           :disable="!archivo || loading"
           @click="subirFactura"
         />
+        <q-toggle
+          v-model="reemplazar"
+          color="negative"
+          dense
+          size="sm"
+          label="Reemplazar todo"
+          :disable="importing"
+        >
+          <q-tooltip>
+            Borra todas las facturas registradas y las vuelve a cargar desde el
+            archivo, para traer las actualizaciones del SIAT.
+          </q-tooltip>
+        </q-toggle>
       </div>
     </div>
     <q-banner v-if="importing" class="bg-blue-1 q-mb-md" rounded>
@@ -94,33 +107,21 @@
           />
         </div>
         <div class="text-caption text-grey-8">
-          Formato de la nota. Parqueo y total de Impuestos son referencias
-          externas editables; no crean facturas ni vínculos.
+          Todo se calcula de este mes. Candy, boletería y alquileres salen del
+          sistema local; el parqueo no se registra ahí, así que se toma de las
+          facturas y se suma al lado del sistema. En Impuestos el parqueo ya
+          viene incluido, por eso se anula en la diferencia.
         </div>
-        <div class="row q-col-gutter-sm q-mt-xs no-print">
-          <q-input
-            class="col-12 col-sm-6"
-            outlined
-            dense
-            type="number"
-            min="0"
-            step="0.01"
-            :model-value="referenciaMes.parqueo"
-            label="Parqueo · nota (Bs)"
-            @update:model-value="updateReference('parqueo', $event)"
-          />
-          <q-input
-            class="col-12 col-sm-6"
-            outlined
-            dense
-            type="number"
-            min="0"
-            step="0.01"
-            :model-value="referenciaMes.siat"
-            label="Impuestos · nota (Bs)"
-            @update:model-value="updateReference('siat', $event)"
-          />
-        </div>
+        <q-banner
+          v-if="!resumen.siat.cantidad"
+          class="bg-orange-2 q-mt-xs"
+          dense
+          rounded
+        >
+          No hay facturas del SIAT importadas para
+          {{ meses.find((item) => item.value === mes)?.label }} {{ anio }}. Suba
+          el reporte de ventas (.zip o .xlsx) para calcular el total del SIAT.
+        </q-banner>
         <q-markup-table dense flat class="q-mt-xs note-table">
           <thead>
             <tr>
@@ -136,69 +137,32 @@
               <td>{{ item.source }}</td>
             </tr>
             <tr class="bg-blue-1 text-weight-bold">
-              <td>Según sistema + parqueo externo</td>
-              <td class="text-right">{{ money(totalConParqueo) }}</td>
-              <td>
-                {{
-                  referenciaMes.parqueo == null
-                    ? "Ingrese el total externo de parqueo"
-                    : "Suma de las cuatro líneas"
-                }}
-              </td>
+              <td>S/g Sistema</td>
+              <td class="text-right">{{ money(totalSistema) }}</td>
+              <td>Suma de las cuatro líneas</td>
             </tr>
-            <tr class="text-weight-bold">
-              <td>Según Impuestos · referencia externa</td>
-              <td class="text-right">{{ money(referenciaMes.siat) }}</td>
-              <td>Dato de la nota; pendiente de respaldo por CUF</td>
+            <tr class="bg-blue-1 text-weight-bold">
+              <td>S/g Impuestos</td>
+              <td class="text-right">{{ money(totalImpuestos) }}</td>
+              <td>
+                {{ resumen.siat.cantidad - resumen.siat.anuladas }} de
+                {{ resumen.siat.cantidad }} facturas del mes, sin anuladas
+              </td>
             </tr>
             <tr class="bg-amber-1 text-weight-bold">
-              <td>Diferencia de la nota (Impuestos − sistema)</td>
+              <td>Dif.</td>
               <td class="text-right">{{ money(diferenciaNota) }}</td>
-              <td>Positivo: Impuestos supera al sistema</td>
-            </tr>
-            <tr>
-              <td>Archivo SIAT importado · sin anuladas</td>
-              <td class="text-right">
-                {{ money(resumen.siat.montoNoAnulado) }}
-              </td>
-              <td>
-                {{ resumen.siat.cantidad - resumen.siat.anuladas }} facturas no
-                anuladas
-              </td>
-            </tr>
-            <tr>
-              <td>Por justificar: referencia Impuestos − archivo SIAT</td>
-              <td class="text-right text-weight-bold">
-                {{ money(brechaArchivo) }}
-              </td>
-              <td>Diferencia entre las fuentes disponibles</td>
+              <td>Impuestos − Sistema; el parqueo se anula en la resta</td>
             </tr>
           </tbody>
         </q-markup-table>
-        <div class="text-caption q-mt-xs">
-          Parqueo identificado en el archivo:
-          <strong
-            >{{ resumen.parqueoSiat.cantidad }} facturas · Bs
-            {{ money(resumen.parqueoSiat.montoNoAnulado) }} sin anuladas</strong
-          >. Regla: «SIN NOMBRE», Bs 10 y sin coincidencia local. No se suma
-          otra vez al total SIAT.
-          <q-btn
-            class="no-print"
-            flat
-            dense
-            no-caps
-            size="sm"
-            label="Ver parqueos"
-            @click="showParking"
-          />
-        </div>
         <div
-          v-if="referenciaMes.siat != null && brechaArchivo !== 0"
-          class="text-caption text-negative"
+          v-if="resumen.siat.cantidad && diferenciaNota !== 0"
+          class="text-caption q-mt-xs text-negative"
         >
-          La cifra de Impuestos de la nota no coincide con el Excel cargado. La
-          diferencia de la nota no demuestra por sí sola qué factura está mal:
-          revise el respaldo y los CUF.
+          Impuestos y sistema no cuadran por Bs {{ money(diferenciaNota) }}.
+          Revise el detalle por CUF para identificar las facturas que faltan o
+          difieren.
         </div>
       </q-card-section>
     </q-card>
@@ -355,6 +319,34 @@
             ></q-td
           >
         </template>
+        <template #body-cell-estado="props">
+          <q-td :props="props">
+            <q-badge
+              v-for="estado in estados(props.value)"
+              :key="estado"
+              class="q-mr-xs"
+              :color="estadoColor(estado)"
+              >{{ estado }}</q-badge
+            >
+            <span v-if="!estados(props.value).length" class="text-grey-7"
+              >—</span
+            >
+          </q-td>
+        </template>
+        <template #body-cell-estadoLocal="props">
+          <q-td :props="props">
+            <q-badge
+              v-for="estado in estados(props.value)"
+              :key="estado"
+              class="q-mr-xs"
+              :color="estadoColor(estado)"
+              >{{ estado }}</q-badge
+            >
+            <span v-if="!estados(props.value).length" class="text-grey-7"
+              >—</span
+            >
+          </q-td>
+        </template>
         <template #body-cell-observaciones="props">
           <q-td :props="props" class="text-negative">{{
             props.value || "—"
@@ -448,7 +440,11 @@
                   <td>{{ item.fecha }}</td>
                   <td>{{ item.nFactura }}</td>
                   <td>{{ money(item.importe) }}</td>
-                  <td>{{ item.estado }}</td>
+                  <td>
+                    <q-badge :color="estadoColor(item.estado)">{{
+                      item.estado || "—"
+                    }}</q-badge>
+                  </td>
                   <td style="word-break: break-all">{{ item.cuf }}</td>
                   <td>
                     <q-btn
@@ -504,7 +500,16 @@
                   <td>{{ item.fechaEmision }}</td>
                   <td>{{ item.numeroFactura }}</td>
                   <td>{{ money(item.montoTotal) }}</td>
-                  <td>{{ Number(item.siatAnulado) ? "ANULADA" : "VALIDA" }}</td>
+                  <td>
+                    <q-badge
+                      :color="
+                        Number(item.siatAnulado) ? 'negative' : 'positive'
+                      "
+                      >{{
+                        Number(item.siatAnulado) ? "ANULADA" : "VALIDA"
+                      }}</q-badge
+                    >
+                  </td>
                   <td>{{ Number(item.siatEnviado) ? "Sí" : "Pendiente" }}</td>
                   <td style="word-break: break-all">
                     {{ item.cuf || "Sin CUF" }}
@@ -567,7 +572,6 @@ export default {
       cineLocal: null,
       resumen: null,
       showReconciliation: false,
-      referencias: { "2026-8": { parqueo: 11565, siat: 1210140 } },
       detalle: null,
       requestId: 0,
       vinculo: "",
@@ -580,12 +584,10 @@ export default {
         { label: "Solo SIAT / sin venta local", value: "solo_siat" },
         { label: "Local / falta en archivo SIAT", value: "falta_siat" },
       ],
-      originOptions: ["", "BOLETERIA", "CANDY", "ALQUILER", "PARQUEO"].map(
-        (value) => ({
-          label: value || "Todos",
-          value,
-        })
-      ),
+      originOptions: ["", "BOLETERIA", "CANDY", "ALQUILER"].map((value) => ({
+        label: value || "Todos",
+        value,
+      })),
       differenceOptions: [
         { label: "Todas", value: "" },
         { label: "Monto diferente", value: "diferenciaMonto" },
@@ -595,6 +597,7 @@ export default {
       ],
       facturas: [],
       archivo: null,
+      reemplazar: false,
       anio: previousMonth.getFullYear(),
       mes: previousMonth.getMonth() + 1,
       anios: Array.from(
@@ -670,59 +673,55 @@ export default {
       const url = this.cine.url2 || "https://siat.impuestos.gob.bo/";
       return url.endsWith("/") ? url : `${url}/`;
     },
-    referenciaMes() {
-      return (
-        this.referencias[`${this.anio}-${this.mes}`] || {
-          parqueo: null,
-          siat: null,
-        }
-      );
-    },
     noteRows() {
       if (!this.resumen) return [];
+      const local = (origen) => {
+        const data = this.resumen.origenes[origen];
+        return `Sistema local · ${data.cantidad - data.anuladas} de ${
+          data.cantidad
+        } facturas`;
+      };
       return [
         {
           label: "TV Candy",
           amount: this.resumen.origenes.CANDY.montoNoAnulado,
-          source: "Sistema local",
+          source: local("CANDY"),
         },
         {
           label: "TV Boletería",
           amount: this.resumen.origenes.BOLETERIA.montoNoAnulado,
-          source: "Sistema local",
+          source: local("BOLETERIA"),
         },
         {
           label: "TV Alquileres",
           amount: this.resumen.origenes.ALQUILER.montoNoAnulado,
-          source: "Sistema local",
+          source: local("ALQUILER"),
         },
         {
           label: "TV Parqueo",
-          amount: this.referenciaMes.parqueo,
-          source: "Referencia externa; no cargada como venta local",
+          amount: this.resumen.parqueo.montoNoAnulado,
+          source: `Facturación · Bs 10 y Bs 5 «SIN NOMBRE» · ${
+            this.resumen.parqueo.cantidad - this.resumen.parqueo.anuladas
+          } de ${this.resumen.parqueo.cantidad} facturas`,
         },
       ];
     },
-    totalConParqueo() {
-      if (!this.resumen || this.referenciaMes.parqueo == null) return null;
+    totalSistema() {
+      // Las tres líneas locales más el parqueo, igual que la nota manual.
+      if (!this.resumen) return null;
       return (
         (Math.round(this.resumen.local.montoNoAnulado * 100) +
-          Math.round(this.referenciaMes.parqueo * 100)) /
+          Math.round(this.resumen.parqueo.montoNoAnulado * 100)) /
         100
       );
     },
-    diferenciaNota() {
-      return this.totalConParqueo == null || this.referenciaMes.siat == null
-        ? null
-        : Math.round((this.referenciaMes.siat - this.totalConParqueo) * 100) /
-            100;
+    totalImpuestos() {
+      // El parqueo ya viene dentro del total de facturas: no se suma otra vez.
+      return this.resumen ? this.resumen.siat.montoNoAnulado : null;
     },
-    brechaArchivo() {
-      return !this.resumen || this.referenciaMes.siat == null
-        ? null
-        : Math.round(
-            (this.referenciaMes.siat - this.resumen.siat.montoNoAnulado) * 100
-          ) / 100;
+    diferenciaNota() {
+      if (this.totalImpuestos == null || this.totalSistema == null) return null;
+      return Math.round((this.totalImpuestos - this.totalSistema) * 100) / 100;
     },
     summaryCards() {
       if (!this.resumen) return [];
@@ -766,26 +765,6 @@ export default {
     printSummary() {
       window.print();
     },
-    updateReference(field, value) {
-      const key = `${this.anio}-${this.mes}`;
-      const number = value === "" || value == null ? null : Number(value);
-      this.referencias[key] = {
-        ...this.referenciaMes,
-        [field]:
-          number !== null && Number.isFinite(number) && number >= 0
-            ? number
-            : null,
-      };
-    },
-    showParking() {
-      this.showReconciliation = true;
-      this.vinculo = "";
-      this.diferencia = "";
-      this.anuladas = false;
-      this.filter = "";
-      this.origen = "PARQUEO";
-      this.buscarFacturas();
-    },
     money(value) {
       return value == null
         ? "—"
@@ -799,6 +778,20 @@ export default {
         this.linkOptions.find((option) => option.value === value)?.label ||
         value
       );
+    },
+    estados(value) {
+      // El backend une varios estados con ", " cuando el CUF se repite.
+      return String(value ?? "")
+        .split(",")
+        .map((estado) => estado.trim())
+        .filter(Boolean);
+    },
+    estadoColor(value) {
+      const estado = String(value ?? "").toUpperCase();
+      if (estado.includes("ANULAD")) return "negative";
+      if (estado.includes("VALID") || estado.includes("VÁLID"))
+        return "positive";
+      return "grey-7";
     },
     setLink(value) {
       this.vinculo = value;
@@ -861,8 +854,25 @@ export default {
         if (requestId === this.requestId) this.loading = false;
       }
     },
+    confirmarReemplazo() {
+      return new Promise((resolve) => {
+        this.$q
+          .dialog({
+            title: "Borrar y recargar facturas",
+            message:
+              "Se eliminarán TODAS las facturas registradas (de todos los meses) y se cargarán nuevamente solo las del archivo seleccionado. Esta acción no se puede deshacer. ¿Continuar?",
+            ok: { label: "Borrar y recargar", color: "negative", noCaps: true },
+            cancel: { label: "Cancelar", flat: true, noCaps: true },
+            persistent: true,
+          })
+          .onOk(() => resolve(true))
+          .onCancel(() => resolve(false))
+          .onDismiss(() => resolve(false));
+      });
+    },
     async subirFactura() {
       if (!this.archivo || this.importing) return;
+      if (this.reemplazar && !(await this.confirmarReemplazo())) return;
       this.importing = true;
       this.resultado = "";
       this.uploadProgress = 0;
@@ -872,6 +882,7 @@ export default {
       }, 1000);
       const formData = new FormData();
       formData.append("archivo", this.archivo);
+      formData.append("modo", this.reemplazar ? "reemplazar" : "agregar");
       try {
         const { data } = await this.$api.post("import", formData, {
           onUploadProgress: ({ loaded, total }) => {
@@ -880,11 +891,16 @@ export default {
               : 0;
           },
         });
-        this.resultado = `${data.total} facturas procesadas: ${
-          data.insertadas
-        } nuevas y ${data.omitidas} omitidas por CUF existente en ${
-          data.segundos
-        } s. Meses: ${data.meses.join(", ")}.`;
+        const detalle = [
+          data.repetidas ? `${data.repetidas} con CUF repetido` : null,
+          data.sinCuf ? `${data.sinCuf} sin CUF` : null,
+        ].filter(Boolean);
+        this.resultado =
+          (data.eliminadas
+            ? `${data.eliminadas} facturas eliminadas y ${data.insertadas} recargadas desde el archivo (${data.total} procesadas) en ${data.segundos} s.`
+            : `${data.total} facturas procesadas: ${data.insertadas} nuevas y ${data.omitidas} omitidas por CUF existente en ${data.segundos} s.`) +
+          (detalle.length ? ` Incluye ${detalle.join(" y ")}.` : "") +
+          ` Meses: ${data.meses.join(", ")}.`;
         const [year, month] = data.meses[data.meses.length - 1]
           .split("-")
           .map(Number);
@@ -893,6 +909,7 @@ export default {
         if (!this.anios.includes(year)) this.anios.push(year);
         this.filter = "";
         this.archivo = null;
+        this.reemplazar = false;
         await this.buscarFacturas();
       } catch (error) {
         this.$q.notify({

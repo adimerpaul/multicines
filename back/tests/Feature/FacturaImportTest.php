@@ -57,9 +57,31 @@ class FacturaImportTest extends TestCase
         return [1, $date, 82, $cuf, '001234', '', 'CLIENTE', 35, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 35, 4.55, 'VALIDA', '', 'OTROS', 'SI', 'PENDIENTE'];
     }
 
-    private function upload(string $path, string $name = 'ventas.xlsx')
+    private function upload(string $path, string $name = 'ventas.xlsx', array $extra = [])
     {
-        return $this->postJson('/api/import', ['archivo' => new UploadedFile($path, $name, null, null, true)]);
+        return $this->postJson('/api/import', $extra + ['archivo' => new UploadedFile($path, $name, null, null, true)]);
+    }
+
+    public function test_replace_mode_deletes_every_invoice_and_reloads_the_file(): void
+    {
+        Factura::create(['cuf' => 'JULIO', 'nFactura' => 1, 'fecha' => '2026-07-01']);
+        Factura::create(['cuf' => 'CUF-1', 'nFactura' => 999, 'fecha' => '2026-07-01', 'estado' => 'PENDIENTE']);
+        Factura::create(['cuf' => 'BORRADA', 'nFactura' => 2, 'fecha' => '2026-07-02'])->delete();
+        $row = $this->row();
+        $row[20] = 'ANULADA';
+        $this->upload($this->excel([$row]), 'ventas.xlsx', ['modo' => 'reemplazar'])
+            ->assertOk()->assertJson(['insertadas' => 1, 'omitidas' => 0, 'eliminadas' => 3, 'total' => 1]);
+        $this->assertSame(1, Factura::withTrashed()->count());
+        $this->assertDatabaseHas('facturas', ['cuf' => 'CUF-1', 'nFactura' => 82, 'estado' => 'ANULADA']);
+    }
+
+    public function test_replace_mode_keeps_data_when_the_file_is_invalid(): void
+    {
+        Factura::create(['cuf' => 'JULIO', 'nFactura' => 1, 'fecha' => '2026-07-01']);
+        $this->upload($this->excel([$this->row(), $this->row('BAD', '31/02/2026')]), 'ventas.xlsx', ['modo' => 'reemplazar'])
+            ->assertStatus(422);
+        $this->upload($this->excel([$this->row()]), 'ventas.xlsx', ['modo' => 'otro'])->assertStatus(422);
+        $this->assertSame(1, Factura::count());
     }
 
     public function test_excel_and_zip_import_are_repeatable_and_preserve_history(): void
@@ -91,13 +113,22 @@ class FacturaImportTest extends TestCase
         $this->assertSame(1, Factura::withTrashed()->count());
     }
 
-    public function test_repeated_cuf_inside_excel_is_inserted_only_once(): void
+    public function test_every_row_of_the_file_is_imported_even_repeated_or_without_cuf(): void
     {
-        $second = $this->row();
-        $second[2] = 999;
-        $this->upload($this->excel([$this->row(), $second]))->assertOk()->assertJson(['insertadas' => 1]);
-        $this->assertSame(1, Factura::count());
+        $repeated = $this->row();
+        $repeated[2] = 999;
+        $withoutCuf = $this->row('');
+        $withoutCuf[0] = '';
+        $withoutCuf[2] = '';
+        $this->upload($this->excel([$this->row(), $repeated, $withoutCuf]))->assertOk()
+            ->assertJson(['insertadas' => 3, 'omitidas' => 0, 'total' => 3, 'repetidas' => 1, 'sinCuf' => 1]);
+        $this->assertSame(3, Factura::count());
         $this->assertDatabaseHas('facturas', ['cuf' => 'CUF-1', 'nFactura' => 82]);
+        $this->assertDatabaseHas('facturas', ['cuf' => 'CUF-1', 'nFactura' => 999]);
+        $this->assertDatabaseHas('facturas', ['cuf' => null, 'nFactura' => null, 'n' => null, 'fecha' => '2026-08-31']);
+        // Volver a subir el mismo archivo no duplica las que si tienen CUF.
+        $this->upload($this->excel([$this->row(), $repeated, $withoutCuf]))->assertOk()
+            ->assertJson(['insertadas' => 1, 'omitidas' => 2]);
     }
     public function test_invalid_file_does_not_write_partial_rows(): void
     {

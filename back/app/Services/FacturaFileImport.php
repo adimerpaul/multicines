@@ -30,7 +30,7 @@ class FacturaFileImport
         throw ValidationException::withMessages(['archivo' => $message]);
     }
 
-    public function import(string $path, string $extension): array
+    public function import(string $path, string $extension, bool $reemplazar = false): array
     {
         $started = microtime(true);
         $temporary = null;
@@ -64,17 +64,38 @@ class FacturaFileImport
             }
             $months = array_values(array_unique(array_map(fn ($row) => substr($row['fecha'], 0, 7), $rows)));
             sort($months);
-            $result = DB::transaction(function () use ($rows) {
+            $seen = [];
+            $repeated = 0;
+            $withoutCuf = 0;
+            foreach ($rows as $row) {
+                if ($row['cuf'] === null || $row['cuf'] === '') {
+                    $withoutCuf++;
+                } elseif (isset($seen[$row['cuf']])) {
+                    $repeated++;
+                } else {
+                    $seen[$row['cuf']] = true;
+                }
+            }
+            unset($seen);
+            $result = DB::transaction(function () use ($rows, $reemplazar) {
                 $inserted = 0;
                 $skipped = 0;
+                $deleted = 0;
                 $timestamp = now();
+                if ($reemplazar) {
+                    // Rebuild from the file: drop every invoice, soft-deleted ones included.
+                    $deleted = DB::table('facturas')->count();
+                    DB::table('facturas')->delete();
+                }
                 foreach (array_chunk($rows, 500) as $batch) {
+                    $cufs = array_values(array_filter(array_column($batch, 'cuf'), fn ($cuf) => $cuf !== null && $cuf !== ''));
                     // Include soft-deleted invoices: the CUF still identifies that invoice.
-                    $existing = Factura::withTrashed()->whereIn('cuf', array_column($batch, 'cuf'))
-                        ->pluck('cuf')->flip();
+                    $existing = $reemplazar || !$cufs ? collect() : Factura::withTrashed()
+                        ->whereIn('cuf', $cufs)->pluck('cuf')->flip();
                     $newRows = [];
                     foreach ($batch as $row) {
-                        if ($existing->has($row['cuf'])) {
+                        // Sin CUF no hay con que identificar la factura: se carga siempre.
+                        if ($row['cuf'] !== null && $row['cuf'] !== '' && $existing->has($row['cuf'])) {
                             $skipped++;
                             continue;
                         }
@@ -88,9 +109,12 @@ class FacturaFileImport
                         $inserted += count($newRows);
                     }
                 }
-                return ['insertadas' => $inserted, 'omitidas' => $skipped];
+                return ['insertadas' => $inserted, 'omitidas' => $skipped, 'eliminadas' => $deleted];
             });
-            return $result + ['total' => count($rows), 'meses' => $months, 'segundos' => round(microtime(true) - $started, 2)];
+            return $result + [
+                'total' => count($rows), 'repetidas' => $repeated, 'sinCuf' => $withoutCuf,
+                'meses' => $months, 'segundos' => round(microtime(true) - $started, 2),
+            ];
         } finally {
             if ($temporary !== null) {
                 unlink($temporary);
@@ -179,18 +203,16 @@ class FacturaFileImport
                     $row[$field] = $value === '' ? null : $value;
                 }
                 $line = (string) $xml['r'];
-                if (!$row['cuf'] || !is_numeric($row['nFactura']) || !is_numeric($row['n'])) {
-                    $this->invalid("Factura incompleta en la fila {$line}.");
-                }
-                $row['nFactura'] = (int) $row['nFactura'];
-                $row['n'] = (int) $row['n'];
+                // Se carga toda fila del reporte: sin CUF, sin numero o repetida sigue siendo una venta del mes.
+                $row['nFactura'] = is_numeric($row['nFactura']) ? (int) $row['nFactura'] : null;
+                $row['n'] = is_numeric($row['n']) ? (int) $row['n'] : null;
                 $row['fecha'] = $this->date($row['fecha'], $line);
-                $rows[$row['cuf']] ??= $row;
+                $rows[] = $row;
             }
             if (array_filter(libxml_get_errors(), fn ($error) => $error->level >= LIBXML_ERR_ERROR)) {
                 $this->invalid('El contenido XML del Excel no es válido.');
             }
-            return array_values($rows);
+            return $rows;
         } finally {
             $reader->close();
             libxml_clear_errors();

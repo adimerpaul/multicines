@@ -87,17 +87,25 @@ class FacturaReconciliationTest extends TestCase
             ->assertJsonCount(2, 'data.0.ventas')->assertJsonPath('data.0.diferencia', null);
     }
 
-    public function test_parking_rule_is_visible_but_does_not_invent_local_link_or_double_count(): void
+    public function test_parking_totals_come_from_facturas_and_only_invoices_with_cuf_count(): void
     {
-        $this->invoice('PARK', ['nombre' => ' SIN NOMBRE ', 'importe' => 10]);
+        // Parqueo: Bs 10 y Bs 5 «SIN NOMBRE». Ya está dentro del total de facturas.
+        $this->invoice('PARK10', ['nombre' => ' SIN NOMBRE ', 'importe' => 10]);
+        $this->invoice('PARK5', ['nombre' => 'SIN NOMBRE', 'importe' => 5]);
         $this->invoice('PARK-CANCELLED', ['nombre' => 'SIN NOMBRE', 'importe' => 10, 'estado' => 'ANULADA']);
-        $this->invoice('CANDY10', ['nombre' => 'SIN NOMBRE', 'importe' => 10]);
-        $this->sale('CANDY10', ['tipo' => 'CANDY', 'montoTotal' => 10]);
-        $this->invoice('OTHER10', ['nombre' => 'CLIENTE', 'importe' => 10]);
-        $this->report(['origen' => 'PARQUEO'])->assertOk()->assertJsonPath('total', 2)
-            ->assertJsonPath('resumen.parqueoSiat.cantidad', 2)->assertJsonPath('resumen.parqueoSiat.montoNoAnulado', 10)
-            ->assertJsonPath('resumen.siat.montoNoAnulado', 30)->assertJsonPath('resumen.local.montoNoAnulado', 10)
-            ->assertJsonPath('data.0.vinculo', 'solo_siat')->assertJsonCount(0, 'data.0.ventas');
+        $this->invoice('NAMED10', ['nombre' => 'CLIENTE', 'importe' => 10]);
+        $this->invoice('OTHER', ['nombre' => 'SIN NOMBRE', 'importe' => 20]);
+        DB::table('facturas')->insert(['cuf' => '', 'nFactura' => 7, 'fecha' => '2026-08-10', 'importe' => 500]);
+        DB::table('facturas')->insert(['cuf' => null, 'nFactura' => 8, 'fecha' => '2026-08-10', 'importe' => 700]);
+        $this->sale('LOCAL', ['montoTotal' => 100]);
+        $this->report()->assertOk()
+            ->assertJsonPath('resumen.parqueo.cantidad', 3)
+            ->assertJsonPath('resumen.parqueo.montoNoAnulado', 15)
+            ->assertJsonPath('resumen.parqueo.montoAnulado', 10)
+            ->assertJsonPath('resumen.siat.cantidad', 5)
+            ->assertJsonPath('resumen.siat.montoNoAnulado', 45)
+            ->assertJsonPath('resumen.local.montoNoAnulado', 100);
+        $this->report(['origen' => 'PARQUEO'])->assertStatus(422);
     }
     public function test_cent_precision_pending_and_deleted_counterpart_are_visible(): void
     {

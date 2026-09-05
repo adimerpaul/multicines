@@ -8,6 +8,7 @@ use App\Models\Programa;
 use App\Models\Sale;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Services\AuditoriaButacas;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -21,6 +22,29 @@ use Illuminate\Support\Facades\DB;
  */
 trait BoletosDeVenta
 {
+    /** Butacas reservadas que no llegaron a boleto en la ultima venta. */
+    protected array $butacasDescartadas = [];
+
+    /**
+     * Aviso para el cajero cuando se imprimieron menos boletos que butacas
+     * reservadas. Antes esas butacas se descartaban en silencio y el cliente
+     * se iba con menos boletos de los que pago.
+     */
+    protected function avisoButacasDescartadas(): string
+    {
+        if (!count($this->butacasDescartadas)) {
+            return "";
+        }
+
+        $detalle = array_map(
+            fn ($b) => $b['butaca'] . ' (' . $b['motivo'] . ')',
+            $this->butacasDescartadas
+        );
+
+        return 'No se imprimieron ' . count($detalle) . ' butaca(s): ' . implode(', ', $detalle)
+            . '. Revise la venta antes de entregar los boletos.';
+    }
+
     /**
      * Inserta los boletos de la venta y limpia los asientos momentaneos del
      * usuario, de modo que cada venta se lleve solo lo suyo.
@@ -38,10 +62,16 @@ trait BoletosDeVenta
             $data = [];
             $ultimoNumero = []; // programa_id => ultimo numero de boleto usado
             $yaEnLote = [];     // butacas ya incluidas en este mismo insert
+            $descartadas = [];  // butacas reservadas que no llegaron a boleto
 
             foreach ($momentaneos as $m) {
                 $programa = Programa::find($m->programa_id);
                 if (!$programa) {
+                    $descartadas[] = [
+                        'butaca' => $m->letra . '-' . $m->columna,
+                        'programa_id' => $m->programa_id,
+                        'motivo' => 'La funcion ya no existe',
+                    ];
                     continue;
                 }
 
@@ -51,6 +81,11 @@ trait BoletosDeVenta
                 // al terminar el foreach.
                 $butaca = $m->programa_id . '|' . $m->fila . '|' . $m->columna . '|' . $m->letra;
                 if (isset($yaEnLote[$butaca])) {
+                    $descartadas[] = [
+                        'butaca' => $m->letra . '-' . $m->columna,
+                        'programa_id' => $m->programa_id,
+                        'motivo' => 'Butaca repetida en la misma venta',
+                    ];
                     continue;
                 }
                 $yaEnLote[$butaca] = true;
@@ -63,6 +98,11 @@ trait BoletosDeVenta
                     ->where("sala_id", $programa->sala->id)
                     ->count();
                 if ($ocupado) {
+                    $descartadas[] = [
+                        'butaca' => $m->letra . '-' . $m->columna,
+                        'programa_id' => $m->programa_id,
+                        'motivo' => 'Ya existe un boleto vendido para esa butaca',
+                    ];
                     continue;
                 }
 
@@ -97,6 +137,11 @@ trait BoletosDeVenta
                     "price_id" => $programa->price->id,
                     "sala_id" => $programa->sala->id,
                     "user_id" => $user->id,
+                    // Ticket::insert no pasa por Eloquent: sin esto los boletos
+                    // quedaban con created_at nulo y no se podia saber a que
+                    // hora se imprimio cada uno.
+                    "created_at" => now(),
+                    "updated_at" => now(),
                 ];
             }
 
@@ -113,7 +158,14 @@ trait BoletosDeVenta
             }
         }
 
-        return Ticket::where('sale_id', $sale->id)->get();
+        $this->butacasDescartadas = $descartadas;
+        $boletos = Ticket::where('sale_id', $sale->id)->get();
+
+        // Butacas reservadas vs boletos impresos: es el rastro que permite
+        // responder "seleccione tal asiento y me imprimio otro".
+        app(AuditoriaButacas::class)->boletos($sale, $momentaneos, $boletos, $descartadas);
+
+        return $boletos;
     }
 
     /**

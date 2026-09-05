@@ -43,7 +43,7 @@ class FacturaController extends Controller{
         $data = $request->validate([
             'anio' => 'required|integer|between:2000,2100', 'mes' => 'required|integer|between:1,12',
             'page' => 'nullable|integer|min:1', 'per_page' => 'nullable|integer|between:1,100',
-            'filter' => 'nullable|string|max:200', 'origen' => 'nullable|in:BOLETERIA,CANDY,ALQUILER,PARQUEO',
+            'filter' => 'nullable|string|max:200', 'origen' => 'nullable|in:BOLETERIA,CANDY,ALQUILER',
             'vinculo' => 'nullable|in:vinculada,solo_siat,falta_siat',
             'diferencia' => 'nullable|in:diferenciaMonto,diferenciaEstado,diferenciaFecha,duplicado',
             'anuladas' => 'nullable|boolean',
@@ -52,7 +52,10 @@ class FacturaController extends Controller{
     }
     public function import(Request $request)
     {
-        $request->validate(['archivo' => 'required|file|max:20480']);
+        $data = $request->validate([
+            'archivo' => 'required|file|max:20480',
+            'modo' => 'nullable|in:agregar,reemplazar',
+        ]);
         $file = $request->file('archivo');
         $lock = \Illuminate\Support\Facades\Cache::lock('facturas-import', 300);
         if (!$lock->get()) {
@@ -61,7 +64,8 @@ class FacturaController extends Controller{
         try {
             set_time_limit(240);
             return response()->json(app(\App\Services\FacturaFileImport::class)->import(
-                $file->getRealPath(), $file->getClientOriginalExtension()
+                $file->getRealPath(), $file->getClientOriginalExtension(),
+                ($data['modo'] ?? 'agregar') === 'reemplazar'
             ));
         } finally {
             $lock->release();

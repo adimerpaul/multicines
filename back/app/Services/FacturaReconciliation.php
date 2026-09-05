@@ -14,7 +14,9 @@ class FacturaReconciliation
         $start = Carbon::create($params['anio'], $params['mes'], 1)->startOfDay()->toDateString();
         $end = Carbon::parse($start)->addMonth()->toDateString();
         $month = substr($start, 0, 7);
-        $invoices = DB::table('facturas')->whereNull('deleted_at')->where('fecha', '>=', $start)->where('fecha', '<', $end)
+        // Only invoices with a CUF count: without it there is nothing to reconcile against.
+        $invoices = DB::table('facturas')->whereNull('deleted_at')->whereNotNull('cuf')->where('cuf', '<>', '')
+            ->where('fecha', '>=', $start)->where('fecha', '<', $end)
             ->get(['id', 'fecha', 'cuf', 'nFactura', 'nit', 'nombre', 'importe', 'estado'])->keyBy('id');
         $locals = collect();
         foreach (self::SOURCES as $table => $source) {
@@ -50,17 +52,10 @@ class FacturaReconciliation
             $groups[$key]['local'][] = $local;
         }
         $rows = [];
-        $parkingIds = [];
         foreach ($groups as $key => $group) {
             $siat = $group['siat'] ?? [];
             $local = $group['local'] ?? [];
             $linked = count($siat) > 0 && count($local) > 0;
-            // User-provided classification; this does not create a local CUF match.
-            $parking = !$local && $siat && count(array_filter($siat, fn ($r) =>
-                preg_replace('/\s+/u', ' ', mb_strtoupper(trim($r->nombre ?? ''))) === 'SIN NOMBRE'
-                && $this->cents($r->importe) === 1000
-            )) === count($siat);
-            if ($parking) foreach ($siat as $invoice) $parkingIds[$invoice->id] = true;
             $ambiguous = count($siat) > 1 || count($local) > 1;
             $siatAmount = $siat ? array_sum(array_map(fn ($r) => $this->cents($r->importe), $siat)) : null;
             $localAmount = $local ? array_sum(array_map(fn ($r) => $this->cents($r->montoTotal), $local)) : null;
@@ -68,7 +63,6 @@ class FacturaReconciliation
             $stateDifference = $linked && !$ambiguous && $this->state($siat[0]->estado) !== $this->localState($local[0]);
             $dateDifference = $linked && !$ambiguous && substr($siat[0]->fecha, 0, 10) !== substr($local[0]->fechaEmision, 0, 10);
             $issues = [];
-            if ($parking) $issues[] = 'Parqueo: regla SIN NOMBRE / Bs 10; sin vínculo local';
             if ($amountDifference) $issues[] = 'Monto diferente';
             if ($stateDifference) $issues[] = 'Estado diferente';
             if ($dateDifference) $issues[] = 'Fecha diferente';
@@ -87,7 +81,7 @@ class FacturaReconciliation
                 'diferencia' => $linked && !$ambiguous ? ($localAmount - $siatAmount) / 100 : null,
                 'estado' => $siat ? implode(', ', array_unique(array_column($siat, 'estado'))) : null,
                 'estadoLocal' => $local ? implode(', ', array_unique(array_map(fn ($r) => $this->localState($r), $local))) : null,
-                'origen' => $local ? implode(', ', array_unique(array_column($local, 'origen'))) : ($parking ? 'PARQUEO' : 'SIN ORIGEN'),
+                'origen' => $local ? implode(', ', array_unique(array_column($local, 'origen'))) : 'SIN ORIGEN',
                 'vinculo' => $linked ? 'vinculada' : ($siat ? 'solo_siat' : 'falta_siat'),
                 'diferenciaMonto' => $amountDifference, 'diferenciaEstado' => $stateDifference,
                 'diferenciaFecha' => $dateDifference, 'duplicado' => $ambiguous,
@@ -99,7 +93,9 @@ class FacturaReconciliation
             'siat' => $this->totals($monthlyInvoices->all(), 'importe', fn ($r) => $this->state($r->estado) === 'ANULADA'),
             'local' => $this->totals($monthlyLocals->all(), 'montoTotal', fn ($r) => (bool) $r->siatAnulado),
             'origenes' => [],
-            'parqueoSiat' => $this->totals($monthlyInvoices->filter(fn ($r) => isset($parkingIds[$r->id]))->all(), 'importe', fn ($r) => $this->state($r->estado) === 'ANULADA'),
+            // Parqueo: se factura pero no se registra como venta local, por eso se suma
+            // al lado del sistema. Ya viene dentro del total de facturas.
+            'parqueo' => $this->totals($monthlyInvoices->filter(fn ($r) => $this->isParking($r))->all(), 'importe', fn ($r) => $this->state($r->estado) === 'ANULADA'),
         ];
         foreach (['BOLETERIA', 'CANDY', 'ALQUILER'] as $origin) {
             $summary['origenes'][$origin] = $this->totals($monthlyLocals->where('origen', $origin)->all(), 'montoTotal', fn ($r) => (bool) $r->siatAnulado);
@@ -146,6 +142,12 @@ class FacturaReconciliation
     private function state(?string $value): string
     {
         return str_replace(['Á', 'ANULADO', 'VALIDO'], ['A', 'ANULADA', 'VALIDA'], mb_strtoupper(trim($value ?? '')));
+    }
+
+    private function isParking(object $row): bool
+    {
+        return in_array($this->cents($row->importe), [500, 1000], true)
+            && preg_replace('/\s+/u', ' ', mb_strtoupper(trim($row->nombre ?? ''))) === 'SIN NOMBRE';
     }
 
     private function localState(object $row): string

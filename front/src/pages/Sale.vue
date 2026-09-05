@@ -99,7 +99,10 @@
               </thead>
               <tbody>
               <tr v-for="(d,i) in detalleVenta" :key="i">
-                <td class="tdx">{{ d.fecha }}</td>
+                <td class="tdx">
+                  <div class="text-bold">{{ horaTexto(d.fecha) }}</div>
+                  <div style="font-size: 11px">{{ diaTexto(d.fecha) }}</div>
+                </td>
                 <td class="tdx">{{ d.cantidad }}</td>
                 <td class="tdx">{{ d.pelicula }}</td>
                 <td class="tdx text-right">{{ d.subtotal }} Bs</td>
@@ -170,10 +173,15 @@
         <q-card-section>
           <div class="row">
             <div class="col-12 row items-center q-pb-none">
-              <div class="col-4 text-bold">{{ movie.nombre }} {{ movie.formato }}
-                <q-icon name="schedule" left/>
-                <q-badge color="red">{{ hour.sala.nombre }}</q-badge>
-                {{ hour.horaInicio.substring(10, 16) }} - {{ hour.price.precio + 'Bs' }}
+              <div class="col-4">
+                <div class="text-bold">{{ movie.nombre }} {{ movie.formato }}</div>
+                <!-- Fecha y hora de la funcion a la vista al elegir butacas -->
+                <div class="funcion-cuando row items-center q-gutter-x-sm">
+                  <q-badge color="red">{{ hour.sala.nombre }}</q-badge>
+                  <div><q-icon name="event"/> {{ diaTexto(hour.horaInicio) }}</div>
+                  <div class="funcion-hora"><q-icon name="schedule"/> {{ horaTexto(hour.horaInicio) }}</div>
+                  <q-badge outline color="grey-9">{{ hour.price.precio }} Bs</q-badge>
+                </div>
               </div>
               <div class="q-pa-xs flex flex-center">
                 <div style="font-size: 12px; font-weight: bold">
@@ -236,125 +244,178 @@
       </q-card>
     </q-dialog>
     <q-dialog full-width v-model="saleDialog" persistent>
-      <q-card>
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Realizar venta</div>
+      <q-card class="venta-dialog">
+        <q-card-section class="venta-header row items-center no-wrap q-py-sm">
+          <q-icon name="point_of_sale" size="28px" class="q-mr-sm"/>
+          <div>
+            <div class="text-h6 text-white line-height-1">Realizar venta</div>
+            <div class="venta-header__sub">
+              {{ resumenVenta.length }} funcion(es) · {{ cantidades }} butaca(s)
+            </div>
+          </div>
           <q-space/>
-
+          <div class="text-right">
+            <div class="venta-header__sub">TOTAL A COBRAR</div>
+            <div class="venta-total">{{ total }} Bs</div>
+          </div>
         </q-card-section>
         <q-form @submit.prevent="saleInsert">
-          <q-card-section>
-            <div class="row">
-              <div class="col-2">
-                <q-input outlined label="NIT/CARNET"
-                         required v-model="client.numeroDocumento"
-                         debounce="300"
-                         @update:modelValue="searchClient"
-                />
-              </div>
-              <div class="col-2">
-                <q-input outlined label="Complemento" v-model="client.complemento"
-                         debounce="300"
-                         @update:modelValue="searchClient"
-                         style="text-transform: uppercase"/>
-              </div>
-              <div class="col-3">
-                <q-input outlined label="nombreRazonSocial" required v-model="client.nombreRazonSocial"
-                         style="text-transform: uppercase"/>
-              </div>
-              <div class="col-3">
-                <q-select v-model="document" outlined :options="documents" @update:model-value="validarnit"/>
-              </div>
-              <div class="col-2">
-                <q-input outlined label="Email" v-model="client.email" type="email"/>
-              </div>
-            </div>
-          </q-card-section>
-          <q-separator/>
-          <q-card-section>
-            <div class="row">
-              <div class="col-3">
-                <q-input outlined label="TOTAL A PAGAR:" disable v-model="total"/>
-              </div>
-              <div class="col-3">
-                <q-input outlined label="EFECTIVO BS." @keyup="cambio" v-model="efectivo"/>
-              </div>
-              <div class="col-2">
-                <q-input outlined label="CAMBIO:" disable v-model="cambio"/>
-              </div>
-              <div class="col-2 flex flex-center">
-                <q-toggle outlined :label="`${credito} T CREDITO`" v-model="credito" color="green" false-value="NO"
-                          true-value="SI" :disable="qrId || qrPolling"/>
-              </div>
-              <div class="col-2 flex flex-center">
-                <q-checkbox outlined label="N CORTESIA" @update:model-value="habilitarCortesia" v-model="cortesia"
-                            color="primary"/>
-              </div>
-              <div class="col-2 flex flex-center">
-                <q-toggle outlined :label="`${tarjeta} VIP`" v-model="tarjeta" color="green" false-value="NO"
-                          true-value="SI"/>
-              </div>
-            </div>
-            <div class="coll-12">
-              <template v-if="tarjeta == 'SI'">
-                <q-form @submit.prevent="consultartarjeta">
-                  <div class="row">
-                    <div class="col-6 ">
-                      <q-input outlined label="Codigo" v-model="codigo" @keyup="consultartarjeta"/>
-                    </div>
-                    <div class="col-6 ">
-                      <q-banner>Saldo :{{ nombresaldo.saldo }} -- {{ nombresaldo.nombre }}</q-banner>
-                    </div>
-                  </div>
-                </q-form>
-              </template>
-              <template v-if="cortesia">
-                <div class="row">
-                  <div class="col-12">
-                    <q-checkbox @click="verificarCortesia" v-for="c in frees" :key="c.id" v-model="c.status"
-                                :label="c.id+''" color="teal"/>
-                  </div>
-                  <div class="col-12">
-                    <div class="text-bold text-center text-h5"> {{ marcados }} - {{ cantidades }}</div>
-                  </div>
+          <q-card-section class="q-pa-md">
+            <div class="row q-col-gutter-md">
+              <div class="col-12 col-md-5">
+                <div class="venta-titulo">
+                  <q-icon name="fact_check" size="18px"/>
+                  Revise lo que esta vendiendo
                 </div>
-              </template>
-            </div>
-            <div class="col-12 text-red text-bold" v-if="error!=''">
-              {{ error }}
-            </div>
-          </q-card-section>
-          <q-separator/>
-          <q-card-section>
-            <div class="row q-col-gutter-md items-stretch">
-              <div class="col-12 col-md-4">
-                <q-btn type="submit" class="full-width q-py-sm" icon="o_add_circle" label="Realizar venta" :loading="loading"
-                       no-caps color="green" :disable="btn || qrPolling"/>
-              </div>
-              <div class="col-12 col-md-3">
-                <q-btn class="full-width q-py-sm" icon="qr_code_2" @click="generarQr" label="Generar QR" no-caps
-                       color="teal" :loading="loading" :disable="qrPolling || !numeroDocumentoValido"/>
-              </div>
-              <div class="col-12 col-md-2">
-                <q-btn v-if="qrId" class="full-width q-py-sm" icon="cancel" @click="cancelarQr" label="Cancelar QR" no-caps
-                       color="warning" :loading="loading"/>
-                <div v-else class="full-width q-py-sm"></div>
-              </div>
-              <div class="col-12 col-md-3">
-                <q-btn class="full-width q-py-sm" icon="undo" @click="cancelarDialogoVenta" label="Atras" no-caps
-                       color="red"/>
-              </div>
-              <div class="col-12" v-if="qrImage">
-                <q-card flat bordered class="bg-teal-1">
-                  <q-card-section class="q-pb-sm">
-                    <div><strong>ID QR:</strong> {{ qrId }}</div>
-                    <div><strong>ID Venta:</strong> {{ qrTransactionId }}</div>
-                    <div><strong>Estado:</strong> {{ qrStatusMessage }}</div>
-                  </q-card-section>
-                  <q-card-section class="row justify-center q-pt-none">
-                    <img :src="qrImage" alt="QR de pago" style="max-width: 260px; width: 100%;">
+                <q-card v-for="f in resumenVenta" :key="f.programa_id" flat bordered
+                        class="funcion-card q-mb-sm" :class="{'funcion-card--alerta': f.iniciada}">
+                  <q-card-section class="q-pa-sm">
+                    <div class="row items-start no-wrap">
+                      <div class="funcion-pelicula">{{ f.pelicula }}</div>
+                      <q-space/>
+                      <q-badge v-if="f.sala" color="blue-9" class="q-ml-xs">{{ f.sala }}</q-badge>
+                    </div>
+                    <div class="funcion-cuando row items-center q-gutter-x-sm q-mt-xs">
+                      <div><q-icon name="event"/> {{ f.dia }}</div>
+                      <div class="funcion-hora"><q-icon name="schedule"/> {{ f.hora }}</div>
+                      <q-badge v-if="f.nroFuncion" outline color="grey-8">Funcion {{ f.nroFuncion }}</q-badge>
+                    </div>
+                    <div v-if="f.iniciada" class="funcion-alerta q-mt-xs">
+                      <q-icon name="warning" size="16px"/>
+                      Esta funcion ya empezo. Confirme con el cliente antes de cobrar.
+                    </div>
+                    <div class="q-mt-xs">
+                      <q-chip v-for="b in f.butacas" :key="b" dense square color="blue-1" text-color="blue-10"
+                              class="butaca-chip" icon="event_seat">{{ b }}</q-chip>
+                    </div>
+                    <div class="row items-center q-mt-xs">
+                      <div class="text-caption text-grey-8">{{ f.cantidad }} x {{ f.precio }} Bs</div>
+                      <q-space/>
+                      <div class="text-bold">{{ f.subtotal }} Bs</div>
+                    </div>
                   </q-card-section>
                 </q-card>
+                <div v-if="!resumenVenta.length" class="text-grey-7 text-center q-pa-md">
+                  No hay butacas seleccionadas.
+                </div>
+              </div>
+              <div class="col-12 col-md-7">
+                <div class="venta-titulo">
+                  <q-icon name="badge" size="18px"/>
+                  Datos del cliente
+                </div>
+                <div class="row q-col-gutter-sm">
+                  <div class="col-6 col-md-3">
+                    <q-input outlined dense label="NIT/CARNET"
+                             required v-model="client.numeroDocumento"
+                             debounce="300"
+                             @update:modelValue="searchClient"
+                    />
+                  </div>
+                  <div class="col-6 col-md-2">
+                    <q-input outlined dense label="Complemento" v-model="client.complemento"
+                             debounce="300"
+                             @update:modelValue="searchClient"
+                             style="text-transform: uppercase"/>
+                  </div>
+                  <div class="col-12 col-md-7">
+                    <q-input outlined dense label="Nombre / Razon social" required v-model="client.nombreRazonSocial"
+                             style="text-transform: uppercase"/>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <q-select v-model="document" outlined dense label="Tipo de documento" :options="documents"
+                              @update:model-value="validarnit"/>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <q-input outlined dense label="Email" v-model="client.email" type="email"/>
+                  </div>
+                </div>
+                <div class="venta-titulo q-mt-md">
+                  <q-icon name="payments" size="18px"/>
+                  Cobro
+                </div>
+                <div class="row q-col-gutter-sm items-center">
+                  <div class="col-6 col-md-3">
+                    <q-input outlined dense label="TOTAL A PAGAR:" disable v-model="total" input-class="text-bold"/>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <q-input outlined dense label="EFECTIVO BS." @keyup="cambio" v-model="efectivo"/>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <q-input outlined dense label="CAMBIO:" disable v-model="cambio" input-class="text-bold"/>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <q-toggle outlined :label="`${credito} T CREDITO`" v-model="credito" color="green" false-value="NO"
+                              true-value="SI" :disable="qrId || qrPolling"/>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <q-checkbox outlined label="N CORTESIA" @update:model-value="habilitarCortesia" v-model="cortesia"
+                                color="primary"/>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <q-toggle outlined :label="`${tarjeta} VIP`" v-model="tarjeta" color="green" false-value="NO"
+                              true-value="SI"/>
+                  </div>
+                </div>
+                <div class="coll-12">
+                  <template v-if="tarjeta == 'SI'">
+                    <q-form @submit.prevent="consultartarjeta">
+                      <div class="row q-col-gutter-sm q-mt-xs items-center">
+                        <div class="col-12 col-md-6">
+                          <q-input outlined dense label="Codigo" v-model="codigo" @keyup="consultartarjeta"/>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <q-banner dense class="bg-grey-2">Saldo :{{ nombresaldo.saldo }} -- {{ nombresaldo.nombre }}</q-banner>
+                        </div>
+                      </div>
+                    </q-form>
+                  </template>
+                  <template v-if="cortesia">
+                    <div class="row q-mt-xs">
+                      <div class="col-12">
+                        <q-checkbox @click="verificarCortesia" v-for="c in frees" :key="c.id" v-model="c.status"
+                                    :label="c.id+''" color="teal"/>
+                      </div>
+                      <div class="col-12">
+                        <div class="text-bold text-center text-h5"> {{ marcados }} - {{ cantidades }}</div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+                <div class="col-12 text-red text-bold q-mt-sm" v-if="error!=''">
+                  {{ error }}
+                </div>
+                <div class="row q-col-gutter-sm items-stretch q-mt-xs">
+                  <div class="col-12 col-md-4">
+                    <q-btn type="submit" class="full-width q-py-sm" icon="o_add_circle" label="Realizar venta" :loading="loading"
+                           no-caps color="green" :disable="btn || qrPolling"/>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <q-btn class="full-width q-py-sm" icon="qr_code_2" @click="generarQr" label="Generar QR" no-caps
+                           color="teal" :loading="loading" :disable="qrPolling || !numeroDocumentoValido"/>
+                  </div>
+                  <div class="col-12 col-md-2">
+                    <q-btn v-if="qrId" class="full-width q-py-sm" icon="cancel" @click="cancelarQr" label="Cancelar QR" no-caps
+                           color="warning" :loading="loading"/>
+                    <div v-else class="full-width q-py-sm"></div>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <q-btn class="full-width q-py-sm" icon="undo" @click="cancelarDialogoVenta" label="Atras" no-caps
+                           color="red"/>
+                  </div>
+                  <div class="col-12" v-if="qrImage">
+                    <q-card flat bordered class="bg-teal-1">
+                      <q-card-section class="q-pb-sm">
+                        <div><strong>ID QR:</strong> {{ qrId }}</div>
+                        <div><strong>ID Venta:</strong> {{ qrTransactionId }}</div>
+                        <div><strong>Estado:</strong> {{ qrStatusMessage }}</div>
+                      </q-card-section>
+                      <q-card-section class="row justify-center q-pt-none">
+                        <img :src="qrImage" alt="QR de pago" style="max-width: 260px; width: 100%;">
+                      </q-card-section>
+                    </q-card>
+                  </div>
+                </div>
               </div>
             </div>
           </q-card-section>
@@ -450,6 +511,16 @@ export default {
     this.stopQrPolling()
   },
   methods: {
+    // "Sabado 30/08/2026" a partir de la hora de inicio de la funcion
+    diaTexto(valor) {
+      const dias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
+      const fecha = moment(valor)
+      return fecha.isValid() ? `${dias[fecha.day()]} ${fecha.format('DD/MM/YYYY')}` : ''
+    },
+    horaTexto(valor) {
+      const fecha = moment(valor)
+      return fecha.isValid() ? fecha.format('HH:mm') : ''
+    },
     resetQrState() {
       this.stopQrPolling()
       this.pagoQr = false
@@ -1002,12 +1073,125 @@ export default {
       })
       return array
     },
+    // Lo que se esta vendiendo, agrupado por funcion: pelicula, sala, fecha,
+    // hora y butacas. Se muestra en el dialogo de venta para que el cajero
+    // confirme la funcion antes de cobrar (la hora es el error mas comun).
+    resumenVenta() {
+      const grupos = []
+      this.momentaneos.forEach(m => {
+        let grupo = grupos.find(g => g.programa_id === m.programa_id)
+        if (grupo == undefined) {
+          const inicio = moment(m.horaInicio || m.fecha)
+          grupo = {
+            programa_id: m.programa_id,
+            pelicula: m.pelicula,
+            sala: m.sala || '',
+            nroFuncion: m.nroFuncion || '',
+            precio: parseFloat(m.precio),
+            dia: this.diaTexto(m.horaInicio || m.fecha),
+            hora: this.horaTexto(m.horaInicio || m.fecha),
+            iniciada: inicio.isValid() && inicio.isBefore(moment()),
+            butacas: [],
+          }
+          grupos.push(grupo)
+        }
+        grupo.butacas.push(`${m.letra}-${m.columna}`)
+      })
+      return grupos.map(g => ({
+        ...g,
+        cantidad: g.butacas.length,
+        subtotal: (g.butacas.length * g.precio).toFixed(2),
+      }))
+    },
 
   }
 }
 </script>
 
 <style scoped>
+/* --- Dialogo de venta --- */
+.venta-dialog {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.venta-header {
+  background: linear-gradient(90deg, #1b5e20 0%, #2e7d32 55%, #388e3c 100%);
+  color: #fff;
+}
+
+.venta-header__sub {
+  font-size: 11px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .85);
+}
+
+.venta-total {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.line-height-1 {
+  line-height: 1.15;
+}
+
+.venta-titulo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: #37474f;
+  border-bottom: 2px solid #cfd8dc;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.funcion-card {
+  border-left: 4px solid #2e7d32;
+  border-radius: 6px;
+}
+
+/* Funcion que ya empezo: el caso del boleto vendido para una funcion pasada */
+.funcion-card--alerta {
+  border-left-color: #c62828;
+  background: #fff8f8;
+}
+
+.funcion-pelicula {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1b2429;
+}
+
+.funcion-cuando {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1565c0;
+}
+
+.funcion-hora {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0d47a1;
+}
+
+.funcion-alerta {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b71c1c;
+  background: #ffebee;
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+
+.butaca-chip {
+  font-weight: 600;
+  margin: 2px 3px 2px 0;
+}
+
 table {
   width: 100%;
 }

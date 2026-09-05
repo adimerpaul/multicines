@@ -87,19 +87,19 @@ class SaleController extends Controller
      */
     private function peliculasDelDia($fecha)
     {
+        // La subconsulta agrupada recorria los 700 mil boletos de toda la
+        // historia para quedarse con los de un dia (6 s). Uniendo directo
+        // contra tickets se usa el indice por programa_id y solo se tocan los
+        // boletos de las funciones de esa fecha.
         return DB::select("
             SELECT m.id, m.nombre, m.duracion, m.formato, m.imagen,
-                   COALESCE(SUM(t.cantidad), 0) as cantidad
+                   COUNT(t.id) as cantidad
             FROM programas p
             INNER JOIN movies m ON m.id = p.movie_id
-            LEFT JOIN (
-                SELECT programa_id, COUNT(*) as cantidad
-                FROM tickets
-                WHERE devuelto = 0 AND deleted_at IS NULL
-                GROUP BY programa_id
-            ) t ON t.programa_id = p.id
+            LEFT JOIN tickets t
+                   ON t.programa_id = p.id AND t.devuelto = 0 AND t.deleted_at IS NULL
             WHERE p.fecha = ? AND p.activo = 'ACTIVO' AND p.deleted_at IS NULL AND m.deleted_at IS NULL
-            GROUP BY m.id, m.nombre, m.duracion, m.formato
+            GROUP BY m.id, m.nombre, m.duracion, m.formato, m.imagen
             ORDER BY m.nombre", [$fecha]);
     }
 
@@ -112,10 +112,12 @@ class SaleController extends Controller
         return response()->json([
             'documents' => Document::orderBy('id')->get(['id', 'codigoClasificador', 'descripcion']),
             'frees' => Cortesia::whereNull('user_id')->limit(30)->get(['id']),
-            'momentaneos' => Momentaneo::where('user_id', $request->user()->id)
-                ->get(['id', 'programa_id', 'pelicula', 'pelicula_id', 'fecha', 'precio', 'promo', 'fila', 'columna', 'letra']),
+            'momentaneos' => Momentaneo::conFuncion()->where('momentaneos.user_id', $request->user()->id)->get(),
             'eventNumber' => Sale::where('siatEnviado', false)->where('siatAnulado', false)->count(),
-            'totalventa' => Ticket::whereDate('fechaFuncion', $request->fecha)->where('devuelto', '0')->count(),
+            // fechaFuncion es DATE: comparar la columna directa usa el indice,
+            // whereDate la envolvia en DATE() y recorria la tabla entera.
+            'totalventa' => Ticket::where('fechaFuncion', substr((string) $request->fecha, 0, 10))
+                ->where('devuelto', '0')->count(),
             'movies' => $this->peliculasDelDia($request->fecha),
         ]);
     }
@@ -358,6 +360,18 @@ class SaleController extends Controller
 
             $cuf = $cuf->obtenerCUF(env('NIT'), $fechaEmision->format("YmdHis000"), $codigoSucursal, $codigoModalidad, $codigoEmision, $tipoFacturaDocumento, $codigoDocumentoSector, $numeroFactura, $codigoPuntoVenta);
             $cuf = $cuf . $cufd->codigoControl;
+
+            // Red de seguridad: el CUF sale del numeroFactura, asi que solo se
+            // puede repetir si dos cajas tomaron el mismo correlativo. Si eso
+            // pasa se corta aqui, antes de enviar a SIAT y de imprimir, y se
+            // libera el correlativo para que la caja reintente.
+            if (Sale::where('cuf', $cuf)->where('id', '<>', $sale->id)->exists()) {
+                error_log('cuf duplicado, venta cancelada: ' . $cuf . ' venta ' . $sale->id);
+                $sale->forceDelete();
+
+                return response()->json(['message' => 'El CUF de la factura ya existe, vuelva a intentar la venta'], 409);
+            }
+
             $sale->cuf = $cuf;
             $sale->save();
             $text = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
@@ -522,7 +536,8 @@ class SaleController extends Controller
             return response()->json([
                 'sale' => $respuesta,
                 "tickets" => $tickets,
-                "error" => $exitecomunicacionSiat ? "" : "Se creo la venta pero no se pudo enviar a siat!!!",
+                "error" => trim(($exitecomunicacionSiat ? "" : "Se creo la venta pero no se pudo enviar a siat!!! ")
+                    . $this->avisoButacasDescartadas()),
             ]);
             //    }
         }
@@ -863,7 +878,7 @@ class SaleController extends Controller
 
     public function totalventa(Request $request)
     {
-        return Ticket::whereDate('fechaFuncion', $request->fecha)->where('devuelto', '0')->count();
+        return Ticket::where('fechaFuncion', substr((string) $request->fecha, 0, 10))->where('devuelto', '0')->count();
     }
 
     public function datocine()
@@ -1839,7 +1854,7 @@ class SaleController extends Controller
         return response()->json([
             'sale' => $sale,
             "tickets" => $tickets,
-            "error" => "Se creo la venta!!!",
+            "error" => trim("Se creo la venta!!! " . $this->avisoButacasDescartadas()),
         ]);
 //        return response()->json(['message' => $e->getMessage()], 500);
     }
@@ -1899,7 +1914,7 @@ class SaleController extends Controller
         return response()->json([
             'sale' => $sale,
             "tickets" => $tickets,
-            "error" => "Se creo la venta!!!",
+            "error" => trim("Se creo la venta!!! " . $this->avisoButacasDescartadas()),
         ]);
 //        return response()->json(['message' => $e->getMessage()], 500);
     }
@@ -1989,7 +2004,7 @@ class SaleController extends Controller
         return response()->json([
             'sale' => $sale,
             "tickets" => $tickets,
-            "error" => "Se creo la venta!!!",
+            "error" => trim("Se creo la venta!!! " . $this->avisoButacasDescartadas()),
         ]);
 //        return response()->json(['message' => $e->getMessage()], 500);
     }

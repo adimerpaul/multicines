@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Momentaneo;
 use App\Http\Requests\StoreMomentaneoRequest;
 use App\Http\Requests\UpdateMomentaneoRequest;
+use App\Services\AuditoriaButacas;
 use Illuminate\Http\Request;
 
 class MomentaneoController extends Controller
 {
+    public function __construct(private AuditoriaButacas $auditoria)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -56,35 +61,52 @@ class MomentaneoController extends Controller
         // esta tomada (por este cajero o por otro) no se crea una segunda reserva.
         // Se devuelve 1 para que el front refresque la sala.
         if (!Momentaneo::insertOrIgnore($datos)) {
+            // Queda registrado el clic que no reservo nada: es el caso en que
+            // el cajero marca una butaca que otra caja ya tenia tomada.
+            $this->auditoria->ocupada((int) $request->programa_id, $datos);
+
             return 1;
         }
 
-        // Se devuelve el registro creado para que el front no tenga que volver a pedir la lista.
-        return Momentaneo::where('programa_id', $request->programa_id)
-            ->where('fila', $request->fila)
-            ->where('columna', $request->columna)
-            ->where('letra', $request->letra)
+        $this->auditoria->seleccionada((int) $request->programa_id, $datos);
+
+        // Se devuelve el registro creado, con la sala y el numero de funcion,
+        // para que el front lo muestre en el resumen sin pedir la lista otra vez.
+        return Momentaneo::conFuncion()
+            ->where('momentaneos.programa_id', $request->programa_id)
+            ->where('momentaneos.fila', $request->fila)
+            ->where('momentaneos.columna', $request->columna)
+            ->where('momentaneos.letra', $request->letra)
             ->first();
     }
     public function momentaneoDelete(Request $request)
     {
-        Momentaneo::where("user_id",$request->user()->id)
+        // Se leen antes de borrar: despues del delete ya no se sabe que solto.
+        $butacas = Momentaneo::where("user_id",$request->user()->id)
             ->where("programa_id",$request->programa_id)
             ->where("fila",$request->fila)
             ->where("columna",$request->columna)
             ->where("letra",$request->letra)
-            ->delete();
+            ->get();
+
+        Momentaneo::whereIn('id', $butacas->pluck('id'))->delete();
+        $this->auditoria->liberadas($butacas, 'clic del cajero');
     }
     public function momentaneoDeleteUser(Request $request)
     {
-        Momentaneo::where("user_id",$request->user()->id)
+        $butacas = Momentaneo::where("user_id",$request->user()->id)
             ->where("programa_id",$request->programa_id)
-            ->delete();
+            ->get();
+
+        Momentaneo::whereIn('id', $butacas->pluck('id'))->delete();
+        $this->auditoria->liberadas($butacas, 'cambio de funcion');
     }
     public function momentaneoDeleteAll(Request $request)
     {
-        Momentaneo::where("user_id",$request->user()->id)
-            ->delete();
+        $butacas = Momentaneo::where("user_id",$request->user()->id)->get();
+
+        Momentaneo::whereIn('id', $butacas->pluck('id'))->delete();
+        $this->auditoria->liberadas($butacas, 'venta cancelada o terminada');
     }
 
     /**
