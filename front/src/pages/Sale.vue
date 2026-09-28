@@ -237,6 +237,8 @@
             <div class="col-12 text-center">
               <q-btn icon="check_circle" class="q-ml-lg" :disable="seleccionados.length==0" color="primary"
                      :loading="loading" label="Agregar" @click="salaDialog=false"/>
+              <q-btn icon="bolt" class="q-ml-lg" :disable="seleccionados.length==0 || detalleVenta.length==0" color="green"
+                     :loading="loading" label="Venta rápida" @click="ventaRapida"/>
               <q-btn icon="highlight_off" class="q-ml-lg" color="red" label="Cancelar" @click="salaDialogClose"/>
             </div>
           </div>
@@ -307,7 +309,7 @@
                 <div class="row q-col-gutter-sm">
                   <div class="col-6 col-md-3">
                     <q-input outlined dense label="NIT/CARNET"
-                             required v-model="client.numeroDocumento"
+                             v-model="client.numeroDocumento"
                              debounce="300"
                              @update:modelValue="searchClient"
                     />
@@ -319,7 +321,7 @@
                              style="text-transform: uppercase"/>
                   </div>
                   <div class="col-12 col-md-7">
-                    <q-input outlined dense label="Nombre / Razon social" required v-model="client.nombreRazonSocial"
+                    <q-input outlined dense label="Nombre / Razon social" v-model="client.nombreRazonSocial"
                              style="text-transform: uppercase"/>
                   </div>
                   <div class="col-12 col-md-6">
@@ -434,7 +436,8 @@ import {Printd} from "printd";
 import conversor from "conversor-numero-a-letras-es-ar";
 import QRCode from "qrcode";
 import moment from "moment"
-import { printBoleto, printPromo, printFactura } from '../addons/impresion'
+import { printBoletoDiseno, printPromo, printFactura } from '../addons/impresion'
+import { io } from 'socket.io-client'
 
 export default {
   name: `Sale`,
@@ -506,11 +509,105 @@ export default {
   created() {
     // Una sola peticion inicial (antes eran 6: document, free, momentaneo, eventSearch, totalventa, movies)
     this.loadSale(this.fecha)
+    // Razon social y NIT para los boletos: si el store aun no los tiene
+    // (p. ej. recien logueado), se piden aqui.
+    if (!this.store.cine || !this.store.cine.razon) {
+      this.$api.get('datocine').then(res => {
+        this.store.cine = res.data
+      })
+    }
+    this.conectarSocket()
   },
   beforeUnmount() {
     this.stopQrPolling()
+    clearTimeout(this.refrescoTimer)
+    if (this.socket) {
+      this.socket.disconnect()
+      this.socket = null
+    }
   },
   methods: {
+    // Tiempo real entre cajas: el socket solo avisa que funciones cambiaron;
+    // las butacas siempre se vuelven a leer del back. Si el socket no esta
+    // disponible la venta sigue funcionando igual que antes.
+    conectarSocket() {
+      // Campos no reactivos: no se declaran en data()
+      this.pendientes = {}
+      this.refrescoTimer = null
+      try {
+        this.socket = io(process.env.API_SOCKET, {
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
+          timeout: 5000,
+        })
+      } catch (e) {
+        console.error('Socket no disponible', e)
+        this.socket = null
+        return
+      }
+      this.socket.on('butacas', data => {
+        const ids = (data && data.programa_ids) || []
+        if (this.salaDialog && this.hour && ids.some(id => id == this.hour.id)) {
+          this.programarRefresco()
+        }
+      })
+      // Al (re)conectar se pudieron perder avisos: se recarga la sala abierta
+      this.socket.on('connect', () => {
+        if (this.salaDialog) this.programarRefresco()
+      })
+      this.socket.on('connect_error', err => {
+        console.warn('Socket sin conexion:', err.message)
+      })
+    },
+    avisarButacas(programaIds) {
+      const ids = [...new Set(programaIds.filter(id => id != null))]
+      if (this.socket && this.socket.connected && ids.length) {
+        this.socket.emit('butacas', {programa_ids: ids})
+      }
+    },
+    // Varios avisos seguidos se juntan en una sola peticion
+    programarRefresco() {
+      clearTimeout(this.refrescoTimer)
+      this.refrescoTimer = setTimeout(() => this.refrescarButacas(), 300)
+    },
+    claveButaca(programaId, s) {
+      return `${programaId}-${s.fila}-${s.columna}-${s.letra}`
+    },
+    refrescarButacas() {
+      const programaId = this.hour && this.hour.id
+      if (!this.salaDialog || !programaId) return
+      this.$api.post('salaData', {id: programaId}).then(res => {
+        // Si en el camino cerro o cambio de sala, se descarta
+        if (!this.salaDialog || !this.hour || this.hour.id != programaId) return
+        const actuales = {}
+        this.seats.forEach(s => {
+          actuales[this.claveButaca(programaId, s)] = s
+        })
+        this.seats = res.data.seats.map(s => {
+          const clave = this.claveButaca(programaId, s)
+          const local = actuales[clave]
+          if (local && this.pendientes[clave]) {
+            // Esta caja esta reservando/liberando esa butaca: manda lo local
+            return {...s, activo: local.activo}
+          }
+          if (local && local.activo == 'SELECCIONADO' && s.activo != 'OCUPADO') {
+            // Reservada por esta caja (en el back figura como RESERVADO)
+            return {...s, activo: 'SELECCIONADO'}
+          }
+          return s
+        })
+        this.actualizarResumen(res.data.resumen)
+      }).catch(err => {
+        console.warn('No se pudo refrescar la sala', err.message)
+      })
+    },
+    actualizarResumen(resumen) {
+      const valores = resumen || {salatotal: 0, venta: 0, temp: 0, dev: 0}
+      this.disponible = parseInt(valores.salatotal) - parseInt(valores.venta) - parseInt(valores.temp)
+      this.vendido = parseInt(valores.venta)
+      this.devueltos = parseInt(valores.dev)
+      this.capacidad = parseInt(valores.salatotal)
+    },
     // "Sabado 30/08/2026" a partir de la hora de inicio de la funcion
     diaTexto(valor) {
       const dias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
@@ -626,12 +723,6 @@ export default {
     //   this.$api.post('listleyenda', {codigo: '590000'}).then(res => {
     //     // console.log(res.data)
     //     this.leyendas = res.data;
-    //   })
-    // },
-    // encabezado() {
-    //   this.$api.get('datocine').then(res => {
-    //     this.cine = res.data;
-    //     // console.log(this.cine)
     //   })
     // },
     generarQr() {
@@ -819,18 +910,22 @@ export default {
           this.printFactura(res.data.sale)
         }
         let valpromo = 0
+        // Uno tras otro: cada boleto espera su imagen de pie antes de imprimir
+        // y asi salen en el mismo orden de las butacas.
+        let impresion = Promise.resolve()
         res.data.tickets.forEach(r => {
           if (r.promo) valpromo++
-          this.boletoprint(r)
+          impresion = impresion.then(() => this.boletoprint(r))
         })
         //console.log(valpromo)
         if (valpromo > 1) {
           let promototal = Math.trunc(valpromo / 2)
           //console.log(promototal)
-          for (let index = 0; index < promototal; index++) {
-            console.log(res.data.sale)
-            this.printPromo(res.data.sale)
-          }
+          impresion.then(() => {
+            for (let index = 0; index < promototal; index++) {
+              this.printPromo(res.data.sale)
+            }
+          })
         }
         // 2 peticiones: limpiar reservas temporales y recargar el panel
         this.momentaneoDeleteAll(true)
@@ -858,7 +953,7 @@ export default {
       printPromo(info, this.store.cine)
     },
     boletoprint(bol) {
-      printBoleto(bol, this.store.cine)
+      return printBoletoDiseno(bol, this.store.cine, bol.sale_id)
     },
     async printFactura(factura){
       await printFactura(factura, this.store.cine, factura.leyenda, this.opts)
@@ -897,6 +992,11 @@ export default {
         if (this.document.codigoClasificador == 5) this.validarnit()
       })
     },
+    // Desde la sala: agrega las butacas y abre directo el dialogo de venta
+    ventaRapida() {
+      this.salaDialog = false
+      this.saleCreate()
+    },
     saleCreate() {
       this.tienerebaja = false
       this.codigo = ''
@@ -907,8 +1007,11 @@ export default {
     },
     momentaneoDeleteAll(recargar = false) {
       this.loading = true
+      const programaIds = this.momentaneos.map(m => m.programa_id)
       this.$api.post('momentaneoDeleteall').then(() => {
         this.momentaneos = []
+        // Tras una venta o cancelacion: las otras cajas ven ocupadas/libres
+        this.avisarButacas(programaIds)
         if (recargar) {
           this.loadSale(this.fecha)
         }
@@ -923,6 +1026,7 @@ export default {
         programa_id: programaId
       }).then(() => {
         this.momentaneos = this.momentaneos.filter(m => m.programa_id != programaId)
+        this.avisarButacas([programaId])
       })
     },
     // Butacas y resumen de la funcion en una sola peticion
@@ -931,11 +1035,7 @@ export default {
       this.loading = true
       this.$api.post('salaData', {id: h.id}).then(res => {
         this.seats = res.data.seats
-        let valores = res.data.resumen || {salatotal: 0, venta: 0, temp: 0, dev: 0}
-        this.disponible = parseInt(valores.salatotal) - parseInt(valores.venta) - parseInt(valores.temp)
-        this.vendido = parseInt(valores.venta)
-        this.devueltos = parseInt(valores.dev)
-        this.capacidad = parseInt(valores.salatotal)
+        this.actualizarResumen(res.data.resumen)
         this.salaDialog = true
       }).finally(() => {
         this.loading = false
@@ -962,6 +1062,11 @@ export default {
     },
     seleccionar(funcion, seat) {
       this.loading = true
+      const clave = this.claveButaca(funcion.id, seat)
+      this.pendientes[clave] = true
+      const terminar = () => {
+        delete this.pendientes[clave]
+      }
       if (seat.activo == 'SELECCIONADO') {
         seat.activo = 'LIBRE'
         this.$api.post('momentaneoDelete', {
@@ -973,7 +1078,8 @@ export default {
         }).then(() => {
           this.loading = false
           this.momentaneos = this.momentaneos.filter(m => !(m.programa_id == funcion.id && m.fila == seat.fila && m.columna == seat.columna && m.letra == seat.letra))
-        })
+          this.avisarButacas([funcion.id])
+        }).finally(terminar)
       } else {
         seat.activo = 'SELECCIONADO'
         this.$api.post('momentaneo', {
@@ -994,8 +1100,9 @@ export default {
             this.clickSala(funcion)
           } else if (res.data && res.data.id) {
             this.momentaneos = [...this.momentaneos, res.data]
+            this.avisarButacas([funcion.id])
           }
-        })
+        }).finally(terminar)
       }
       // console.log(seat)
       // this.hour.sala.seats[indice]['activo']

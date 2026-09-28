@@ -127,6 +127,7 @@ export default {
         console.log(res.data)
         this.$router.push('/')
         this.store.user=res.data.user
+        this.store.cine=res.data.datocine
         this.store.isLoggedIn=true
         res.data.user.permisos.forEach(r => {
             if(r.id==1) this.store.booluser=true

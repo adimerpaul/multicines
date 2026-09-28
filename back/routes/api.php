@@ -110,6 +110,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('disponibleSeats', [\App\Http\Controllers\SaleController::class, 'disponibleSeats']);
     Route::post('upimagenrubro', [\App\Http\Controllers\RubroController::class, 'upimagenrubro']);
     Route::post('upimagenmovie', [\App\Http\Controllers\MovieController::class, 'upimagenmovie']);
+    Route::get('movie/{movie}/footer-images', [\App\Http\Controllers\MovieFooterImageController::class, 'index']);
+    Route::post('movie/{movie}/footer-images/ordenar', [\App\Http\Controllers\MovieFooterImageController::class, 'ordenar']);
+    Route::post('movie-footer-image', [\App\Http\Controllers\MovieFooterImageController::class, 'store']);
+    Route::delete('movie-footer-image/{movieFooterImage}', [\App\Http\Controllers\MovieFooterImageController::class, 'destroy']);
     Route::post('upimagenproducto', [\App\Http\Controllers\ProductoController::class, 'upimagenproducto']);
     Route::post('listadoprod', [\App\Http\Controllers\RubroController::class, 'listadoprod']);
 
@@ -145,6 +149,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('revertirAnularRental', [\App\Http\Controllers\RentalController::class, 'revertirAnularRental']);
     Route::post('cambioPago', [\App\Http\Controllers\SaleController::class,'cambioPago']);
+    Route::post('boletosDuplicados/funciones', [\App\Http\Controllers\BoletosDuplicadosController::class, 'funciones']);
+    Route::post('boletosDuplicados/boletos', [\App\Http\Controllers\BoletosDuplicadosController::class, 'boletos']);
 });
 Route::post('anularCuf', [\App\Http\Controllers\SaleController::class,'anularCuf']);
 Route::get('anularMasivo', [\App\Http\Controllers\FacturaController::class,'anularMasivo']);

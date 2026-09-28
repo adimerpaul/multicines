@@ -37,4 +37,14 @@ $table->unsignedBigInteger("seat_id")->nullable();
 $table->unsignedBigInteger("sale_id")->nullable();
 $table->unsignedBigInteger("price_id")->nullable();
 $table->unsignedBigInteger("sala_id")->nullable();*/
+
+    /**
+     * Imagenes de pie de boleto de la pelicula del boleto (tickets.pelicula_id).
+     */
+    public function footerImages()
+    {
+        return $this->hasMany(MovieFooterImage::class, 'movie_id', 'pelicula_id')
+            ->orderBy('orden')
+            ->orderBy('id');
+    }
 }

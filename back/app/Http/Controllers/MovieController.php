@@ -10,7 +10,7 @@ use App\Models\Rubro;
 
 class MovieController extends Controller{
     public function index(){
-        $movies= Movie::with('distributor')
+        $movies= Movie::with('distributor')->with('footerImages')
             ->orderBy('id','desc')
             ->get();
         foreach ($movies as $movie){
@@ -22,19 +22,19 @@ class MovieController extends Controller{
     }
     public function store(StoreMovieRequest $request){
         $movie= Movie::create($request->all());
-        return Movie::where('id',$movie->id)->with('distributor')->first();
+        return Movie::where('id',$movie->id)->with('distributor')->with('footerImages')->first();
     }
     public function update(UpdateMovieRequest $request, Movie $movie)
     {
         $movie->update($request->all());
-        return $movie->with('distributor')->get();
+        return Movie::where('id',$movie->id)->with('distributor')->with('footerImages')->first();
     }
     public function upimagenmovie(UpdateMovieRequest $request){
         $movie= Movie::find($request->id);
         $movie->imagen=$request->imagen;
         $movie->save();
 
-        $movie=Movie::with('distributor')->where('id',$request->id)->first();
+        $movie=Movie::with('distributor')->with('footerImages')->where('id',$request->id)->first();
         return $movie;
     }
     public function upimagenrubro(UpdateRubroRequest $request){

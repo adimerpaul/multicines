@@ -159,7 +159,7 @@ trait BoletosDeVenta
         }
 
         $this->butacasDescartadas = $descartadas;
-        $boletos = Ticket::where('sale_id', $sale->id)->get();
+        $boletos = Ticket::where('sale_id', $sale->id)->with('footerImages')->get();
 
         // Butacas reservadas vs boletos impresos: es el rastro que permite
         // responder "seleccione tal asiento y me imprimio otro".

@@ -2,34 +2,133 @@ import { Printd } from 'printd'
 import conversor from 'conversor-numero-a-letras-es-ar'
 import QRCode from 'qrcode'
 
-export function printBoleto(bol, cine) {
-  let ticket = "<style>\
-    .titulo{ font-size: 14px; text-align: center; font-weight: bold; }\
-    .tifecha{ font-size: 14px; }\
-    .titnit{ font-size: 10px; text-align: center; }\
-    hr{ border-top: 1px dashed; }\
-    .titpelicula{ font-size: 18px; text-align: center; font-weight: bold; }\
-    </style><div style='padding: 0.5cm'>";
-  ticket += `<div class='titulo'>${cine.razon}</div>
-             <div class='titnit'>NIT:${cine.nit}</div>
-             <hr>
-             <div class='titpelicula'>${bol.titulo} <br> ${bol.nombreSala}</div>
-             <br>
-             <div class='tifecha'>Fecha: <span style='font-size: 20px;'>${bol.fechaFuncion}</span>
-             <span style='float:right'>Bs. ${bol.costo}</span></div>
-             <div class='tifecha'>Butaca: <span style='font-size:22px;'>${bol.letra}-${bol.columna}</span>
-             <div style='float:right'>Hora: <span style='font-size:20px;'>${bol.horaFuncion.substring(11)}</span></div></div>
-             <hr>
-             <div style='font-size: 12px'>Cod: ${bol.numboc}<br>Trans: ${bol.sale_id}</div>
-             <hr><br>
-             <div class='tifecha' style='font-size: 10px'>${bol.fechaFuncion} ${bol.horaFuncion.substring(11)}</div>
-             <div class='titpelicula' style='font-size:10px'>${bol.titulo}<br>${bol.nombreSala} ${bol.letra}-${bol.columna}</div>
-             <div>_</div><br>`;
-  ticket += "</div>";
+const COLOR_MARCA = '#7a1049'
 
-  document.getElementById('myelement').innerHTML = ticket;
-  const d = new Printd();
-  d.print(document.getElementById('myelement'));
+// Iconos en SVG inline: el iframe de impresion no tiene la fuente de iconos.
+const ICONOS = {
+  fecha: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M7.5 14h1M11.5 14h1M15.5 14h1M7.5 17.5h1M11.5 17.5h1"/>',
+  precio: '<path d="M4 8a2 2 0 0 0 0 4v0a2 2 0 0 1 0 4v2h16v-2a2 2 0 0 1 0-4v0a2 2 0 0 0 0-4V6H4z" transform="rotate(-35 12 12)"/><path d="M10 9.5l4 5" transform="rotate(-35 12 12)" stroke-dasharray="1.5 1.5"/>',
+  butaca: '<path d="M7 11V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v4"/><path d="M4 12a1.5 1.5 0 0 1 3 0v2h10v-2a1.5 1.5 0 0 1 3 0v4H4z"/><path d="M6 16v4M18 16v4"/>',
+  hora: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12h3.5"/>',
+}
+
+function iconoBoleto(nombre) {
+  return `<div class="bi-icono"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONOS[nombre]}</svg></div>`
+}
+
+// Separa el formato del final del titulo ("AVENGERS BONUS 2D" -> "AVENGERS BONUS" + "2D")
+// para resaltarlo con el color de la marca.
+function tituloYFormato(titulo) {
+  const t = (titulo || '').trim()
+  const m = t.match(/^(.*?)\s+(2D|3D|4D|4DX|IMAX)$/i)
+  return m ? { nombre: m[1], formato: m[2].toUpperCase() } : { nombre: t, formato: '' }
+}
+
+/**
+ * Boleto compacto (para la billetera): imagen de la pelicula al azar arriba,
+ * con el logo montado en la onda, y los datos debajo. trans: numero de "Trans:".
+ */
+export async function printBoletoDiseno(bol, cine, trans) {
+  const logo = new URL('multicines-logo-ticket.png', window.location.href.split('#')[0]).href
+  const { nombre, formato } = tituloYFormato(bol.titulo)
+  const hora = (bol.horaFuncion || '').substring(11)
+  const imagenes = bol.footer_images || []
+  const base = process.env.API + '../imagen/'
+
+  const estilos = `<style>
+    @page { margin: 0; }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .bi { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; padding: 0 0.2cm 0.05cm; }
+    .bi-sinimg { padding-top: 0.3cm; }
+    .bi-head { display: flex; align-items: center; justify-content: center; gap: 0.15cm; }
+    .bi-head img { height: 1.05cm; }
+    .bi-razon { color: ${COLOR_MARCA}; font-size: 15px; font-weight: 800; border-bottom: 1.5px solid ${COLOR_MARCA}; line-height: 1.1; }
+    .bi-nit { font-size: 10px; text-align: center; margin-top: 1px; }
+    .bi-hr { border: 0; border-top: 1px dashed #333; margin: 0.18cm 0; }
+    .bi-titulo { text-align: center; font-size: 20px; font-weight: 900; line-height: 1.1; text-transform: uppercase; margin-top: 0.2cm; }
+    .bi-formato { color: ${COLOR_MARCA}; }
+    .bi-sala { display: flex; align-items: center; gap: 0.12cm; margin: 0.15cm 0 0.2cm; }
+    .bi-sala .linea { flex: 1; border-top: 1px solid ${COLOR_MARCA}; }
+    .bi-sala .estrella { color: ${COLOR_MARCA}; font-size: 10px; }
+    .bi-sala .pill { background: ${COLOR_MARCA}; color: #fff; font-weight: 800; font-size: 15px; padding: 2px 12px; border-radius: 4px; white-space: nowrap; }
+    .bi-grid { display: grid; grid-template-columns: 1fr auto; gap: 0.2cm 0.2cm; }
+    .bi-dato { display: flex; align-items: center; gap: 0.1cm; }
+    .bi-icono { width: 0.75cm; height: 0.75cm; border-radius: 4px; background: ${COLOR_MARCA}; display: flex; align-items: center; justify-content: center; flex: none; }
+    .bi-label { font-size: 11px; line-height: 1; }
+    .bi-valor { font-size: 18px; font-weight: 800; line-height: 1.1; }
+    .bi-cod { font-size: 12px; line-height: 1.3; display: flex; justify-content: space-between; }
+    .bi-cod b { font-weight: 700; }
+    .bi-talon { text-align: center; font-size: 11px; line-height: 1.35; }
+    /* Portada: la imagen ocupa siempre el mismo recuadro (se estira si hace
+       falta) para que todos los boletos midan igual. Abajo cierra con una
+       onda blanca que continua el boleto. */
+    .bi-portada { position: relative; height: 1.3cm; margin: 0 -0.2cm; overflow: hidden; border-radius: 0.35cm 0.35cm 0 0; }
+    .bi-portada-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: block; }
+    .bi-ola { position: absolute; bottom: 0; left: 0; width: 100%; height: 0.4cm; display: block; filter: drop-shadow(0 -1px 1.5px rgba(0,0,0,.35)); }
+    .bi-portada + .bi-head { margin-top: 0.02cm; }
+  </style>`
+
+  // Una sola imagen por boleto, elegida al azar entre las de la pelicula:
+  // cada boleto (y cada reimpresion) puede salir con una distinta.
+  let imgUrl = ''
+  if (imagenes.length) {
+    const img = imagenes[Math.floor(Math.random() * imagenes.length)]
+    imgUrl = base + img.imagen
+  }
+  const cabecera = `<div class='bi-head'>
+      <img src="${logo}" />
+      <div>
+        <div class='bi-razon'>${cine.razon}</div>
+        <div class='bi-nit'>NIT:${cine.nit}</div>
+      </div>
+    </div>`
+  // Borde superior del boleto: sube por los costados hasta una meseta al
+  // centro, recortando la imagen.
+  const ola = `<svg class='bi-ola' viewBox='0 0 100 40' preserveAspectRatio='none'>
+    <path fill='#fff' d='M0,40 H100 V30 C92,28 86,8 70,5 H30 C14,8 8,28 0,30 Z'/>
+  </svg>`
+  const portada = imgUrl
+    ? `<div class='bi-portada'><img class='bi-portada-img' src="${imgUrl}" />${ola}</div>${cabecera}`
+    : cabecera
+
+  const html = `${estilos}<div class='bi${imgUrl ? '' : ' bi-sinimg'}'>
+    ${portada}
+    <div class='bi-titulo'>${nombre}${formato ? ` <span class='bi-formato'>${formato}</span>` : ''}</div>
+    <div class='bi-sala'><span class='linea'></span><span class='estrella'>&#9733;</span><span class='pill'>${bol.nombreSala}</span><span class='estrella'>&#9733;</span><span class='linea'></span></div>
+    <div class='bi-grid'>
+      <div class='bi-dato'>${iconoBoleto('fecha')}<div><div class='bi-label'>Fecha:</div><div class='bi-valor'>${bol.fechaFuncion}</div></div></div>
+      <div class='bi-dato'>${iconoBoleto('precio')}<div class='bi-valor'>Bs. ${bol.costo}</div></div>
+      <div class='bi-dato'>${iconoBoleto('butaca')}<div><div class='bi-label'>Butaca:</div><div class='bi-valor'>${bol.letra}-${bol.columna}</div></div></div>
+      <div class='bi-dato'>${iconoBoleto('hora')}<div><div class='bi-label'>Hora:</div><div class='bi-valor'>${hora}</div></div></div>
+    </div>
+    <hr class='bi-hr'>
+    <div class='bi-cod'><span><b>Cod:</b> ${bol.numboc}</span><span>Trans: ${trans}</span></div>
+    <hr class='bi-hr'>
+    <div class='bi-talon'>${bol.fechaFuncion} ${hora}<br><b>${bol.titulo}</b><br>${bol.nombreSala} ${bol.letra}-${bol.columna}</div>
+    <div>_</div>
+  </div>`
+
+  // Si se imprime antes de que la imagen termine de descargarse, el boleto
+  // sale sin ella. Se espera a que el logo y la imagen esten en cache.
+  await precargarImagenes([logo, imgUrl].filter(Boolean))
+
+  // Elemento propio y no #myelement: printFactura (asincrona) lo reescribe
+  // mientras este boleto espera las imagenes.
+  const el = document.createElement('div')
+  el.innerHTML = html
+  const d = new Printd()
+  d.print(el)
+}
+
+function precargarImagenes(urls, espera = 8000) {
+  return Promise.all(urls.map(url => new Promise(resolve => {
+    const img = new Image()
+    const listo = () => resolve()
+    img.onload = listo
+    img.onerror = listo
+    setTimeout(listo, espera)
+    img.src = url
+  })))
 }
 
 export function printPromo(info, cine) {

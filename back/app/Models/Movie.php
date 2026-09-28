@@ -38,4 +38,8 @@ class Movie extends Model
     {
         return $this->hasMany(Programa::class);
     }
+    public function footerImages()
+    {
+        return $this->hasMany(MovieFooterImage::class)->orderBy('orden')->orderBy('id');
+    }
 }

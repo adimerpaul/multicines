@@ -22,7 +22,7 @@ class UserController extends Controller
             if (Hash::check($request->password, $user->password)) {
                 $user = User::with('permisos')->where('email', $request->email)->first();
                 $token = $user->createToken('authToken')->plainTextToken;
-                return response(['user' => $user, 'token' => $token]);
+                return response(['user' => $user, 'token' => $token, 'datocine' => $this->datocine()]);
             } else {
                 return response(['message' => 'Contraseña incorrecta'], 500);
             }
@@ -39,24 +39,23 @@ class UserController extends Controller
             //->whereDate('fechaLimite','>=',date('Y-m-d'))
             ->firstOrFail();
 
-        $nit = env('NIT');
-        $razon = env("RAZON");
-        $dir = env("DIRECCION");
-        $tel = env("TELEFONO");
-        $url = env("URL_SIAT");
-        $url2 = env("URL_SIAT2");
         return [
             'user' => $user,
-            'datocine' => [
-                'nit' => $nit,
-                'razon' => $razon,
-                'direccion' => $dir,
-                'telefono' => $tel,
-                'url' => $url,
-                'url2' => $url2
-            ]
+            'datocine' => $this->datocine()
         ];
         //return  $request->user();
+    }
+
+    private function datocine()
+    {
+        return [
+            'nit' => env('NIT'),
+            'razon' => env("RAZON"),
+            'direccion' => env("DIRECCION"),
+            'telefono' => env("TELEFONO"),
+            'url' => env("URL_SIAT"),
+            'url2' => env("URL_SIAT2")
+        ];
     }
 
     public function logout(Request $request)

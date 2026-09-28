@@ -199,6 +199,21 @@ class SaleController extends Controller
         }
         error_log('Paso 1 - Validación inicial: ' . (microtime(true) - $startTime));
 
+        // Sin NIT/CI: se vende como cliente 0 (S/N) y sale como recibo.
+        $datosCliente = $request->client ?? [];
+        if (trim((string) ($datosCliente['numeroDocumento'] ?? '')) === '') {
+            $clienteSN = Client::where('numeroDocumento', '0')->where('complemento', '')->first();
+            $nombre = trim((string) ($datosCliente['nombreRazonSocial'] ?? ''));
+            $request->merge(['client' => [
+                'id' => $clienteSN ? $clienteSN->id : null,
+                'numeroDocumento' => '0',
+                'complemento' => '',
+                'nombreRazonSocial' => $nombre !== '' ? $nombre : ($clienteSN ? $clienteSN->nombreRazonSocial : 'S/N'),
+                'codigoTipoDocumentoIdentidad' => $datosCliente['codigoTipoDocumentoIdentidad'] ?? 1,
+                'email' => $datosCliente['email'] ?? '',
+            ]]);
+        }
+
         if ($request->client['complemento'] == null) {
             $complemento = "";
         } else {
@@ -861,7 +876,7 @@ class SaleController extends Controller
 
     public function listBoletos(Request $request)
     {
-        return Ticket::where('sale_id', $request->id)->get();
+        return Ticket::where('sale_id', $request->id)->with('footerImages')->get();
     }
 
     /**
@@ -1836,7 +1851,7 @@ class SaleController extends Controller
         $sale->codigoRecepcion = "";
         $sale->cuf = "";
         $sale->save();
-        $tickets = Ticket::where('sale_id', $sale->id)->get();
+        $tickets = Ticket::where('sale_id', $sale->id)->with('footerImages')->get();
         $codigo = $this->hexToStr($request->codigoTarjeta);
         $result = DB::connection('tarjeta')->select("SELECT * from cliente  WHERE codigo='$codigo'")[0];
         DB::connection('tarjeta')->select("
@@ -1896,7 +1911,7 @@ class SaleController extends Controller
         $sale->codigoRecepcion = "";
         $sale->cuf = "";
         $sale->save();
-        $tickets = Ticket::where('sale_id', $sale->id)->get();
+        $tickets = Ticket::where('sale_id', $sale->id)->with('footerImages')->get();
 
         foreach ($request->frees as $f) {
             if ($f['status'] == 1) {
@@ -1986,7 +2001,7 @@ class SaleController extends Controller
         $sale->codigoRecepcion = "";
         $sale->cuf = "";
         $sale->save();
-        $tickets = Ticket::where('sale_id', $sale->id)->get();
+        $tickets = Ticket::where('sale_id', $sale->id)->with('footerImages')->get();
 
         foreach ($request->frees as $f) {
             if ($f['status'] == 1) {

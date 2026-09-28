@@ -42,7 +42,7 @@ class ListaVentaBoleteriaController extends Controller
             ->with('user')
             ->with('client')
             ->with('details')
-            ->with('tickets')
+            ->with('tickets.footerImages')
             ->orderBy('id', 'desc')
             ->get();
         }
@@ -54,7 +54,7 @@ class ListaVentaBoleteriaController extends Controller
             ->with('user')
             ->with('client')
             ->with('details')
-            ->with('tickets')
+            ->with('tickets.footerImages')
             ->orderBy('id', 'desc')
             ->get();
         }

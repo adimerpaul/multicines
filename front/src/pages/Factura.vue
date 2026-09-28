@@ -813,13 +813,20 @@ export default {
     },
     errorMessage(error) {
       const data = error.response?.data;
-      return (
+      const status = error.response?.status;
+      // Un 413 o un 504 vienen del servidor web, sin cuerpo JSON que mostrar.
+      const detalle =
         Object.values(data?.errors || {})
           .flat()
-          .join(" ") ||
-        data?.message ||
-        "No se pudo completar la operación. Intente nuevamente."
-      );
+          .join(" ") || (typeof data?.message === "string" ? data.message : "");
+      if (detalle) return detalle;
+      if (status === 413)
+        return "El servidor rechazó el archivo por su tamaño (413). Hay que subir el límite de subida del servidor web.";
+      if (status === 504 || status === 408)
+        return `El servidor cortó la importación por tiempo (${status}). Hay que subir el tiempo de espera.`;
+      return status
+        ? `No se pudo completar la operación (error ${status}).`
+        : "No se pudo completar la operación. Revise su conexión.";
     },
     buscarFacturas() {
       return this.getYearMonthFacturas({

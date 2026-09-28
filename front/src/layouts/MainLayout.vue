@@ -267,7 +267,7 @@
           exact
           icon="o_local_activity"
           label="Venta Boleteria"
-          v-if="store.boolboleteria || store.boollistbol"
+          v-if="store.boolboleteria || store.boollistbol || store.booltodoventa"
         >
           <q-expansion-item
             dense
@@ -292,6 +292,18 @@
             to="listaVenta"
             expand-icon="null"
             v-if="store.boollistbol"
+          />
+          <q-expansion-item
+            dense
+            exact
+            :header-inset-level="1"
+            expand-separator
+            icon="o_content_copy"
+            label="Boletos duplicados"
+            default-opened
+            to="boletosDuplicados"
+            expand-icon="null"
+            v-if="store.booltodoventa"
           />
         </q-expansion-item>
         <q-expansion-item

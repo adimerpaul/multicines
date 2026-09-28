@@ -18,8 +18,19 @@
           </template>
           <template v-slot:body-cell-imagen="props">
             <q-td auto-width :props="props">
-
-                <q-img :src="url+'../imagen/'+props.row.imagen" class="q-pa-lg" style="border:0px solid black;height: 50px; max-width: 50px;"/>
+              <div
+                class="drop-img"
+                :class="{ 'drop-img--over': dragOverId === props.row.id }"
+                @dragover.prevent="dragOverId = props.row.id"
+                @dragleave.prevent="dragOverId = null"
+                @drop.prevent="onDropImagen($event, props.row)"
+              >
+                <q-img :src="url+'../imagen/'+props.row.imagen" style="height: 50px; width: 50px;"/>
+                <q-inner-loading :showing="uploadingId === props.row.id">
+                  <q-spinner size="20px" color="primary" />
+                </q-inner-loading>
+                <q-tooltip>Arrastra una imagen aquí para cambiarla</q-tooltip>
+              </div>
             </q-td>
           </template>
           <template v-slot:body-cell-nombre="props">
@@ -27,21 +38,59 @@
                 {{ props.row.nombre }}
             </q-td>
           </template>
+          <template v-slot:body-cell-formato="props">
+            <q-td auto-width :props="props">
+              <q-badge :color="props.row.formato=='3D' ? 'purple' : 'teal'" :label="props.row.formato" />
+            </q-td>
+          </template>
+          <template v-slot:body-cell-pie="props">
+            <q-td auto-width :props="props">
+              <div
+                class="drop-pie row no-wrap items-center q-gutter-xs cursor-pointer"
+                :class="{ 'drop-img--over': pieDragOverId === props.row.id }"
+                @click="abrirPie(props.row)"
+                @dragover.prevent="pieDragOverId = props.row.id"
+                @dragleave.prevent="pieDragOverId = null"
+                @drop.prevent="onDropPie($event, props.row)"
+              >
+                <img
+                  v-for="img in (props.row.footer_images || [])"
+                  :key="img.id"
+                  :src="url+'../imagen/'+img.imagen"
+                  class="pie-mini"
+                />
+                <q-btn v-if="!(props.row.footer_images || []).length" flat dense size="sm" icon="add_photo_alternate" color="grey" />
+                <q-inner-loading :showing="pieUploadingId === props.row.id">
+                  <q-spinner size="20px" color="primary" />
+                </q-inner-loading>
+                <q-tooltip>Arrastra imagenes aquí para agregarlas al pie de boleto</q-tooltip>
+              </div>
+            </q-td>
+          </template>
           <template v-slot:body-cell-opciones="props">
             <q-td auto-width :props="props">
               <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">
                 <q-list>
                   <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=props.row;this.store.distributor=props.row.distributor">
+                    <q-item-section avatar><q-icon name="edit" color="orange" /></q-item-section>
                     <q-item-section>
                       <q-item-label>Actualizar</q-item-label>
                     </q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup @click="dialog_img=true;movie2=props.row;">
+                    <q-item-section avatar><q-icon name="image" color="primary" /></q-item-section>
                     <q-item-section>
                       <q-item-label>Actualizar Imagen</q-item-label>
                     </q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup @click="movieDelete(props.row.id,props.pageIndex)">
+                  <q-item clickable v-close-popup @click="abrirPie(props.row)">
+                    <q-item-section avatar><q-icon name="collections" color="teal" /></q-item-section>
+                    <q-item-section>
+                      <q-item-label>Imagenes pie de boleto</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup @click="movieDelete(props.row.id)">
+                    <q-item-section avatar><q-icon name="delete" color="negative" /></q-item-section>
                     <q-item-section>
                       <q-item-label>Eliminar</q-item-label>
                     </q-item-section>
@@ -226,6 +275,54 @@
       </q-card>
     </q-dialog>
 
+    <q-dialog v-model="pieDialog">
+      <q-card style="width: 560px; max-width: 95vw;">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6">Pie de boleto: {{ pieMovie.nombre }} <q-badge :label="pieMovie.formato" /></div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section>
+          <div class="text-caption text-grey-7 q-mb-sm">
+            Imagenes que se imprimen abajo del boleto (una al azar). Se comprimen y se guardan en WebP automaticamente.
+          </div>
+          <div v-if="!pieImagenes.length" class="text-grey text-center q-pa-md">Sin imagenes</div>
+          <q-list bordered separator v-else>
+            <q-item v-for="(img, i) in pieImagenes" :key="img.id">
+              <q-item-section avatar>
+                <div class="pie-preview"><img :src="url+'../imagen/'+img.imagen" /></div>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ img.nombre || img.imagen }}</q-item-label>
+                <q-item-label caption>Posicion {{ i + 1 }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <div class="row no-wrap">
+                  <q-btn flat round dense icon="arrow_upward" :disable="i===0" @click="moverPie(i,-1)" />
+                  <q-btn flat round dense icon="arrow_downward" :disable="i===pieImagenes.length-1" @click="moverPie(i,1)" />
+                  <q-btn flat round dense icon="delete" color="negative" @click="eliminarPie(img)" />
+                </div>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
+        <q-card-section class="flex flex-center">
+          <q-uploader
+            ref="pieUploader"
+            accept=".png, .jpg, .jpeg, .webp"
+            multiple
+            @added="subirPie"
+            hide-upload-btn
+            label="Arrastra o selecciona imagenes (PNG, JPG, WebP)"
+            flat
+            bordered
+            max-file-size="30000000"
+            @rejected="onRejected"
+            style="width: 100%;"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
     <q-dialog v-model="dialog_img">
       <q-card>
         <q-card-section class="bg-amber-14 text-white">
@@ -267,6 +364,27 @@
 import {globalStore} from "stores/globalStore";
 import {date} from "quasar";
 
+const TIPOS_PIE = ['image/png', 'image/jpeg', 'image/webp']
+const PIE_LADO_MAXIMO = 800
+
+// Reduce la imagen a PIE_LADO_MAXIMO px por lado y la pasa a WebP (conserva
+// la transparencia). Si el navegador no puede, se sube el archivo original.
+async function comprimirWebp(file) {
+  try {
+    const bitmap = await createImageBitmap(file)
+    const escala = Math.min(1, PIE_LADO_MAXIMO / Math.max(bitmap.width, bitmap.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, Math.round(bitmap.width * escala))
+    canvas.height = Math.max(1, Math.round(bitmap.height * escala))
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.85))
+    if (!blob || blob.type !== 'image/webp') return file
+    return new File([blob], file.name.replace(/\.\w+$/, '') + '.webp', { type: 'image/webp' })
+  } catch (e) {
+    return file
+  }
+}
+
 export default {
   name: `Peliculas`,
   data() {
@@ -275,6 +393,12 @@ export default {
       movieFilter:'',
       url:process.env.API,
       dialog_img:false,
+      dragOverId:null,
+      pieDialog:false,
+      pieDragOverId:null,
+      pieUploadingId:null,
+      pieMovie:{},
+      uploadingId:null,
       movie:{
         clasificacion:'+13',
         formato:'2D',
@@ -292,10 +416,11 @@ export default {
         {label:'duracion',field:'duracion',name:'duracion',sortable:true},
         // {label:'paisOrigen',field:'paisOrigen',name:'paisOrigen',sortable:true},
         // {label:'genero',field:'genero',name:'genero',sortable:true},
-        // {label:'formato',field:'formato',name:'formato',sortable:true},
+        {label:'formato',field:'formato',name:'formato',sortable:true},
         // {label:'clasificacion',field:'clasificacion',name:'clasificacion',sortable:true},
         {label:'fechaEstreno',field:'fechaEstreno',name:'fechaEstreno',sortable:true},
         {label:'Imagen',field:'imagen',name:'imagen',sortable:true},
+        {label:'Pie de boleto',field:row=>(row.footer_images||[]).length,name:'pie',align:'left'},
         {label:'distributor_id',field:row=>row.distributor.nombre,name:'distributor_id',sortable:true},
       ]
     }
@@ -324,7 +449,107 @@ export default {
       })
     }
   },
+  computed: {
+    pieImagenes(){
+      return this.pieMovie.footer_images || []
+    }
+  },
   methods: {
+    abrirPie(row){
+      if (!row.footer_images) row.footer_images = []
+      this.pieMovie = row
+      this.pieDialog = true
+    },
+    async onDropPie(event, row){
+      this.pieDragOverId = null
+      const files = Array.from(event.dataTransfer.files || [])
+      if (!files.length) return
+      const validos = files.filter(f => TIPOS_PIE.includes(f.type))
+      if (validos.length < files.length) {
+        this.$q.notify({ type: 'negative', message: 'Solo se aceptan imagenes PNG, JPG o WebP; se omitieron ' + (files.length - validos.length) + ' archivo(s)' })
+      }
+      if (!validos.length) return
+      if (!row.footer_images) row.footer_images = []
+      this.pieUploadingId = row.id
+      const agregadas = await this.agregarPies(row, validos)
+      this.pieUploadingId = null
+      if (agregadas) {
+        this.$q.notify({ type: 'positive', icon: 'done', message: agregadas + ' imagen(es) de pie agregada(s) a ' + row.nombre })
+      }
+    },
+    async subirPie(files){
+      await this.agregarPies(this.pieMovie, files)
+      this.$refs.pieUploader.reset()
+    },
+    async agregarPies(movie, files){
+      let agregadas = 0
+      for (const file of files) {
+        try {
+          // Se comprime en el navegador para no chocar con el limite de 2MB
+          // de PHP; el servidor igual la vuelve a reducir y guarda en WebP.
+          const comprimida = await comprimirWebp(file)
+          const fd = new FormData()
+          fd.append('file', comprimida, comprimida.name)
+          fd.append('movie_id', movie.id)
+          fd.append('nombre', file.name.replace(/\.(png|jpe?g|webp)$/i, ''))
+          const res = await this.$api.post('movie-footer-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+          movie.footer_images.push(res.data)
+          agregadas++
+        } catch (e) {
+          this.$q.notify({ type: 'negative', message: 'Error al subir ' + file.name + ': ' + (e.response?.data?.message || e.message) })
+        }
+      }
+      return agregadas
+    },
+    moverPie(i, dir){
+      const lista = this.pieMovie.footer_images
+      const [img] = lista.splice(i, 1)
+      lista.splice(i + dir, 0, img)
+      this.$api.post('movie/' + this.pieMovie.id + '/footer-images/ordenar', { ids: lista.map(x => x.id) })
+        .catch(() => this.$q.notify({ type: 'negative', message: 'No se pudo guardar el orden' }))
+    },
+    eliminarPie(img){
+      this.$q.dialog({
+        title: 'Eliminar imagen',
+        message: '¿Quitar esta imagen del pie de boleto?',
+        cancel: true,
+      }).onOk(() => {
+        this.$api.delete('movie-footer-image/' + img.id).then(() => {
+          const lista = this.pieMovie.footer_images
+          const index = lista.findIndex(x => x.id === img.id)
+          if (index !== -1) lista.splice(index, 1)
+        })
+      })
+    },
+    onDropImagen(event, row){
+      this.dragOverId = null
+      const file = event.dataTransfer.files[0]
+      if (!file) return
+      if (!['image/jpeg','image/png'].includes(file.type)) {
+        this.$q.notify({ type: 'negative', message: 'Solo se permiten imagenes .jpg o .png' })
+        return
+      }
+      if (file.size > 2000000) {
+        this.$q.notify({ type: 'negative', message: 'La imagen no debe superar 2MB' })
+        return
+      }
+      const fd = new FormData()
+      fd.append('file', file)
+      this.uploadingId = row.id
+      this.$api.post('upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+        .then(res => this.$api.post('upimagenmovie', { id: row.id, imagen: res.data }))
+        .then(res => {
+          let index = this.store.movies.findIndex(m => m.id == res.data.id);
+          if (index !== -1) this.store.movies[index] = res.data
+          this.$q.notify({ type: 'positive', message: 'Imagen actualizada: ' + res.data.nombre, icon: 'done' })
+        })
+        .catch(() => {
+          this.$q.notify({ type: 'negative', message: 'Error al subir la imagen' })
+        })
+        .finally(() => {
+          this.uploadingId = null
+        })
+    },
     onModImagen(){
       this.movie2.imagen=this.foto
       this.$q.loading.show()
@@ -404,7 +629,7 @@ export default {
         this.loading=false
       })
     },
-    movieDelete(id,pageIndex){
+    movieDelete(id){
       this.$q.dialog({
         title: 'Eliminar Pelicula',
         message: '¿Esta seguro de eliminar la pelicula?',
@@ -418,7 +643,8 @@ export default {
       }).onOk(() => {
         this.$q.loading.show()
         this.$api.delete('movie/'+id).then(res=>{
-          this.store.movies.splice(pageIndex,1)
+          let index = this.store.movies.findIndex(m => m.id == id);
+          if (index !== -1) this.store.movies.splice(index,1)
           this.$q.loading.hide()
           this.$q.notify({
             message: 'Pelicula eliminada',
@@ -433,5 +659,53 @@ export default {
 </script>
 
 <style scoped>
+.drop-img {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  padding: 3px;
+  border: 2px dashed transparent;
+  border-radius: 6px;
+  transition: border-color .15s, background-color .15s;
+}
+.drop-img:hover {
+  border-color: #bdbdbd;
+}
+.drop-pie {
+  position: relative;
+  min-width: 58px;
+  min-height: 40px;
+  padding: 3px;
+  border: 2px dashed transparent;
+  border-radius: 6px;
+  transition: border-color .15s, background-color .15s;
+}
+.drop-pie:hover {
+  border-color: #bdbdbd;
+}
+.pie-mini {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+}
+.pie-preview {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* cuadriculado para ver la transparencia del PNG */
+  background: repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 12px 12px;
+  border-radius: 6px;
+}
+.pie-preview img {
+  max-width: 52px;
+  max-height: 52px;
+  object-fit: contain;
+}
+.drop-img--over {
+  border-color: #21ba45;
+  background-color: rgba(33, 186, 69, .15);
+}
 
 </style>
