@@ -188,7 +188,32 @@ class SaleController extends Controller
        (SELECT s.capacidad from salas s, programas p where s.id=p.sala_id and p.id=$request->id) as salatotal;");
     }
 
+    /**
+     * Una venta a la vez por cajero: si el mismo cajero manda la venta dos
+     * veces (doble clic, reintento de red), la segunda se rechaza aqui en vez
+     * de crear otra venta/factura sin boletos.
+     */
     public function store(StoreSaleRequest $request)
+    {
+        $lock = 'multisalas_venta_user_' . $request->user()->id;
+        $tomado = DB::selectOne('SELECT GET_LOCK(?, 0) AS tomado', [$lock]);
+        if (!$tomado || intval($tomado->tomado) !== 1) {
+            return response()->json(['message' => 'Ya hay una venta en proceso en esta caja. Espere a que termine.'], 409);
+        }
+
+        try {
+            $error = $this->validarButacasVenta($request->user(), (array) $request->detalleVenta);
+            if ($error !== null) {
+                return response()->json(['message' => $error], 409);
+            }
+
+            return $this->procesarVenta($request);
+        } finally {
+            DB::selectOne('SELECT RELEASE_LOCK(?) AS liberado', [$lock]);
+        }
+    }
+
+    private function procesarVenta(StoreSaleRequest $request)
     {
         // return $request;
         // validar detalleVenta

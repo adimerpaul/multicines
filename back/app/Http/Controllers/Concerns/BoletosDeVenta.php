@@ -46,6 +46,53 @@ trait BoletosDeVenta
     }
 
     /**
+     * Verificacion antes de crear la venta (y la factura): las butacas que el
+     * cajero tiene reservadas deben seguir libres y coincidir con lo que se
+     * esta cobrando. Devuelve el mensaje de error, o null si se puede vender.
+     */
+    protected function validarButacasVenta(User $user, array $detalleVenta): ?string
+    {
+        $momentaneos = Momentaneo::where('user_id', $user->id)->get();
+        if ($momentaneos->isEmpty()) {
+            return 'No hay butacas reservadas para esta venta. Puede que ya se haya vendido: revise la lista de ventas antes de volver a cobrar.';
+        }
+
+        $vendidas = [];
+        $porFuncion = []; // programa_id => cantidad de butacas reservadas
+        foreach ($momentaneos as $m) {
+            $porFuncion[$m->programa_id] = ($porFuncion[$m->programa_id] ?? 0) + 1;
+
+            $ocupado = Ticket::where('programa_id', $m->programa_id)
+                ->where('fila', $m->fila)
+                ->where('columna', $m->columna)
+                ->where('letra', $m->letra)
+                ->where('devuelto', 0)
+                ->exists();
+            if ($ocupado) {
+                $vendidas[] = $m->letra . '-' . $m->columna;
+            }
+        }
+        if (count($vendidas)) {
+            return 'Butaca(s) ya vendida(s): ' . implode(', ', $vendidas)
+                . '. Quitelas de la venta y elija otras.';
+        }
+
+        // Lo que se cobra debe ser exactamente lo reservado
+        $cobrado = [];
+        foreach ($detalleVenta as $d) {
+            $id = $d['programa_id'] ?? null;
+            $cobrado[$id] = ($cobrado[$id] ?? 0) + intval($d['cantidad'] ?? 0);
+        }
+        ksort($porFuncion);
+        ksort($cobrado);
+        if ($porFuncion != $cobrado) {
+            return 'Las butacas reservadas no coinciden con el detalle de la venta. Recargue la pagina y vuelva a intentar.';
+        }
+
+        return null;
+    }
+
+    /**
      * Inserta los boletos de la venta y limpia los asientos momentaneos del
      * usuario, de modo que cada venta se lleve solo lo suyo.
      *
