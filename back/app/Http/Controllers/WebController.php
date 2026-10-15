@@ -115,10 +115,20 @@ class WebController extends Controller{
             ];
         });
 
+        // Los asientos se muestran igual; si la pelicula web tiene la venta online
+        // desactivada, la web solo debe informar y no permitir comprar (venta en ventanilla)
+        $ventaOnline = !\DB::table('web_movie_programa')
+            ->join('web_movies', 'web_movies.id', '=', 'web_movie_programa.web_movie_id')
+            ->where('web_movie_programa.programa_id', $programa->id)
+            ->whereNull('web_movies.deleted_at')
+            ->where('web_movies.venta_online', false)
+            ->exists();
+
         return [
             "sala" => $programa->sala,
             "seat" => $result,
             "programa" => $programa,
+            "venta_online" => $ventaOnline,
         ];
     }
 

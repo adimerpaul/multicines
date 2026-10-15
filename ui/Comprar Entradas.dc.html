@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Comprar entradas · MultiCines Plaza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;background:#0d0710;color:#f6f1f4;font-family:Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#ffc72c;text-decoration:none}
+a:hover{color:#ffe08a}
+input::placeholder{color:#7d6c80}
+button{font-family:inherit}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#0d0710;display:flex;flex-direction:column">
+
+<!-- Header -->
+<header style="position:sticky;top:0;z-index:40;background:rgba(13,7,16,.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)">
+  <div style="max-width:1280px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+    <a href="MultiCines Plaza.dc.html#inicio" style="display:flex;align-items:center;gap:12px;color:#f6f1f4">
+      <img src="img/logo.png" alt="MultiCines Plaza" style="width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 2px #d61f7f"></img>
+      <div style="display:flex;flex-direction:column;line-height:1">
+        <span style="font-family:Anton,sans-serif;font-size:22px;letter-spacing:.5px">MULTICINES <span style="color:#ffc72c">PLAZA</span></span>
+        <span style="font-size:11px;color:#b8a9b8;letter-spacing:2px;margin-top:4px">ORURO · BOLIVIA</span>
+      </div>
+    </a>
+    <nav style="display:flex;gap:24px;flex:1;min-width:0;overflow-x:auto;white-space:nowrap;scrollbar-width:none;font-weight:600;font-size:15px">
+      <a href="MultiCines Plaza.dc.html#cartelera" style="color:#f6f1f4">Cartelera</a>
+      <a href="MultiCines Plaza.dc.html#proximos" style="color:#f6f1f4">Próximos estrenos</a>
+      <a href="MultiCines Plaza.dc.html#comprar" style="color:#f6f1f4">Cómo comprar</a>
+      <a href="MultiCines Plaza.dc.html#contacto" style="color:#f6f1f4">Contacto</a>
+      <a href="Mi Cuenta.dc.html" style="color:#f6f1f4">Mis compras</a>
+    </nav>
+    <a href="Mi Cuenta.dc.html" style="white-space:nowrap;flex:0 0 auto;color:#f6f1f4;font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px"><sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}"><span style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6a1fb0,#d61f7f);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">{{ userInitial }}</span></sc-if>{{ userLabel }}</a>
+    <button onClick="{{ goHome }}" style="white-space:nowrap;flex:0 0 auto;border:0;cursor:pointer;background:#ffc72c;color:#1a0a1c;font-weight:800;font-size:15px;padding:12px 22px;border-radius:999px" style-hover="background:#ffd659">Comprar entradas</button>
+  </div>
+</header>
+
+<!-- Booking page -->
+<main style="flex:1;padding:28px 24px 72px;box-sizing:border-box">
+    <div style="max-width:1100px;margin:0 auto 18px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#b8a9b8;flex-wrap:wrap">
+      <a href="MultiCines Plaza.dc.html#cartelera" style="color:#ffc72c">← Cartelera</a><span>/</span><span>Comprar entradas</span>
+    </div>
+    <div style="max-width:1100px;margin:0 auto;background:#140b19;border-radius:24px;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 40px 120px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-wrap:wrap">
+      <!-- Summary -->
+      <aside style="flex:1 1 300px;max-width:100%;position:relative;min-height:320px;overflow:hidden">
+        <img src="{{ bm.img }}" alt="" style="position:absolute;inset:-30px;width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(26px) saturate(1.3);opacity:.55"></img>
+        <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(106,31,176,.55),rgba(13,7,16,.92) 70%)"></div>
+        <div style="position:relative;padding:28px;display:flex;flex-direction:column;gap:20px">
+          <img src="{{ bm.img }}" alt="" style="width:150px;aspect-ratio:2/3;object-fit:cover;object-position:bottom;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.5)"></img>
+          <div>
+            <h3 style="font-family:Anton,sans-serif;font-weight:400;font-size:30px;line-height:1.05;margin:0 0 6px;text-transform:uppercase">{{ bm.titulo }}</h3>
+            <div style="color:#d9cdd8;font-size:14px;font-weight:600">{{ bm.genero }} · {{ bm.duracion }} · {{ bm.clasif }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;border-top:1px solid rgba(255,255,255,.12);padding-top:18px">
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#b8a9b8">Fecha</span><strong>{{ sumFecha }}</strong></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#b8a9b8">Hora</span><strong>{{ sumHora }}</strong></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#b8a9b8">Sala</span><strong>{{ sumSala }}</strong></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#b8a9b8">Asientos</span><strong>{{ sumSeats }}</strong></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-top:1px solid rgba(255,255,255,.12);padding-top:14px;margin-top:4px"><span style="color:#b8a9b8">Total</span><strong style="font-family:Anton,sans-serif;font-weight:400;font-size:32px;color:#ffc72c">{{ sumTotal }}</strong></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Steps -->
+      <div style="flex:2 1 520px;max-width:100%;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;gap:24px;min-height:560px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ stepTabs }}" as="t" hint-placeholder-count="5">
+              <span style="white-space:nowrap;font-size:13px;font-weight:700;padding:8px 12px;border-radius:999px;background:{{ t.bg }};color:{{ t.color }}">{{ t.label }}</span>
+            </sc-for>
+          </div>
+          <a href="MultiCines Plaza.dc.html#cartelera" style="flex:0 0 auto;font-size:14px;font-weight:700;color:#b8a9b8;white-space:nowrap">Cancelar</a>
+        </div>
+
+        <sc-if value="{{ isStep0 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <div>
+              <div style="font-weight:800;font-size:13px;letter-spacing:2px;color:#ffc72c;margin-bottom:12px">DÍA</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ bDays }}" as="d" hint-placeholder-count="7">
+                  <button onClick="{{ d.pick }}" style="cursor:pointer;width:70px;padding:10px 0;border-radius:12px;border:1px solid {{ d.border }};background:{{ d.bg }};color:{{ d.color }};display:flex;flex-direction:column;align-items:center">
+                    <span style="font-size:12px;font-weight:600">{{ d.dow }}</span>
+                    <span style="font-family:Anton,sans-serif;font-size:24px">{{ d.num }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-weight:800;font-size:13px;letter-spacing:2px;color:#ffc72c;margin-bottom:12px">HORARIO</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <sc-for list="{{ bTimes }}" as="h" hint-placeholder-count="3">
+                  <button onClick="{{ h.pick }}" style="cursor:pointer;min-width:130px;padding:14px 16px;border-radius:14px;border:1px solid {{ h.border }};background:{{ h.bg }};color:#fff;display:flex;flex-direction:column;gap:4px;text-align:left">
+                    <span style="font-family:Anton,sans-serif;font-size:26px">{{ h.hora }}</span>
+                    <span style="font-size:13px;color:#e5d6e6;font-weight:600">{{ h.f }} · Bs. {{ h.p }} · {{ h.sala }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ needLogin }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:center;padding:8px 0">
+            <div style="width:min(440px,100%);background:#1a1020;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px">
+              <div>
+                <h3 style="font-family:Anton,sans-serif;font-weight:400;font-size:28px;margin:0 0 6px;line-height:1.05">INICIA SESIÓN PARA ELEGIR TUS ASIENTOS</h3>
+                <p style="margin:0;color:#b8a9b8;font-size:14px;line-height:1.5">Tus entradas quedan guardadas en Mis compras y puedes volver a ver tus QR cuando quieras.</p>
+              </div>
+              <button onClick="{{ doAuth }}" style="cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:#fff;color:#1f1f1f;border:0;border-radius:999px;padding:14px 20px;font-weight:700;font-size:15px" style-hover="background:#f1ecf0">
+                <span style="width:24px;height:24px;border-radius:50%;border:2px solid #ea4335;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#4285f4;box-sizing:border-box">G</span>
+                Continuar con Google
+              </button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showSeats }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:22px">
+            <div style="width:80%;height:34px;border-top:4px solid #d61f7f;border-radius:50%/100% 100% 0 0;box-shadow:0 -10px 30px -6px rgba(214,31,127,.6);text-align:center;padding-top:10px;font-size:12px;letter-spacing:4px;color:#b8a9b8;font-weight:700">PANTALLA</div>
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:100%;overflow-x:auto">
+              <sc-for list="{{ seatRows }}" as="r" hint-placeholder-count="8">
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="width:18px;font-size:12px;font-weight:700;color:#8e7d90;text-align:center">{{ r.letra }}</span>
+                  <div style="display:flex;gap:6px">
+                    <sc-for list="{{ r.left }}" as="s" hint-placeholder-count="6">
+                      <button onClick="{{ s.toggle }}" title="{{ s.id }}" style="cursor:{{ s.cursor }};width:30px;height:28px;border-radius:8px 8px 4px 4px;border:0;background:{{ s.bg }};color:{{ s.color }};font-size:10px;font-weight:800;padding:0">{{ s.num }}</button>
+                    </sc-for>
+                  </div>
+                  <span style="width:20px"></span>
+                  <div style="display:flex;gap:6px">
+                    <sc-for list="{{ r.right }}" as="s" hint-placeholder-count="6">
+                      <button onClick="{{ s.toggle }}" title="{{ s.id }}" style="cursor:{{ s.cursor }};width:30px;height:28px;border-radius:8px 8px 4px 4px;border:0;background:{{ s.bg }};color:{{ s.color }};font-size:10px;font-weight:800;padding:0">{{ s.num }}</button>
+                    </sc-for>
+                  </div>
+                  <span style="width:18px;font-size:12px;font-weight:700;color:#8e7d90;text-align:center">{{ r.letra }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:20px;font-size:13px;font-weight:600;color:#d9cdd8;flex-wrap:wrap;justify-content:center">
+              <span style="display:flex;gap:8px;align-items:center"><span style="width:14px;height:14px;border-radius:4px;background:#3a2a40"></span>Disponible</span>
+              <span style="display:flex;gap:8px;align-items:center"><span style="width:14px;height:14px;border-radius:4px;background:#ffc72c"></span>Seleccionado</span>
+              <span style="display:flex;gap:8px;align-items:center"><span style="width:14px;height:14px;border-radius:4px;background:#5a1238"></span>Ocupado</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px;max-width:520px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <div style="font-weight:800;font-size:13px;letter-spacing:2px;color:#ffc72c">DATOS DE FACTURACIÓN</div>
+              <button onClick="{{ sinNombre }}" style="cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff;font-weight:700;font-size:13px;padding:8px 12px;border-radius:999px">Sin nombre (S/N)</button>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#d9cdd8">NIT / CI
+                <input value="{{ nit }}" onChange="{{ setNit }}" placeholder="1234567" style="background:#0d0710;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px;color:#fff;font-size:16px;font-family:inherit;outline:none"></input>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#d9cdd8">Complemento
+                <input value="{{ cplx }}" onChange="{{ setCplx }}" placeholder="1A" style="background:#0d0710;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px;color:#fff;font-size:16px;font-family:inherit;outline:none"></input>
+              </label>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#d9cdd8">Nombre o razón social
+              <input value="{{ nombre }}" onChange="{{ setNombre }}" placeholder="Juan Pérez" style="background:#0d0710;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px;color:#fff;font-size:16px;font-family:inherit;outline:none"></input>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#d9cdd8">Correo para recibir la entrada y factura
+              <input value="{{ email }}" onChange="{{ setEmail }}" placeholder="correo@ejemplo.com" style="background:#0d0710;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:14px;color:#fff;font-size:16px;font-family:inherit;outline:none"></input>
+            </label>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
+            <div style="background:#fff;padding:18px;border-radius:20px;box-shadow:0 0 0 6px rgba(214,31,127,.35)">
+              <div style="width:220px;height:220px;display:grid;grid-template-columns:repeat(25,1fr)">
+                <sc-for list="{{ qr }}" as="c" hint-placeholder-count="0">
+                  <span style="background:{{ c }}"></span>
+                </sc-for>
+              </div>
+            </div>
+            <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-weight:800;font-size:13px;letter-spacing:2px;color:#ffc72c">PAGO CON QR</div>
+              <div style="font-family:Anton,sans-serif;font-size:48px;line-height:1">{{ sumTotal }}</div>
+              <p style="margin:0;color:#d9cdd8;font-size:15px;line-height:1.6">Abre la app de tu banco, elige “Pagar con QR” y escanea el código. La confirmación es automática.</p>
+              <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:#fff;background:rgba(255,255,255,.06);border-radius:12px;padding:12px 14px;width:fit-content">
+                <span style="width:10px;height:10px;border-radius:50%;background:#ffc72c"></span>Esperando pago · expira en {{ timer }}
+              </div>
+              <button onClick="{{ simularPago }}" style="cursor:pointer;margin-top:6px;background:transparent;border:1px dashed rgba(255,255,255,.35);color:#d9cdd8;font-weight:700;font-size:13px;padding:10px 14px;border-radius:10px;width:fit-content">Simular pago confirmado (demo)</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isStep4 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+            <div style="color:#ffc72c;font-weight:800;letter-spacing:2px;font-size:13px">¡PAGO CONFIRMADO!</div>
+            <div style="width:min(380px,100%);border-radius:22px;overflow:hidden;background:#f7eff5;color:#1a0a1c;box-shadow:0 30px 80px rgba(214,31,127,.35)">
+              <div style="background:linear-gradient(135deg,#6a1fb0,#d61f7f);color:#fff;padding:20px 22px;display:flex;gap:14px;align-items:center">
+                <img src="{{ bm.img }}" alt="" style="width:54px;height:80px;object-fit:cover;border-radius:8px"></img>
+                <div>
+                  <div style="font-family:Anton,sans-serif;font-size:22px;line-height:1.05;text-transform:uppercase">{{ bm.titulo }}</div>
+                  <div style="font-size:12px;font-weight:700;opacity:.9;margin-top:4px">MULTICINES PLAZA · ORURO</div>
+                </div>
+              </div>
+              <div style="padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+                <div><div style="color:#7a6a7c;font-weight:700">Fecha</div><div style="font-weight:800;font-size:15px">{{ sumFecha }}</div></div>
+                <div><div style="color:#7a6a7c;font-weight:700">Hora</div><div style="font-weight:800;font-size:15px">{{ sumHora }}</div></div>
+                <div><div style="color:#7a6a7c;font-weight:700">Sala</div><div style="font-weight:800;font-size:15px">{{ sumSala }}</div></div>
+                <div><div style="color:#7a6a7c;font-weight:700">Asientos</div><div style="font-weight:800;font-size:15px">{{ sumSeats }}</div></div>
+              </div>
+              <div style="border-top:2px dashed #d8c6d4;margin:0 14px"></div>
+              <div style="padding:18px 22px;display:flex;align-items:center;gap:16px">
+                <div style="width:96px;height:96px;display:grid;grid-template-columns:repeat(25,1fr);flex:0 0 auto">
+                  <sc-for list="{{ qr }}" as="c" hint-placeholder-count="0">
+                    <span style="background:{{ c }}"></span>
+                  </sc-for>
+                </div>
+                <div style="font-size:13px;display:flex;flex-direction:column;gap:4px">
+                  <span style="color:#7a6a7c;font-weight:700">Código de entrada</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:500">{{ code }}</span>
+                  <span style="color:#7a6a7c">Total pagado {{ sumTotal }}</span>
+                </div>
+              </div>
+            </div>
+            <p style="margin:0;color:#b8a9b8;font-size:14px;text-align:center">Enviamos tu entrada y factura a {{ emailShown }}</p>
+            <a href="Mi Cuenta.dc.html" style="font-weight:700;font-size:14px">Ver en Mis compras →</a>
+          </div>
+        </sc-if>
+
+        <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,.08);padding-top:20px">
+          <button onClick="{{ back }}" style="cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:15px;padding:13px 22px;border-radius:999px;visibility:{{ backVis }}">Atrás</button>
+          <span style="color:#b8a9b8;font-size:13px;font-weight:600;text-align:center">{{ hint }}</span>
+          <button onClick="{{ next }}" style="cursor:pointer;border:0;background:{{ nextBg }};color:#1a0a1c;font-weight:800;font-size:15px;padding:14px 26px;border-radius:999px;opacity:{{ nextOp }}">{{ nextLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<footer style="border-top:1px solid rgba(255,255,255,.08);background:#0a050c">
+  <div style="max-width:1280px;margin:0 auto;padding:22px 24px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#8e7d90;font-size:13px">
+    <span>MultiCines Plaza · Av. Tacna, Jaén y Tomás Frías, Oruro · 2 5281290</span>
+    <span>Pago seguro con QR</span>
+  </div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;qrMinutes&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5,&quot;min&quot;:1,&quot;max&quot;:15,&quot;tsType&quot;:&quot;number&quot;,&quot;unit&quot;:&quot;min&quot;}}">
+const MOVIES=[
+ {id:'avengers',titulo:'Avengers: Endgame Bonus',img:'img/avengers.png',genero:'Acción',duracion:'3h 01m',clasif:'+13',estreno:false,horas:[{h:'10:15',f:'2D',p:30,sala:'Sala 1'},{h:'18:15',f:'3D',p:40,sala:'Sala 1'}]},
+ {id:'vertigo',titulo:'Vértigo 2: Punto Muerto',img:'img/vertigo.png',genero:'Suspenso',duracion:'1h 45m',clasif:'+13',estreno:true,horas:[{h:'13:45',f:'2D',p:40,sala:'Sala 2'},{h:'19:15',f:'2D',p:40,sala:'Sala 2'},{h:'21:30',f:'2D',p:40,sala:'Sala 2'}]},
+ {id:'resident',titulo:'Resident Evil: Noche Cero',img:'img/resident.png',genero:'Terror',duracion:'1h 50m',clasif:'+16',estreno:false,horas:[{h:'15:00',f:'2D',p:30,sala:'Sala 3'},{h:'16:00',f:'2D',p:30,sala:'Sala 4'},{h:'22:00',f:'2D',p:30,sala:'Sala 3'}]},
+ {id:'verity',titulo:'Verity: La sombra de un engaño',img:'img/verity.png',genero:'Thriller',duracion:'1h 55m',clasif:'+16',estreno:true,horas:[{h:'12:15',f:'2D',p:40,sala:'Sala 4'},{h:'20:00',f:'2D',p:40,sala:'Sala 4'}]},
+ {id:'coyote',titulo:'Coyote vs. Acme',img:'img/coyote.png',genero:'Animación',duracion:'1h 40m',clasif:'ATP',estreno:false,horas:[{h:'17:00',f:'2D',p:30,sala:'Sala 1'}]},
+ {id:'digger',titulo:'Digger',img:'img/digger.png',genero:'Drama',duracion:'2h 05m',clasif:'+13',estreno:true,horas:[{h:'16:30',f:'2D',p:40,sala:'Sala 2'}]},
+ {id:'hambre',titulo:'Los Juegos del Hambre: En Llamas',img:'img/hambre.png',genero:'Aventura',duracion:'2h 26m',clasif:'+13',estreno:true,horas:[{h:'13:30',f:'2D',p:30,sala:'Sala 3'}]},
+ {id:'isla',titulo:'La Isla Olvidada',img:'img/isla.png',genero:'Animación',duracion:'1h 35m',clasif:'ATP',estreno:false,horas:[{h:'10:00',f:'2D',p:30,sala:'Sala 4'}]},
+ {id:'bestia',titulo:'El Corazón de la Bestia',img:'img/bestia.png',genero:'Aventura',duracion:'1h 50m',clasif:'+13',estreno:false,horas:[{h:'11:00',f:'2D',p:30,sala:'Sala 3'}]}
+];
+const SLIDES=[
+ {id:'avengers',tag:'REESTRENO',bg:'img/cover.png',filter:'none',sinopsis:'La épica final de los Vengadores vuelve a la pantalla grande con contenido extra. Disponible en 2D y 3D.'},
+ {id:'vertigo',tag:'ESTRENO',bg:'img/vertigo.png',filter:'blur(28px) saturate(1.2)',sinopsis:'A miles de metros de altura, un error puede ser el último. Estreno exclusivo de esta semana.'},
+ {id:'resident',tag:'EN CARTELERA',bg:'img/resident.png',filter:'blur(28px) saturate(1.3)',sinopsis:'El horror regresa a Raccoon City. Funciones todos los días, también en trasnoche.'},
+ {id:'hambre',tag:'ESTRENO',bg:'img/hambre.png',filter:'blur(28px) saturate(1.2)',sinopsis:'Katniss y Peeta vuelven a la arena en el Vasallaje de los 25.'}
+];
+const PROX=[{titulo:'Próximo estreno',fecha:'Fecha por anunciar',meta:'Director · Género · Duración'},{titulo:'Próximo estreno',fecha:'Fecha por anunciar',meta:'Director · Género · Duración'},{titulo:'Próximo estreno',fecha:'Fecha por anunciar',meta:'Director · Género · Duración'}];
+const DOW=['dom','lun','mar','mié','jue','vie','sáb'];
+const DAYS=Array.from({length:7},(_,i)=>{const d=new Date(2026,9,14+i);return{dow:i===0?'hoy':DOW[d.getDay()],num:d.getDate(),mon:'oct',full:DOW[d.getDay()]+' '+d.getDate()+' oct'}});
+const LETRAS='ABCDEFGH'.split('');
+const COLS=12;
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function makeQR(seed){const n=25,cells=[];let r=hash(seed);const rnd=()=>{r^=r<<13;r>>>=0;r^=r>>17;r^=r<<5;r>>>=0;return r/4294967296};
+ const finder=(x,y)=>{for(const [fx,fy] of [[0,0],[n-7,0],[0,n-7]]){const dx=x-fx,dy=y-fy;if(dx>=0&&dx<7&&dy>=0&&dy<7){if(dx===0||dx===6||dy===0||dy===6)return 1;if(dx>=2&&dx<=4&&dy>=2&&dy<=4)return 1;return 0}if(dx>=-1&&dx<=7&&dy>=-1&&dy<=7)return 0}return -1};
+ for(let y=0;y<n;y++)for(let x=0;x<n;x++){const f=finder(x,y);const on=f===-1?rnd()>.52:f===1;cells.push(on?'#1a0a1c':'transparent')}return cells}
+
+class Component extends DCLogic{
+ state={user:null,authMode:'login',slide:0,filter:'Todos',day:0,trailer:null,open:true,mid:'avengers',step:0,bday:0,bt:0,seats:[],nit:'',cplx:'',nombre:'',email:'',left:300,code:'',remind:{}};
+ componentDidMount(){let u=null;try{u=JSON.parse(localStorage.getItem('mp_user')||'null')}catch(e){}if(u)this.setState({user:u,email:u.email,nombre:u.nombre});const q=new URLSearchParams(location.search);const id=q.get('pelicula');const t=q.get('funcion');const d=q.get('dia');this.setState({mid:MOVIES.some(m=>m.id===id)?id:MOVIES[0].id,bt:t!=null?+t:0,bday:d!=null?+d:0,step:t!=null?1:0})}
+ componentWillUnmount(){clearInterval(this.t);clearInterval(this.q)}
+ movie(id){return MOVIES.find(m=>m.id===id)}
+ openBook(id,ti){clearInterval(this.q);this.setState({open:true,trailer:null,mid:id,step:ti==null?0:1,bday:this.state.day,bt:ti||0,seats:[],code:''})}
+ goStep(n){clearInterval(this.q);if(n===3){const mins=this.props.qrMinutes??5;this.setState({step:3,left:mins*60});this.q=setInterval(()=>this.setState(s=>({left:Math.max(0,s.left-1)})),1000)}else this.setState({step:n})}
+ occupied(m,bday,bt){const set=new Set();LETRAS.forEach(l=>{for(let c=1;c<=COLS;c++){if(hash(m.id+bday+bt+l+c)%100<30)set.add(l+c)}});return set}
+ renderVals(){
+  const s=this.state;
+  const slides=SLIDES.map((sl,i)=>{const m=this.movie(sl.id);return{...sl,titulo:m.titulo,poster:m.img,meta:m.genero+' · '+m.duracion+' · '+m.clasif,op:i===s.slide?1:0,pe:i===s.slide?'auto':'none',buy:()=>this.openBook(m.id),trailer:()=>this.setState({trailer:m.titulo})}});
+  const dots=SLIDES.map((_,i)=>({w:i===s.slide?'44px':'18px',bg:i===s.slide?'#ffc72c':'rgba(255,255,255,.35)',go:()=>this.setState({slide:i})}));
+  const filters=['Todos','Estrenos','2D','3D'].map(l=>{const a=s.filter===l;return{label:l,bg:a?'#f6f1f4':'transparent',color:a?'#1a0a1c':'#f6f1f4',border:a?'#f6f1f4':'rgba(255,255,255,.25)',pick:()=>this.setState({filter:l})}});
+  const dayChip=(d,i,active,pick)=>({...d,bg:active?'linear-gradient(160deg,#6a1fb0,#d61f7f)':'#170e1c',color:'#fff',border:active?'#d61f7f':'rgba(255,255,255,.08)',pick});
+  const days=DAYS.map((d,i)=>dayChip(d,i,i===s.day,()=>this.setState({day:i})));
+  const list=MOVIES.filter(m=>s.filter==='Todos'||(s.filter==='Estrenos'?m.estreno:m.horas.some(h=>h.f===s.filter)));
+  const cartelera=list.map(m=>{const ps=[...new Set(m.horas.map(h=>h.p))];return{...m,precioTxt:'Bs. '+ps.join(' / '),trailer:()=>this.setState({trailer:m.titulo}),horas:m.horas.map((h,i)=>({hora:h.h,f:h.f,go:()=>this.openBook(m.id,i)}))}});
+  const proximos=PROX.map((p,i)=>{const on=!!s.remind[i];return{...p,trailer:()=>this.setState({trailer:'Próximo estreno'}),rlabel:on?'✓ Te avisaremos':'Recordarme',rbg:on?'#6a1fb0':'transparent',remind:()=>this.setState(st=>({remind:{...st.remind,[i]:!st.remind[i]}}))}});
+
+  const bm=this.movie(s.mid)||MOVIES[0];
+  const ht=bm.horas[s.bt]||bm.horas[0];
+  const occ=this.occupied(bm,s.bday,s.bt);
+  const seatObj=(l,c)=>{const id=l+c,o=occ.has(id),sel=s.seats.includes(id);return{id,num:c,bg:o?'#5a1238':sel?'#ffc72c':'#3a2a40',color:sel?'#1a0a1c':o?'#8a3a64':'#bfaec3',cursor:o?'not-allowed':'pointer',toggle:()=>{if(o)return;this.setState(st=>({seats:st.seats.includes(id)?st.seats.filter(x=>x!==id):[...st.seats,id].slice(-10)}))}}};
+  const seatRows=LETRAS.map(l=>({letra:l,left:Array.from({length:6},(_,i)=>seatObj(l,i+1)),right:Array.from({length:6},(_,i)=>seatObj(l,i+7))}));
+  const total=s.seats.length*ht.p;
+  const labels=['Función','Asientos','Datos','Pago QR','Entrada'];
+  const stepTabs=labels.map((l,i)=>({label:(i+1)+'. '+l,bg:i===s.step?'#d61f7f':i<s.step?'rgba(214,31,127,.2)':'rgba(255,255,255,.05)',color:i<=s.step?'#fff':'#8e7d90'}));
+  const can=[true,!!s.user&&s.seats.length>0,!!s.nit&&!!s.nombre,false,true][s.step];
+  const hints=['','Selecciona hasta 10 asientos','La factura se emite con estos datos','Escanea el QR para continuar',''];
+  const mm=Math.floor(s.left/60),ss=String(s.left%60).padStart(2,'0');
+  return{
+   loggedIn:!!s.user,userInitial:s.user?s.user.nombre.charAt(0).toUpperCase():'',userLabel:s.user?s.user.nombre.split(' ')[0]:'Ingresar',
+   slides,dots,filters,days,cartelera,proximos,
+   prevSlide:()=>this.setState(st=>({slide:(st.slide-1+SLIDES.length)%SLIDES.length})),
+   nextSlide:()=>this.setState(st=>({slide:(st.slide+1)%SLIDES.length})),
+   goCartelera:()=>{const el=document.getElementById('cartelera');if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-70,behavior:'smooth'})},
+   trailerOpen:!!s.trailer,trailerTitle:s.trailer||'',closeTrailer:()=>this.setState({trailer:null}),stop:e=>e.stopPropagation(),
+   bookOpen:s.open,bm,closeBook:()=>{location.href='MultiCines Plaza.dc.html#cartelera'},goHome:()=>{location.href='MultiCines Plaza.dc.html#cartelera'},
+   sumFecha:DAYS[s.bday].full,sumHora:ht.h+' · '+ht.f,sumSala:ht.sala,sumSeats:s.seats.length?s.seats.join(', '):'—',sumTotal:'Bs. '+total,
+   stepTabs,isStep0:s.step===0,isStep1:s.step===1,isStep2:s.step===2,isStep3:s.step===3,isStep4:s.step===4,
+   bDays:DAYS.map((d,i)=>dayChip(d,i,i===s.bday,()=>this.setState({bday:i,seats:[]}))),
+   bTimes:bm.horas.map((h,i)=>({hora:h.h,f:h.f,p:h.p,sala:h.sala,bg:i===s.bt?'linear-gradient(160deg,#6a1fb0,#d61f7f)':'#1d1224',border:i===s.bt?'#d61f7f':'rgba(255,255,255,.1)',pick:()=>this.setState({bt:i,seats:[]})})),
+   seatRows,
+   showSeats:s.step===1&&!!s.user,needLogin:s.step===1&&!s.user,
+   isRegister:s.authMode==='register',authErr:s.authErr||'',authCta:s.authMode==='register'?'Crear cuenta y continuar':'Ingresar y continuar',
+   tabLogin:s.authMode==='login'?'#f6f1f4':'transparent',tabLoginC:s.authMode==='login'?'#1a0a1c':'#f6f1f4',
+   tabReg:s.authMode==='register'?'#f6f1f4':'transparent',tabRegC:s.authMode==='register'?'#1a0a1c':'#f6f1f4',
+   toLogin:()=>this.setState({authMode:'login',authErr:''}),toRegister:()=>this.setState({authMode:'register',authErr:''}),
+   lEmail:s.lEmail||'',lPass:s.lPass||'',lNombre:s.lNombre||'',
+   setLEmail:e=>this.setState({lEmail:e.target.value}),setLPass:e=>this.setState({lPass:e.target.value}),setLNombre:e=>this.setState({lNombre:e.target.value}),
+   doAuth:()=>{const u={nombre:'Usuario Demo',email:'usuario.demo@gmail.com'};localStorage.setItem('mp_user',JSON.stringify(u));this.setState({user:u,email:s.email||u.email,nombre:s.nombre||u.nombre})},
+   nit:s.nit,cplx:s.cplx,nombre:s.nombre,email:s.email,
+   setNit:e=>this.setState({nit:e.target.value}),setCplx:e=>this.setState({cplx:e.target.value}),setNombre:e=>this.setState({nombre:e.target.value}),setEmail:e=>this.setState({email:e.target.value}),
+   sinNombre:()=>this.setState({nit:'0',nombre:'S/N'}),
+   qr:makeQR(bm.id+s.seats.join('')+s.code),timer:mm+':'+ss,
+   simularPago:()=>{clearInterval(this.q);const code='MP-'+(hash(Date.now()+'')%900000+100000);let list=[];try{list=JSON.parse(localStorage.getItem('mp_compras')||'[]')}catch(e){}list.unshift({code,email:s.user?s.user.email:'',mid:bm.id,titulo:bm.titulo,img:bm.img,fecha:DAYS[s.bday].full,hora:ht.h+' · '+ht.f,sala:ht.sala,seats:s.seats.join(', '),total:'Bs. '+total,nit:s.nit,nombre:s.nombre,creado:new Date().toISOString()});localStorage.setItem('mp_compras',JSON.stringify(list));this.setState({step:4,code})},
+   code:s.code,emailShown:s.email||'tu correo',
+   backVis:s.step>0&&s.step<4?'visible':'hidden',
+   back:()=>this.goStep(Math.max(0,s.step-1)),
+   hint:s.step===1&&!s.user?'Inicia sesión para continuar':hints[s.step],
+   nextLabel:s.step===4?'Volver al inicio':s.step===2?'Ir a pagar':'Continuar',
+   nextBg:s.step===3?'#3a2a40':'#ffc72c',nextOp:can?1:.4,
+   next:()=>{if(!can)return;if(s.step===4){location.href='MultiCines Plaza.dc.html';return}this.goStep(s.step+1)}
+  };
+ }
+}
+</script>
+</body>
+</html>

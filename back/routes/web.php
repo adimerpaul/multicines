@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CineController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+// Web publica de la cartelera (Blade)
+Route::middleware('cine.headers')->group(function () {
+    Route::get('/', [CineController::class, 'home'])->name('cine.home');
+    Route::get('/comprar/{id}', [CineController::class, 'comprar'])->whereNumber('id')->name('cine.comprar');
+
+    Route::post('/cine/asientos', [CineController::class, 'asientos'])
+        ->middleware(['cine.token', 'throttle:60,1'])
+        ->name('cine.asientos');
 });

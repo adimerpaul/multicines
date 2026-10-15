@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WebMovie;
 use App\Models\WebMovieActor;
 use App\Models\WebStudio;
+use App\Services\ImagenWebp;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -150,12 +151,14 @@ class WebMovieController extends Controller
         $trailer = $request->trailer_youtube ?: $this->resolveYoutubeTrailer($movieData['videos']['results'] ?? []);
         $posterLocal = $this->downloadImageLocally(
             $this->tmdbImageUrl($movieData['poster_path'] ?? null, 'original'),
-            'webmovies'
+            'webmovies',
+            780
         );
 
         $backdropLocal = $this->downloadImageLocally(
             $this->tmdbImageUrl($movieData['backdrop_path'] ?? null, 'original'),
-            'webmovies'
+            'webmovies',
+            1280
         );
 
         $imdbId = $movieData['external_ids']['imdb_id'] ?? null;
@@ -213,8 +216,9 @@ class WebMovieController extends Controller
         $cast = array_slice($movieData['credits']['cast'] ?? [], 0, 20);
         foreach ($cast as $actor) {
             $actorImage = $this->downloadImageLocally(
-                $this->tmdbImageUrl($actor['profile_path'] ?? null, 'original'),
-                'webmovies/actors'
+                $this->tmdbImageUrl($actor['profile_path'] ?? null, 'w342'),
+                'webmovies/actors',
+                300
             );
 
             WebMovieActor::create([
@@ -229,8 +233,11 @@ class WebMovieController extends Controller
 
     public function listProgramaciones()
     {
+        // Ventana acotada: sin tope la consulta cargaba miles de programas y agotaba la memoria
         return \App\Models\Programa::whereDate('fecha', '>=', now()->toDateString())
-            ->with('movie', 'sala', 'price')
+            ->whereDate('fecha', '<=', now()->addMonths(3)->toDateString())
+            ->select('id', 'fecha', 'horaInicio', 'horaFin', 'nroFuncion', 'movie_id', 'sala_id', 'price_id')
+            ->with('movie:id,nombre,imagen', 'sala:id,nombre', 'price:id,precio')
             ->orderBy('fecha')
             ->orderBy('horaInicio')
             ->get();
@@ -241,10 +248,28 @@ class WebMovieController extends Controller
         $data = $request->validate([
             'programa_ids' => 'nullable|array',
             'programa_ids.*' => 'integer|exists:programas,id',
+            // Funciones vinculadas que se ven en la web pero solo se venden en boleteria
+            'sin_venta_online_ids' => 'nullable|array',
+            'sin_venta_online_ids.*' => 'integer',
         ]);
 
-        $ids = $data['programa_ids'] ?? [];
-        $webMovie->programas()->sync($ids);
+        $sinVenta = array_flip($data['sin_venta_online_ids'] ?? []);
+        $sync = [];
+        foreach ($data['programa_ids'] ?? [] as $id) {
+            $sync[$id] = ['venta_online' => !isset($sinVenta[$id])];
+        }
+        $webMovie->programas()->sync($sync);
+
+        return $this->show($webMovie);
+    }
+
+    public function toggleVentaOnline(Request $request, WebMovie $webMovie)
+    {
+        $data = $request->validate([
+            'venta_online' => 'required|boolean',
+        ]);
+
+        $webMovie->update(['venta_online' => $data['venta_online']]);
 
         return $this->show($webMovie);
     }
@@ -286,6 +311,7 @@ class WebMovieController extends Controller
             'clasificacion' => 'nullable|string|max:50',
             'premios' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:50',
+            'venta_online' => 'sometimes|boolean',
             'api_payload' => 'nullable|array',
             'actores' => 'nullable|array',
             'actores.*.nombre' => 'required|string|max:255',
@@ -395,7 +421,7 @@ class WebMovieController extends Controller
         return isset($matches[0]) ? (int) $matches[0] : null;
     }
 
-    private function downloadImageLocally(?string $imageUrl, string $subDirectory = 'webmovies'): ?string
+    private function downloadImageLocally(?string $imageUrl, string $subDirectory = 'webmovies', int $maxWidth = 1280): ?string
     {
         if (!$imageUrl) {
             return null;
@@ -405,6 +431,11 @@ class WebMovieController extends Controller
             $response = Http::timeout(20)->get($imageUrl);
             if (!$response->ok()) {
                 return null;
+            }
+
+            $webp = ImagenWebp::guardar($response->body(), $subDirectory, $maxWidth);
+            if ($webp) {
+                return $webp;
             }
 
             $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);

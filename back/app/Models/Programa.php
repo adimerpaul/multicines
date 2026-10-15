@@ -46,7 +46,7 @@ class Programa extends Model
 
     public function webMovies()
     {
-        return $this->belongsToMany(WebMovie::class, 'web_movie_programa');
+        return $this->belongsToMany(WebMovie::class, 'web_movie_programa')->withPivot('venta_online');
     }
     protected $hidden = [
         'created_at',

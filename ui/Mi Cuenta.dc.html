@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Mis compras · MultiCines Plaza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0d0710;color:#f6f1f4;font-family:Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#ffc72c;text-decoration:none}
+a:hover{color:#ffe08a}
+button{font-family:inherit}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#0d0710;display:flex;flex-direction:column">
+
+<header style="position:sticky;top:0;z-index:40;background:rgba(13,7,16,.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)">
+  <div style="max-width:1280px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+    <a href="MultiCines Plaza.dc.html" style="display:flex;align-items:center;gap:12px;color:#f6f1f4">
+      <img src="img/logo.png" alt="MultiCines Plaza" style="width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 2px #d61f7f"></img>
+      <div style="display:flex;flex-direction:column;line-height:1">
+        <span style="font-family:Anton,sans-serif;font-size:22px;letter-spacing:.5px">MULTICINES <span style="color:#ffc72c">PLAZA</span></span>
+        <span style="font-size:11px;color:#b8a9b8;letter-spacing:2px;margin-top:4px">ORURO · BOLIVIA</span>
+      </div>
+    </a>
+    <nav style="display:flex;gap:24px;flex:1;min-width:0;overflow-x:auto;white-space:nowrap;scrollbar-width:none;font-weight:600;font-size:15px">
+      <a href="MultiCines Plaza.dc.html#cartelera" style="color:#f6f1f4">Cartelera</a>
+      <a href="MultiCines Plaza.dc.html#proximos" style="color:#f6f1f4">Próximos estrenos</a>
+      <a href="MultiCines Plaza.dc.html#comprar" style="color:#f6f1f4">Cómo comprar</a>
+      <a href="MultiCines Plaza.dc.html#contacto" style="color:#f6f1f4">Contacto</a>
+      <a href="Mi Cuenta.dc.html" style="color:#ffc72c">Mis compras</a>
+    </nav>
+    <a href="MultiCines Plaza.dc.html#cartelera" style="white-space:nowrap;flex:0 0 auto;background:#ffc72c;color:#1a0a1c;font-weight:800;font-size:15px;padding:12px 22px;border-radius:999px">Comprar entradas</a>
+  </div>
+</header>
+
+<main style="flex:1;max-width:1280px;width:100%;margin:0 auto;padding:40px 24px 72px;box-sizing:border-box">
+
+  <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;justify-content:center;padding:32px 0">
+      <div style="width:min(420px,100%);background:#170e1c;border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:36px 32px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center">
+        <img src="img/logo.png" alt="" style="width:64px;height:64px;border-radius:50%"></img>
+        <div>
+          <h1 style="font-family:Anton,sans-serif;font-weight:400;font-size:34px;margin:0 0 8px;line-height:1">MI CUENTA</h1>
+          <p style="margin:0;color:#b8a9b8;font-size:14px;line-height:1.5">Ingresa con tu cuenta de Gmail para ver tus compras y los QR de tus entradas.</p>
+        </div>
+        <button onClick="{{ googleLogin }}" style="cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:#fff;color:#1f1f1f;border:0;border-radius:999px;padding:14px 20px;font-weight:700;font-size:15px" style-hover="background:#f1ecf0">
+          <span style="width:24px;height:24px;border-radius:50%;border:2px solid #ea4335;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#4285f4;box-sizing:border-box">G</span>
+          Continuar con Google
+        </button>
+        <span style="color:#8e7d90;font-size:12px">Al continuar aceptas los términos y la política de privacidad.</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:32px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:16px">
+          <span style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#6a1fb0,#d61f7f);display:flex;align-items:center;justify-content:center;font-family:Anton,sans-serif;font-size:28px">{{ userInitial }}</span>
+          <div>
+            <div style="color:#ffc72c;font-weight:800;font-size:13px;letter-spacing:3px;margin-bottom:6px;text-transform:uppercase">Hola, {{ userFirst }}</div>
+            <h1 style="font-family:Anton,sans-serif;font-weight:400;font-size:clamp(38px,5vw,56px);margin:0;line-height:1">MIS COMPRAS</h1>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span style="color:#b8a9b8;font-size:14px;font-weight:600">{{ userEmail }}</span>
+          <button onClick="{{ logout }}" style="white-space:nowrap;flex:0 0 auto;cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff;font-weight:700;font-size:14px;padding:10px 16px;border-radius:999px">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px dashed rgba(255,255,255,.2);border-radius:22px;padding:56px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+          <div style="font-family:Anton,sans-serif;font-size:28px">AÚN NO TIENES COMPRAS</div>
+          <p style="margin:0;color:#b8a9b8;font-size:15px;text-wrap:balance">Cuando compres entradas, aquí verás tus QR para entrar a la sala.</p>
+          <a href="MultiCines Plaza.dc.html#cartelera" style="display:inline-block;white-space:nowrap;background:#ffc72c;color:#1a0a1c;font-weight:800;font-size:15px;padding:13px 24px;border-radius:999px">Ver cartelera</a>
+        </div>
+      </sc-if>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:20px">
+        <sc-for list="{{ compras }}" as="c" hint-placeholder-count="0">
+          <article style="background:#170e1c;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08);display:flex;flex-direction:column">
+            <div style="display:flex;gap:16px;padding:18px">
+              <img src="{{ c.img }}" alt="" style="width:76px;height:112px;object-fit:cover;object-position:bottom;border-radius:10px;flex:0 0 auto"></img>
+              <div style="min-width:0;display:flex;flex-direction:column;gap:6px">
+                <span style="width:fit-content;background:rgba(255,199,44,.15);color:#ffc72c;font-weight:800;font-size:11px;letter-spacing:1.5px;padding:5px 8px;border-radius:6px">VIGENTE</span>
+                <h3 style="font-family:Anton,sans-serif;font-weight:400;font-size:22px;line-height:1.05;margin:0;text-transform:uppercase">{{ c.titulo }}</h3>
+                <span style="color:#d9cdd8;font-size:14px;font-weight:600">{{ c.fecha }} · {{ c.hora }}</span>
+                <span style="color:#b8a9b8;font-size:13px">{{ c.sala }} · Asientos {{ c.seats }}</span>
+              </div>
+            </div>
+            <div style="border-top:2px dashed rgba(255,255,255,.12);margin:0 14px"></div>
+            <div style="padding:14px 18px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:14px">{{ c.code }}</span>
+                <span style="color:#b8a9b8;font-size:13px">{{ c.total }} · Pagado con QR</span>
+              </div>
+              <button onClick="{{ c.ver }}" style="cursor:pointer;border:0;background:linear-gradient(135deg,#6a1fb0,#d61f7f);color:#fff;font-weight:800;font-size:14px;padding:11px 18px;border-radius:999px;white-space:nowrap">Ver QR</button>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+</main>
+
+<footer style="border-top:1px solid rgba(255,255,255,.08);background:#0a050c">
+  <div style="max-width:1280px;margin:0 auto;padding:22px 24px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#8e7d90;font-size:13px">
+    <span>MultiCines Plaza · Av. Tacna, Jaén y Tomás Frías, Oruro · 2 5281290</span>
+    <span>Pago seguro con QR</span>
+  </div>
+</footer>
+
+<sc-if value="{{ qrOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeQr }}" style="position:fixed;inset:0;z-index:60;background:rgba(5,2,8,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div onClick="{{ stop }}" style="width:min(380px,100%);border-radius:24px;overflow:hidden;background:#f7eff5;color:#1a0a1c;box-shadow:0 30px 80px rgba(214,31,127,.35)">
+      <div style="background:linear-gradient(135deg,#6a1fb0,#d61f7f);color:#fff;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div>
+          <div style="font-family:Anton,sans-serif;font-size:22px;line-height:1.05;text-transform:uppercase">{{ sel.titulo }}</div>
+          <div style="font-size:13px;font-weight:700;opacity:.9;margin-top:4px">{{ sel.fecha }} · {{ sel.hora }}</div>
+        </div>
+        <button onClick="{{ closeQr }}" style="cursor:pointer;flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;font-size:15px">✕</button>
+      </div>
+      <div style="padding:26px;display:flex;flex-direction:column;align-items:center;gap:16px">
+        <div style="width:240px;height:240px;display:grid;grid-template-columns:repeat(25,1fr)">
+          <sc-for list="{{ qr }}" as="q" hint-placeholder-count="0">
+            <span style="background:{{ q }}"></span>
+          </sc-for>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:18px">{{ sel.code }}</span>
+        <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;border-top:1px solid #e2d2de;padding-top:14px">
+          <div><div style="color:#7a6a7c;font-weight:700">Sala</div><div style="font-weight:800;font-size:15px">{{ sel.sala }}</div></div>
+          <div><div style="color:#7a6a7c;font-weight:700">Asientos</div><div style="font-weight:800;font-size:15px">{{ sel.seats }}</div></div>
+        </div>
+        <span style="color:#7a6a7c;font-size:13px;text-align:center">Muestra este código en el ingreso a la sala.</span>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function makeQR(seed){const n=25,cells=[];let r=hash(seed)||1;const rnd=()=>{r^=r<<13;r>>>=0;r^=r>>17;r^=r<<5;r>>>=0;return r/4294967296};
+ const finder=(x,y)=>{for(const [fx,fy] of [[0,0],[n-7,0],[0,n-7]]){const dx=x-fx,dy=y-fy;if(dx>=0&&dx<7&&dy>=0&&dy<7){if(dx===0||dx===6||dy===0||dy===6)return 1;if(dx>=2&&dx<=4&&dy>=2&&dy<=4)return 1;return 0}if(dx>=-1&&dx<=7&&dy>=-1&&dy<=7)return 0}return -1};
+ for(let y=0;y<n;y++)for(let x=0;x<n;x++){const f=finder(x,y);const on=f===-1?rnd()>.52:f===1;cells.push(on?'#1a0a1c':'transparent')}return cells}
+const DEMO={nombre:'Usuario Demo',email:'usuario.demo@gmail.com'};
+
+class Component extends DCLogic{
+ state={user:null,compras:[],sel:null,ready:false};
+ componentDidMount(){let u=null,c=[];try{u=JSON.parse(localStorage.getItem('mp_user')||'null');c=JSON.parse(localStorage.getItem('mp_compras')||'[]')}catch(e){}this.setState({user:u,compras:c,ready:true})}
+ renderVals(){
+  const s=this.state,u=s.user;
+  const mine=u?s.compras.filter(c=>!c.email||c.email===u.email):[];
+  return{
+   loggedOut:!u,loggedIn:!!u,
+   userInitial:u?u.nombre.charAt(0).toUpperCase():'',userFirst:u?u.nombre.split(' ')[0]:'',userEmail:u?u.email:'',
+   googleLogin:()=>{localStorage.setItem('mp_user',JSON.stringify(DEMO));this.setState({user:DEMO})},
+   logout:()=>{localStorage.removeItem('mp_user');this.setState({user:null})},
+   empty:!!u&&mine.length===0,
+   compras:mine.map(c=>({...c,ver:()=>this.setState({sel:c})})),
+   qrOpen:!!s.sel,sel:s.sel||{},qr:s.sel?makeQR(s.sel.code):[],
+   closeQr:()=>this.setState({sel:null}),stop:e=>e.stopPropagation()
+  };
+ }
+}
+</script>
+</body>
+</html>

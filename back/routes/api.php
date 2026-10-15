@@ -54,6 +54,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('webMovieImportExternal', [\App\Http\Controllers\WebMovieController::class, 'importExternal']);
     Route::get('webMovieProgramaciones', [\App\Http\Controllers\WebMovieController::class, 'listProgramaciones']);
     Route::post('webMovie/{webMovie}/syncProgramaciones', [\App\Http\Controllers\WebMovieController::class, 'syncProgramaciones']);
+    Route::post('webMovie/{webMovie}/ventaOnline', [\App\Http\Controllers\WebMovieController::class, 'toggleVentaOnline']);
     Route::resource('cortesia', \App\Http\Controllers\CortesiaController::class);
     Route::get('free', [\App\Http\Controllers\CortesiaController::class,'free']);
     Route::resource('distributor', \App\Http\Controllers\DistributorController::class);

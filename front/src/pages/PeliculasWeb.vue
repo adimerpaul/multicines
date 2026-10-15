@@ -25,13 +25,13 @@
         >
           <template v-slot:body-cell-imagen="props">
             <q-td :props="props" auto-width>
-              <q-img :src="movieImage(props.row.imagen)" style="height: 60px; width: 45px; border-radius: 8px" />
+              <q-img :src="movieImage(props.row.imagen)" class="cursor-pointer" style="height: 60px; width: 45px; border-radius: 8px" @click="openImageFull(movieImage(props.row.imagen), props.row.titulo)" />
             </q-td>
           </template>
 
           <template v-slot:body-cell-backdrop_imagen="props">
             <q-td :props="props" auto-width>
-              <q-img :src="movieImage(props.row.backdrop_imagen)" style="height: 45px; width: 80px; border-radius: 8px" />
+              <q-img :src="movieImage(props.row.backdrop_imagen)" fit="contain" class="img-preview cursor-pointer" style="height: 45px; width: 80px; border-radius: 8px" @click="openImageFull(movieImage(props.row.backdrop_imagen), props.row.titulo)" />
             </q-td>
           </template>
 
@@ -44,6 +44,19 @@
               <q-chip dense :color="props.row.estado === 'ACTIVO' ? 'positive' : 'negative'" text-color="white">
                 {{ props.row.estado || 'INACTIVO' }}
               </q-chip>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-venta_online="props">
+            <q-td :props="props" auto-width>
+              <q-toggle
+                dense
+                color="positive"
+                :model-value="props.row.venta_online !== false"
+                @update:model-value="(val) => toggleVentaOnline(props.row, val)"
+              >
+                <q-tooltip>{{ props.row.venta_online !== false ? 'Se puede comprar en la web' : 'Solo venta en ventanilla' }}</q-tooltip>
+              </q-toggle>
             </q-td>
           </template>
 
@@ -121,41 +134,24 @@
               <div class="col-12 col-md-9">
                 <div class="row q-col-gutter-xs">
                   <div class="col-12"><q-input dense outlined label="Titulo" v-model="form.titulo" :rules="[required]" /></div>
-                  <div class="col-4"><q-select dense outlined label="Tipo" v-model="form.tipo" :options="['pelicula', 'proximo']" /></div>
-                  <div class="col-4"><q-input dense outlined label="TMDB ID" v-model.number="form.tmdb_id" type="number" /></div>
-                  <div class="col-4"><q-input dense outlined label="Anio" v-model.number="form.anio" type="number" /></div>
 
-                  <div class="col-4"><q-input dense outlined label="IMDb ID" v-model="form.imdb_id" /></div>
-                  <div class="col-4"><q-input dense outlined label="Calidad" v-model="form.calidad" /></div>
-                  <div class="col-4"><q-input dense outlined label="Bucket" v-model="form.bucket" /></div>
-
-                  <div class="col-6"><q-input dense outlined label="Estudio" v-model="form.studio_nombre" /></div>
-                  <div class="col-3"><q-input dense outlined label="Descuento (%)" v-model.number="form.descuento" type="number" min="0" max="100" step="0.1" /></div>
-                  <div class="col-3"><q-input dense outlined label="Fecha Estreno" v-model="form.fecha_estreno" type="date" /></div>
-
-                  <div class="col-3"><q-input dense outlined label="Clasificacion" v-model="form.clasificacion" /></div>
-                  <div class="col-3"><q-select dense outlined label="Estado" v-model="form.estado" :options="['ACTIVO', 'INACTIVO']" /></div>
-                  <div class="col-3"><q-input dense outlined label="Duracion" v-model="form.duracion" /></div>
-                  <div class="col-3"><q-input dense outlined label="Tele" v-model="form.tele" /></div>
-
-                  <div class="col-3"><q-input dense outlined label="Puntaje Web" v-model.number="form.puntaje_web" type="number" step="0.001" /></div>
-                  <div class="col-3"><q-input dense outlined label="Puntaje Tomatoes" v-model.number="form.puntaje_tomatoes" type="number" step="0.1" /></div>
-                  <div class="col-3"><q-input dense outlined label="Puntaje IBM" v-model.number="form.puntaje_ibm" type="number" step="0.001" /></div>
-                  <div class="col-3"><q-input dense outlined label="Metacritic" v-model.number="form.puntaje_metacritic" type="number" step="0.1" /></div>
-
-                  <div class="col-4"><q-input dense outlined label="Votos Total" v-model.number="form.votos_total" type="number" /></div>
-                  <div class="col-4"><q-input dense outlined label="Popularidad" v-model.number="form.popularidad" type="number" step="0.001" /></div>
-                  <div class="col-4"><q-input dense outlined label="Me gusta" v-model.number="form.me_gusta" type="number" /></div>
-
-                  <div class="col-4"><q-input dense outlined label="Genero" v-model="form.genero" /></div>
-                  <div class="col-4"><q-input dense outlined label="Pais" v-model="form.pais" /></div>
-                  <div class="col-4"><q-input dense outlined label="Idioma" v-model="form.idioma" /></div>
-
-                  <div class="col-4"><q-input dense outlined label="URL YouTube" v-model="form.url_video_youtube" /></div>
-                  <div class="col-4"><q-input dense outlined label="URL oficial" v-model="form.url_oficial" /></div>
-                  <div class="col-4"><q-input dense outlined label="Tagline" v-model="form.tagline" /></div>
-
-                  <div class="col-6">
+                  <div class="col-12 col-sm-4 row items-center">
+                    <q-btn-toggle
+                      v-model="form.tipo"
+                      spread
+                      no-caps
+                      unelevated
+                      class="full-width"
+                      style="border: 1px solid #c2c2c2"
+                      toggle-color="primary"
+                      :options="[
+                        { label: 'Pelicula', value: 'pelicula', icon: 'movie' },
+                        { label: 'Proximo', value: 'proximo', icon: 'event' }
+                      ]"
+                    />
+                  </div>
+                  <div class="col-12 col-sm-4"><q-select dense outlined label="Estado" v-model="form.estado" :options="['ACTIVO', 'INACTIVO']" /></div>
+                  <div class="col-12 col-sm-4">
                     <q-select dense outlined label="Carrusel" v-model="form.carrusel_tipo"
                       :options="[
                         { label: 'Ninguno', value: 'ninguno' },
@@ -164,10 +160,90 @@
                         { label: 'Ambos', value: 'ambos' }
                       ]" emit-value map-options />
                   </div>
-                  <div class="col-6"><q-input dense outlined label="Premios" v-model="form.premios" /></div>
 
-                  <div class="col-12"><q-input dense outlined label="Actores (separados por coma)" v-model="actoresTexto" /></div>
-                  <div class="col-12"><q-input dense outlined type="textarea" rows="2" label="Descripcion" v-model="form.descripcion" /></div>
+                  <div class="col-6 col-sm-3"><q-input dense outlined label="Fecha Estreno" v-model="form.fecha_estreno" type="date" /></div>
+                  <div class="col-6 col-sm-3"><q-input dense outlined label="Duracion" v-model="form.duracion" /></div>
+                  <div class="col-6 col-sm-3"><q-input dense outlined label="Clasificacion" v-model="form.clasificacion" /></div>
+                  <div class="col-6 col-sm-3"><q-input dense outlined label="Descuento (%)" v-model.number="form.descuento" type="number" min="0" max="100" step="0.1" /></div>
+
+                  <div class="col-12 col-sm-6"><q-input dense outlined label="Genero" v-model="form.genero" /></div>
+                  <div class="col-12 col-sm-6"><q-input dense outlined label="URL YouTube" v-model="form.url_video_youtube" /></div>
+
+                  <div class="col-12">
+                    <q-checkbox v-model="form.venta_online" label="Venta online (si se desmarca, la pelicula se ve en la web pero solo se vende en ventanilla)" />
+                  </div>
+
+                  <div class="col-12"><q-input dense outlined type="textarea" rows="3" label="Descripcion" v-model="form.descripcion" /></div>
+
+                  <div class="col-12">
+                    <q-expansion-item dense switch-toggle-side icon="tune" label="Más datos" caption="TMDB, puntajes, actores, estudio, país..." header-class="text-grey-8">
+                      <div class="row q-col-gutter-xs q-pt-xs">
+                        <div class="col-4"><q-input dense outlined label="TMDB ID" v-model.number="form.tmdb_id" type="number" /></div>
+                        <div class="col-4"><q-input dense outlined label="IMDb ID" v-model="form.imdb_id" /></div>
+                        <div class="col-4"><q-input dense outlined label="Anio" v-model.number="form.anio" type="number" /></div>
+
+                        <div class="col-4"><q-input dense outlined label="Estudio" v-model="form.studio_nombre" /></div>
+                        <div class="col-4"><q-input dense outlined label="Pais" v-model="form.pais" /></div>
+                        <div class="col-4"><q-input dense outlined label="Idioma" v-model="form.idioma" /></div>
+
+                        <div class="col-3"><q-input dense outlined label="Puntaje Web" v-model.number="form.puntaje_web" type="number" step="0.001" /></div>
+                        <div class="col-3"><q-input dense outlined label="Puntaje Tomatoes" v-model.number="form.puntaje_tomatoes" type="number" step="0.1" /></div>
+                        <div class="col-3"><q-input dense outlined label="Puntaje IBM" v-model.number="form.puntaje_ibm" type="number" step="0.001" /></div>
+                        <div class="col-3"><q-input dense outlined label="Metacritic" v-model.number="form.puntaje_metacritic" type="number" step="0.1" /></div>
+
+                        <div class="col-4"><q-input dense outlined label="Votos Total" v-model.number="form.votos_total" type="number" /></div>
+                        <div class="col-4"><q-input dense outlined label="Popularidad" v-model.number="form.popularidad" type="number" step="0.001" /></div>
+                        <div class="col-4"><q-input dense outlined label="Me gusta" v-model.number="form.me_gusta" type="number" /></div>
+
+                        <div class="col-4"><q-input dense outlined label="Calidad" v-model="form.calidad" /></div>
+                        <div class="col-4"><q-input dense outlined label="Bucket" v-model="form.bucket" /></div>
+                        <div class="col-4"><q-input dense outlined label="Tele" v-model="form.tele" /></div>
+
+                        <div class="col-6"><q-input dense outlined label="URL oficial" v-model="form.url_oficial" /></div>
+                        <div class="col-6"><q-input dense outlined label="Tagline" v-model="form.tagline" /></div>
+
+                        <div class="col-12"><q-input dense outlined label="Premios" v-model="form.premios" /></div>
+                      </div>
+                    </q-expansion-item>
+                  </div>
+
+                  <div class="col-12">
+                    <q-expansion-item dense switch-toggle-side icon="groups" label="Reparto" :caption="actoresList.length + ' actores · clic o arrastra una foto para cambiarla'" header-class="text-grey-8">
+                      <div class="row q-col-gutter-sm q-pt-xs">
+                        <div v-for="(actor, i) in actoresList" :key="actor.key" class="col-6 col-sm-3 col-md-2">
+                          <div
+                            class="actor-card"
+                            :class="{ 'actor-card--drag': actorDragIndex === i }"
+                            @dragover.prevent="actorDragIndex = i"
+                            @dragleave.prevent="actorDragIndex = null"
+                            @drop.prevent="onDropActor($event, i)"
+                          >
+                            <div class="actor-foto" @click="elegirFotoActor(i)" title="Cambiar foto">
+                              <q-img :src="actor.preview || movieImage(actor.imagen)" :ratio="1" fit="cover">
+                                <template v-slot:error>
+                                  <div class="absolute-full flex flex-center bg-grey-4 text-grey-7 text-h5">{{ (actor.nombre || '?').charAt(0) }}</div>
+                                </template>
+                              </q-img>
+                              <div class="actor-foto-hover"><q-icon name="photo_camera" size="22px" /></div>
+                              <q-badge v-if="actor.file" floating color="positive" rounded><q-icon name="check" size="10px" /></q-badge>
+                            </div>
+                            <q-input v-model="actor.nombre" dense borderless input-class="text-center text-caption" placeholder="Nombre" />
+                            <q-btn class="actor-quitar" round dense flat size="xs" icon="close" color="negative" @click="actoresList.splice(i, 1)">
+                              <q-tooltip>Quitar</q-tooltip>
+                            </q-btn>
+                          </div>
+                        </div>
+                        <div class="col-6 col-sm-3 col-md-2">
+                          <div class="actor-card actor-card--nuevo">
+                            <q-input v-model="nuevoActor" dense outlined placeholder="Nuevo actor" @keyup.enter="agregarActor">
+                              <template v-slot:append><q-btn round dense flat icon="add" color="primary" @click="agregarActor" /></template>
+                            </q-input>
+                          </div>
+                        </div>
+                      </div>
+                      <input ref="actorFileInput" type="file" accept="image/*" style="display: none" @change="onActorFileChange" />
+                    </q-expansion-item>
+                  </div>
                 </div>
               </div>
 
@@ -177,7 +253,7 @@
                   <div class="text-caption text-grey-7">Poster — arrastra para cambiar</div>
                   <q-space />
                   <q-btn flat round dense icon="open_in_new" size="xs" color="grey-7"
-                    @click.stop="openImageFull(posterPreview || movieImage(form.imagen))"
+                    @click.stop="openImageFull(posterPreview || movieImage(form.imagen), 'Poster')"
                     title="Ver imagen completa" />
                 </div>
                 <div
@@ -187,7 +263,8 @@
                   @dragleave.prevent="isDraggingPoster = false"
                   @drop.prevent="onDropPoster"
                 >
-                  <q-img :src="posterPreview || movieImage(form.imagen)" style="height: 180px; border-radius: 6px" />
+                  <q-img :src="posterPreview || movieImage(form.imagen)" fit="contain" class="img-preview" style="height: 280px"
+                    @click="openImageFull(posterPreview || movieImage(form.imagen), 'Poster')" />
                   <div v-if="isDraggingPoster" class="img-drop-overlay">
                     <div class="text-center"><q-icon name="image" size="32px" /><br>Soltar imagen</div>
                   </div>
@@ -200,7 +277,7 @@
                   <div class="text-caption text-grey-7">Background — arrastra para cambiar</div>
                   <q-space />
                   <q-btn flat round dense icon="open_in_new" size="xs" color="grey-7"
-                    @click.stop="openImageFull(backdropPreview || movieImage(form.backdrop_imagen))"
+                    @click.stop="openImageFull(backdropPreview || movieImage(form.backdrop_imagen), 'Background')"
                     title="Ver imagen completa" />
                 </div>
                 <div
@@ -210,7 +287,8 @@
                   @dragleave.prevent="isDraggingBackdrop = false"
                   @drop.prevent="onDropBackdrop"
                 >
-                  <q-img :src="backdropPreview || movieImage(form.backdrop_imagen)" style="height: 110px; border-radius: 6px" />
+                  <q-img :src="backdropPreview || movieImage(form.backdrop_imagen)" fit="contain" class="img-preview" style="height: 170px"
+                    @click="openImageFull(backdropPreview || movieImage(form.backdrop_imagen), 'Background')" />
                   <div v-if="isDraggingBackdrop" class="img-drop-overlay">
                     <div class="text-center"><q-icon name="wallpaper" size="32px" /><br>Soltar imagen</div>
                   </div>
@@ -245,7 +323,7 @@
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-6">
               <div class="text-subtitle2 q-mb-sm">Imagen actual</div>
-              <q-img :src="imageDialogCurrent" style="height: 260px; border-radius: 12px" />
+              <q-img :src="imageDialogCurrent" fit="contain" class="img-preview" style="height: 260px; border-radius: 12px" />
             </div>
             <div class="col-12 col-md-6">
               <div class="text-subtitle2 q-mb-sm">Nueva imagen</div>
@@ -258,8 +336,8 @@
               >
                 <q-icon name="cloud_upload" size="36px" :color="isDraggingImage ? 'primary' : 'grey-5'" />
                 <div class="text-grey-6 q-mt-xs q-mb-sm">Arrastra una imagen aqui o</div>
-                <q-file dense outlined v-model="replaceImageFile" accept=".jpg,.jpeg,.png" label="Seleccionar archivo" @update:model-value="onReplaceSelected" />
-                <q-img v-if="replaceImagePreview" class="q-mt-md" :src="replaceImagePreview" style="height: 180px; border-radius: 12px" />
+                <q-file dense outlined v-model="replaceImageFile" accept=".jpg,.jpeg,.png,.webp" label="Seleccionar archivo" @update:model-value="onReplaceSelected" />
+                <q-img v-if="replaceImagePreview" fit="contain" class="q-mt-md img-preview" :src="replaceImagePreview" style="height: 180px; border-radius: 12px" />
               </div>
             </div>
           </div>
@@ -285,9 +363,43 @@
         <q-card-section>
           <div class="row q-col-gutter-sm q-mb-sm">
             <div class="col-12 col-md-4">
-              <q-input dense outlined v-model="programFilterText" label="Filtrar por pelicula" clearable>
-                <template v-slot:append><q-icon name="search" /></template>
-              </q-input>
+              <q-select
+                dense
+                outlined
+                v-model="programFilterMovie"
+                label="Pelicula (selecciona sus funciones)"
+                :options="programMovieOptionsFiltradas"
+                option-value="id"
+                option-label="nombre"
+                emit-value
+                map-options
+                use-input
+                input-debounce="0"
+                clearable
+                @filter="filtrarPeliculasPrograma"
+                @update:model-value="onProgramMovieSelected"
+              >
+                <template v-slot:prepend>
+                  <q-avatar v-if="programMovieSeleccionada" rounded size="28px">
+                    <img :src="movieImage(programMovieSeleccionada.imagen)" style="object-fit: cover" />
+                  </q-avatar>
+                  <q-icon v-else name="search" />
+                </template>
+                <template v-slot:option="scope">
+                  <q-item v-bind="scope.itemProps">
+                    <q-item-section avatar>
+                      <q-img :src="movieImage(scope.opt.imagen)" style="width: 36px; height: 54px; border-radius: 4px" fit="cover" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.nombre }}</q-item-label>
+                      <q-item-label caption>{{ scope.opt.funciones }} funciones · {{ scope.opt.salas }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+                <template v-slot:no-option>
+                  <q-item><q-item-section class="text-grey">Sin peliculas con funciones</q-item-section></q-item>
+                </template>
+              </q-select>
             </div>
             <div class="col-12 col-md-3">
               <q-select dense outlined v-model="programFilterSala" label="Filtrar por sala" :options="programSalaOptions" clearable />
@@ -313,10 +425,33 @@
               <q-td :props="props">{{ formatProgramDate(props.row.fecha, props.row.horaInicio) }}</q-td>
             </template>
             <template v-slot:body-cell-pelicula="props">
-              <q-td :props="props">{{ props.row.movie ? props.row.movie.nombre : '' }}</q-td>
+              <q-td :props="props">
+                <div class="row items-center no-wrap q-gutter-sm">
+                  <q-img
+                    :src="movieImage(props.row.movie ? props.row.movie.imagen : null)"
+                    style="width: 32px; height: 48px; border-radius: 4px"
+                    fit="cover"
+                  />
+                  <span>{{ props.row.movie ? props.row.movie.nombre : '' }}</span>
+                </div>
+              </q-td>
             </template>
             <template v-slot:body-cell-sala="props">
               <q-td :props="props">{{ props.row.sala ? props.row.sala.nombre : '' }}</q-td>
+            </template>
+            <template v-slot:body-cell-venta_online="props">
+              <q-td :props="props" auto-width>
+                <q-toggle
+                  dense
+                  color="positive"
+                  :disable="!isProgramSelected(props.row)"
+                  :model-value="!programSinVenta[props.row.id]"
+                  @update:model-value="(val) => setProgramVenta(props.row, val)"
+                  :label="!programSinVenta[props.row.id] ? 'Web' : 'Solo boleteria'"
+                >
+                  <q-tooltip v-if="!isProgramSelected(props.row)">Primero selecciona la funcion</q-tooltip>
+                </q-toggle>
+              </q-td>
             </template>
             <template v-slot:body-cell-tarifa="props">
               <q-td :props="props">{{ props.row.price ? props.row.price.precio : '' }}</q-td>
@@ -368,6 +503,19 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <q-dialog v-model="imageViewer.open">
+      <q-card class="bg-black text-white" style="max-width: 95vw; width: auto">
+        <q-card-section class="row items-center q-py-xs">
+          <div class="text-subtitle1">{{ imageViewer.title }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section class="q-pa-none flex flex-center">
+          <img :src="imageViewer.src" style="display: block; max-width: 95vw; max-height: 85vh; object-fit: contain" />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -407,6 +555,7 @@ const emptyForm = () => ({
   clasificacion: null,
   premios: null,
   estado: 'ACTIVO',
+  venta_online: true,
   actores: [],
 });
 
@@ -432,7 +581,11 @@ export default {
       isDraggingImage: false,
       isDraggingPoster: false,
       isDraggingBackdrop: false,
-      actoresTexto: '',
+      imageViewer: { open: false, src: '', title: '' },
+      actoresList: [],
+      nuevoActor: '',
+      actorFotoIndex: null,
+      actorDragIndex: null,
       form: emptyForm(),
       posterFile: null,
       posterPreview: '',
@@ -444,7 +597,9 @@ export default {
       imageDialogMode: 'poster',
       programRows: [],
       selectedProgramRows: [],
-      programFilterText: '',
+      programSinVenta: {},
+      programFilterMovie: null,
+      programMovieSearch: '',
       programFilterSala: null,
       programFilterTarifa: null,
       columns: [
@@ -453,6 +608,7 @@ export default {
         { label: 'BG', field: 'backdrop_imagen', name: 'backdrop_imagen' },
         { label: 'Titulo', field: 'titulo', name: 'titulo', sortable: true },
         { label: 'Estado', field: 'estado', name: 'estado', sortable: true },
+        { label: 'Venta online', field: 'venta_online', name: 'venta_online', sortable: true },
         { label: 'Tipo', field: 'tipo', name: 'tipo', sortable: true },
         { label: 'Carrusel', field: 'carrusel_tipo', name: 'carrusel_tipo', sortable: true },
         { label: 'Puntaje', field: 'puntaje_web', name: 'puntaje_web', sortable: true },
@@ -472,6 +628,7 @@ export default {
         { label: 'Pelicula', field: 'pelicula', name: 'pelicula' },
         { label: 'Sala', field: 'sala', name: 'sala' },
         { label: 'Tarifa', field: 'tarifa', name: 'tarifa' },
+        { label: 'Venta online', field: 'venta_online', name: 'venta_online', align: 'left' },
       ],
     };
   },
@@ -481,18 +638,37 @@ export default {
   computed: {
     filteredProgramRows() {
       return (this.programRows || []).filter((row) => {
-        const movieName = row.movie?.nombre || '';
         const salaName = row.sala?.nombre || '';
         const tarifa = row.price?.precio != null ? String(row.price.precio) : '';
 
-        const byName = this.programFilterText
-          ? movieName.toLowerCase().includes(this.programFilterText.toLowerCase())
-          : true;
+        const byMovie = this.programFilterMovie ? row.movie_id === this.programFilterMovie : true;
         const bySala = this.programFilterSala ? salaName === this.programFilterSala : true;
         const byTarifa = this.programFilterTarifa ? tarifa === String(this.programFilterTarifa) : true;
 
-        return byName && bySala && byTarifa;
+        return byMovie && bySala && byTarifa;
       });
+    },
+    // Peliculas (de programacion) con funciones en la ventana, para el buscador del dialogo
+    programMovieOptions() {
+      const map = new Map();
+      (this.programRows || []).forEach((row) => {
+        if (!row.movie) return;
+        const m = map.get(row.movie_id) || { id: row.movie_id, nombre: row.movie.nombre, imagen: row.movie.imagen, funciones: 0, salasSet: new Set() };
+        m.funciones += 1;
+        if (row.sala?.nombre) m.salasSet.add(row.sala.nombre);
+        map.set(row.movie_id, m);
+      });
+      return [...map.values()]
+        .map(({ salasSet, ...m }) => ({ ...m, salas: [...salasSet].join(', ') }))
+        .sort((a, b) => a.nombre.localeCompare(b.nombre));
+    },
+    programMovieOptionsFiltradas() {
+      const q = (this.programMovieSearch || '').toLowerCase();
+      if (!q) return this.programMovieOptions;
+      return this.programMovieOptions.filter((m) => m.nombre.toLowerCase().includes(q));
+    },
+    programMovieSeleccionada() {
+      return this.programMovieOptions.find((m) => m.id === this.programFilterMovie) || null;
     },
     programSalaOptions() {
       const names = [...new Set((this.programRows || []).map((row) => row.sala?.nombre).filter(Boolean))];
@@ -523,7 +699,8 @@ export default {
       this.isEdit = false;
       this.currentRow = null;
       this.form = emptyForm();
-      this.actoresTexto = '';
+      this.actoresList = [];
+      this.nuevoActor = '';
       this.posterFile = null;
       this.posterPreview = '';
       this.backdropFile = null;
@@ -539,7 +716,8 @@ export default {
         studio_nombre: row.studio ? row.studio.nombre : '',
         bucket: row.bucket || 'local',
       };
-      this.actoresTexto = (row.actores || []).map((a) => a.nombre).join(', ');
+      this.actoresList = (row.actores || []).map((a) => this.nuevoItemActor(a.nombre, a.imagen));
+      this.nuevoActor = '';
       this.posterFile = null;
       this.posterPreview = '';
       this.backdropFile = null;
@@ -565,15 +743,45 @@ export default {
     async openLinkProgramDialog(row) {
       this.currentRow = row;
       this.linkProgramDialog = true;
-      this.programFilterText = '';
+      this.programFilterMovie = null;
+      this.programMovieSearch = '';
       this.programFilterSala = null;
       this.programFilterTarifa = null;
       await this.loadProgramRows();
       const selectedIds = (row.programas || []).map((p) => p.id);
       this.selectedProgramRows = this.programRows.filter((p) => selectedIds.includes(p.id));
+      // Funciones vinculadas marcadas como "solo boleteria"
+      this.programSinVenta = {};
+      (row.programas || []).forEach((p) => {
+        if (p.pivot && !p.pivot.venta_online) this.programSinVenta[p.id] = true;
+      });
+
+      // Preseleccionar la pelicula: la de las funciones ya vinculadas, o la que tenga el mismo titulo
+      const vinculada = this.selectedProgramRows[0]?.movie_id;
+      const titulo = (row.titulo || '').trim().toLowerCase();
+      const porTitulo = this.programMovieOptions.find((m) => (m.nombre || '').trim().toLowerCase() === titulo);
+      this.programFilterMovie = vinculada || porTitulo?.id || null;
     },
-    openImageFull(src) {
-      window.open(src, '_blank');
+    isProgramSelected(row) {
+      return this.selectedProgramRows.some((p) => p.id === row.id);
+    },
+    setProgramVenta(row, habilitada) {
+      if (habilitada) delete this.programSinVenta[row.id];
+      else this.programSinVenta[row.id] = true;
+    },
+    filtrarPeliculasPrograma(val, update) {
+      update(() => {
+        this.programMovieSearch = val;
+      });
+    },
+    onProgramMovieSelected(movieId) {
+      this.programMovieSearch = '';
+      if (!movieId) return;
+      // Al elegir la pelicula se seleccionan todas sus funciones (respetando filtros de sala/tarifa)
+      this.selectedProgramRows = [...this.filteredProgramRows];
+    },
+    openImageFull(src, title = '') {
+      this.imageViewer = { open: true, src, title };
     },
     onDropPoster(event) {
       this.isDraggingPoster = false;
@@ -602,10 +810,12 @@ export default {
         this.replaceImagePreview = URL.createObjectURL(file);
       }
     },
-    async uploadImage(file) {
+    async uploadImage(file, maxWidth = 1280) {
       if (!file) return null;
       const fd = new FormData();
       fd.append('file', file);
+      fd.append('webp', 1);
+      fd.append('max_width', maxWidth);
       const res = await this.$api.post('upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (event) => {
@@ -615,25 +825,56 @@ export default {
       this.uploadProgress = 0;
       return res.data;
     },
-    buildActors() {
-      return this.actoresTexto
-        .split(',')
-        .map((x) => x.trim())
-        .filter((x) => !!x)
-        .map((x) => ({ nombre: x, imagen: null }));
+    nuevoItemActor(nombre, imagen = null) {
+      return { key: Math.random().toString(36).slice(2), nombre, imagen, file: null, preview: '' };
+    },
+    agregarActor() {
+      // Permite pegar varios separados por coma
+      const nombres = (this.nuevoActor || '').split(',').map((x) => x.trim()).filter(Boolean);
+      nombres.forEach((n) => this.actoresList.push(this.nuevoItemActor(n)));
+      this.nuevoActor = '';
+    },
+    elegirFotoActor(i) {
+      this.actorFotoIndex = i;
+      this.$refs.actorFileInput.value = '';
+      this.$refs.actorFileInput.click();
+    },
+    setFotoActor(i, file) {
+      if (!file || !file.type.startsWith('image/') || !this.actoresList[i]) return;
+      this.actoresList[i].file = file;
+      this.actoresList[i].preview = URL.createObjectURL(file);
+    },
+    onActorFileChange(event) {
+      this.setFotoActor(this.actorFotoIndex, event.target.files[0]);
+      this.actorFotoIndex = null;
+    },
+    onDropActor(event, i) {
+      this.actorDragIndex = null;
+      this.setFotoActor(i, event.dataTransfer.files[0]);
+    },
+    async buildActors() {
+      // Sube solo las fotos nuevas; las demas conservan su imagen actual
+      const actores = [];
+      for (const a of this.actoresList) {
+        const nombre = (a.nombre || '').trim();
+        if (!nombre) continue;
+        const imagen = a.file ? await this.uploadImage(a.file, 300) : a.imagen;
+        actores.push({ nombre, imagen: imagen || null });
+      }
+      return actores;
     },
     async saveRow() {
       try {
         this.loading = true;
-        const uploadedPoster = this.posterFile ? await this.uploadImage(this.posterFile) : null;
-        const uploadedBackdrop = this.backdropFile ? await this.uploadImage(this.backdropFile) : null;
+        const uploadedPoster = this.posterFile ? await this.uploadImage(this.posterFile, 780) : null;
+        const uploadedBackdrop = this.backdropFile ? await this.uploadImage(this.backdropFile, 1280) : null;
         const payload = {
           ...this.form,
           imagen: uploadedPoster || this.form.imagen,
           backdrop_imagen: uploadedBackdrop || this.form.backdrop_imagen,
           trailer_youtube: this.form.url_video_youtube || this.form.trailer_youtube,
           url_video_youtube: this.form.url_video_youtube || this.form.trailer_youtube,
-          actores: this.buildActors(),
+          actores: await this.buildActors(),
         };
 
         const res = this.isEdit
@@ -654,6 +895,20 @@ export default {
         this.loading = false;
       }
     },
+    async toggleVentaOnline(row, value) {
+      try {
+        const res = await this.$api.post('webMovie/' + row.id + '/ventaOnline', { venta_online: value });
+        const i = this.rows.findIndex((x) => x.id === row.id);
+        if (i !== -1) this.rows[i] = res.data;
+        this.$q.notify({
+          color: value ? 'positive' : 'warning',
+          icon: value ? 'shopping_cart' : 'storefront',
+          message: value ? 'Venta online habilitada: ' + row.titulo : 'Solo ventanilla: ' + row.titulo,
+        });
+      } catch (e) {
+        this.$q.notify({ color: 'negative', icon: 'error', message: e?.response?.data?.message || 'No se pudo cambiar la venta online' });
+      }
+    },
     async saveImageOnly() {
       if (!this.replaceImageFile) {
         this.$q.notify({ color: 'warning', message: 'Selecciona una imagen primero' });
@@ -662,7 +917,7 @@ export default {
 
       try {
         this.loading = true;
-        const uploaded = await this.uploadImage(this.replaceImageFile);
+        const uploaded = await this.uploadImage(this.replaceImageFile, this.imageDialogMode === 'background' ? 1280 : 780);
         const row = this.currentRow;
         const payload = {
           ...row,
@@ -722,6 +977,7 @@ export default {
         const programaIds = this.selectedProgramRows.map((p) => p.id);
         const res = await this.$api.post(`webMovie/${this.currentRow.id}/syncProgramaciones`, {
           programa_ids: programaIds,
+          sin_venta_online_ids: programaIds.filter((id) => this.programSinVenta[id]),
         });
         const i = this.rows.findIndex((x) => x.id === res.data.id);
         if (i !== -1) this.rows[i] = res.data;
@@ -801,6 +1057,61 @@ export default {
   transition: border-color 0.2s;
   overflow: hidden;
   cursor: pointer;
+}
+.actor-card {
+  position: relative;
+  border: 2px dashed transparent;
+  border-radius: 10px;
+  padding: 6px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.actor-card:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.actor-card--drag {
+  border-color: #1976d2;
+  background: rgba(25, 118, 210, 0.06);
+}
+.actor-card--nuevo {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.actor-foto {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  width: 80%;
+  margin: 0 auto;
+}
+.actor-foto-hover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.actor-foto:hover .actor-foto-hover {
+  opacity: 1;
+}
+.actor-quitar {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.actor-card:hover .actor-quitar {
+  opacity: 1;
+}
+.img-preview {
+  border-radius: 6px;
+  background: #1d1d1d;
 }
 .img-drop-zone:hover {
   border-color: #9e9e9e;

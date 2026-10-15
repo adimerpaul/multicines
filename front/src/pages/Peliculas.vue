@@ -2,7 +2,7 @@
   <q-page class="q-pa-xs">
     <div class="row">
       <div class="col-12">
-        <q-table dense title="Gestionar peliculas" :rows-per-page-options="[0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter">
+        <q-table dense flat bordered class="tabla-peliculas" title="Gestionar peliculas" v-model:pagination="moviePagination" :rows-per-page-options="[10,20,50,0]" :rows="store.movies" :columns="movieColumns" :filter="movieFilter">
 
           <template v-slot:top-right>
             <q-btn
@@ -25,7 +25,7 @@
                 @dragleave.prevent="dragOverId = null"
                 @drop.prevent="onDropImagen($event, props.row)"
               >
-                <q-img :src="url+'../imagen/'+props.row.imagen" style="height: 50px; width: 50px;"/>
+                <q-img :src="url+'../imagen/'+props.row.imagen" style="height: 34px; width: 34px;"/>
                 <q-inner-loading :showing="uploadingId === props.row.id">
                   <q-spinner size="20px" color="primary" />
                 </q-inner-loading>
@@ -34,7 +34,7 @@
             </q-td>
           </template>
           <template v-slot:body-cell-nombre="props">
-            <q-td :props="props">
+            <q-td :props="props" class="celda-nombre">
                 {{ props.row.nombre }}
             </q-td>
           </template>
@@ -69,8 +69,8 @@
           </template>
           <template v-slot:body-cell-opciones="props">
             <q-td auto-width :props="props">
-              <q-btn-dropdown color="primary" label="Opciones" dropdown-icon="more_vert" no-caps dense size="10px">
-                <q-list>
+              <q-btn-dropdown color="primary" dropdown-icon="more_vert" no-caps dense size="10px" class="q-px-xs">
+                <q-list dense>
                   <q-item clickable v-close-popup @click="movieUpdateDialog=true;movie2=props.row;this.store.distributor=props.row.distributor">
                     <q-item-section avatar><q-icon name="edit" color="orange" /></q-item-section>
                     <q-item-section>
@@ -391,6 +391,7 @@ export default {
     return {
       loading: false,
       movieFilter:'',
+      moviePagination:{ rowsPerPage:10 },
       url:process.env.API,
       dialog_img:false,
       dragOverId:null,
@@ -661,9 +662,9 @@ export default {
 <style scoped>
 .drop-img {
   position: relative;
-  width: 58px;
-  height: 58px;
-  padding: 3px;
+  width: 40px;
+  height: 40px;
+  padding: 1px;
   border: 2px dashed transparent;
   border-radius: 6px;
   transition: border-color .15s, background-color .15s;
@@ -673,9 +674,9 @@ export default {
 }
 .drop-pie {
   position: relative;
-  min-width: 58px;
-  min-height: 40px;
-  padding: 3px;
+  min-width: 40px;
+  min-height: 30px;
+  padding: 1px;
   border: 2px dashed transparent;
   border-radius: 6px;
   transition: border-color .15s, background-color .15s;
@@ -684,8 +685,8 @@ export default {
   border-color: #bdbdbd;
 }
 .pie-mini {
-  height: 28px;
-  width: 28px;
+  height: 24px;
+  width: 24px;
   object-fit: contain;
 }
 .pie-preview {
@@ -702,6 +703,15 @@ export default {
   max-width: 52px;
   max-height: 52px;
   object-fit: contain;
+}
+.tabla-peliculas :deep(td) {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.celda-nombre {
+  max-width: 260px;
+  white-space: normal;
+  line-height: 1.1;
 }
 .drop-img--over {
   border-color: #21ba45;

@@ -46,6 +46,7 @@ class WebMovie extends Model
         'clasificacion',
         'premios',
         'estado',
+        'venta_online',
         'api_payload',
     ];
 
@@ -53,6 +54,7 @@ class WebMovie extends Model
 
     protected $casts = [
         'api_payload' => 'array',
+        'venta_online' => 'boolean',
     ];
 
     public function studio()
@@ -68,6 +70,7 @@ class WebMovie extends Model
     public function programas()
     {
         return $this->belongsToMany(Programa::class, 'web_movie_programa')
+            ->withPivot('venta_online')
             ->with('movie', 'sala', 'price');
     }
 }
