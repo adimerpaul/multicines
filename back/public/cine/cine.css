@@ -318,6 +318,27 @@ img { display: block; }
 .pie-pasos .hint { color: var(--muted); font-size: 13px; font-weight: 600; text-align: center; }
 .invisible { visibility: hidden; }
 
+/* Cuenta del cliente + login con Google */
+.header-acciones { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.header-acciones [hidden] { display: none !important; }
+.btn-ingresar { padding: 11px 18px; }
+.cuenta { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); border-radius: 999px; padding: 4px 6px 4px 4px; }
+.cuenta-avatar { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: var(--grad); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; flex: 0 0 34px; }
+.cuenta-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.cuenta-nombre { font-weight: 700; font-size: 14px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cuenta-salir { background: transparent; border: 0; color: var(--muted); font-weight: 700; font-size: 13px; padding: 6px 10px; border-radius: 999px; }
+.cuenta-salir:hover { color: #fff; background: rgba(255, 255, 255, .08); }
+.login-box { position: relative; width: min(420px, 100%); background: var(--card-2); border-radius: 24px; box-shadow: 0 0 0 1px var(--line), 0 40px 120px rgba(0, 0, 0, .6); padding: 36px 28px 28px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+.login-box h3 { font-family: Anton, sans-serif; font-weight: 400; font-size: 32px; margin: 0; }
+.login-box p { margin: 0; color: var(--text-2); font-size: 15px; line-height: 1.5; }
+.login-x { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; font-size: 16px; }
+.login-logo { width: 64px; height: 64px; border-radius: 50%; box-shadow: 0 0 0 2px var(--pink); }
+.btn-google { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; background: #fff; color: #1f1f1f; border: 0; border-radius: 999px; padding: 14px 20px; font-weight: 800; font-size: 15px; margin-top: 6px; transition: opacity .2s; }
+.btn-google:hover { opacity: .92; }
+.btn-google[disabled] { opacity: .6; cursor: wait; }
+.login-box .aviso { width: 100%; text-align: left; }
+.login-nota { color: var(--muted-2); font-size: 12px; }
+
 /* Ficha de pelicula (pagina de compra) */
 .ficha { position: relative; overflow: hidden; background: var(--bg); }
 .ficha-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 20%; opacity: .55; }
@@ -381,3 +402,36 @@ img { display: block; }
 }
 .poster-link { position: absolute; inset: 0; z-index: 1; }
 .poster-foot { z-index: 2; }
+
+/* Entrada con QR real */
+.ticket-qr { padding: 18px 22px 22px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.ticket-qr img { width: 200px; height: 200px; background: #fff; border-radius: 12px; padding: 8px; }
+.ticket-qr .mono { font-size: 20px; letter-spacing: 1px; }
+.ticket-qr small { color: #7a6a7c; font-weight: 700; }
+
+/* Mis compras */
+.compras-main { max-width: 1280px; margin: 0 auto; padding: 40px 24px 72px; }
+.compras-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 32px; }
+.compras-user { display: flex; align-items: center; gap: 16px; }
+.compras-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; font-family: Anton, sans-serif; font-size: 28px; overflow: hidden; }
+.compras-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.grid-compras { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 20px; }
+.compra { background: var(--card); border-radius: 20px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); display: flex; flex-direction: column; }
+.compra-top { display: flex; gap: 16px; padding: 18px; }
+.compra-top img { width: 76px; height: 112px; object-fit: cover; object-position: bottom; border-radius: 10px; flex: 0 0 auto; }
+.compra-info { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.compra-info h3 { font-family: Anton, sans-serif; font-weight: 400; font-size: 22px; line-height: 1.05; margin: 0; text-transform: uppercase; }
+.compra-info .l1 { color: var(--text-2); font-size: 14px; font-weight: 600; }
+.compra-info .l2 { color: var(--muted); font-size: 13px; }
+.estado { width: fit-content; font-weight: 800; font-size: 11px; letter-spacing: 1.5px; padding: 5px 8px; border-radius: 6px; background: rgba(255, 199, 44, .15); color: var(--gold); }
+.estado.usada { background: rgba(255, 255, 255, .08); color: var(--muted); }
+.estado.vencida, .estado.anulada { background: rgba(214, 31, 127, .15); color: #ff8fc4; }
+.compra-cut { border-top: 2px dashed rgba(255, 255, 255, .12); margin: 0 14px; }
+.compra-foot { padding: 14px 18px 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.compra-foot .mono { font-size: 14px; }
+.compra-foot small { display: block; color: var(--muted); font-size: 13px; }
+.btn-grad { border: 0; background: var(--grad); color: #fff; font-weight: 800; font-size: 14px; padding: 11px 18px; border-radius: 999px; white-space: nowrap; }
+.modal-entrada { width: min(800px, 100%); max-height: calc(100vh - 48px); overflow: auto; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.login-card { display: flex; justify-content: center; padding: 32px 0; }
+.login-card > div { width: min(420px, 100%); background: var(--card); border: 1px solid rgba(255, 255, 255, .1); border-radius: 22px; padding: 36px 32px; display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; }
+.login-card img { width: 64px; height: 64px; border-radius: 50%; }

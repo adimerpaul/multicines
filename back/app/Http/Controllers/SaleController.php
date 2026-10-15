@@ -112,7 +112,7 @@ class SaleController extends Controller
         return response()->json([
             'documents' => Document::orderBy('id')->get(['id', 'codigoClasificador', 'descripcion']),
             'frees' => Cortesia::whereNull('user_id')->limit(30)->get(['id']),
-            'momentaneos' => Momentaneo::conFuncion()->where('momentaneos.user_id', $request->user()->id)->get(),
+            'momentaneos' => Momentaneo::conFuncion()->where('momentaneos.user_id', $request->user()->id)->whereNull('momentaneos.web_compra')->get(),
             'eventNumber' => Sale::where('siatEnviado', false)->where('siatAnulado', false)->count(),
             // fechaFuncion es DATE: comparar la columna directa usa el indice,
             // whereDate la envolvia en DATE() y recorria la tabla entera.

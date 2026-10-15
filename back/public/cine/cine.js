@@ -105,5 +105,82 @@
     if (e.key === 'Escape') cerrarTrailer();
   });
 
-  window.Cine = { api: api, el: el, fakeQr: fakeQr, hash: hash };
+  // ---------- Cuenta del cliente (login con Google) ----------
+  // El login real lo hace auth.js (modulo con Firebase); aqui solo el estado,
+  // el modal y la cola de acciones que esperan a que el cliente ingrese.
+  var authData = JSON.parse((document.getElementById('cine-auth') || {}).textContent || '{}');
+  var loginModal = document.getElementById('login-modal');
+  var pendientes = [];
+
+  function pintarCuenta() {
+    var c = authData.cliente;
+    var cuenta = document.querySelector('[data-cuenta]');
+    var ingresar = document.querySelector('[data-abrir-login]');
+    if (!cuenta || !ingresar) return;
+    cuenta.hidden = !c;
+    ingresar.hidden = !!c;
+    if (!c) return;
+    var avatar = document.querySelector('[data-cuenta-avatar]');
+    avatar.textContent = '';
+    if (c.foto) {
+      var img = el('img');
+      img.src = c.foto;
+      img.alt = '';
+      img.referrerPolicy = 'no-referrer';
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = (c.nombre || c.email || '?').charAt(0).toUpperCase();
+    }
+    document.querySelector('[data-cuenta-nombre]').textContent = (c.nombre || c.email || '').split(' ')[0];
+  }
+  function abrirLogin() {
+    if (!loginModal) return;
+    var err = loginModal.querySelector('[data-login-error]');
+    if (err) err.hidden = true;
+    loginModal.hidden = false;
+  }
+  function cerrarLogin() {
+    if (loginModal) loginModal.hidden = true;
+    pendientes = [];
+  }
+  // Ejecuta fn si hay sesion; si no, pide login y la ejecuta al ingresar.
+  function requerirLogin(fn) {
+    if (authData.cliente) { if (fn) fn(authData.cliente); return; }
+    if (fn) pendientes.push(fn);
+    abrirLogin();
+  }
+  // Lo llama auth.js cuando el backend acepto el login
+  function loginOk(cliente) {
+    authData.cliente = cliente;
+    pintarCuenta();
+    if (loginModal) loginModal.hidden = true;
+    var cola = pendientes;
+    pendientes = [];
+    cola.forEach(function (fn) { fn(cliente); });
+    document.dispatchEvent(new CustomEvent('cine:login', { detail: cliente }));
+  }
+  function loginError(msg) {
+    var err = loginModal && loginModal.querySelector('[data-login-error]');
+    if (!err) return;
+    err.textContent = msg;
+    err.hidden = false;
+  }
+  function logout() {
+    api(authData.logoutUrl).catch(function () {}).then(function () { location.reload(); });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-abrir-login]')) { abrirLogin(); return; }
+    if (e.target.closest('[data-logout]')) { logout(); return; }
+    if (e.target === loginModal || e.target.closest('[data-cerrar-login]')) cerrarLogin();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && loginModal && !loginModal.hidden) cerrarLogin();
+  });
+
+  window.Cine = {
+    api: api, el: el, fakeQr: fakeQr, hash: hash,
+    auth: authData, requerirLogin: requerirLogin, loginOk: loginOk, loginError: loginError,
+    cliente: function () { return authData.cliente; }
+  };
 })();

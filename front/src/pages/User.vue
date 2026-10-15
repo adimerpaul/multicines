@@ -80,7 +80,7 @@
       </q-card>
     </q-dialog>
 
-    <q-table :filter="filter" title="REGISTRO DE USUARIOS" :rows="data" :columns="columns" row-key="name" :rows-per-page-options="[50,100]">
+    <q-table dense flat bordered :filter="filter" title="REGISTRO DE USUARIOS" :rows="data" :columns="columns" row-key="id" :rows-per-page-options="[50,100]">
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
@@ -89,10 +89,37 @@
         </q-input>
       </template>
       <template v-slot:body-cell-permisos="props">
-          <q-td key="permisos" :props="props">
-            <ul>
-              <li v-for="(p,i) in props.row.permisos" :key="i">{{p.nombre}}</li>
-            </ul>
+          <q-td key="permisos" :props="props" style="white-space: normal; max-width: 520px">
+            <div class="row items-center" style="gap: 2px">
+              <q-chip
+                v-for="p in permisosVisibles(props.row)"
+                :key="p.id"
+                dense
+                square
+                size="11px"
+                color="green-1"
+                text-color="green-10"
+                class="q-ma-none"
+              >{{ p.nombre }}</q-chip>
+              <q-chip
+                v-if="(props.row.permisos || []).length > maxPermisos"
+                dense
+                square
+                clickable
+                size="11px"
+                :color="permisosAbiertos[props.row.id] ? 'grey-3' : 'primary'"
+                :text-color="permisosAbiertos[props.row.id] ? 'grey-8' : 'white'"
+                :icon="permisosAbiertos[props.row.id] ? 'expand_less' : 'expand_more'"
+                class="q-ma-none"
+                @click="togglePermisos(props.row)"
+              >
+                {{ permisosAbiertos[props.row.id] ? 'menos' : '+' + (props.row.permisos.length - maxPermisos) }}
+                <q-tooltip v-if="!permisosAbiertos[props.row.id]" max-width="320px">
+                  {{ props.row.permisos.slice(maxPermisos).map((p) => p.nombre).join(', ') }}
+                </q-tooltip>
+              </q-chip>
+              <span v-if="!(props.row.permisos || []).length" class="text-grey-6 text-caption">Sin permisos</span>
+            </div>
           </q-td>
           </template>
           <template v-slot:body-cell-opcion="props">
@@ -245,12 +272,15 @@ export default {
       permisos:[],
       permisos2:[],
       modelpermiso:false,
+      // Permisos en chips: se muestran los primeros y el resto se despliega por fila
+      maxPermisos: 4,
+      permisosAbiertos: {},
       uni:{},
       columns: [
         {name: "name", align: "left", label: "NOMBRE ", field: "name", sortable: true,},
         {name: "nick", align: "left", label: "NICK ", field: "nick", sortable: true,},
         {name: "email", align: "left", label: "E-MAIL", field: "email", sortable: true,},
-        {name: "permisos", align: "left", label: "PERMISOS", field: "permisos", sortable: true,},
+        {name: "permisos", align: "left", label: "PERMISOS", field: (row) => (row.permisos || []).length, sortable: true,},
         { name: "opcion", label: "OPCIÓN", field: "action", sortable: false },
       ],
       data: [],
@@ -270,6 +300,13 @@ export default {
     })
   },
   methods: {
+    permisosVisibles(row) {
+      const lista = row.permisos || [];
+      return this.permisosAbiertos[row.id] ? lista : lista.slice(0, this.maxPermisos);
+    },
+    togglePermisos(row) {
+      this.permisosAbiertos[row.id] = !this.permisosAbiertos[row.id];
+    },
     regDialog(){
       this.dato= { fechaLimite:(moment(this.fecha).add(36, 'months').format("YYYY-MM-DD"))}
       this.alert = true

@@ -23,6 +23,7 @@
     "numero-a-letras": "^1.0.6",
     "pinia": "^2.0.11",
     "printd": "^1.5.1",
+    "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.1",
     "quasar": "^2.6.0",
     "socket.io-client": "^4.8.4",

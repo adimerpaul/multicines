@@ -21,7 +21,7 @@ class MomentaneoController extends Controller
      */
     public function index(Request $request)
     {
-        return Momentaneo::where('user_id',$request->user()->id)->get();
+        return Momentaneo::where('user_id',$request->user()->id)->whereNull('web_compra')->get();
     }
 
     /**
@@ -82,7 +82,7 @@ class MomentaneoController extends Controller
     public function momentaneoDelete(Request $request)
     {
         // Se leen antes de borrar: despues del delete ya no se sabe que solto.
-        $butacas = Momentaneo::where("user_id",$request->user()->id)
+        $butacas = Momentaneo::where("user_id",$request->user()->id)->whereNull('web_compra')
             ->where("programa_id",$request->programa_id)
             ->where("fila",$request->fila)
             ->where("columna",$request->columna)
@@ -94,7 +94,7 @@ class MomentaneoController extends Controller
     }
     public function momentaneoDeleteUser(Request $request)
     {
-        $butacas = Momentaneo::where("user_id",$request->user()->id)
+        $butacas = Momentaneo::where("user_id",$request->user()->id)->whereNull('web_compra')
             ->where("programa_id",$request->programa_id)
             ->get();
 
@@ -103,7 +103,7 @@ class MomentaneoController extends Controller
     }
     public function momentaneoDeleteAll(Request $request)
     {
-        $butacas = Momentaneo::where("user_id",$request->user()->id)->get();
+        $butacas = Momentaneo::where("user_id",$request->user()->id)->whereNull('web_compra')->get();
 
         Momentaneo::whereIn('id', $butacas->pluck('id'))->delete();
         $this->auditoria->liberadas($butacas, 'venta cancelada o terminada');

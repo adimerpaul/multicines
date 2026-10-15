@@ -1,5 +1,6 @@
 /* MultiCines Plaza - compra de entradas: funcion, asientos, datos, QR y entrada.
-   Por ahora solo los asientos vienen del servidor; QR, pago y factura son diseno. */
+   Los asientos, la reserva y la venta van al servidor; el QR de pago aun es
+   diseno (pago simulado) hasta conectar el QR del banco. */
 (function () {
   'use strict';
 
@@ -60,7 +61,8 @@
       b.appendChild(el('span', 'funcion-h', f.hora));
       b.appendChild(el('span', 'funcion-d', f.formato + ' · ' + precioTxt(f.precio) + ' · ' + (f.sala || '')));
       if (f.ventaOnline === false) b.appendChild(el('span', 'funcion-tag', 'Solo boletería'));
-      b.addEventListener('click', function () { elegirFuncion(f); });
+      // Elegir funcion requiere sesion (login con Google)
+      b.addEventListener('click', function () { Cine.requerirLogin(function () { elegirFuncion(f); }); });
       cont.appendChild(b);
     });
   }
@@ -105,6 +107,7 @@
     }).catch(function (e) {
       if (id !== cargaId) return;
       cargando.hidden = true;
+      if (e.status === 401) { Cine.requerirLogin(function () { cargarSala(false); }); return; }
       if (!silencioso) {
         err.textContent = e.message || 'No se pudo cargar la sala';
         err.hidden = false;
@@ -169,44 +172,96 @@
     render();
   });
 
-  // ---------- Paso 4: QR (diseno) ----------
+  // ---------- Paso 4: reserva de asientos + QR de pago ----------
+  // "Ir a pagar" retiene los asientos en el servidor; si no se paga a tiempo
+  // (o se vuelve atras) se sueltan.
+  var errPago = $('[data-pago-error]');
+  var enviando = false;
+
+  function reservarYPagar() {
+    if (enviando) return;
+    enviando = true;
+    $('[data-siguiente]').disabled = true;
+    Cine.api(data.iniciarUrl, {
+      programa_id: estado.funcion.id,
+      asientos: estado.seleccion,
+      nit: campo('nit').value.trim(),
+      complemento: campo('complemento').value.trim(),
+      nombre: campo('nombre').value.trim(),
+      email: campo('email').value.trim()
+    }).then(function (res) {
+      estado.compra = res;
+      irPaso(3);
+    }).catch(function (e) {
+      if (e.status === 401) { Cine.requerirLogin(reservarYPagar); return; }
+      // Lo mas comun: alguien tomo uno de los asientos. Se vuelve a la sala.
+      irPaso(1);
+      var err = $('[data-sala-error]');
+      err.textContent = e.message || 'No se pudieron reservar los asientos';
+      err.hidden = false;
+    }).then(function () { enviando = false; render(); });
+  }
+
+  function soltarReserva() {
+    if (!estado.compra) return;
+    Cine.api(data.cancelarUrl, { token: estado.compra.token }).catch(function () {});
+    estado.compra = null;
+  }
+
   function iniciarQr() {
     clearInterval(timerQr);
-    var restante = QR_MINUTOS * 60;
+    errPago.hidden = true;
+    var restante = estado.compra ? estado.compra.expiraEn : QR_MINUTOS * 60;
     var t = $('[data-timer]');
     var pintar = function () { t.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0'); };
     pintar();
     timerQr = setInterval(function () {
       restante = Math.max(0, restante - 1);
       pintar();
-      if (!restante) clearInterval(timerQr);
+      if (!restante) {
+        clearInterval(timerQr);
+        soltarReserva();
+        irPaso(1);
+        var err = $('[data-sala-error]');
+        err.textContent = 'Se acabó el tiempo para pagar y tus asientos se liberaron. Vuelve a elegirlos.';
+        err.hidden = false;
+      }
     }, 1000);
-    $$('[data-qr]').forEach(function (q) { Cine.fakeQr(q, estado.funcion.id + estado.seleccion.join('')); });
+    // QR de pago: solo diseno hasta conectar el QR del banco
+    $$('[data-qr-pago]').forEach(function (q) { Cine.fakeQr(q, estado.compra ? estado.compra.token : ''); });
   }
-  $('[data-simular-pago]').addEventListener('click', function () {
-    clearInterval(timerQr);
-    estado.codigo = 'MP-' + (Cine.hash(Date.now() + '') % 900000 + 100000);
-    llenarEntrada();
-    irPaso(4);
+
+  var btnDemo = $('[data-simular-pago]');
+  if (btnDemo) btnDemo.addEventListener('click', function () {
+    if (!estado.compra || enviando) return;
+    enviando = true;
+    btnDemo.disabled = true;
+    errPago.hidden = true;
+    Cine.api(data.pagarDemoUrl, { token: estado.compra.token }).then(function (res) {
+      clearInterval(timerQr);
+      estado.compra = null;
+      llenarEntrada(res.entrada);
+      irPaso(4);
+    }).catch(function (e) {
+      errPago.textContent = e.message || 'No se pudo registrar el pago';
+      errPago.hidden = false;
+    }).then(function () { enviando = false; btnDemo.disabled = false; });
   });
 
-  // ---------- Paso 5: entrada + factura (diseno) ----------
-  function llenarEntrada() {
-    $('[data-codigo]').textContent = estado.codigo;
-    $$('[data-qr]').forEach(function (q) { Cine.fakeQr(q, estado.codigo); });
-    var fac = function (k, v) { $$('[data-fac="' + k + '"]').forEach(function (e) { e.textContent = v; }); };
-    fac('nit', campo('nit').value.trim() + (campo('complemento').value.trim() ? '-' + campo('complemento').value.trim() : ''));
-    fac('nombre', campo('nombre').value.trim());
-    fac('email', campo('email').value.trim() || 'tu correo');
-    fac('emision', new Date().toLocaleString('es-BO'));
-    fac('total', total().toFixed(2));
-    var det = $('[data-fac-detalle]');
-    det.textContent = '';
-    estado.seleccion.forEach(function (s) {
-      var tr = el('tr');
-      tr.appendChild(el('td', '', 'Entrada ' + s + ' · ' + estado.funcion.hora));
-      tr.appendChild(el('td', 'r', estado.precio.toFixed(2)));
-      det.appendChild(tr);
+  // ---------- Paso 5: entrada con QR real + recibo ----------
+  function llenarEntrada(e) {
+    var datos = Object.assign({}, e, {
+      subtotal: e.total.toFixed(2),
+      total: e.total.toFixed(2),
+      cantidad: String(e.cantidad),
+      numero: String(e.numero)
+    });
+    $$('[data-entrada] [data-e]').forEach(function (n) {
+      var v = datos[n.getAttribute('data-e')];
+      n.textContent = v == null ? '' : v;
+    });
+    $$('[data-entrada] [data-e-img]').forEach(function (img) {
+      img.src = datos[img.getAttribute('data-e-img')] || '';
     });
   }
 
@@ -228,13 +283,17 @@
   // pasos intermedios estan completos. A la entrada solo se llega pagando.
   function pasoAlcanzable(n) {
     if (estado.paso === 4) return n === 4;
+    if (n === 3) return estado.paso === 3; // al pago solo se entra reservando
     if (n <= estado.paso) return true;
     for (var i = 0; i < n; i++) if (!pasoCompleto(i)) return false;
     return true;
   }
 
   function irPaso(n) {
-    estado.paso = Math.max(0, Math.min(PASOS - 1, n));
+    n = Math.max(0, Math.min(PASOS - 1, n));
+    // Salir del pago sin pagar suelta los asientos retenidos
+    if (estado.paso === 3 && n < 3) soltarReserva();
+    estado.paso = n;
     clearInterval(timerSala);
     if (estado.paso !== 3) clearInterval(timerQr);
     if (estado.paso === 1) {
@@ -271,7 +330,7 @@
 
     var ok = puedeSeguir();
     var sig = $('[data-siguiente]');
-    sig.disabled = !ok;
+    sig.disabled = !ok || enviando;
     sig.textContent = estado.paso === 4 ? 'Volver al inicio' : estado.paso === 2 ? 'Ir a pagar' : 'Continuar';
     sig.hidden = estado.paso === 3;
     $('[data-atras]').classList.toggle('invisible', !(estado.paso > 0 && estado.paso < 4));
@@ -289,7 +348,13 @@
   $('[data-siguiente]').addEventListener('click', function () {
     if (!puedeSeguir()) return;
     if (estado.paso === 4) { location.href = data.inicioUrl; return; }
-    irPaso(estado.paso + 1);
+    if (estado.paso === 2) {
+      guardarDatosCliente();
+      Cine.requerirLogin(reservarYPagar);
+      return;
+    }
+    var siguiente = estado.paso + 1;
+    Cine.requerirLogin(function () { irPaso(siguiente); });
   });
   $('[data-atras]').addEventListener('click', function () { irPaso(estado.paso - 1); });
   $$('[data-tab]').forEach(function (t) {
@@ -302,11 +367,35 @@
     b.addEventListener('click', function () { elegirDia(b.getAttribute('data-dia')); render(); });
   });
 
+  // ---------- Cliente: autocompletar y guardar datos de facturacion ----------
+  function prellenar(c) {
+    if (!c) return;
+    if (!campo('nit').value && c.nit) campo('nit').value = c.nit;
+    if (!campo('complemento').value && c.complemento) campo('complemento').value = c.complemento;
+    if (!campo('nombre').value && (c.razonSocial || c.nombre)) campo('nombre').value = c.razonSocial || c.nombre;
+    if (!campo('email').value && c.email) campo('email').value = c.email;
+    render();
+  }
+  function guardarDatosCliente() {
+    if (!Cine.cliente()) return;
+    Cine.api(Cine.auth.datosUrl, {
+      nit: campo('nit').value.trim(),
+      complemento: campo('complemento').value.trim(),
+      nombre: campo('nombre').value.trim()
+    }).then(function (res) { if (res.cliente) Cine.auth.cliente = res.cliente; }).catch(function () {});
+  }
+  document.addEventListener('cine:login', function (e) { prellenar(e.detail); });
+
   // ---------- Inicio ----------
   var inicial = data.funciones.filter(function (f) { return f.id === data.funcionInicial; })[0];
-  if (inicial) {
+  prellenar(Cine.cliente());
+  if (inicial && Cine.cliente()) {
     elegirFuncion(inicial);
     irPaso(1);
+  } else if (inicial) {
+    // Viene con funcion en la URL pero sin sesion: se muestra el dia y se pide login al elegir
+    elegirDia(inicial.fecha);
+    render();
   } else if (data.funciones.length) {
     var dia = funcionesDelDia(data.diaInicial).length ? data.diaInicial : data.funciones[0].fecha;
     elegirDia(dia);

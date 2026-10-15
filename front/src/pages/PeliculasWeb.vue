@@ -41,9 +41,15 @@
 
           <template v-slot:body-cell-estado="props">
             <q-td :props="props">
-              <q-chip dense :color="props.row.estado === 'ACTIVO' ? 'positive' : 'negative'" text-color="white">
-                {{ props.row.estado || 'INACTIVO' }}
-              </q-chip>
+              <q-toggle
+                dense
+                color="positive"
+                :model-value="props.row.estado === 'ACTIVO'"
+                :label="props.row.estado === 'ACTIVO' ? 'Activo' : 'Inactivo'"
+                @update:model-value="(val) => toggleEstado(props.row, val)"
+              >
+                <q-tooltip>{{ props.row.estado === 'ACTIVO' ? 'Se muestra en la web' : 'Oculta en la web' }}</q-tooltip>
+              </q-toggle>
             </q-td>
           </template>
 
@@ -150,7 +156,15 @@
                       ]"
                     />
                   </div>
-                  <div class="col-12 col-sm-4"><q-select dense outlined label="Estado" v-model="form.estado" :options="['ACTIVO', 'INACTIVO']" /></div>
+                  <div class="col-12 col-sm-4 row items-center">
+                    <q-toggle
+                      v-model="form.estado"
+                      true-value="ACTIVO"
+                      false-value="INACTIVO"
+                      color="positive"
+                      :label="form.estado === 'ACTIVO' ? 'Activo (se ve en la web)' : 'Inactivo (oculta en la web)'"
+                    />
+                  </div>
                   <div class="col-12 col-sm-4">
                     <q-select dense outlined label="Carrusel" v-model="form.carrusel_tipo"
                       :options="[
@@ -893,6 +907,20 @@ export default {
         this.$q.notify({ color: 'negative', icon: 'error', message: e?.response?.data?.message || 'No se pudo guardar' });
       } finally {
         this.loading = false;
+      }
+    },
+    async toggleEstado(row, activo) {
+      try {
+        const res = await this.$api.post('webMovie/' + row.id + '/estado', { estado: activo ? 'ACTIVO' : 'INACTIVO' });
+        const i = this.rows.findIndex((x) => x.id === row.id);
+        if (i !== -1) this.rows[i] = res.data;
+        this.$q.notify({
+          color: activo ? 'positive' : 'warning',
+          icon: activo ? 'visibility' : 'visibility_off',
+          message: (activo ? 'Activa en la web: ' : 'Oculta en la web: ') + row.titulo,
+        });
+      } catch (e) {
+        this.$q.notify({ color: 'negative', icon: 'error', message: e?.response?.data?.message || 'No se pudo cambiar el estado' });
       }
     },
     async toggleVentaOnline(row, value) {

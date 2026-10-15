@@ -73,6 +73,11 @@ class CineController extends Controller
                 'diaInicial' => (string) $request->query('dia', ''),
                 'asientosUrl' => route('cine.asientos'),
                 'inicioUrl' => route('cine.home'),
+                'iniciarUrl' => route('cine.compra.iniciar'),
+                'cancelarUrl' => route('cine.compra.cancelar'),
+                'pagarDemoUrl' => route('cine.compra.demo'),
+                'comprasUrl' => route('cine.compras'),
+                'pagoDemo' => (bool) config('services.cine.pago_demo'),
             ],
         ]);
     }
@@ -83,6 +88,11 @@ class CineController extends Controller
      */
     public function asientos(Request $request)
     {
+        // Para elegir funcion/asientos el cliente debe haber iniciado sesion
+        if (!CineAuthController::clienteActual($request)) {
+            return response()->json(['message' => 'Inicia sesion para elegir tus asientos', 'login' => true], 401);
+        }
+
         $data = $request->validate(['programa_id' => 'required|integer|min:1']);
 
         $programa = Programa::with('sala', 'price', 'movie')

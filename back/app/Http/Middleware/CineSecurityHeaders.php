@@ -18,12 +18,14 @@ class CineSecurityHeaders
 
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self'",
+            // gstatic/apis.google.com: SDK de Firebase y popup de Google (solo login)
+            "script-src 'self' https://www.gstatic.com https://apis.google.com",
             "style-src 'self' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com",
-            "img-src 'self' data:",
-            "connect-src 'self'",
-            "frame-src https://www.youtube-nocookie.com",
+            "img-src 'self' data: https://lh3.googleusercontent.com",
+            // www.gstatic.com: los .map del SDK de Firebase que pide DevTools
+            "connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://www.gstatic.com",
+            "frame-src https://www.youtube-nocookie.com https://" . (config('services.firebase.auth_domain') ?: 'localhost'),
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",

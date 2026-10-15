@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CineAuthController;
+use App\Http\Controllers\CineCompraController;
 use App\Http\Controllers\CineController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,4 +24,19 @@ Route::middleware('cine.headers')->group(function () {
     Route::post('/cine/asientos', [CineController::class, 'asientos'])
         ->middleware(['cine.token', 'throttle:60,1'])
         ->name('cine.asientos');
+
+    // Login de clientes web (Google via Firebase; los datos quedan en web_clientes)
+    Route::middleware(['cine.token', 'throttle:20,1'])->group(function () {
+        Route::post('/cine/login', [CineAuthController::class, 'login'])->name('cine.login');
+        Route::post('/cine/logout', [CineAuthController::class, 'logout'])->name('cine.logout');
+        Route::post('/cine/cliente/datos', [CineAuthController::class, 'guardarDatos'])->name('cine.cliente.datos');
+    });
+
+    // Compra de entradas (reserva de asientos, pago y registro en sales)
+    Route::get('/mis-compras', [CineCompraController::class, 'misCompras'])->name('cine.compras');
+    Route::middleware(['cine.token', 'throttle:20,1'])->group(function () {
+        Route::post('/cine/compra/iniciar', [CineCompraController::class, 'iniciar'])->name('cine.compra.iniciar');
+        Route::post('/cine/compra/cancelar', [CineCompraController::class, 'cancelar'])->name('cine.compra.cancelar');
+        Route::post('/cine/compra/pagar-demo', [CineCompraController::class, 'pagarDemo'])->name('cine.compra.demo');
+    });
 });

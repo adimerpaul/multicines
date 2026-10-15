@@ -305,6 +305,17 @@
             expand-icon="null"
             v-if="store.booltodoventa"
           />
+          <q-expansion-item
+            dense
+            exact
+            :header-inset-level="1"
+            expand-separator
+            icon="o_qr_code_scanner"
+            label="Verificar entradas web"
+            default-opened
+            to="verificarEntrada"
+            expand-icon="null"
+          />
         </q-expansion-item>
         <q-expansion-item
           expand-separator

@@ -274,6 +274,17 @@ class WebMovieController extends Controller
         return $this->show($webMovie);
     }
 
+    public function toggleEstado(Request $request, WebMovie $webMovie)
+    {
+        $data = $request->validate([
+            'estado' => 'required|in:ACTIVO,INACTIVO',
+        ]);
+
+        $webMovie->update(['estado' => $data['estado']]);
+
+        return $this->show($webMovie);
+    }
+
     private function validatePayload(Request $request): array
     {
         return $request->validate([

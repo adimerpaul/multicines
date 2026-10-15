@@ -187,70 +187,30 @@
                     </label>
                 </form>
 
-                {{-- 4. Pago QR (solo diseno) --}}
+                {{-- 4. Pago QR: los asientos quedan retenidos mientras corre el tiempo --}}
                 <div class="qr-pay" data-paso="3" hidden>
-                    <div class="qr-box"><div class="qr qr-lg" data-qr></div></div>
+                    <div class="qr-box"><div class="qr qr-lg" data-qr-pago></div></div>
                     <div class="qr-info">
                         <div class="label-sec">PAGO CON QR</div>
                         <div class="qr-total" data-sum="total">Bs. 0</div>
                         <p>Abre la app de tu banco, elige “Pagar con QR” y escanea el código. La confirmación es automática.</p>
-                        <div class="esperando"><i></i>Esperando pago · expira en <span data-timer>5:00</span></div>
-                        <button type="button" class="btn-demo" data-simular-pago>Simular pago confirmado (demo)</button>
+                        <div class="esperando"><i></i>Tus asientos están reservados · expira en <span data-timer>10:00</span></div>
+                        <div class="aviso aviso-err" data-pago-error hidden></div>
+                        @if($cineData['pagoDemo'])
+                            <button type="button" class="btn-demo" data-simular-pago>Simular pago confirmado (prueba)</button>
+                        @else
+                            <div class="aviso">El pago QR en línea se activará pronto. Por ahora compra en boletería.</div>
+                        @endif
                     </div>
                 </div>
 
-                {{-- 5. Entrada + factura (solo diseno) --}}
+                {{-- 5. Entrada (QR real para la puerta) + recibo --}}
                 <div class="entrada-wrap" data-paso="4" hidden>
-                    <div class="ok">¡PAGO CONFIRMADO! <span class="demo-sello">DEMO</span></div>
-                    <div class="docs">
-                        <div class="ticket">
-                            <div class="ticket-head">
-                                <img src="{{ $pelicula['poster'] }}" alt="">
-                                <div>
-                                    <div class="ticket-t">{{ $pelicula['titulo'] }}</div>
-                                    <div class="ticket-s">MULTICINES PLAZA · ORURO</div>
-                                </div>
-                            </div>
-                            <div class="ticket-grid">
-                                <div><small>Fecha</small><b data-sum="fecha">—</b></div>
-                                <div><small>Hora</small><b data-sum="hora">—</b></div>
-                                <div><small>Sala</small><b data-sum="sala">—</b></div>
-                                <div><small>Asientos</small><b data-sum="asientos">—</b></div>
-                            </div>
-                            <div class="ticket-cut"></div>
-                            <div class="ticket-code">
-                                <div class="qr qr-sm" data-qr></div>
-                                <div>
-                                    <small>Código de entrada</small>
-                                    <span class="mono" data-codigo>—</span>
-                                    <small>Total pagado <span data-sum="total">Bs. 0</span></small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="factura">
-                            <h4>FACTURA</h4>
-                            <div class="c">CON DERECHO A CRÉDITO FISCAL</div>
-                            <div class="c">MULTICINES PLAZA · Oruro</div>
-                            <hr>
-                            <table>
-                                <tr><td>NIT/CI</td><td class="r" data-fac="nit">0</td></tr>
-                                <tr><td>Nombre</td><td class="r" data-fac="nombre">S/N</td></tr>
-                                <tr><td>Fecha</td><td class="r" data-fac="emision">—</td></tr>
-                            </table>
-                            <hr>
-                            <table data-fac-detalle></table>
-                            <hr>
-                            <table>
-                                <tr class="tot"><td>TOTAL Bs</td><td class="r" data-fac="total">0.00</td></tr>
-                            </table>
-                            <div class="factura-qr"><div class="qr qr-sm" data-qr></div></div>
-                            <hr>
-                            <div class="ley">Vista de ejemplo. La factura real se emitirá cuando se active el pago en línea.</div>
-                        </div>
-                    </div>
-                    <p class="nota">Enviaremos tu entrada y factura a <strong data-fac="email">tu correo</strong></p>
+                    <div class="ok">¡COMPRA REGISTRADA!</div>
+                    @include('cine.partials.entrada', ['e' => null])
+                    <p class="nota">Muestra este QR en la entrada de la sala. También lo tienes en <a href="{{ route('cine.compras') }}">Mis compras</a>.</p>
                 </div>
+
 
                 <div class="pie-pasos">
                     <button type="button" class="btn btn-outline invisible" data-atras>Atrás</button>

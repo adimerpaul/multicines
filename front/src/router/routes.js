@@ -61,6 +61,7 @@ const routes = [
       { path: 'factura', component: Factura ,meta: { requiresAuth: true } },
       { path: 'pagos', component: Pagos ,meta: { requiresAuth: true } },
       { path: 'boletosDuplicados', component: () => import('pages/BoletosDuplicados.vue') ,meta: { requiresAuth: true } },
+      { path: 'verificarEntrada', component: () => import('pages/VerificarEntrada.vue') ,meta: { requiresAuth: true } },
       { path: 'anulaciones', component: () => import('pages/Anulaciones.vue') ,meta: { requiresAuth: true } },
     ]
   },

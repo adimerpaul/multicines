@@ -55,6 +55,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('webMovieProgramaciones', [\App\Http\Controllers\WebMovieController::class, 'listProgramaciones']);
     Route::post('webMovie/{webMovie}/syncProgramaciones', [\App\Http\Controllers\WebMovieController::class, 'syncProgramaciones']);
     Route::post('webMovie/{webMovie}/ventaOnline', [\App\Http\Controllers\WebMovieController::class, 'toggleVentaOnline']);
+    Route::post('webMovie/{webMovie}/estado', [\App\Http\Controllers\WebMovieController::class, 'toggleEstado']);
     Route::resource('cortesia', \App\Http\Controllers\CortesiaController::class);
     Route::get('free', [\App\Http\Controllers\CortesiaController::class,'free']);
     Route::resource('distributor', \App\Http\Controllers\DistributorController::class);
@@ -150,6 +151,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('revertirAnularRental', [\App\Http\Controllers\RentalController::class, 'revertirAnularRental']);
     Route::post('cambioPago', [\App\Http\Controllers\SaleController::class,'cambioPago']);
+    Route::post('entradaWeb/buscar', [\App\Http\Controllers\EntradaWebController::class, 'buscar']);
+    Route::post('entradaWeb/verificar', [\App\Http\Controllers\EntradaWebController::class, 'verificar']);
     Route::post('boletosDuplicados/funciones', [\App\Http\Controllers\BoletosDuplicadosController::class, 'funciones']);
     Route::post('boletosDuplicados/boletos', [\App\Http\Controllers\BoletosDuplicadosController::class, 'boletos']);
 });

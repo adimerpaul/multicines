@@ -52,7 +52,7 @@ trait BoletosDeVenta
      */
     protected function validarButacasVenta(User $user, array $detalleVenta): ?string
     {
-        $momentaneos = Momentaneo::where('user_id', $user->id)->get();
+        $momentaneos = Momentaneo::where('user_id', $user->id)->whereNull('web_compra')->get();
         if ($momentaneos->isEmpty()) {
             return 'No hay butacas reservadas para esta venta. Puede que ya se haya vendido: revise la lista de ventas antes de volver a cobrar.';
         }
@@ -105,7 +105,7 @@ trait BoletosDeVenta
         $conLock = $tomado && intval($tomado->tomado) === 1;
 
         try {
-            $momentaneos = Momentaneo::where('user_id', $user->id)->get();
+            $momentaneos = Momentaneo::where('user_id', $user->id)->whereNull('web_compra')->get();
             $data = [];
             $ultimoNumero = []; // programa_id => ultimo numero de boleto usado
             $yaEnLote = [];     // butacas ya incluidas en este mismo insert
@@ -198,7 +198,7 @@ trait BoletosDeVenta
 
             // Los asientos ya son boletos: se sueltan para que la siguiente
             // venta del usuario no los vuelva a arrastrar.
-            Momentaneo::where('user_id', $user->id)->delete();
+            Momentaneo::where('user_id', $user->id)->whereNull('web_compra')->delete();
         } finally {
             if ($conLock) {
                 DB::selectOne('SELECT RELEASE_LOCK(?) AS liberado', [$lock]);
