@@ -102,7 +102,7 @@ class FacturaController extends Controller{
                 $client = new \SoapClient(env("URL_SIAT")."ServicioFacturacionCompraVenta?WSDL",  [
                     'stream_context' => stream_context_create([
                         'http' => [
-                            'header' => "apikey: TokenApi " . env('TOKEN'),
+                            'header' => "apikey: TokenApi " . \App\Models\SiatToken::actual(),
                         ]
                     ]),
                     'cache_wsdl' => WSDL_CACHE_NONE,

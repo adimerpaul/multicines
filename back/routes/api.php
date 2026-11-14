@@ -61,6 +61,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::resource('distributor', \App\Http\Controllers\DistributorController::class);
     Route::resource('sala', \App\Http\Controllers\SalaController::class);
     Route::resource('cui', \App\Http\Controllers\CuiController::class);
+    Route::get('certificado', [\App\Http\Controllers\CertificadoController::class, 'index']);
+    Route::post('certificado', [\App\Http\Controllers\CertificadoController::class, 'store']);
+    Route::post('certificado/{certificado}/activar', [\App\Http\Controllers\CertificadoController::class, 'activar']);
+    Route::delete('certificado/{certificado}', [\App\Http\Controllers\CertificadoController::class, 'destroy']);
+    Route::get('siatToken', [\App\Http\Controllers\SiatTokenController::class, 'index']);
+    Route::post('siatToken', [\App\Http\Controllers\SiatTokenController::class, 'store']);
+    Route::post('siatToken/{siatToken}/activar', [\App\Http\Controllers\SiatTokenController::class, 'activar']);
+    Route::delete('siatToken/{siatToken}', [\App\Http\Controllers\SiatTokenController::class, 'destroy']);
     Route::resource('price', \App\Http\Controllers\PriceController::class);
     Route::resource('programa', \App\Http\Controllers\ProgramaController::class);
     Route::resource('cufd', \App\Http\Controllers\CufdController::class);

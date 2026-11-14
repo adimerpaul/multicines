@@ -15,7 +15,8 @@ class CuiController extends Controller
      */
     public function index()
     {
-        return Cui::orderBy('id','desc')->get();
+        // Incluye los dados de baja para mostrarlos en el historial
+        return Cui::withTrashed()->with('userBaja:id,name')->orderBy('id','desc')->get();
     }
 
     /**
@@ -42,7 +43,7 @@ class CuiController extends Controller
             $client = new \SoapClient(env("URL_SIAT")."FacturacionCodigos?WSDL",  [
                 'stream_context' => stream_context_create([
                     'http' => [
-                        'header' => "apikey: TokenApi ".env('TOKEN'),
+                        'header' => "apikey: TokenApi ".\App\Models\SiatToken::actual(),
                     ]
                 ]),
                 'cache_wsdl' => WSDL_CACHE_NONE,
@@ -61,14 +62,29 @@ class CuiController extends Controller
                     "nit"=>env('NIT'),
                 ]
             ]);
+            $respuesta = $result->RespuestaCuis;
+            $mensajes = [];
+            if (isset($respuesta->mensajesList)) {
+                $lista = is_array($respuesta->mensajesList) ? $respuesta->mensajesList : [$respuesta->mensajesList];
+                foreach ($lista as $m) {
+                    $mensajes[] = $m->descripcion ?? '';
+                }
+            }
+            if (empty($respuesta->codigo)) {
+                return response()->json(['message' => 'El SIAT no devolvió un CUIS: ' . (implode(' / ', $mensajes) ?: 'sin detalle')], 400);
+            }
             $cui = new Cui();
-            $cui->codigo = $result->RespuestaCuis->codigo;
+            $cui->codigo = $respuesta->codigo;
             $cui->fechaVigencia =  date('Y-m-d H:i:s', strtotime($result->RespuestaCuis->fechaVigencia));
             $cui->codigoPuntoVenta = $request->codigoPuntoVenta;
             $cui->codigoSucursal = $request->codigoSucursal;
             $cui->fechaCreacion= date('Y-m-d H:i:s');
             $cui->save();
-            return response()->json(['success' => 'CUI creado correctamente'], 200);
+            return response()->json([
+                'success' => 'CUI creado correctamente',
+                'codigo' => $cui->codigo,
+                'mensaje' => implode(' / ', array_filter($mensajes)),
+            ], 200);
         }
     }
 
@@ -112,8 +128,24 @@ class CuiController extends Controller
      * @param  \App\Models\Cui  $cui
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Cui $cui)
+    /**
+     * Dar de baja un CUIS: deja de usarse para facturar (soft delete, ya que todas las
+     * consultas de CUIS excluyen los eliminados) pero queda en el historial con el motivo.
+     */
+    public function destroy(\Illuminate\Http\Request $request, Cui $cui)
     {
-        //
+        abort_unless(
+            $request->user()->permisos()->where('permisos.id', 2)->exists(),
+            403,
+            'No tiene permiso para dar de baja el CUIS'
+        );
+        $request->validate(['motivo' => 'required|string|max:255']);
+
+        $cui->motivoBaja = $request->motivo;
+        $cui->userBaja_id = $request->user()->id;
+        $cui->save();
+        $cui->delete();
+
+        return response()->json(['message' => 'CUIS dado de baja']);
     }
 }

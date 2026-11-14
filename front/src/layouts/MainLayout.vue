@@ -113,7 +113,9 @@
             store.boolcuis ||
             store.boolsincr ||
             store.boolcufd ||
-            store.boolevento
+            store.boolevento ||
+            store.boolcertificado ||
+            store.booltokensiat
           "
         >
           <q-expansion-item
@@ -121,12 +123,12 @@
             exact
             :header-inset-level="1"
             expand-separator
-            icon="o_psychology"
-            label="Cuis"
+            icon="o_event_available"
+            label="Vigencias (CUIS, firma, token)"
             default-opened
-            to="cuis"
+            to="vigencias"
             expand-icon="null"
-            v-if="store.boolcuis"
+            v-if="store.boolcuis || store.boolcertificado || store.booltokensiat"
           />
           <q-expansion-item
             dense
@@ -531,6 +533,8 @@ export default {
             globalStore().boolcliente = false;
             globalStore().boolcortesia = false;
             globalStore().boolpagos = false;
+            globalStore().boolcertificado = false;
+            globalStore().booltokensiat = false;
           });
         })
         .onCancel(() => {});

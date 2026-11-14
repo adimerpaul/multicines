@@ -2,7 +2,7 @@ import IndexPage from "pages/IndexPage";
 import Peliculas from "pages/Peliculas";
 import PeliculasWeb from "pages/PeliculasWeb";
 import Distribuidores from "pages/Distribuidores";
-import Cuis from "pages/Cuis";
+import VigenciasSiat from "pages/VigenciasSiat";
 import Sincronizacion from "pages/Sincronizacion";
 import Salas from "pages/Salas";
 import Tarifas from "pages/Tarifas";
@@ -37,7 +37,10 @@ const routes = [
       { path: 'peliculas', component: Peliculas ,meta: { requiresAuth: true } },
       { path: 'peliculas-web', component: PeliculasWeb ,meta: { requiresAuth: true } },
       { path: 'distribuidores', component: Distribuidores ,meta: { requiresAuth: true } },
-      { path: 'cuis', component: Cuis ,meta: { requiresAuth: true } },
+      { path: 'vigencias', component: VigenciasSiat ,meta: { requiresAuth: true } },
+      { path: 'cuis', redirect: { path: '/vigencias', query: { tab: 'cuis' } } },
+      { path: 'certificados', redirect: { path: '/vigencias', query: { tab: 'certificados' } } },
+      { path: 'token-siat', redirect: { path: '/vigencias', query: { tab: 'tokens' } } },
       { path: 'cufd', component: Cufd ,meta: { requiresAuth: true } },
       { path: 'sincronizacion', component: Sincronizacion ,meta: { requiresAuth: true } },
       { path: 'salas', component: Salas ,meta: { requiresAuth: true } },

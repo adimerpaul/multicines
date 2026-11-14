@@ -16,5 +16,12 @@ class Cui extends Model
         'fechaCreacion',
         'codigoPuntoVenta',
         'codigoSucursal',
+        'motivoBaja',
+        'userBaja_id',
     ];
+
+    public function userBaja()
+    {
+        return $this->belongsTo(User::class, 'userBaja_id');
+    }
 }

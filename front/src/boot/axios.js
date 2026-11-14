@@ -66,6 +66,8 @@ export default boot(({ app,router }) => {
           if(r.id==29) globalStore().booltipopago=true
           if(r.id==30) globalStore().boolpagos=true
           if(r.id==31) globalStore().boolvincularpago=true
+          if(r.id==32) globalStore().boolcertificado=true
+          if(r.id==33) globalStore().booltokensiat=true
 
       });
     }).catch((error) => {
@@ -104,6 +106,8 @@ export default boot(({ app,router }) => {
       globalStore().booltipopago=false
       globalStore().boolpagos=false
       globalStore().boolvincularpago=false
+      globalStore().boolcertificado=false
+      globalStore().booltokensiat=false
       router.push('/login')
     })
   }else {
@@ -141,6 +145,8 @@ export default boot(({ app,router }) => {
     globalStore().booltipopago=false
     globalStore().boolpagos=false
     globalStore().boolvincularpago=false
+    globalStore().boolcertificado=false
+    globalStore().booltokensiat=false
     localStorage.removeItem('tokenMulti')
     globalStore().isLoggedIn=false
   }

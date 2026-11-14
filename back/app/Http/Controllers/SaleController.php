@@ -496,7 +496,7 @@ class SaleController extends Controller
                     $clientSoap = new \SoapClient(env("URL_SIAT") . "ServicioFacturacionCompraVenta?WSDL", [
                         'stream_context' => stream_context_create([
                             'http' => [
-                                'header' => "apikey: TokenApi " . env('TOKEN'),
+                                'header' => "apikey: TokenApi " . \App\Models\SiatToken::actual(),
                             ]
                         ]),
                         'cache_wsdl' => WSDL_CACHE_NONE,
@@ -583,7 +583,7 @@ class SaleController extends Controller
         }
     }
     public function revertirAnularSale(Request $request){
-                $token= env('TOKEN');
+                $token= \App\Models\SiatToken::actual();
 
         $sale=Sale::find($request->id);
         $codigoAmbiente=env('AMBIENTE');
@@ -1038,7 +1038,7 @@ class SaleController extends Controller
             $client = new \SoapClient(env("URL_SIAT") . "ServicioFacturacionCompraVenta?WSDL", [
                 'stream_context' => stream_context_create([
                     'http' => [
-                        'header' => "apikey: TokenApi " . env('TOKEN'),
+                        'header' => "apikey: TokenApi " . \App\Models\SiatToken::actual(),
                     ]
                 ]),
                 'cache_wsdl' => WSDL_CACHE_NONE,
@@ -1133,7 +1133,7 @@ class SaleController extends Controller
             $client = new \SoapClient(env("URL_SIAT") . "ServicioFacturacionCompraVenta?WSDL", [
                 'stream_context' => stream_context_create([
                     'http' => [
-                        'header' => "apikey: TokenApi " . env('TOKEN'),
+                        'header' => "apikey: TokenApi " . \App\Models\SiatToken::actual(),
                     ]
                 ]),
                 'cache_wsdl' => WSDL_CACHE_NONE,
@@ -1965,7 +1965,7 @@ class SaleController extends Controller
         $client = new \SoapClient(env("URL_SIAT") . "FacturacionCodigos?WSDL", [
             'stream_context' => stream_context_create([
                 'http' => [
-                    'header' => "apikey: TokenApi " . env('TOKEN'),
+                    'header' => "apikey: TokenApi " . \App\Models\SiatToken::actual(),
                 ]
             ]),
             'cache_wsdl' => WSDL_CACHE_NONE,
